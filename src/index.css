@@ -2,5 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-family: "Montserrat", sans-serif;
+  --bg-primary: #ff5252;
+  --bg-primary-lite: #ff52520d;
 
+}
 
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+  }
+  
+  
+  body {
+  font-family: var(--font-family);
+  font-optical-sizing: auto;
+  background-color: #F5F0F0;
+}
+
+/* --------  Top strip of Page -------- */
+.container {
+  width: 95%;
+  margin: auto;
+}
+
+.link:hover {
+  color: var(--bg-primary);
+}
+
+.MuiBadge-badge{
+  background-color: var(--bg-primary) !important;
+} 
+
+button{
+  font-family: var(--font-family) !important;
+}
+button:hover{
+  /* background: var(--bg-primary-lite) !important; */
+  background: none !important;
+}
+nav ul button{
+  text-transform: capitalize !important;
+}
+nav ul button:hover{
+  background: none !important;
+}
