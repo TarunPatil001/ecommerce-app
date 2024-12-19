@@ -41,7 +41,7 @@ button{
 }
 button:hover{
   /* background: var(--bg-primary-lite) !important; */
-  background: none !important;
+  /* background: none !important; */
 }
 nav ul button{
   text-transform: capitalize !important;

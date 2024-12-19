@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import "./style.css"
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Divider from "@mui/material/Divider";
 import { Button } from "@mui/material";
 import { FaRegSquareMinus, FaRegSquarePlus } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { TfiClose } from "react-icons/tfi";
-import "./style.css"
+import PropTypes from "prop-types";
+import { RxCross2 } from "react-icons/rx";
 
 const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
   const [submenuOpen, setSubmenuOpen] = useState({});
@@ -38,11 +39,11 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
 
   const DrawerList = () => (
     <Box sx={{ width: 315 }} role="presentation" className="categoryPanel">
-      <h3 className="p-3 ml-3 text-[16px] font-[500] flex items-center justify-between">
+      <h3 className="p-3 ml-3 text-[16px] font-[600] flex items-center justify-between">
         Shop By Categories{" "}
-        <TfiClose
+        <RxCross2 
           onClick={toggleDrawer}
-          className="cursor-pointer text-[15px]"
+          className="cursor-pointer text-[25px] hover:text-red-600"
         />
       </h3>
       <Divider />
@@ -248,6 +249,11 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
       <DrawerList />
     </Drawer>
   );
+};
+
+CategoryPanel.propTypes = {
+  isOpenPanel: PropTypes.bool.isRequired,
+  openCategoryPanel: PropTypes.func.isRequired,
 };
 
 export default CategoryPanel;

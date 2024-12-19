@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import "./style.css";
+import { useState } from "react";
 import Button from "@mui/material/Button";
 import { RiMenu2Fill } from "react-icons/ri";
 import { LiaAngleDownSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import { GoRocket } from "react-icons/go";
 import CategoryPanel from "./CategoryPanel";
-import "./style.css";
 
 const Navigation = () => {
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
@@ -49,7 +49,7 @@ const Navigation = () => {
                   </Button>
                 </Link>
 
-                <div className="submenu absolute top-[120%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all !rounded-md">
+                <div className="submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all !rounded-md">
                   <ul>
                     <li className="list-none w-full relative">
                       <Link to="/" className="w-full">

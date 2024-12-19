@@ -2,6 +2,14 @@
     text-transform: capitalize !important;
 }
 
+nav .col_1 button:hover{
+    background-color: var(--bg-primary-lite) !important;
+}
+
+button{
+    background: none !important; 
+}
+
 .nav li .submenu{visibility: hidden;}
 .nav li .submenu{font-weight: 400 !important;}
 .nav li:hover .submenu{opacity: 1 !important; visibility: inherit;}
