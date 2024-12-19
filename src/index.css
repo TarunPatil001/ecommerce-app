@@ -20,6 +20,7 @@
   font-family: var(--font-family);
   font-optical-sizing: auto;
   background-color: #F5F0F0;
+  overflow-x: hidden;
 }
 
 /* --------  Top strip of Page -------- */
@@ -29,7 +30,7 @@
 }
 
 .link:hover {
-  color: var(--bg-primary);
+  color: var(--bg-primary) !important;
 }
 
 .MuiBadge-badge{
@@ -39,13 +40,64 @@
 button{
   font-family: var(--font-family) !important;
 }
-button:hover{
-  /* background: var(--bg-primary-lite) !important; */
-  /* background: none !important; */
-}
+
 nav ul button{
   text-transform: capitalize !important;
 }
 nav ul button:hover{
   background: none !important;
+}
+
+/* ---------- Big Banner Slider ---------- */
+.sliderHome{
+  overflow: inherit !important;
+}
+
+.swiper-button-prev, .swiper-button-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  border-radius: 100%;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
+  box-shadow: 0 1px 3px #0000001f,0 1px 2px #0000003d !important;
+}
+
+.swiper-button-prev::after, .swiper-button-next::after{
+  font-size: 25px !important;
+  font-weight: bold;
+  color: #000;
+}
+
+/* ---------- Product Category Slider ---------- */
+.homeCatSlider .swiper{
+  overflow: inherit !important;
+}
+.homeCatSlider .swiper-button-prev, .homeCatSlider .swiper-button-next {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+}
+.homeCatSlider .swiper-button-prev::after, .homeCatSlider .swiper-button-next::after {
+  font-size: 18px !important;
+}
+
+.homeCatSlider .swiper-button-prev{left: -10px !important;}
+.homeCatSlider .swiper-button-next{right: -10px !important;}
+
+.homeCatSlider .swiper-button-prev:hover, .homeCatSlider .swiper-button-next:hover{
+  background: var(--bg-primary) !important;
+}
+.homeCatSlider .swiper-button-prev:hover::after, .homeCatSlider .swiper-button-next:hover::after{
+  color: #fff !important;
+}
+
+.homeCatSlider .item:hover img{
+  transform: scale(1.1);
 }

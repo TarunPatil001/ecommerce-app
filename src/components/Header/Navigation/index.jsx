@@ -6,6 +6,7 @@ import { LiaAngleDownSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import { GoRocket } from "react-icons/go";
 import CategoryPanel from "./CategoryPanel";
+import { IoIosArrowForward } from "react-icons/io";
 
 const Navigation = () => {
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
@@ -41,7 +42,7 @@ const Navigation = () => {
               </li>
               <li className="list-none relative">
                 <Link
-                  to="/fashion"
+                  to="/"
                   className="link transition text-[14px] font-[500]"
                 >
                   <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
@@ -49,15 +50,16 @@ const Navigation = () => {
                   </Button>
                 </Link>
 
-                <div className="submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all !rounded-md">
+                <div className="submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                   <ul>
                     <li className="list-none w-full relative">
                       <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                        <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
                           Men
+                          <IoIosArrowForward />
                         </Button>
 
-                        <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all !rounded-md">
+                        <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                           <ul>
                             <li className="list-none w-full">
                               <Link to="/" className="w-full">

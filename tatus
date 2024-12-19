@@ -1,0 +1,17 @@
+[33mcommit d04184288c1a515a6c266c24734b8d691a1791a8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Tarun Patil <tarunpatil001@gmail.com>
+Date:   Thu Dec 19 11:11:00 2024 +0530
+
+    lint errors removed : unnecessary imports and props error resolved, button hover in navigation applied
+
+[33mcommit 26dc543880c29391abddf28e4fd22a96bbccb58a[m
+Author: Tarun Patil <tarunpatil001@gmail.com>
+Date:   Thu Dec 19 01:34:11 2024 +0530
+
+    Header Design Complete : includes top-strip, header section(logo, search bar, register, login, compare, wishlist, cart), navigation, sidePanel.
+
+[33mcommit ed91371d724f071268a9a4f3b8054bb2a0ca0d85[m
+Author: Tarun Patil <tarunpatil001@gmail.com>
+Date:   Tue Dec 17 15:09:37 2024 +0530
+
+    Base files of project created.

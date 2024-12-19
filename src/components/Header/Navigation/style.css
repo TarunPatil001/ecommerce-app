@@ -10,9 +10,9 @@ button{
     background: none !important; 
 }
 
-.nav li .submenu{visibility: hidden;}
+.nav li .submenu{visibility: hidden; z-index: 1000;}
 .nav li .submenu{font-weight: 400 !important;}
-.nav li:hover .submenu{opacity: 1 !important; visibility: inherit;}
+.nav li:hover .submenu{ opacity: 1 !important; visibility: inherit; transition: all 0.3s ease-in-out; -webkit-transition: all 0.3s ease-in-out ; -moz-transition: all 0.3s ease-in-out ; -ms-transition: all 0.3s ease-in-out ; -o-transition: all 0.3s ease-in-out ; }
 
 .nav li .submenu li .submenu{top: 0px !important; left: 120% !important; opacity: 0 !important;}
 .nav li .submenu li:hover .submenu{left: 100% !important; opacity: 1 !important;}
