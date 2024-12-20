@@ -18,7 +18,6 @@ const HomeSlider = () => {
           slidesPerView={1}
           centeredSlides={true}
           spaceBetween={10}
-          
           autoplay={{
             delay: 2500,
             disableOnInteraction: false,

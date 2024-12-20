@@ -44,7 +44,7 @@ const Header = () => {
                     Help Center
                   </Link>
                 </li>
-                <span> | </span>
+                <span className="line !h-[15px]"></span>
                 <li className="list-none">
                   <Link
                     to="/order-tracking"
@@ -78,10 +78,13 @@ const Header = () => {
           <div className="col3 w-[30%] flex items-center pl-7">
             <ul className="flex items-center justify-end gap-3 w-full">
               <li className="list-none">
+                <div className="flex items-center justify-center">
                 <Link to="/login" className="link transition text-[15px] font-[500]">Login</Link>
-                <span> | </span>
+                <span className="line !h-[20px] mx-2 !w-[0.5px]"></span>
                 <Link to="/register" className="link transition text-[15px] font-[500]">Register</Link>
+                </div>
               </li>
+                <span className="line !h-[40px] mx-2"></span>
               
               <li>
               <Tooltip title="Compare" placement="top" arrow>

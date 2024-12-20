@@ -30,7 +30,7 @@ const Navigation = () => {
               <LiaAngleDownSolid className="text-[13px] ml-auto font-bold" />
             </Button>
           </div>
-
+          <span className="line !h-[20px]"></span>
           <div className="col_2 w-[60%]">
             <ul className="flex items-center gap-3 nav">
               <li className="list-none">
@@ -53,7 +53,6 @@ const Navigation = () => {
                 <div className="submenu main-submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                   <ul>
                     <li className="list-none w-full relative">
-                      <Link to="/" className="w-full">
                         <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
                           Men
                           <IoIosArrowForward />
@@ -76,7 +75,7 @@ const Navigation = () => {
                               </Link>
                             </li>
                             <li className="list-none w-full">
-                              <Link to="/" className="w-full">
+                              <Link to="/boys" className="w-full">
                                 <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
                                   Boys
                                 </Button>
@@ -105,7 +104,6 @@ const Navigation = () => {
                             </li>
                           </ul>
                         </div>
-                      </Link>
                     </li>
                     <li className="list-none w-full">
                       <Link to="/" className="w-full">
@@ -162,7 +160,6 @@ const Navigation = () => {
                 <div className="submenu main-submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                   <ul>
                     <li className="list-none w-full relative">
-                      <Link to="/" className="w-full">
                         <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
                           Men
                           <IoIosArrowForward />
@@ -214,7 +211,6 @@ const Navigation = () => {
                             </li>
                           </ul>
                         </div>
-                      </Link>
                     </li>
                     <li className="list-none w-full">
                       <Link to="/" className="w-full">

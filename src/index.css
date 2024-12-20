@@ -5,6 +5,7 @@
 :root {
   --font-family: "Montserrat", sans-serif;
   --bg-primary: #ff5252;
+  --bg-primary-lite-medium: #ff52527e;
   --bg-primary-lite: #ff52520d;
 
 }
@@ -22,6 +23,12 @@
   background-color: #F5F0F0;
   overflow-x: hidden;
 }
+
+/* ---------- Scroll-bar ------------- */
+::-webkit-scrollbar{ width: 5px !important; height: 5px !important;}
+::-webkit-scrollbar-thumb{ background: var(--bg-primary) !important;}
+::-webkit-scrollbar-track{ background: #fff; }
+
 
 /* --------  Top strip of Page -------- */
 .container {
@@ -83,6 +90,10 @@ nav ul button:hover{
   color: #fff !important;
 }
 
+.swiper-pagination-bullet-active-main{
+  background: var(--bg-primary) !important;
+}
+
 /* ---------- Product Category Slider ---------- */
 .homeCatSlider .swiper{
   overflow: inherit !important;
@@ -101,4 +112,71 @@ nav ul button:hover{
 
 .homeCatSlider .item:hover img{
   transform: scale(1.1);
+}
+
+.smallBtn .swiper-button-prev, .smallBtn .swiper-button-next {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  top: 55% !important;
+}
+.smallBtn .swiper-button-prev::after, .smallBtn .swiper-button-next::after {
+  font-size: 18px !important;
+}
+
+.img-box {
+  width: 350px; /* Set container width */
+  height: 200px; /* Set container height */
+  overflow: hidden; /* Prevent the image from overflowing outside */
+  position: relative; /* Ensure proper positioning */
+}
+
+.scalable-image {
+  width: 100%; /* Ensure the image spans the container */
+  height: 100%; /* Maintain image size within the container */
+  object-fit: cover; /* Prevent distortion */
+  transition: transform 0.3s ease-in-out; /* Smooth scaling effect */
+}
+
+.img-box:hover .scalable-image {
+  transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  -o-transform: scale(1.1);
+}
+
+/* ------- Vertical Line ------- */
+
+.line {
+  position: relative;
+  height: 35px; /* Adjust the height as needed */
+  width: 1px; /* Make the line thinner */
+  background-color: #ccc; /* Set the line color */
+}
+
+.line::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Centers the line */
+  background-color: #ccc; /* Line color */
+}
+
+/* ----------------------------------------------- */
+
+.css-1qltlow-MuiTabs-indicator{
+  background-color: var(--bg-primary) !important;
+}
+
+.css-1usuzwp-MuiButtonBase-root-MuiTab-root.Mui-selected{
+  color: var(--bg-primary) !important;
+}
+
+.productSlider .swiper-wrapper{
+  padding: 15px;
+  margin-right: -15px;
+  margin-left: -15px;
 }
