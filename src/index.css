@@ -75,6 +75,14 @@ nav ul button:hover{
   color: #000;
 }
 
+.swiper-button-prev:hover, .swiper-button-next:hover{
+  background: var(--bg-primary) !important;
+}
+
+.swiper-button-prev:hover::after, .swiper-button-next:hover::after{
+  color: #fff !important;
+}
+
 /* ---------- Product Category Slider ---------- */
 .homeCatSlider .swiper{
   overflow: inherit !important;
@@ -90,13 +98,6 @@ nav ul button:hover{
 
 .homeCatSlider .swiper-button-prev{left: -10px !important;}
 .homeCatSlider .swiper-button-next{right: -10px !important;}
-
-.homeCatSlider .swiper-button-prev:hover, .homeCatSlider .swiper-button-next:hover{
-  background: var(--bg-primary) !important;
-}
-.homeCatSlider .swiper-button-prev:hover::after, .homeCatSlider .swiper-button-next:hover::after{
-  color: #fff !important;
-}
 
 .homeCatSlider .item:hover img{
   transform: scale(1.1);

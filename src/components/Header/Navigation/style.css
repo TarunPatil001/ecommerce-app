@@ -10,8 +10,19 @@ button{
     background: none !important; 
 }
 
-.nav li .submenu{visibility: hidden; z-index: 1000;}
-.nav li .submenu{font-weight: 400 !important;}
+.nav li .submenu{visibility: hidden; z-index: 1000; font-weight: 400 !important; border-radius: 10px !important;}
+.nav li .main-submenu > ul > li:first-child > a > button {
+    border-radius: 10px 10px 0 0 !important; /* Top-left and top-right corners */
+  }
+  
+  .nav li .main-submenu > ul > li:last-child > a > button {
+    border-radius: 0 0 10px 10px !important; /* Bottom-left and bottom-right corners */
+  }
+  
+  .nav li .main-submenu > ul > li:not(:first-child):not(:last-child) > a > button {
+    border-radius: 0 !important; /* Remove radius for middle buttons */
+  }
+
 .nav li:hover .submenu{ opacity: 1 !important; visibility: inherit; transition: all 0.3s ease-in-out; -webkit-transition: all 0.3s ease-in-out ; -moz-transition: all 0.3s ease-in-out ; -ms-transition: all 0.3s ease-in-out ; -o-transition: all 0.3s ease-in-out ; }
 
 .nav li .submenu li .submenu{top: 0px !important; left: 120% !important; opacity: 0 !important;}

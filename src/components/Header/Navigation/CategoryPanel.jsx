@@ -74,7 +74,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
             )}
 
             {submenuOpen[0] && (
-              <ul className="submenu w-full pl-6">
+              <ul className="submenu w-full pl-6 ">
                 <li key="apparel" className="list-none relative">
                   <Link to="/" className="w-full">
                     <Button
