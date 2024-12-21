@@ -17,7 +17,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="py-2">
+      <nav>
         <div className="container flex items-center justify-end gap-8">
           <div className="col_1 w-[20%]">
             <Button
@@ -35,75 +35,73 @@ const Navigation = () => {
             <ul className="flex items-center gap-3 nav">
               <li className="list-none">
                 <Link to="/" className="link transition text-[14px]">
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary text-capitalize">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] text-capitalize !py-4">
                     Home
                   </Button>
                 </Link>
               </li>
               <li className="list-none relative">
-                <Link
-                  to="/"
-                  className="link transition text-[14px] font-[500]"
-                >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                <Link to="/" className="link transition text-[14px] font-[500]">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] !py-4">
                     Fashion
                   </Button>
                 </Link>
 
-                <div className="submenu main-submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
+                <div className="submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                   <ul>
                     <li className="list-none w-full relative">
+                      <Link to="/" className="w-full">
                         <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
                           Men
                           <IoIosArrowForward />
                         </Button>
-
-                        <div className="submenu main-submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
-                          <ul>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Men
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Women
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/boys" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Boys
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Girls
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Kids
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Kids
-                                </Button>
-                              </Link>
-                            </li>
-                          </ul>
-                        </div>
+                      </Link>
+                      <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
+                        <ul>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Men
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Women
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/boys" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Boys
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Girls
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Kids
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Kids
+                              </Button>
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </li>
                     <li className="list-none w-full">
                       <Link to="/" className="w-full">
@@ -142,75 +140,74 @@ const Navigation = () => {
                   to="/electronics"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Electronics
                   </Button>
                 </Link>
               </li>
 
               <li className="list-none relative">
-                <Link
-                  to="/"
-                  className="link transition text-[14px] font-[500]"
-                >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                <Link to="/" className="link transition text-[14px] font-[500]">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Bags
                   </Button>
                 </Link>
-                <div className="submenu main-submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
+                <div className="submenu absolute top-[100%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
                   <ul>
                     <li className="list-none w-full relative">
+                      <Link to="/" className="w-full">
                         <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
                           Men
                           <IoIosArrowForward />
                         </Button>
+                      </Link>
 
-                        <div className="submenu main-submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
-                          <ul>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Men
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Women
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Boys
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Girls
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Kids
-                                </Button>
-                              </Link>
-                            </li>
-                            <li className="list-none w-full">
-                              <Link to="/" className="w-full">
-                                <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
-                                  Kids
-                                </Button>
-                              </Link>
-                            </li>
-                          </ul>
-                        </div>
+                      <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 visibility-hidden transition-all">
+                        <ul>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Men
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Women
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Boys
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Girls
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Kids
+                              </Button>
+                            </Link>
+                          </li>
+                          <li className="list-none w-full">
+                            <Link to="/" className="w-full">
+                              <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-start !rounded-none">
+                                Kids
+                              </Button>
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </li>
                     <li className="list-none w-full">
                       <Link to="/" className="w-full">
@@ -248,7 +245,7 @@ const Navigation = () => {
                   to="/footware"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Footwear
                   </Button>
                 </Link>
@@ -258,7 +255,7 @@ const Navigation = () => {
                   to="/groceries"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[560000] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[560000] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Groceries
                   </Button>
                 </Link>
@@ -268,7 +265,7 @@ const Navigation = () => {
                   to="/beauty"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Beauty
                   </Button>
                 </Link>
@@ -278,7 +275,7 @@ const Navigation = () => {
                   to="/wellness"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Wellness
                   </Button>
                 </Link>
@@ -288,7 +285,7 @@ const Navigation = () => {
                   to="/jewellery"
                   className="link transition text-[14px] font-[500]"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-primary">
+                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Jewellery
                   </Button>
                 </Link>

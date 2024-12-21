@@ -43,7 +43,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
         Shop By Categories{" "}
         <RxCross2 
           onClick={toggleDrawer}
-          className="cursor-pointer text-[25px] hover:text-red-600"
+          className="cursor-pointer text-[25px] hover:text-red-500"
         />
       </h3>
       <Divider />
@@ -54,7 +54,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
           <li key="fashion" className="list-none flex items-center relative flex-col">
             <Link to="/" className="w-full">
               <Button
-                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                 disableRipple
               >
                 Fashion
@@ -78,7 +78,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                 <li key="apparel" className="list-none relative">
                   <Link to="/" className="w-full">
                     <Button
-                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                       disableRipple
                     >
                       Apparel
@@ -101,7 +101,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-1" className="list-none relative">
                         <Link to="/table" className="link w-full">
                           <Button
-                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Smart Tablet
@@ -111,7 +111,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-2" className="list-none relative">
                         <Link to="/t-shirt" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Crepe T-Shirt
@@ -121,7 +121,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-3" className="list-none relative">
                         <Link to="/watch" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Leather Watch
@@ -131,7 +131,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-4" className="list-none relative">
                         <Link to="/diamond" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Rolling Diamond
@@ -149,7 +149,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
           <li key="outerwear" className="list-none flex items-center relative flex-col">
             <Link to="/" className="w-full">
               <Button
-                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                 disableRipple
               >
                 Outerwear
@@ -173,7 +173,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                 <li key="apparel" className="list-none relative">
                   <Link to="/" className="w-full">
                     <Button
-                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                       disableRipple
                     >
                       Apparel
@@ -196,7 +196,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-1" className="list-none relative">
                         <Link to="/table" className="link w-full">
                           <Button
-                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Smart Tablet
@@ -206,7 +206,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-2" className="list-none relative">
                         <Link to="/t-shirt" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Crepe T-Shirt
@@ -216,7 +216,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-3" className="list-none relative">
                         <Link to="/watch" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Leather Watch
@@ -226,7 +226,7 @@ const CategoryPanel = ({ isOpenPanel, openCategoryPanel }) => {
                       <li key="apparel-link-4" className="list-none relative">
                         <Link to="/diamond" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-primary"
+                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Rolling Diamond

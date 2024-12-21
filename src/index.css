@@ -4,20 +4,20 @@
 
 :root {
   --font-family: "Montserrat", sans-serif;
-  --bg-primary: #ff5252;
+  --bg-primary: rgb(255, 82, 82);
+  /* --bg-primary: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%); */
   --bg-primary-lite-medium: #ff52527e;
   --bg-primary-lite: #ff52520d;
-
 }
 
 * {
-    margin: 0px;
-    padding: 0px;
-    box-sizing: border-box;
-  }
-  
-  
-  body {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+
+body {
   font-family: var(--font-family);
   font-optical-sizing: auto;
   background-color: #F5F0F0;
@@ -25,9 +25,18 @@
 }
 
 /* ---------- Scroll-bar ------------- */
-::-webkit-scrollbar{ width: 5px !important; height: 5px !important;}
-::-webkit-scrollbar-thumb{ background: var(--bg-primary) !important;}
-::-webkit-scrollbar-track{ background: #fff; }
+::-webkit-scrollbar {
+  width: 5px !important;
+  height: 5px !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-primary) !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff;
+}
 
 
 /* --------  Top strip of Page -------- */
@@ -36,31 +45,39 @@
   margin: auto;
 }
 
+/* link:hover {
+  background: var(--bg-primary) !important; 
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+} */
+
 .link:hover {
   color: var(--bg-primary) !important;
 }
 
-.MuiBadge-badge{
-  background-color: var(--bg-primary) !important;
-} 
+.MuiBadge-badge {
+  background: var(--bg-primary) !important;
+}
 
-button{
+button {
   font-family: var(--font-family) !important;
 }
 
-nav ul button{
+nav ul button {
   text-transform: capitalize !important;
 }
-nav ul button:hover{
+
+nav ul button:hover {
   background: none !important;
 }
 
 /* ---------- Big Banner Slider ---------- */
-.sliderHome{
+.sliderHome {
   overflow: inherit !important;
 }
 
-.swiper-button-prev, .swiper-button-next {
+.swiper-button-prev,
+.swiper-button-next {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,69 +90,92 @@ nav ul button:hover{
   -moz-border-radius: 100%;
   -ms-border-radius: 100%;
   -o-border-radius: 100%;
-  box-shadow: 0 1px 3px #0000001f,0 1px 2px #0000003d !important;
+  box-shadow: 0 1px 3px #0000001f, 0 1px 2px #0000003d !important;
 }
 
-.swiper-button-prev::after, .swiper-button-next::after{
+.swiper-button-prev::after,
+.swiper-button-next::after {
   font-size: 25px !important;
   font-weight: bold;
   color: #000;
 }
 
-.swiper-button-prev:hover, .swiper-button-next:hover{
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
   background: var(--bg-primary) !important;
 }
 
-.swiper-button-prev:hover::after, .swiper-button-next:hover::after{
+.swiper-button-prev:hover::after,
+.swiper-button-next:hover::after {
   color: #fff !important;
 }
 
-.swiper-pagination-bullet-active-main{
+.swiper-pagination-bullet-active-main {
   background: var(--bg-primary) !important;
 }
 
 /* ---------- Product Category Slider ---------- */
-.homeCatSlider .swiper{
+.homeCatSlider .swiper {
   overflow: inherit !important;
 }
-.homeCatSlider .swiper-button-prev, .homeCatSlider .swiper-button-next {
+
+.homeCatSlider .swiper-button-prev,
+.homeCatSlider .swiper-button-next {
   width: 30px;
   height: 30px;
   min-width: 30px;
 }
-.homeCatSlider .swiper-button-prev::after, .homeCatSlider .swiper-button-next::after {
+
+.homeCatSlider .swiper-button-prev::after,
+.homeCatSlider .swiper-button-next::after {
   font-size: 18px !important;
 }
 
-.homeCatSlider .swiper-button-prev{left: -10px !important;}
-.homeCatSlider .swiper-button-next{right: -10px !important;}
+.homeCatSlider .swiper-button-prev {
+  left: -10px !important;
+}
 
-.homeCatSlider .item:hover img{
+.homeCatSlider .swiper-button-next {
+  right: -10px !important;
+}
+
+.homeCatSlider .item:hover img {
   transform: scale(1.1);
 }
 
-.smallBtn .swiper-button-prev, .smallBtn .swiper-button-next {
+.smallBtn .swiper-button-prev,
+.smallBtn .swiper-button-next {
   width: 30px;
   height: 30px;
   min-width: 30px;
   top: 55% !important;
 }
-.smallBtn .swiper-button-prev::after, .smallBtn .swiper-button-next::after {
+
+.smallBtn .swiper-button-prev::after,
+.smallBtn .swiper-button-next::after {
   font-size: 18px !important;
 }
 
 .img-box {
-  width: 350px; /* Set container width */
-  height: 200px; /* Set container height */
-  overflow: hidden; /* Prevent the image from overflowing outside */
-  position: relative; /* Ensure proper positioning */
+  width: 350px;
+  /* Set container width */
+  height: 200px;
+  /* Set container height */
+  overflow: hidden;
+  /* Prevent the image from overflowing outside */
+  position: relative;
+  /* Ensure proper positioning */
 }
 
 .scalable-image {
-  width: 100%; /* Ensure the image spans the container */
-  height: 100%; /* Maintain image size within the container */
-  object-fit: cover; /* Prevent distortion */
-  transition: transform 0.3s ease-in-out; /* Smooth scaling effect */
+  width: 100%;
+  /* Ensure the image spans the container */
+  height: 100%;
+  /* Maintain image size within the container */
+  object-fit: cover;
+  /* Prevent distortion */
+  transition: transform 0.3s ease-in-out;
+  /* Smooth scaling effect */
 }
 
 .img-box:hover .scalable-image {
@@ -150,9 +190,12 @@ nav ul button:hover{
 
 .line {
   position: relative;
-  height: 35px; /* Adjust the height as needed */
-  width: 1px; /* Make the line thinner */
-  background-color: #ccc; /* Set the line color */
+  height: 35px;
+  /* Adjust the height as needed */
+  width: 1px;
+  /* Make the line thinner */
+  background-color: #ccc;
+  /* Set the line color */
 }
 
 .line::before {
@@ -161,22 +204,75 @@ nav ul button:hover{
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%; /* Centers the line */
-  background-color: #ccc; /* Line color */
+  left: 50%;
+  /* Centers the line */
+  background-color: #ccc;
+  /* Line color */
 }
 
 /* ----------------------------------------------- */
 
-.css-1qltlow-MuiTabs-indicator{
+.css-1qltlow-MuiTabs-indicator {
   background-color: var(--bg-primary) !important;
 }
 
-.css-1usuzwp-MuiButtonBase-root-MuiTab-root.Mui-selected{
+.css-1usuzwp-MuiButtonBase-root-MuiTab-root.Mui-selected {
   color: var(--bg-primary) !important;
 }
 
-.productSlider .swiper-wrapper{
+.productSlider .swiper-wrapper {
   padding: 15px;
   margin-right: -15px;
   margin-left: -15px;
 }
+
+/* styles.css */
+.custom-textfield .MuiOutlinedInput-root {
+  border-color: gray;
+}
+
+.custom-textfield .MuiInputLabel-root {
+  color: gray;
+}
+
+.custom-textfield .MuiOutlinedInput-root.Mui-focused {
+  border-color: var(--bg-primary) !important;
+}
+
+.custom-textfield .MuiInputLabel-root.Mui-focused {
+  color: var(--bg-primary) !important;
+}
+
+.custom-textfield .MuiFormLabel-root {
+  color: gray;
+}
+
+.custom-textfield legend {
+  color: gray;
+  border-color: gray; /* Ensure the legend starts with the gray border */
+}
+
+.custom-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: var(--bg-primary) !important; /* Apply bg-primary border on focus */
+}
+
+.custom-textfield .MuiInputLabel-root.Mui-focused {
+  color: var(--bg-primary) !important; /* Change label text color to bg-primary on focus */
+}
+
+.custom-textfield input:focus {
+  outline: none;
+  border-color: var(--bg-primary) !important;
+}
+
+/* CheckboxStyles.css */
+.custom-checkbox {
+  /* Add any base styles for the checkbox here, if necessary */
+  color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.custom-checkbox.Mui-checked {
+  color: var(--bg-primary) !important;
+}
+
+

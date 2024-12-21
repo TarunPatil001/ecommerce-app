@@ -10,16 +10,16 @@ button{
     background: none !important; 
 }
 
-.nav li .submenu{visibility: hidden; z-index: 1000; font-weight: 400 !important; border-radius: 10px !important;}
-.nav li .main-submenu > ul > li:first-child > a > button {
-    border-radius: 10px 10px 0 0 !important; /* Top-left and top-right corners */
-  }
+.nav li .submenu{ visibility: hidden; z-index: 1000; font-weight: 400 !important; border-radius: 0px 0px 10px 10px !important; }
+.nav li:hover > a > button {
+  color: var(--bg-primary) !important; /* Change active nav text color */
+}
   
-  .nav li .main-submenu > ul > li:last-child > a > button {
+  .nav li .submenu > ul > li:last-child > a > button {
     border-radius: 0 0 10px 10px !important; /* Bottom-left and bottom-right corners */
   }
   
-  .nav li .main-submenu > ul > li:not(:first-child):not(:last-child) > a > button {
+  .nav li .submenu > ul > li:not(:first-child):not(:last-child) > a > button {
     border-radius: 0 !important; /* Remove radius for middle buttons */
   }
 

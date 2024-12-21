@@ -27,7 +27,7 @@ const ProductItem = () => {
             />
           </div>
         </Link>
-        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-md p-1 text-[12px] font-medium">
+        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-[var(--bg-primary)] text-white rounded-md p-1 text-[12px] font-medium">
           -10%
         </span>
 
@@ -38,7 +38,7 @@ const ProductItem = () => {
             arrow
             enterDelay={3000}
           >
-            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-white text-black hover:!bg-primary hover:!text-white group">
+            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-white text-black hover:!bg-[var(--bg-primary)] hover:!text-white group">
               <IoMdHeartEmpty className="text-[35px] !text-black group-hover:text-white " />
             </Button>
           </Tooltip>
@@ -48,7 +48,7 @@ const ProductItem = () => {
             arrow
             enterDelay={3000}
           >
-            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-primary hover:!text-white group">
+            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-[var(--bg-primary)] hover:!text-white group">
               <IoGitCompareOutline className="text-[35px] !text-black group-hover:text-white " />
             </Button>
           </Tooltip>
@@ -58,11 +58,11 @@ const ProductItem = () => {
             arrow
             enterDelay={3000}
           >
-            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-primary hover:!text-white group">
+            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-[var(--bg-primary)] hover:!text-white group">
               <BsArrowsFullscreen className="text-[18px] !text-black group-hover:text-white" />
             </Button>
           </Tooltip>
-          <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-primary hover:!text-white group">
+          <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-black hover:!bg-[var(--bg-primary)] hover:!text-white group">
             <LiaExternalLinkAltSolid className="text-[35px] !text-black group-hover:text-white " />
           </Button>
         </div>
@@ -83,7 +83,7 @@ const ProductItem = () => {
           <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-medium">
             ₹58.00
           </span>
-          <span className="price text-primary text-[17px] font-semibold">
+          <span className="price text-[var(--bg-primary)] text-[17px] font-semibold">
             ₹58.00
           </span>
         </div>

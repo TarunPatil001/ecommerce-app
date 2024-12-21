@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const BannerBox = (props) => {
   return (
-    <div className="box bannerBox img-box rounded-lg w-full">
+    <div className="box bannerBox img-box rounded-lg !w-full">
       <Link to={props.link}>
         <img src={props.img} alt="banner" className="scalable-image" />
       </Link>

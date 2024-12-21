@@ -3,7 +3,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Navigation } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import BannerBox from "../BannerBox";
 import PropTypes from "prop-types";
 
@@ -13,24 +13,33 @@ const AdsBannerSlider = (props) => {
       <Swiper
         slidesPerView={props.items}
         spaceBetween={10}
-        navigation={true}
-        modules={[Navigation]}
+        autoplay={{
+          delay: props.timedelay,
+          // disableOnInteraction: false,
+        }}
+        loop={true}
+        // navigation={true}
+        modules={[Autoplay, Navigation]}
         className="smallBtn"
       >
         <SwiperSlide>
-            <BannerBox img={'/banner1.jpg'} link={'/b1'}/>
+            <BannerBox img={'https://i.ytimg.com/vi/RF2ywPBi4RM/maxresdefault.jpg'} link={'/'}/>
         </SwiperSlide>
+        
         <SwiperSlide>
-            <BannerBox img={'/banner2.jpg'} link={'/b2'}/>
+            <BannerBox img={'https://styleoutwatches.com/cdn/shop/articles/The_Future_of_Luxury_Watches-_Trends_for_2025_and_Beyond_1024x1024.jpg?v=1725268526'} link={'/'}/>
         </SwiperSlide>
+        
         <SwiperSlide>
-            <BannerBox img={'/banner3.jpg'} link={'/'}/>
+            <BannerBox img={'https://cdn.wccftech.com/wp-content/uploads/2023/12/First-18-inch-mini-LED-1.png'} link={'/b1'}/>
         </SwiperSlide>
+        
         <SwiperSlide>
-            <BannerBox img={'/banner4.jpg'} link={'/'}/>
+            <BannerBox img={'https://www.yatra.com/ythomepagecms/media/todayspick/2024/Aug/9c12339dd9b60b390524ffc7957636cc.jpg'} link={'/b2'}/>
         </SwiperSlide>
+        
         <SwiperSlide>
-            <BannerBox img={'/banner4.jpg'} link={'/'}/>
+            <BannerBox img={'https://www.kapoorwatch.com/blogs/wp-content/uploads/B-127-LVMH-Watch-Week-23-TAG-Heuer-Releases-Banner.webp'} link={'/'}/>
         </SwiperSlide>
            
       </Swiper>
@@ -39,7 +48,8 @@ const AdsBannerSlider = (props) => {
 };
 
 AdsBannerSlider.propTypes = {
-    items: PropTypes.number.isRequired
+    items: PropTypes.number.isRequired,
+    timedelay: PropTypes.number.isRequired
 }
 
 export default AdsBannerSlider;
