@@ -11,7 +11,11 @@ export default {
       },
       backgroundColor: {
         primary: "#ff5252"
-      }
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
+      
     },
   },
   plugins: [],

@@ -8,7 +8,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 // import required modules
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import { Autoplay, Pagination, Navigation, EffectFlip } from "swiper/modules";
 
 const HomeSlider = () => {
   return (
@@ -27,8 +27,9 @@ const HomeSlider = () => {
             clickable: true,
             dynamicBullets: true,
           }}
+        
           navigation={true}
-          modules={[Autoplay, Pagination, Navigation]}
+          modules={[Autoplay, Pagination, Navigation, EffectFlip]}
           className="sliderHome"
         >
           <SwiperSlide>

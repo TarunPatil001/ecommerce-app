@@ -15,6 +15,8 @@ import "swiper/css/pagination";
 import { Pagination, Autoplay, Navigation } from "swiper/modules";
 import BlogItem from "../../components/BlogItem";
 import Footer from "../../components/Footer";
+import HomeBannerV2 from "../../components/HomeSliderV2";
+import BannerBoxV2 from "../../components/bannerBoxV2";
 
 const Home = () => {
   const [value, setValue] = React.useState(0);
@@ -26,6 +28,19 @@ const Home = () => {
   return (
     <>
       <HomeSlider />
+
+      <section className="py-6">
+        <div className="container flex">
+          <div className="part1 w-[66%]">
+            <HomeBannerV2 />
+          </div>
+          <div className="part2 w-[34%] pl-10 flex items-center justify-between flex-col gap-5">
+            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"}/>
+            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-2.jpg"} heading={"Marcel Dining Room Chair"}/>
+          </div>
+        </div>
+      </section>
+
       <HomeCatSlider />
 
       <section className="bg-white py-5">
@@ -112,7 +127,7 @@ const Home = () => {
             autoplay={{
               delay: 1000, // Continuous autoplay
               disableOnInteraction: false, // Continue autoplay even after interaction
-              pauseOnMouseEnter:true,
+              pauseOnMouseEnter: true,
             }}
             // speed={5000} // Smooth continuous scrolling
             loop={true} // Infinite loop
@@ -164,10 +179,8 @@ const Home = () => {
           </Swiper>
         </div>
       </section>
-      
+
       <Footer />
-
-
     </>
   );
 };

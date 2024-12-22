@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --font-family: "Montserrat", sans-serif;
+  --rupee: "Amazon Ember", sans-serif;
+  --font-family: "Poppins", serif;
+  --letter-spacing: 0.5px;
   --bg-primary: rgb(255, 82, 82);
   /* --bg-primary: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%); */
   --bg-primary-lite-medium: #ff52527e;
@@ -16,13 +18,18 @@
   box-sizing: border-box;
 }
 
-
 body {
   font-family: var(--font-family);
+  letter-spacing: var(--letter-spacing); /* Apply letter spacing */
   font-optical-sizing: auto;
-  background-color: #F5F0F0;
+  background-color: #f5f0f0;
   overflow-x: hidden;
 }
+
+.rupee {
+  font-family: var(--rupee); /* Custom font for rupee symbol */
+}
+
 
 /* ---------- Scroll-bar ------------- */
 ::-webkit-scrollbar {
@@ -37,7 +44,6 @@ body {
 ::-webkit-scrollbar-track {
   background: #fff;
 }
-
 
 /* --------  Top strip of Page -------- */
 .container {
@@ -103,6 +109,7 @@ nav ul button:hover {
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
   background: var(--bg-primary) !important;
+  opacity: 1;
 }
 
 .swiper-button-prev:hover::after,
@@ -110,9 +117,89 @@ nav ul button:hover {
   color: #fff !important;
 }
 
+.swiper-pagination-bullet {
+  width: 12px !important; /* Increase width */
+  height: 12px !important; /* Increase height */
+}
+
 .swiper-pagination-bullet-active-main {
   background: var(--bg-primary) !important;
+  width: 12px !important; /* Slightly larger for the active bullet */
+  height: 12px !important;
 }
+
+/* -----  Buttons on homeSliderV2 prev & next   --------- */
+.homeSliderV2 .swiper-button-prev {
+  opacity: 0;
+  left: -20%;
+  transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -webkit-transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -moz-transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -ms-transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -o-transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.homeSliderV2:hover .swiper-button-prev {
+  opacity: 1;
+  left: 3%; /* Move to the visible position */
+}
+
+.homeSliderV2 .swiper-button-next {
+  opacity: 0;
+  right: -20%;
+  transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -webkit-transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -moz-transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -ms-transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -o-transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.homeSliderV2:hover .swiper-button-next {
+  opacity: 1;
+  right: 3%; /* Move to the visible position */
+}
+
+/* -------   text on HomeBannerV2   ------- */
+.homeSliderV2 .swiper-slide-active .info{
+  right: 0px !important;
+  opacity: 1;
+}
+.homeSliderV2 .swiper-slide-active .info h4{
+  right: 0px !important;
+  opacity: 1;
+}
+.homeSliderV2 .swiper-slide-active .info h2{
+  right: 0px !important;
+  opacity: 1;
+}
+.homeSliderV2 .swiper-slide-active .info h3{
+  right: 0px !important;
+  opacity: 1;
+}
+.homeSliderV2 .swiper-slide-active .info .btn_{
+  right: 0px !important;
+  opacity: 1;
+}
+
+.homeSliderV2 .info h4{
+  transition-duration: 1s;
+  transition-delay: 200ms;
+}
+.homeSliderV2 .info h2{
+  transition-duration: 1s;
+  transition-delay: 400ms;
+}
+.homeSliderV2 .info h3{
+  transition-duration: 1s;
+  transition-delay: 600ms;
+}
+.homeSliderV2 .info .btn_{
+  transition-duration: 1s;  
+  transition-delay: 800ms;
+}
+
+
+
 
 /* ---------- Product Category Slider ---------- */
 .homeCatSlider .swiper {
@@ -199,7 +286,7 @@ nav ul button:hover {
 }
 
 .line::before {
-  content: '';
+  content: "";
   display: block;
   position: absolute;
   top: 0;
@@ -253,11 +340,15 @@ nav ul button:hover {
 }
 
 .custom-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
-  border-color: var(--bg-primary) !important; /* Apply bg-primary border on focus */
+  border-color: var(
+    --bg-primary
+  ) !important; /* Apply bg-primary border on focus */
 }
 
 .custom-textfield .MuiInputLabel-root.Mui-focused {
-  color: var(--bg-primary) !important; /* Change label text color to bg-primary on focus */
+  color: var(
+    --bg-primary
+  ) !important; /* Change label text color to bg-primary on focus */
 }
 
 .custom-textfield input:focus {
@@ -274,5 +365,3 @@ nav ul button:hover {
 .custom-checkbox.Mui-checked {
   color: var(--bg-primary) !important;
 }
-
-

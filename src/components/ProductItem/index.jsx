@@ -69,12 +69,12 @@ const ProductItem = () => {
       </div>
       <div className="info p-3 py-5">
         <h6 className="text-[13px]">
-          <Link to="/" className="link transition-all">
-            RARE RABBIT
+          <Link to="/" className="link transition-all line-clamp-1">
+          RARE RABBIT
           </Link>
         </h6>
         <h3 className="text-[13px] title mt-1 font-medium mb-1 text-[#000]">
-          <Link to="/" className="link transition-all">
+          <Link to="/" className="link transition-all line-clamp-2">
             Men Layer Regular Fit Spread Collar Cotton Shirt
           </Link>
         </h3>

@@ -21,7 +21,7 @@ const BlogItem = () => {
 
       <div className="info py-4">
         <h2 className="text-[15px] font-semibold text-black"><Link to="/" className="link">Nullam ullamcorper ornare molestie</Link></h2>
-        <p className="text-[13px] font-normal text-[rgba(0,0,0,0.8)] mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid Lorem, ipsum......</p>
+        <p className="text-[13px] font-normal text-[rgba(0,0,0,0.8)] mb-4 line-clamp-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem veniam provident deleniti cupiditate similique eius amet voluptate voluptates quo voluptatum earum ut, laborum iusto explicabo maxime impedit est fuga pariatur neque repellat ea dicta recusandae placeat! Quidem, omnis corrupti earum dolor debitis itaque fuga corporis dolores cumque! Libero, numquam optio.</p>
         <Link to="/" className="link font-medium flex items-center gap-1">
             Read More <IoIosArrowForward />
         </Link>

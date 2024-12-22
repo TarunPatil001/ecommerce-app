@@ -39,7 +39,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Tablets</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Tablets</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -53,7 +53,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Washing Machines</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Washing Machines</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -67,7 +67,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Office Study Chairs</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Office Study Chairs</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -81,7 +81,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Sofa and Sectionals</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Sofa and Sectionals</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -95,7 +95,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Televisions</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Televisions</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -109,7 +109,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Beds</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Beds</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -123,7 +123,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Mens Mufflers</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Mens Mufflers</h3>
               </div>
             </Link>
           </SwiperSlide>
@@ -137,7 +137,7 @@ const HomeCatSlider = () => {
                     className="scalable-image rounded-lg"
                   /> 
                 </div>
-                <h3 className="text-[15px] font-[500] mt-3">Air Conditioners</h3>
+                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Air Conditioners</h3>
               </div>
             </Link>
           </SwiperSlide>
