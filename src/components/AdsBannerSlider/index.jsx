@@ -31,17 +31,29 @@ const AdsBannerSlider = (props) => {
         </SwiperSlide>
         
         <SwiperSlide>
-            <BannerBox img={'https://cdn.wccftech.com/wp-content/uploads/2023/12/First-18-inch-mini-LED-1.png'} link={'/b1'}/>
+            <BannerBox img={'https://cdn.wccftech.com/wp-content/uploads/2023/12/First-18-inch-mini-LED-1.png'} link={'/'}/>
         </SwiperSlide>
         
         <SwiperSlide>
-            <BannerBox img={'https://www.yatra.com/ythomepagecms/media/todayspick/2024/Aug/9c12339dd9b60b390524ffc7957636cc.jpg'} link={'/b2'}/>
+            <BannerBox img={'https://www.yatra.com/ythomepagecms/media/todayspick/2024/Aug/9c12339dd9b60b390524ffc7957636cc.jpg'} link={'/'}/>
+        </SwiperSlide>
+
+        <SwiperSlide>
+            <BannerBox img={'https://i.ytimg.com/vi/RF2ywPBi4RM/maxresdefault.jpg'} link={'/'}/>
         </SwiperSlide>
         
         <SwiperSlide>
-            <BannerBox img={'https://www.kapoorwatch.com/blogs/wp-content/uploads/B-127-LVMH-Watch-Week-23-TAG-Heuer-Releases-Banner.webp'} link={'/'}/>
+            <BannerBox img={'https://styleoutwatches.com/cdn/shop/articles/The_Future_of_Luxury_Watches-_Trends_for_2025_and_Beyond_1024x1024.jpg?v=1725268526'} link={'/'}/>
         </SwiperSlide>
-           
+        
+        <SwiperSlide>
+            <BannerBox img={'https://cdn.wccftech.com/wp-content/uploads/2023/12/First-18-inch-mini-LED-1.png'} link={'/'}/>
+        </SwiperSlide>
+        
+        <SwiperSlide>
+            <BannerBox img={'https://www.yatra.com/ythomepagecms/media/todayspick/2024/Aug/9c12339dd9b60b390524ffc7957636cc.jpg'} link={'/'}/>
+        </SwiperSlide>
+        
       </Swiper>
     </div>
   );

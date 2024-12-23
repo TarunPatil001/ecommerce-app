@@ -12,11 +12,12 @@ import ProductSlider from "../../components/ProductSlider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Pagination, Autoplay, Navigation } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import BlogItem from "../../components/BlogItem";
 import Footer from "../../components/Footer";
 import HomeBannerV2 from "../../components/HomeSliderV2";
 import BannerBoxV2 from "../../components/bannerBoxV2";
+import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2";
 
 const Home = () => {
   const [value, setValue] = React.useState(0);
@@ -35,8 +36,8 @@ const Home = () => {
             <HomeBannerV2 />
           </div>
           <div className="part2 w-[34%] pl-10 flex items-center justify-between flex-col gap-5">
-            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"}/>
-            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-2.jpg"} heading={"Marcel Dining Room Chair"}/>
+            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"} price={7999} />
+            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-2.jpg"} heading={"Marcel Dining Room Chair"} price={9999} />
           </div>
         </div>
       </section>
@@ -95,6 +96,7 @@ const Home = () => {
             <p className="font-bold text-2xl">- Only ₹500*</p>
           </div>
           <AdsBannerSlider items={4} timedelay={7000} />
+          <AdsBannerSliderV2 items={4} timedelay={3000} height={200} />
         </div>
       </section>
 
@@ -104,6 +106,7 @@ const Home = () => {
           <p className="text-sm font-normal">New release for winter.</p>
           <ProductSlider items={5} />
           <AdsBannerSlider items={2} timedelay={5000} />
+          <AdsBannerSliderV2 items={2} timedelay={3000} height={200} />
         </div>
       </section>
 
@@ -115,6 +118,7 @@ const Home = () => {
           </p>
           <ProductSlider items={5} />
           <AdsBannerSlider items={3} timedelay={3000} />
+          <AdsBannerSliderV2 items={3} timedelay={3000} />
         </div>
       </section>
 
@@ -125,19 +129,15 @@ const Home = () => {
             slidesPerView={4}
             spaceBetween={30}
             autoplay={{
-              delay: 1000, // Continuous autoplay
+              delay: 1500, // Continuous autoplay
               disableOnInteraction: false, // Continue autoplay even after interaction
               pauseOnMouseEnter: true,
             }}
             // speed={5000} // Smooth continuous scrolling
             loop={true} // Infinite loop
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
             navigation={true} // Enable navigation
             allowTouchMove={true} // Allow swiping
-            modules={[Autoplay, Pagination, Navigation]}
+            modules={[Autoplay, Navigation]}
             className="blogSlider"
           >
             <SwiperSlide>

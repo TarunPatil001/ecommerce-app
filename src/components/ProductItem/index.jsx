@@ -81,10 +81,10 @@ const ProductItem = () => {
         <Rating name="size-small" defaultValue={2.5} precision={0.5} readOnly />
         <div className="flex items-center gap-3">
           <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-medium">
-            ₹58.00
+            <span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(599)}
           </span>
           <span className="price text-[var(--bg-primary)] text-[17px] font-semibold">
-            ₹58.00
+            <span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(499)}
           </span>
         </div>
       </div>
