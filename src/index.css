@@ -8,8 +8,8 @@
   --letter-spacing: 0.5px;
   --bg-primary: rgb(255, 82, 82);
   /* --bg-primary: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%); */
-  --bg-primary-lite-medium: #ff52527e;
-  --bg-primary-lite: #ff52520d;
+  /* --bg-primary-lite-medium: #a6a6a63c; */
+  /* --bg-primary-lite: #ff52520d; */
 }
 
 * {
@@ -20,14 +20,16 @@
 
 body {
   font-family: var(--font-family);
-  letter-spacing: var(--letter-spacing); /* Apply letter spacing */
+  letter-spacing: var(--letter-spacing);
+  /* Apply letter spacing */
   font-optical-sizing: auto;
   background-color: #f5f0f0;
   overflow-x: hidden;
 }
 
 .rupee {
-  font-family: var(--rupee); /* Custom font for rupee symbol */
+  font-family: var(--rupee);
+  /* Custom font for rupee symbol */
 }
 
 
@@ -45,18 +47,15 @@ body {
   background: #fff;
 }
 
+
 /* --------  Top strip of Page -------- */
 .container {
   width: 95%;
   margin: auto;
 }
 
-/* link:hover {
-  background: var(--bg-primary) !important; 
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-} */
-
+/* link:hover { background: var(--bg-primary) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+*/
 .link:hover {
   color: var(--bg-primary) !important;
 }
@@ -76,6 +75,7 @@ nav ul button {
 nav ul button:hover {
   background: none !important;
 }
+
 
 /* ---------- Big Banner Slider ---------- */
 .sliderHome {
@@ -118,15 +118,19 @@ nav ul button:hover {
 }
 
 .swiper-pagination-bullet {
-  width: 12px !important; /* Increase width */
-  height: 12px !important; /* Increase height */
+  width: 12px !important;
+  /* Increase width */
+  height: 12px !important;
+  /* Increase height */
 }
 
 .swiper-pagination-bullet-active-main {
   background: var(--bg-primary) !important;
-  width: 12px !important; /* Slightly larger for the active bullet */
+  width: 12px !important;
+  /* Slightly larger for the active bullet */
   height: 12px !important;
 }
+
 
 /* -----  Buttons on homeSliderV2 prev & next   --------- */
 .homeSliderV2 .swiper-button-prev {
@@ -141,7 +145,8 @@ nav ul button:hover {
 
 .homeSliderV2:hover .swiper-button-prev {
   opacity: 1;
-  left: 3%; /* Move to the visible position */
+  left: 3%;
+  /* Move to the visible position */
 }
 
 .homeSliderV2 .swiper-button-next {
@@ -156,49 +161,56 @@ nav ul button:hover {
 
 .homeSliderV2:hover .swiper-button-next {
   opacity: 1;
-  right: 3%; /* Move to the visible position */
+  right: 3%;
+  /* Move to the visible position */
 }
+
 
 /* -------   text on HomeBannerV2   ------- */
-.homeSliderV2 .swiper-slide-active .info{
-  right: 0px !important;
-  opacity: 1;
-}
-.homeSliderV2 .swiper-slide-active .info h4{
-  right: 0px !important;
-  opacity: 1;
-}
-.homeSliderV2 .swiper-slide-active .info h2{
-  right: 0px !important;
-  opacity: 1;
-}
-.homeSliderV2 .swiper-slide-active .info h3{
-  right: 0px !important;
-  opacity: 1;
-}
-.homeSliderV2 .swiper-slide-active .info .btn_{
+.homeSliderV2 .swiper-slide-active .info {
   right: 0px !important;
   opacity: 1;
 }
 
-.homeSliderV2 .info h4{
+.homeSliderV2 .swiper-slide-active .info h4 {
+  right: 0px !important;
+  opacity: 1;
+}
+
+.homeSliderV2 .swiper-slide-active .info h2 {
+  right: 0px !important;
+  opacity: 1;
+}
+
+.homeSliderV2 .swiper-slide-active .info h3 {
+  right: 0px !important;
+  opacity: 1;
+}
+
+.homeSliderV2 .swiper-slide-active .info .btn_ {
+  right: 0px !important;
+  opacity: 1;
+}
+
+.homeSliderV2 .info h4 {
   transition-duration: 1s;
   transition-delay: 200ms;
 }
-.homeSliderV2 .info h2{
+
+.homeSliderV2 .info h2 {
   transition-duration: 1s;
   transition-delay: 400ms;
 }
-.homeSliderV2 .info h3{
+
+.homeSliderV2 .info h3 {
   transition-duration: 1s;
   transition-delay: 600ms;
 }
-.homeSliderV2 .info .btn_{
-  transition-duration: 1s;  
+
+.homeSliderV2 .info .btn_ {
+  transition-duration: 1s;
   transition-delay: 800ms;
 }
-
-
 
 
 /* ---------- Product Category Slider ---------- */
@@ -273,8 +285,8 @@ nav ul button:hover {
   -o-transform: scale(1.1);
 }
 
-/* ------- Vertical Line ------- */
 
+/* ------- Vertical Line ------- */
 .line {
   position: relative;
   height: 35px;
@@ -298,7 +310,6 @@ nav ul button:hover {
 }
 
 /* ----------------------------------------------- */
-
 .css-1qltlow-MuiTabs-indicator {
   background-color: var(--bg-primary) !important;
 }
@@ -336,19 +347,18 @@ nav ul button:hover {
 
 .custom-textfield legend {
   color: gray;
-  border-color: gray; /* Ensure the legend starts with the gray border */
+  border-color: gray;
+  /* Ensure the legend starts with the gray border */
 }
 
 .custom-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
-  border-color: var(
-    --bg-primary
-  ) !important; /* Apply bg-primary border on focus */
+  border-color: var(--bg-primary) !important;
+  /* Apply bg-primary border on focus */
 }
 
 .custom-textfield .MuiInputLabel-root.Mui-focused {
-  color: var(
-    --bg-primary
-  ) !important; /* Change label text color to bg-primary on focus */
+  color: var(--bg-primary) !important;
+  /* Change label text color to bg-primary on focus */
 }
 
 .custom-textfield input:focus {
@@ -356,12 +366,140 @@ nav ul button:hover {
   border-color: var(--bg-primary) !important;
 }
 
-/* CheckboxStyles.css */
-.custom-checkbox {
-  /* Add any base styles for the checkbox here, if necessary */
-  color: rgba(0, 0, 0, 0.4) !important;
+/* -------  Checkbox  ------ */
+/* Target the label when checkbox is checked */
+.Mui-checked {
+  color: var(--bg-primary) !important;
+  /* Optional: to change the text color */
 }
 
-.custom-checkbox.Mui-checked {
-  color: var(--bg-primary) !important;
+.MuiCheckbox-root{
+  padding: 6px !important;
+}
+
+.rootColorLabelUnchecked .MuiFormControlLabel-label {
+  color: #000;
+}
+
+.rootColorLabelChecked .MuiFormControlLabel-label {
+  color: #ff0000 !important;
+}
+
+/* ------- ProductListing Collapse --------- */
+.ReactCollapse--collapse {
+  transition: height 500ms;
+}
+
+.ReactCollapse--collapse {
+  transition: height 500ms;
+  margin-left: -14px;
+}
+
+.ReactCollapse--content{
+  padding-left: 14px; /* You can adjust this padding as necessary */
+}
+
+.range-slider__thumb, .range-slider__range{
+  background: var(--bg-primary) !important;
+}
+
+.range-slider{
+  height: 4px !important;
+}
+
+.range-slider__thumb{
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.range-slider__thumb:hover, .range-slider__thumb:active{
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #767676 !important;
+}
+
+/* ------   Flip Image in ProductItem   ---------------- */
+/* For the flip container */
+.flip-container {
+  perspective: 1000px; /* Create a 3D effect */
+}
+
+/* On hover, front image should fade out and rotate */
+.flip-container:hover .front-image {
+  transform: rotateY(180deg); /* Rotate the front image */
+  opacity: 0; /* Fade out the front image */
+}
+
+/* On hover, back image should rotate into view */
+.flip-container:hover .back-image {
+  transform: rotateY(0deg); /* Rotate the back image to the front */
+  opacity: 1; /* Fade in the back image */
+}
+
+/* Hide the back face when not rotated */
+.front-image,
+.back-image {
+  transition: transform 0.8s, opacity 0.8s; /* Smooth transition for flip and opacity */
+  position: absolute;
+  backface-visibility: hidden; /* Hide the back of the element */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1; /* Ensure both images are visible initially */
+}
+
+/* Front image should initially be visible and not rotated */
+.front-image {
+  transform: rotateY(0deg); /* Front image starts facing forward */
+}
+
+/* Back image should initially be hidden (rotated by 180deg) */
+.back-image {
+  transform: rotateY(180deg); /* Initially, the back image is hidden */
+  opacity: 0; /* Back image is hidden at the start */
+}
+
+
+/* --------------- DropDown in sort in ProductListing -------------------- */
+
+.css-1rju2q6-MuiButtonBase-root-MuiMenuItem-root{
+  font-family: var(--font-family) !important;
+}
+
+/* ----- Blink button ------- */
+.blink-button {
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+    color: rgb(0, 166, 22);
+  }
+  50% {
+    color: rgb(0, 34, 255);
+  }
+  100% {
+    opacity: 1;
+    color: var(--bg-primary);
+  }
+}
+
+
+/* ------ Pagination hover color --------- */
+.css-1l5xwdx-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+  background-color: var(--bg-primary) !important;
+  color: #fff;
+}
+
+
+/* ---------------Button Primary Black  ---------------------- */
+.buttonPrimaryBlack{
+  background: var(--bg-primary) !important;
+  color: #fff !important;
+}
+
+.buttonPrimaryBlack:hover{
+  background: rgba(0,0,0,0.8) !important;
+  color: #fff !important;
 }

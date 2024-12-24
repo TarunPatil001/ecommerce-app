@@ -87,7 +87,7 @@ const Header = () => {
                 <span className="line !h-[40px] mx-2"></span>
               
               <li>
-              <Tooltip title="Compare" placement="top" arrow>
+              <Tooltip title="Compare" placement="top" enterDelay={5000} arrow>
                 <IconButton aria-label="compare" className="link transition">
                   <StyledBadge badgeContent={4} color="secondary">
                   <IoGitCompareOutline />
@@ -96,7 +96,7 @@ const Header = () => {
               </Tooltip>
               </li>
               <li>
-              <Tooltip title="Wishlist" placement="top" arrow>
+              <Tooltip title="Wishlist" placement="top" enterDelay={5000} arrow>
                 <IconButton aria-label="wishlist" className="link transition">
                   <StyledBadge badgeContent={4} color="secondary">
                     <FaRegHeart />
@@ -105,7 +105,7 @@ const Header = () => {
                 </Tooltip>
               </li>
               <li>
-              <Tooltip title="Cart" placement="top" arrow>
+              <Tooltip title="Cart" placement="top" enterDelay={5000} arrow>
                 <IconButton aria-label="cart" className="link transition">
                   <StyledBadge badgeContent={4} color="secondary" anchorOrigin={{vertical: 'top', horizontal: 'right'}} className="w-[]">
                     <MdOutlineShoppingCart />

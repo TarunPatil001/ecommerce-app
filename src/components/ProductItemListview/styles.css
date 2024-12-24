@@ -1,12 +1,12 @@
-.productItem .title{
+.productItemListView .title{
     line-height: 18px;
 }
 
-.productItem .actions button:hover svg{
+.productItemListView .actions button:hover svg{
     color: #fff !important;
 }
 
-.productItem .actions button svg{
+.productItemListView .actions button svg{
     pointer-events: none !important;
 }
 

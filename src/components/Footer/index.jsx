@@ -221,9 +221,9 @@ const Footer = () => {
                 >
                   <Button
                     variant="contained"
-                    className={`uppercase !text-white !bg-[var(--bg-primary)] ${
+                    className={`uppercase buttonPrimaryBlack ${
                       isChecked
-                        ? "hover:!bg-black !bg-[var(--bg-primary)]"
+                        ? "buttonPrimaryBlack"
                         : "hover:!bg-gray-400 !cursor-not-allowed"
                     } `}
                     onClick={handleSubscribe}
@@ -238,7 +238,6 @@ const Footer = () => {
                     <Checkbox
                       checked={isChecked}
                       onChange={handleCheckboxChange}
-                      className="custom-checkbox"
                     />
                   }
                   className="mt-3 flex flex-row items-start"

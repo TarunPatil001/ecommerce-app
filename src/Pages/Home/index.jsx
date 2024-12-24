@@ -14,7 +14,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Navigation } from "swiper/modules";
 import BlogItem from "../../components/BlogItem";
-import Footer from "../../components/Footer";
 import HomeBannerV2 from "../../components/HomeSliderV2";
 import BannerBoxV2 from "../../components/bannerBoxV2";
 import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2";
@@ -180,7 +179,6 @@ const Home = () => {
         </div>
       </section>
 
-      <Footer />
     </>
   );
 };
