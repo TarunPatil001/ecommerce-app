@@ -29,7 +29,7 @@ const Sidebar = () => {
                     <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter1(!isOpenCategoryFilter1) }}> {isOpenCategoryFilter1 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter1}>
-                    <div className="scroll relative flex flex-col w-full mb-1">
+                    <div className="relative flex flex-col w-full mb-1">
 
                         <div className="px-4 flex flex-col w-full mb-2 capitalize">
                             <FormControlLabel control={<Checkbox size="small" />} label="Fashion" className="link w-full" />
@@ -57,7 +57,7 @@ const Sidebar = () => {
                     <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter2(!isOpenCategoryFilter2) }}> {isOpenCategoryFilter2 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter2}>
-                    <div className="scroll relative flex flex-col mb-1">
+                    <div className="relative flex flex-col mb-1">
 
                         <div className="px-5  flex flex-col w-full mb-2 capitalize">
                             <div className="flex items-center justify-between">
@@ -84,7 +84,7 @@ const Sidebar = () => {
                     <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter3(!isOpenCategoryFilter3) }}> {isOpenCategoryFilter3 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter3}>
-                    <div className="scroll relative flex flex-col mb-1">
+                    <div className="relative flex flex-col mb-1">
 
                         <div className="px-5  flex flex-col w-full mb-2 capitalize">
                             <div className="flex items-center justify-between">

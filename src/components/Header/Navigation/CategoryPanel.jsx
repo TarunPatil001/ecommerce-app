@@ -17,7 +17,7 @@ const CategoryPanel = (props) => {
         Shop By Categories{" "}
         <RxCross2 
           onClick={toggleDrawer}
-          className="cursor-pointer text-[25px] hover:text-blue-500"
+          className="cursor-pointer text-[25px] hover:text-red-500"
         />
       </h3>
       <Divider />

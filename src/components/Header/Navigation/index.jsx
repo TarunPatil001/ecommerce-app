@@ -1,5 +1,5 @@
 import "./style.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { RiMenu2Fill } from "react-icons/ri";
 import { LiaAngleDownSolid } from "react-icons/lia";
@@ -10,14 +10,41 @@ import { IoIosArrowForward } from "react-icons/io";
 
 const Navigation = () => {
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
+  const [isSticky, setIsSticky] = useState(true); // Track sticky state
+  const [lastScrollY, setLastScrollY] = useState(0); // Track last scroll position
+
 
   const openCategoryPanel = (isOpenCatPanel) => {
     setIsOpenCatPanel(isOpenCatPanel);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show navbar (sticky) when scrolling up
+      if (currentScrollY < lastScrollY) {
+        setIsSticky(true);
+      }
+      // Hide navbar (non-sticky) when scrolling down
+      else {
+        setIsSticky(false);
+      }
+
+      setLastScrollY(currentScrollY); // Update the last scroll position
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
+
   return (
     <>
-      <nav className="border-b">
+
+      <nav className={`bg-white border-b shadow-md w-full z-[999] transition-all duration-500 ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
         <div className="container flex items-center justify-end gap-8">
           <div className="col_1 w-[20%]">
             <Button

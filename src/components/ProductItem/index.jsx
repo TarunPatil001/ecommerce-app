@@ -15,9 +15,10 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const ProductItem = () => {
   return (
-    <div className="transition-all duration-300 hover:scale-105 hover:shadow-l">
-      <div className="productItem rounded-md shadow-lg overflow-hidden border border-1 border-[rgba(0,0,0,0.1)]">
-        <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden rounded-md relative">
+    <div className="transition-all duration-300 hover:shadow-xl rounded-md">
+      <div className="productItem rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)]">
+        <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative">
+
           <Link to="/">
 
             {/* <ProductImageFlipChange firstImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/320-large_default/hummingbird-printed-t-shirt.jpg"} SecondImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/318-large_default/hummingbird-printed-t-shirt.jpg"} /> */}
@@ -28,12 +29,18 @@ const ProductItem = () => {
             -10%
           </span>
 
+          <span className=" px-1 flex items-center gap-1 absolute bottom-2 right-2 z-50 border rounded-sm text-[12px] bg-[rgba(255,255,255,0.8)]">
+            <span className="flex items-center gap-1 font-semibold">4.1<Rating name="" defaultValue={1} max={1} readOnly className="!text-sm !text-[var(--rating-star-color)]" /></span>
+            <span className="line !h-[10px] mx-0.5 !bg-[var(--text-light)]"></span>
+            <span className="flex items-center gap-1 font-semibold">{new Intl.NumberFormat("en", { notation: "compact" }).format(500000).toLowerCase()}</span>
+          </span>
+
+
           <div className="actions absolute top-[-200px] right-[0px] z-50 flex items-center gap-2 flex-col w-[80px] transition-all duration-500 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
             <Tooltip
               title="Add to Wishlist"
               placement="right"
               arrow
-              enterDelay={5000}
             >
               <Button className="heartBtn !w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] text-gray-700 hover:!bg-[var(--bg-primary)] group">
                 {/* <IoMdHeartEmpty className="text-[35px] !text-gray-700 group-hover:text-white  " /> */}
@@ -44,7 +51,6 @@ const ProductItem = () => {
               title="Add to Compare"
               placement="right"
               arrow
-              enterDelay={5000}
             >
               <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
                 <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
@@ -54,7 +60,6 @@ const ProductItem = () => {
               title="View Product details"
               placement="right"
               arrow
-              enterDelay={5000}
             >
               <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
                 <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
@@ -65,25 +70,29 @@ const ProductItem = () => {
             </Button>
           </div>
         </div>
-        <div className="info p-3 py-5">
-          <h6 className="text-[13px]">
+
+
+
+        <div className="info px-3 py-1 border-t">
+          <h6 className="text-[16px] font-bold text-[var(--text-dark)]">
             <Link to="/" className="link transition-all line-clamp-1">
               RARE RABBIT
             </Link>
           </h6>
-          <h3 className="text-[13px] title mt-1 font-medium mb-1 text-[#000]">
-            <Link to="/" className="link transition-all line-clamp-2">
+          <h3 className="text-[14px] title mt-1 mb-1 text-[var(--text-light)]">
+            <Link to="/" className="link transition-all line-clamp-1">
               Men Layer Regular Fit Spread Collar Cotton Shirt
             </Link>
           </h3>
-          <Rating name="size-small" defaultValue={2.5} precision={0.5} readOnly />
-          <div className="flex items-center gap-3">
-            <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-medium">
-              <span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(599)}
+
+          <div className="flex items-center gap-2">
+            <span className="price text-black text-[14px] font-bold flex items-center">
+              ₹<span>{new Intl.NumberFormat('en-IN').format(499)}</span>
             </span>
-            <span className="price text-[var(--bg-primary)] text-[17px] font-semibold">
-              <span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(499)}
+            <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[12px] font-normal flex items-center">
+              ₹<span>{new Intl.NumberFormat('en-IN').format(599)}</span>
             </span>
+            <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">(17% OFF)</span>
           </div>
         </div>
       </div>

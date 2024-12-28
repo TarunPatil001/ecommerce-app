@@ -35,7 +35,7 @@ const CategoryCollapse = () => {
       <div className="scroll">
         <ul className="w-full !pl-3">
           {/* Fashion Menu */}
-          <li key="fashion" className="list-none flex items-center relative flex-col">
+          <li key="fashion" className="list-none flex items-center relative flex-col ">
             <Link to="/" className="w-full">
               <Button
                 className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"

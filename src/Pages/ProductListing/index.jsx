@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 
 import Sidebar from "../../components/Sidebar"
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Typography from '@mui/material/Typography';
 import { Link } from "react-router-dom";
-import { GrNext } from "react-icons/gr";
 import ProductItem from './../../components/ProductItem/index';
 import Button from "@mui/material/Button";
 import { IoGridSharp } from "react-icons/io5";
@@ -29,35 +27,6 @@ const ProductListing = () => {
   const [selectedOption, setSelectedOption] = useState("Sales: highest to lowest");
   const [itemView, setItemView] = useState('grid');
 
-  const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" href="/" onClick={handleClick} className="link transition">
-      Home
-    </Link>,
-    <Link
-      underline="hover"
-      key="2"
-      color="inherit"
-      href="/material-ui/getting-started/installation/"
-      onClick={handleClick}
-      className="link transition"
-    >
-      Fashion
-    </Link>,
-    <Link
-      underline="hover"
-      key="3"
-      color="inherit"
-      href="/material-ui/getting-started/installation/"
-      onClick={handleClick}
-      className="link transition"
-    >
-      Men
-    </Link>,
-    <Typography key="4" className="text-black !font-medium !font-poppins">
-      Shirt
-    </Typography>,
-  ];
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleDropdownClick = (event) => {
@@ -74,18 +43,56 @@ const ProductListing = () => {
 
   return (
     <section className="py-0 pb-0">
-      
-      <div className="bg-white p-5 border-b">
-        <div className="container px-3 flex items-center bg-white">
-          <Breadcrumbs separator={<GrNext fontSize="small" />} aria-label="breadcrumb" className="!font-poppins">
-            {breadcrumbs}
+
+      <div className="bg-white px-5 pb-2 py-5 border-b">
+        <div className="container flex items-center bg-white">
+          <Breadcrumbs separator={"/"} aria-label="breadcrumb" className="!text-[var(--text-dark)]">
+            <Link
+              underline="hover"
+              key="1" color="inherit"
+              href="/"
+              onClick={handleClick}
+              className="link transition capitalize text-[14px] hover:underline underline-offset-4">
+              Home
+            </Link>
+            <Link
+              underline="hover"
+              key="2"
+              color="inherit"
+              href="/material-ui/getting-started/installation/"
+              onClick={handleClick}
+              className="link transition capitalize text-[14px] hover:underline underline-offset-4"
+            >
+              Fashion
+            </Link>
+            <Link
+              underline="hover"
+              key="3"
+              color="inherit"
+              href="/material-ui/getting-started/installation/"
+              onClick={handleClick}
+              className="link transition capitalize text-[14px] hover:underline underline-offset-4"
+            >
+              Men
+            </Link>
+            <Link
+              underline="hover"
+              key="4"
+              color="inherit"
+              href="/material-ui/getting-started/installation/"
+              onClick={handleClick}
+              className="link transition capitalize text-[14px] font-bold text-[var(--text-dark)] hover:underline underline-offset-4"
+            >
+              T-Shirt
+            </Link>
+
           </Breadcrumbs>
         </div>
       </div>
 
       <div className="bg-white p-3">
         <div className="container flex gap-3">
-          <div className="sidebarWrapper w-[20%] h-full bg-white p-3 sticky top-0">
+          <div className="sidebarWrapper w-[20%] h-full bg-white p-3 sticky top-20">
             <Sidebar />
           </div>
 
@@ -113,7 +120,7 @@ const ProductListing = () => {
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleDropdownClick}
-                    className="!bg-[var(--bg-primary)] !text-white !capitalize !h-8 !text-[14px] !w-[200px] flex !justify-start"
+                    className="!bg-[var(--bg-primary)] !text-white !capitalize !h-8 !text-[14px] !w-[190px] flex !justify-start"
                   >
                     {selectedOption}
                   </Button>
@@ -137,7 +144,7 @@ const ProductListing = () => {
               </div>
             </div>
 
-            <div className={`grid ${itemView === 'grid' ? "grid-cols-4 md:grid-cols-4" : "grid-cols-1 md:grid-cols-1"} gap-4`}>
+            <div className={`grid ${itemView === 'grid' ? "grid-cols-5 md:grid-cols-5" : "grid-cols-1 md:grid-cols-1"} gap-5`}>
 
               {
                 itemView === 'grid' ?

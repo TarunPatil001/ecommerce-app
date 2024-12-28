@@ -2,7 +2,7 @@ import React from 'react'
 
 const ProductImageOpacityChange = () => {
     return (
-        <div className="h-[270px] overflow-hidden">
+        <div className="h-auto overflow-hidden">
             <img
                 src="https://api.spicezgold.com/download/file_1734529474612_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-0-202304080900.webp"
                 alt="product image"
