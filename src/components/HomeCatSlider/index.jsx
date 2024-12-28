@@ -141,48 +141,6 @@ const HomeCatSlider = () => {
               </div>
             </Link>
           </SwiperSlide>
-          <SwiperSlide>
-            <Link to="/">
-              <div className="item p-2 bg-white rounded-lg shadow-sm text-center flex items-center justify-center flex-col transition-all link">
-              <div className="img-box !w-full !h-[150px] rounded-lg">
-                  <img
-                    src="https://learn.sensibo.com/hubfs/image_2023-11-20_10-40-17%20%281%29.png"
-                    alt="categoryImage"
-                    className="scalable-image rounded-lg"
-                  /> 
-                </div>
-                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Air Conditioners</h3>
-              </div>
-            </Link>
-          </SwiperSlide>
-          <SwiperSlide>
-            <Link to="/">
-              <div className="item p-2 bg-white rounded-lg shadow-sm text-center flex items-center justify-center flex-col transition-all link">
-              <div className="img-box !w-full !h-[150px] rounded-lg">
-                  <img
-                    src="https://learn.sensibo.com/hubfs/image_2023-11-20_10-40-17%20%281%29.png"
-                    alt="categoryImage"
-                    className="scalable-image rounded-lg"
-                  /> 
-                </div>
-                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Air Conditioners</h3>
-              </div>
-            </Link>
-          </SwiperSlide>
-          <SwiperSlide>
-            <Link to="/">
-              <div className="item p-2 bg-white rounded-lg shadow-sm text-center flex items-center justify-center flex-col transition-all link">
-              <div className="img-box !w-full !h-[150px] rounded-lg">
-                  <img
-                    src="https://learn.sensibo.com/hubfs/image_2023-11-20_10-40-17%20%281%29.png"
-                    alt="categoryImage"
-                    className="scalable-image rounded-lg"
-                  /> 
-                </div>
-                <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Air Conditioners</h3>
-              </div>
-            </Link>
-          </SwiperSlide>
         </Swiper>
       </div>
     </div>

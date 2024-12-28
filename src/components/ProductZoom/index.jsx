@@ -23,7 +23,7 @@ const ProductZoom = () => {
 
     return (
         <>
-            <div className="flex gap-3 sticky top-20 z-[99]">
+            <div className="flex gap-3 sticky top-20 z-[99] stickyZoom">
                 <div className="slider w-[15%] productDetailImageOptions">
                     <Swiper
                         ref={zoomSlideSml}
@@ -72,16 +72,16 @@ const ProductZoom = () => {
                     </Swiper>
                 </div>
 
-                <div className="zoomContainer w-[85%] !h-[600px] ">
-                    <div className="w-full h-[600px]  border-red-400">
+                <div className="zoomContainer w-full h-[600px] max-w-[85%] mx-auto relative">
+                    {/* <div className="w-full h-full border-red-400"> */}
                         <Swiper
                             ref={zoomSlideBig}
                             slidesPerView={1}
                             spaceBetween={0}
-                            className="productZoomSwiper !w-full !h-[600px] rounded-md"
+                            className="productZoomSwiper w-full h-full rounded-md"
                         >
                             <SwiperSlide>
-                                <div className="!h-[600px] !w-auto">
+                                {/* <div className="w-full h-full "> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -89,13 +89,13 @@ const ProductZoom = () => {
                                         fullscreenOnMobile={false}
                                         zoomScale={1}
                                         src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/z3UAG5L0_e6cd3d86e0ec4ecfbd0d275b4651a52d.jpg"
-                                        className="w-full h-full object-cover" // Ensure the image fits properly
+                                        className="w-full h-full object-cover" // Ensure image covers the container while maintaining aspect ratio
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
 
                             <SwiperSlide>
-                                <div className="h-[600px] w-auto">
+                                {/* <div className="w-full h-full relative"> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -105,11 +105,11 @@ const ProductZoom = () => {
                                         src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/oVVmjA9k_c2cbde379fee4d2a8df7ba5b2675c151.jpg"
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
 
                             <SwiperSlide>
-                                <div className="h-[600px] w-auto">
+                                {/* <div className="w-full h-full relative"> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -119,11 +119,11 @@ const ProductZoom = () => {
                                         src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/Ll9f5oK5_cb9b052d790544db81169ff1f74e2858.jpg"
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
 
                             <SwiperSlide>
-                                <div className="h-[600px] w-auto">
+                                {/* <div className="w-full h-full relative"> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -133,10 +133,10 @@ const ProductZoom = () => {
                                         src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/Pr3HFMT1_fc5b89183e554cf4af0755a87b0ac8d4.jpg"
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
                             <SwiperSlide>
-                                <div className="h-[600px] w-auto">
+                                {/* <div className="w-full h-full relative"> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -146,10 +146,10 @@ const ProductZoom = () => {
                                         src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/28044696/2024/7/19/4014fe66-c567-4adc-b965-081fb17dbdb41721374973991-Libas-Floral-Printed-Mandarin-Collar-A-Line-Kurti-4817213749-7.jpg"
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
                             <SwiperSlide>
-                                <div className="h-[600px] w-auto">
+                                {/* <div className="w-full h-full relative"> */}
                                     <InnerImageZoom
                                         zoomType="hover"
                                         zoomPreload={true}
@@ -159,10 +159,10 @@ const ProductZoom = () => {
                                         src="https://rukminim1.flixcart.com/image/1664/1664/xif0q/kurta/8/u/0/s-sa19kr1353m-surhi-original-imah78urfwrvcsta.jpeg"
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                                {/* </div> */}
                             </SwiperSlide>
                         </Swiper>
-                    </div>
+                    {/* </div> */}
                 </div>
             </div>
         </>

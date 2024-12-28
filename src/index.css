@@ -531,6 +531,13 @@ nav ul button:hover {
   cursor: crosshair !important;
 }
 
+
+
+/* .productDetailsModalContainer .zoomContainer, .productDetailsModalContainer .zoomProductSliderThumbs{ */
+  /* ---------- For product modal  -------------- */
+  /* height: 500px !important; */
+/* } */
+
 .productDetailImageOptions .zoomProductSliderThumbs .swiper-button-prev{
   top: 22px !important;
   left: inherit !important;
@@ -590,17 +597,27 @@ nav ul button:hover {
 
 .productContent .actions button{
   font-size: 14px !important;
-  font-weight: 500;
+  font-weight: 500 !important;
   min-width: 40px !important;
   height: 40px !important;
-  color: #000;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000 ;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 } 
 .productContent .actions button:hover{
   border: 1px solid var(--bg-primary);
 }
 
-
+.productDetailsModalContainer .actions button{
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  color: #000;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+} 
+.productDetailsModalContainer .actions button:hover{
+  border: 1px solid var(--bg-primary);
+}
 
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 

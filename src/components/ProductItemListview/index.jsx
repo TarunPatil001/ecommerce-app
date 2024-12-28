@@ -1,4 +1,4 @@
-// import React from "react";
+import React, { useContext } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -12,11 +12,15 @@ import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
 import { BiSolidDiscount } from "react-icons/bi";
+import { MyContext } from "../../App";
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const ProductItemListView = () => {
+
+  const context = useContext(MyContext);
+
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
       <div className="productItemListView rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)] flex items-center h-[230px]">
@@ -62,7 +66,7 @@ const ProductItemListView = () => {
               placement="right"
               arrow
             >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group"  onClick={()=>context.setOpenProductDetailsModal(true)}>
                 <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
               </Button>
             </Tooltip>

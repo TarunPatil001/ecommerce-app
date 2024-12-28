@@ -9,7 +9,6 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
 import Tooltip from '@mui/material/Tooltip';
-import Navigation from './Navigation/index';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
