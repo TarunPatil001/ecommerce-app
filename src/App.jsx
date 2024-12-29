@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -20,13 +20,30 @@ function App() {
   const [openProductDetailsModal, setOpenProductDetailsModal] = useState(false);
   const [maxWidth, setMaxWidth] = useState('lg');
   const [fullWidth, setFullWidth] = useState(true);
+  const [openCartPanel, setOpenCartPanel] = useState(false);
+  const [cartItemsQty, setCartItemsQty] = useState(5);
+
+  // callback from cartPanel
+  const handleCartItemQtyChange = (newQty) => {
+    setCartItemsQty(newQty); // Updates the cart quantity
+  };
 
   const handleCloseProductDetailsModal = () => {
     setOpenProductDetailsModal(false);
   };
 
+  const toggleCartPanel = (newOpen) => () => {
+    setOpenCartPanel(newOpen);
+  };
+
   const values = {
-    setOpenProductDetailsModal
+    handleCartItemQtyChange,
+    cartItemsQty,
+    setCartItemsQty,
+    setOpenProductDetailsModal,
+    toggleCartPanel,
+    setOpenCartPanel,
+    openCartPanel,
   };
 
   return (
@@ -74,13 +91,14 @@ function App() {
             </div>
           </div>
 
-
         </DialogContent>
       </Dialog>
+
+      
     </BrowserRouter>
   );
 }
 
 export default App;
 
-export {MyContext};
+export { MyContext };

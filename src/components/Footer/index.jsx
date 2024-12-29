@@ -3,21 +3,28 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
+  Drawer,
   FormControlLabel,
   TextField,
   Tooltip,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { BsTwitterX } from "react-icons/bs";
 import { CiDeliveryTruck, CiGift } from "react-icons/ci";
 import { FaYoutube } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
-import { IoWalletOutline } from "react-icons/io5";
+import { IoCloseOutline, IoWalletOutline } from "react-icons/io5";
 import { RiFacebookFill, RiForward30Fill } from "react-icons/ri";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { Link } from "react-router-dom";
+import CartPanel from "../CartPanel";
+import { MyContext } from "../../App";
 
 const Footer = () => {
+  
+  const context = useContext(MyContext);
+
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState(false);
@@ -221,11 +228,10 @@ const Footer = () => {
                 >
                   <Button
                     variant="contained"
-                    className={`uppercase buttonPrimaryBlack ${
-                      isChecked
-                        ? "buttonPrimaryBlack"
-                        : "hover:!bg-gray-400 !cursor-not-allowed"
-                    } `}
+                    className={`uppercase buttonPrimaryBlack ${isChecked
+                      ? "buttonPrimaryBlack"
+                      : "hover:!bg-gray-400 !cursor-not-allowed"
+                      } `}
                     onClick={handleSubscribe}
                   >
                     Subscribe
@@ -258,29 +264,49 @@ const Footer = () => {
       <div className="bottomStrip border-t border-[rgba(0,0,0,0.2)] py-3">
         <div className="container flex items-center justify-between">
           <ul className="flex items-center gap-2">
-            <li className="list-none "> 
+            <li className="list-none ">
               <Link to="/" target="_blank" className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.2)] flex items-center justify-center group hover:bg-[var(--bg-primary)] transition-all duration-500">
                 <RiFacebookFill className="group-hover:text-white text-[50px] p-1.5" />
               </Link>
             </li>
-            <li className="list-none"> 
-            <Link to="/" target="_blank" className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.2)] flex items-center justify-center group hover:bg-[var(--bg-primary)] transition-all duration-500">
+            <li className="list-none">
+              <Link to="/" target="_blank" className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.2)] flex items-center justify-center group hover:bg-[var(--bg-primary)] transition-all duration-500">
                 <BsTwitterX className="group-hover:text-white text-[50px] p-2" />
               </Link>
             </li>
-            <li className="list-none"> 
-            <Link to="/" target="_blank" className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.2)] flex items-center justify-center group hover:bg-[var(--bg-primary)] transition-all duration-500">
+            <li className="list-none">
+              <Link to="/" target="_blank" className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.2)] flex items-center justify-center group hover:bg-[var(--bg-primary)] transition-all duration-500">
                 <FaYoutube className="group-hover:text-white text-[50px] p-1.5" />
               </Link>
             </li>
           </ul>
-            <p className="text-[13px] text-center mb-0">&copy;2024-2025 EcommerceApp.com</p>
-          
+          <p className="text-[13px] text-center mb-0">&copy;2024-2025 EcommerceApp.com</p>
+
           <div className="flex items-center">
             <img src="https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/payment-method-c454fb.svg" alt="visa" />
           </div>
         </div>
       </div>
+
+
+      {/* Cart Panel */}
+      <Drawer open={context.openCartPanel} onClose={context.toggleCartPanel(false)} anchor="right">
+        <div className="flex items-center justify-between px-4 py-1 !w-[400px] !max-w-[400px]">
+          <h3 className="text-[18px] !font-semibold text-[var(--text-dark)]">Shopping Cart ({context.cartItemsQty})</h3>
+          <Button
+            className="!w-[40px] !h-[40px] !min-w-[40px] !shadow-sm !text-red-500 !rounded-full flex items-center justify-center"
+            onClick={context.toggleCartPanel(false)}
+          >
+            <IoCloseOutline className="text-[50px]" onClose={context.toggleCartPanel(false)} />
+          </Button>
+        </div>
+        <Divider />
+        {/* <CartPanel  /> */}
+        <CartPanel onCartItemQtyChange={context.handleCartItemQtyChange} />
+
+      </Drawer>
+
+
     </>
   );
 };
