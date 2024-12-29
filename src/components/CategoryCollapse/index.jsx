@@ -38,7 +38,7 @@ const CategoryCollapse = () => {
           <li key="fashion" className="list-none flex items-center relative flex-col ">
             <Link to="/" className="w-full">
               <Button
-                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                className="w-full !text-[16px] !font-[500] !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                 disableRipple
               >
                 Fashion
@@ -62,7 +62,7 @@ const CategoryCollapse = () => {
                 <li key="mens" className="list-none relative">
                   <Link to="/" className="w-full">
                     <Button
-                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                      className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                       disableRipple
                     >
                       Men&apos;s
@@ -85,7 +85,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-1" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s Shirt
@@ -95,7 +95,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-2" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s T-Shirt
@@ -105,7 +105,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-3" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s Jackets
@@ -115,7 +115,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-4" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s Cargo Pants
@@ -125,7 +125,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-5" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s Jeans
@@ -135,7 +135,7 @@ const CategoryCollapse = () => {
                       <li key="mens-link-6" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Men&apos;s Shoes
@@ -153,7 +153,7 @@ const CategoryCollapse = () => {
           <li key="outerwear" className="list-none flex items-center relative flex-col">
             <Link to="/" className="w-full">
               <Button
-                className="w-full !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                className="w-full !text-[16px] !font-[500] !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                 disableRipple
               >
                 Electronic&apos;s
@@ -177,7 +177,7 @@ const CategoryCollapse = () => {
                 <li key="Laptop" className="list-none relative">
                   <Link to="/" className="w-full">
                     <Button
-                      className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                      className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                       disableRipple
                     >
                       Laptop
@@ -200,7 +200,7 @@ const CategoryCollapse = () => {
                       <li key="Laptop-link-1" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Lenovo
@@ -210,7 +210,7 @@ const CategoryCollapse = () => {
                       <li key="Laptop-link-2" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Dell
@@ -220,7 +220,7 @@ const CategoryCollapse = () => {
                       <li key="Laptop-link-3" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             Asus
@@ -230,7 +230,7 @@ const CategoryCollapse = () => {
                       <li key="Laptop-link-4" className="list-none relative">
                         <Link to="/" className="link w-full">
                           <Button
-                            className="w-full !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
                             disableRipple
                           >
                             MacBook

@@ -10,8 +10,6 @@ import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { Checkbox, Tooltip } from "@mui/material";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MdOutlineShoppingCart } from "react-icons/md";
-import { TbRosetteDiscountFilled } from "react-icons/tb";
-import { BiSolidDiscount } from "react-icons/bi";
 import { MyContext } from "../../App";
 
 

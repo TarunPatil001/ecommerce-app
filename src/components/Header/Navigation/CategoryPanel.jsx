@@ -13,7 +13,7 @@ const CategoryPanel = (props) => {
 
   const DrawerList = () => (
     <Box sx={{ width: 315 }} role="presentation" className="categoryPanel">
-      <h3 className="p-3 ml-3 text-[16px] font-[600] flex items-center justify-between">
+      <h3 className="p-3 ml-3 text-[18px] font-[600] flex items-center justify-between">
         Shop By Categories{" "}
         <RxCross2 
           onClick={toggleDrawer}

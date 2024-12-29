@@ -48,11 +48,11 @@ const Navigation = () => {
         <div className="container flex items-center justify-end gap-8">
           <div className="col_1 w-[20%]">
             <Button
-              className="!text-black !font-[500] gap-2 w-full hover:!text-[rgba(0,0,0,0.9)]"
+              className="!text-black !text-[16px] !font-[600] gap-2 w-full hover:!text-[rgba(0,0,0,0.9)]"
               disableRipple
               onClick={() => openCategoryPanel(true)}
             >
-              <RiMenu2Fill className="text-[18px]" />
+              <RiMenu2Fill className="" />
               Shop By Categories
               <LiaAngleDownSolid className="text-[13px] ml-auto font-bold" />
             </Button>
@@ -61,15 +61,15 @@ const Navigation = () => {
           <div className="col_2 w-[60%]">
             <ul className="flex items-center gap-3 nav">
               <li className="list-none">
-                <Link to="/" className="link transition text-[14px]">
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] text-capitalize !py-4">
+                <Link to="/" className="link transition ">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] text-capitalize !py-4">
                     Home
                   </Button>
                 </Link>
               </li>
               <li className="list-none relative">
-                <Link to="/productListing" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] !py-4">
+                <Link to="/productListing" className="link transition  font-[500]">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] !py-4">
                     Fashion
                   </Button>
                 </Link>
@@ -78,7 +78,7 @@ const Navigation = () => {
                   <ul>
                     <li className="list-none w-full relative">
                       <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.9)] w-full !text-left !justify-between !rounded-none">
+                        <Button className="!text-[rgba(0,0,0,0.9)]  w-full !text-left !justify-between !rounded-none">
                           Men
                           <IoIosArrowForward />
                         </Button>
@@ -165,17 +165,17 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/electronics"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Electronics
                   </Button>
                 </Link>
               </li>
 
               <li className="list-none relative">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                <Link to="/" className="link transition">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Bags
                   </Button>
                 </Link>
@@ -270,9 +270,9 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/footware"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Footwear
                   </Button>
                 </Link>
@@ -280,9 +280,9 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/groceries"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[560000] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Groceries
                   </Button>
                 </Link>
@@ -290,9 +290,9 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/beauty"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Beauty
                   </Button>
                 </Link>
@@ -300,9 +300,9 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/wellness"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Wellness
                   </Button>
                 </Link>
@@ -310,9 +310,9 @@ const Navigation = () => {
               <li className="list-none">
                 <Link
                   to="/jewellery"
-                  className="link transition text-[14px] font-[500]"
+                  className="link transition"
                 >
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
+                  <Button className="link transition !text-[16px] !font-[600] !text-[rgba(0,0,0,0.9)] hover:!text-[var(--bg-primary)] !py-4">
                     Jewellery
                   </Button>
                 </Link>
@@ -321,7 +321,7 @@ const Navigation = () => {
           </div>
 
           <div className="col_3 w-[20%]">
-            <p className="text-[14px] font-[500] flex items-center gap-3 mt-0 mb-0">
+            <p className="!text-[16px] !font-[600] flex items-center gap-3 mt-0 mb-0">
               <GoRocket className="text-[18px]" />
               Free International Delivery
             </p>

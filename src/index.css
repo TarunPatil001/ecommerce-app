@@ -636,7 +636,7 @@ input[type=number]::-webkit-outer-spin-button {
   border-radius: 0px !important;
 }
 
-
-/* review */
-
+.MuiTextField-root{
+  color: var(--bg-primary) !important;
+}
 

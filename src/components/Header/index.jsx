@@ -78,38 +78,38 @@ const Header = () => {
             <ul className="flex items-center justify-end gap-3 w-full">
               <li className="list-none">
                 <div className="flex items-center justify-center">
-                <Link to="/login" className="link transition text-[15px] font-[500]">Login</Link>
-                <span className="line !h-[20px] mx-2 !w-[0.5px]"></span>
-                <Link to="/register" className="link transition text-[15px] font-[500]">Register</Link>
+                  <Link to="/login" className="link transition text-[15px] font-[500]">Login</Link>
+                  <span className="line !h-[20px] mx-2 !w-[0.5px]"></span>
+                  <Link to="/register" className="link transition text-[15px] font-[500]">Register</Link>
                 </div>
               </li>
-                <span className="line !h-[40px] mx-2"></span>
-              
+              <span className="line !h-[40px] mx-2"></span>
+
               <li>
-              <Tooltip title="Compare" placement="top" arrow>
-                <IconButton aria-label="compare" className="link transition">
-                  <StyledBadge badgeContent={4} color="secondary">
-                  <IoGitCompareOutline />
-                  </StyledBadge>
-                </IconButton>
-              </Tooltip>
-              </li>
-              <li>
-              <Tooltip title="Wishlist" placement="top" arrow>
-                <IconButton aria-label="wishlist" className="link transition">
-                  <StyledBadge badgeContent={4} color="secondary">
-                    <FaRegHeart />
-                  </StyledBadge>
-                </IconButton>
+                <Tooltip title="Compare" placement="top" arrow>
+                  <IconButton aria-label="compare" className="link transition">
+                    <StyledBadge badgeContent={4} color="secondary">
+                      <IoGitCompareOutline />
+                    </StyledBadge>
+                  </IconButton>
                 </Tooltip>
               </li>
               <li>
-              <Tooltip title="Cart" placement="top" arrow>
-                <IconButton aria-label="cart" className="link transition">
-                  <StyledBadge badgeContent={4} color="secondary" anchorOrigin={{vertical: 'top', horizontal: 'right'}} className="w-[]">
-                    <MdOutlineShoppingCart />
-                  </StyledBadge>
-                </IconButton>
+                <Tooltip title="Wishlist" placement="top" arrow>
+                  <IconButton aria-label="wishlist" className="link transition">
+                    <StyledBadge badgeContent={4} color="secondary">
+                      <FaRegHeart />
+                    </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip title="Cart" placement="top" arrow>
+                  <IconButton aria-label="cart" className="link transition">
+                    <StyledBadge badgeContent={4} color="secondary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }} className="w-[]">
+                      <MdOutlineShoppingCart />
+                    </StyledBadge>
+                  </IconButton>
                 </Tooltip>
               </li>
             </ul>
