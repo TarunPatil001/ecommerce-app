@@ -640,3 +640,5 @@ input[type=number]::-webkit-outer-spin-button {
   color: var(--bg-primary) !important;
 }
 
+#basic-menu .MuiButtonBase-root{font-size: 12px !important;}
+

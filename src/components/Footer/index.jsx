@@ -302,7 +302,7 @@ const Footer = () => {
         </div>
         <Divider />
         {/* <CartPanel  /> */}
-        <CartPanel onCartItemQtyChange={context.handleCartItemQtyChange} />
+        <CartPanel onCartItemQtyChange={context.handleCartItemQtyChange} onPlatformFeeChange={context.handlePlatformFeeChange} onShippingFeeChange={context.handleShippingFeeChange} />
 
       </Drawer>
 
