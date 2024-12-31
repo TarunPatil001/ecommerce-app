@@ -92,7 +92,7 @@ const CartPage = () => {
                             </div>
                             <Divider />
                             <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
-                                <Link to="/checkout" className="w-full"><Button className="buttonPrimaryBlack w-full flex items-center gap-1" onClick={context.toggleCartPanel(false)}><IoBagCheck />Checkout</Button></Link>
+                                <Link to="/checkout" className="w-full"><Button className="buttonPrimaryBlack w-full flex items-center gap-1" onClick={context.toggleCartPanel(false)}><IoBagCheck />Place Order</Button></Link>
                             </div>
                         </div>
                     </div>

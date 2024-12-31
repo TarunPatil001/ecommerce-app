@@ -603,6 +603,7 @@ nav ul button:hover {
   color: #000 ;
   border: 1px solid rgba(0, 0, 0, 0.2);
 } 
+
 .productContent .actions button:hover{
   border: 1px solid var(--bg-primary);
 }
@@ -615,6 +616,7 @@ nav ul button:hover {
   color: #000;
   border: 1px solid rgba(0, 0, 0, 0.2);
 } 
+
 .productDetailsModalContainer .actions button:hover{
   border: 1px solid var(--bg-primary);
 }
@@ -654,4 +656,5 @@ input[type=number]::-webkit-outer-spin-button {
   height: 90vh;
   display: flex;
 }
+
 
