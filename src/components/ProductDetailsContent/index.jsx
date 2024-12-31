@@ -4,8 +4,6 @@ import QtyBox from '../../components/QtyBox';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
 import { IoGitCompareOutline } from 'react-icons/io5';
-import TextField from '@mui/material/TextField';
-import { BsPencilSquare } from 'react-icons/bs';
 import { Button, Rating } from '@mui/material';
 import { Link } from 'react-router-dom';
 

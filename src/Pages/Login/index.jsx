@@ -2,14 +2,31 @@ import React, { useState } from 'react'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
+import toast from 'react-hot-toast';
 
 
 
 const Login = () => {
 
     const [isShowPassword, setIsShowPassword] = useState(false);
+    const [formFields, setFormFields] = useState({
+        email:'',
+        password:'',
+    });
+
+    const history = useNavigate();
+
+    const forgetPassword = () => {
+        if(formFields.email !== ""){
+            ""
+        }else{
+            ""
+        }
+        history("/verify");
+        toast.success("Verification code send!");
+    }
 
     return (
         <div>
@@ -20,10 +37,10 @@ const Login = () => {
 
                         <form action="" className="w-full mt-5">
                             <div className="form-group w-full mb-5 relative">
-                                <TextField type="email" id="email" label="Email Id" placeholder="Enter email" required variant="outlined" className="custom-textfield w-full mb-5" />
+                                <TextField type="email" id="email" label="Email Id" name="name" placeholder="Enter email" required variant="outlined" className="custom-textfield w-full mb-5" />
                             </div>
                             <div className="form-group w-full mb-5 relative">
-                                <TextField type={isShowPassword === true ? 'text' : 'password'} id="password" label="Password" placeholder="Enter password" required variant="outlined" className="custom-textfield w-full mb-5" />
+                                <TextField type={isShowPassword === true ? 'text' : 'password'} id="password" name="password" label="Password" placeholder="Enter password" required variant="outlined" className="custom-textfield w-full mb-5" />
                                 <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword(!isShowPassword)}>
                                     {
                                         isShowPassword === false ?
@@ -33,7 +50,7 @@ const Login = () => {
                                     }
                                 </Button>
                             </div>
-                            <a className="cursor-pointer text-[14px] font-medium text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8">Forgot Password?</a>
+                            <a className="cursor-pointer text-[14px] font-medium text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8" onClick={forgetPassword}>Forgot Password?</a>
 
                             <Button className="buttonPrimaryBlack !w-full !text-[15px] !font-semibold !mt-4">Sign In</Button>
 
