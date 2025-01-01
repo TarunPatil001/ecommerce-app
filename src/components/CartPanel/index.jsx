@@ -92,7 +92,7 @@ const CartPanel = ({ onCartItemQtyChange, onPlatformFeeChange, onShippingFeeChan
                 <Divider />
                 <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
                     <Link to="/cart" className="w-[45%]"><Button className="buttonPrimaryBlack w-full" onClick={context.toggleCartPanel(false)}>View Cart</Button></Link>
-                    <Link to="/checkout" className="w-[45%]"><Button className="buttonPrimaryBlack w-full flex items-center gap-1" onClick={context.toggleCartPanel(false)}><IoBagCheck />Checkout</Button></Link>
+                    <Link to="/checkout" className="w-[45%]"><Button className="buttonPrimaryWhite w-full flex items-center gap-1" onClick={context.toggleCartPanel(false)}><IoBagCheck />Checkout</Button></Link>
                 </div>
             </div>
         </>

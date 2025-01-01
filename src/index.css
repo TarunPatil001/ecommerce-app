@@ -523,6 +523,17 @@ nav ul button:hover {
   background: rgba(0,0,0,0.8) !important;
   color: #fff !important;
 }
+.buttonPrimaryWhite{
+  background: #ffffff !important;
+  color: var(--bg-primary) !important;
+  border: 2px var(--bg-primary) solid !important;
+}
+
+.buttonPrimaryWhite:hover{
+  background: rgba(0,0,0,0.8) !important;
+  color: #fff !important;
+  border: 2px solid gray !important;
+}
 
 /* --------- ProductDetails ----------- */
 
@@ -658,3 +669,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 
+.myAccountTabs li a{position: relative; display: block;}
+.myAccountTabs li a:before{content: ''; width: 3px; height: 50%; position: absolute; top: 50%x; left: 0px; background: var(--bg-primary); transition: all 0.3s ease-in-out; opacity: 0;}
+.myAccountTabs li a.active::before{height: 100%; opacity: 1; top: 0px;}
+.myAccountTabs li a.active button svg{color: var(--bg-primary) !important; opacity: 1 !important;}

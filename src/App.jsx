@@ -18,6 +18,8 @@ import Verify from './Pages/Verify';
 import { Toaster } from 'react-hot-toast';
 import ForgotPassword from './Pages/ForgotPassword';
 import Checkout from './Pages/Checkout';
+import MyAccount from './Pages/MyAccount';
+import Wishlist from './Pages/Wishlist';
 
 const MyContext = createContext();
 
@@ -29,7 +31,8 @@ function App() {
   const [cartItemsQty, setCartItemsQty] = useState(0);
   const [platformFee, setPlatformFee] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
-
+  const [isLogin, setIsLogin] = useState(true);
+  
 
   // callback from cartPanel
   const handleCartItemQtyChange = (newQty) => {
@@ -57,6 +60,7 @@ function App() {
     platformFee,
     shippingFee,
     openCartPanel,
+    isLogin,
     handleCartItemQtyChange,
     handlePlatformFeeChange,
     handleShippingFeeChange,
@@ -66,6 +70,7 @@ function App() {
     setOpenProductDetailsModal,
     toggleCartPanel,
     setOpenCartPanel,
+    setIsLogin,
   };
 
   return (
@@ -83,6 +88,8 @@ function App() {
           <Route path={"/verify"} exact={true} element={<Verify />} />
           <Route path={"/forgot-password"} exact={true} element={<ForgotPassword />} />
           <Route path={"/checkout"} exact={true} element={<Checkout />} />
+          <Route path={"/my-account"} exact={true} element={<MyAccount />} />
+          <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
         </Routes>
         <Footer />
         <Toaster />
