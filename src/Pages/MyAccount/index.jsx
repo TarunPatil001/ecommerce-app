@@ -1,5 +1,5 @@
-import { Button, Divider, TextField } from '@mui/material'
 import React from 'react'
+import { Button, Divider, TextField } from '@mui/material'
 import AccountSidebar from '../../components/AccountSidebar'
 
 const MyAccount = () => {

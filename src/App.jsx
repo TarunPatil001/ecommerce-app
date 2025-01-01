@@ -20,6 +20,7 @@ import ForgotPassword from './Pages/ForgotPassword';
 import Checkout from './Pages/Checkout';
 import MyAccount from './Pages/MyAccount';
 import Wishlist from './Pages/Wishlist';
+import Orders from './Pages/Orders';
 
 const MyContext = createContext();
 
@@ -90,6 +91,7 @@ function App() {
           <Route path={"/checkout"} exact={true} element={<Checkout />} />
           <Route path={"/my-account"} exact={true} element={<MyAccount />} />
           <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
+          <Route path={"/my-orders"} exact={true} element={<Orders />} />
         </Routes>
         <Footer />
         <Toaster />

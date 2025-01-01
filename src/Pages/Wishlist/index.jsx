@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
-import { Button, Divider } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Divider } from '@mui/material'
 import { MyContext } from '../../App'
 import WishlistItems from './wishlistItems'
 import AccountSidebar from '../../components/AccountSidebar'
@@ -16,8 +15,8 @@ const Wishlist = () => {
                 <div className="leftPart w-[70%]">
                     <div className="shadow-md rounded-md bg-white flex flex-col gap-2">
                         <div className="py-2 px-3">
-                            <h2 className="font-bold">Your Cart</h2>
-                            <p className="mt-0">There are <span className="font-bold text-[var(--bg-primary)]">{context.cartItemsQty}</span> product{context.cartItemsQty <= 1 ? ("") : ("s")} in your cart</p>
+                            <h2 className="font-bold">My Wishlist</h2>
+                            <p className="mt-0">There are <span className="font-bold text-[var(--bg-primary)]">{context.cartItemsQty}</span> product{context.cartItemsQty <= 1 ? ("") : ("s")} in your wishlist.</p>
                         </div>
                         <Divider />
                         <div className="flex items-center flex-col p-3 gap-4">

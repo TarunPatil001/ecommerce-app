@@ -1,6 +1,5 @@
-import { Button, Menu, MenuItem } from '@mui/material';
-import React, { useContext, useState } from 'react'
-import { FaCaretDown } from 'react-icons/fa';
+import React, { useContext } from 'react'
+import { Button } from '@mui/material';
 import { RiCloseLargeLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { MyContext } from '../../App';

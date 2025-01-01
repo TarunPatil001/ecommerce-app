@@ -2,10 +2,7 @@ import React, { useContext } from 'react'
 import { Button, Divider } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { MyContext } from '../../App'
-import { GiReturnArrow } from 'react-icons/gi'
-import { FaCaretDown } from 'react-icons/fa'
-import { RiCloseLargeLine } from 'react-icons/ri'
-import { IoBagCheck, IoBagCheckOutline } from 'react-icons/io5'
+import { IoBagCheck } from 'react-icons/io5'
 import CartItems from './cartItems'
 
 const CartPage = () => {
