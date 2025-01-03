@@ -26,7 +26,7 @@ body {
   font-family: var(--font-family) !important;
   /* Apply letter spacing */
   /* letter-spacing: var(--letter-spacing) !important;  */
-  font-optical-sizing: auto;
+  font-optical-sizing: auto !important;
   background: #f5f0f0;
   color: var(--text-dark) !important;
   overflow-x: hidden;
