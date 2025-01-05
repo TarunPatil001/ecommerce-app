@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Badge, Button, Divider, IconButton } from '@mui/material';
-import { RiMenu2Line } from "react-icons/ri";
+import { AiOutlineMenuFold } from "react-icons/ai";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaRegBell, FaRegUser } from "react-icons/fa";
 import { styled } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { MdOutlineLogout } from "react-icons/md";
+import { MdOutlineDoubleArrow, MdOutlineLogout } from "react-icons/md";
+import { MyContext } from "../../App";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -22,6 +23,10 @@ const Header = () => {
 
   const [anchorMyAcc, setAnchorMyAcc] = useState(null);
   const openMyAcc = Boolean(anchorMyAcc);
+
+  const [isSticky, setIsSticky] = useState(true); // Track sticky state
+  const [lastScrollY, setLastScrollY] = useState(0); // Track last scroll position
+  
   const handleClickMyAcc = (event) => {
     setAnchorMyAcc(event.currentTarget);
   };
@@ -29,10 +34,36 @@ const Header = () => {
     setAnchorMyAcc(null);
   };
 
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show navbar (sticky) when scrolling up
+      if (currentScrollY < lastScrollY) {
+        setIsSticky(true);
+      }
+      // Hide navbar (non-sticky) when scrolling down
+      else {
+        setIsSticky(false);
+      }
+
+      setLastScrollY(currentScrollY); // Update the last scroll position
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
+
+  const context = useContext(MyContext);
+
   return (
-    <header className="w-full h-auto py-2 shadow-md pl-72 bg-[#fff] pr-7 flex items-center justify-between">
+    <header className={`w-full h-auto py-2 shadow-md ${context.isSidebarOpen === true ? 'pl-72' : 'pl-5'} bg-[#fff] pr-7 flex items-center justify-between z-[50] transition-all duration-300 ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
       <div className="part1">
-        <Button className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !text-[rgba(0,0,0,0.8)]"><RiMenu2Line className="text-[18px]" /></Button>
+        <Button className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !text-[rgba(0,0,0,0.8)] shadow-md hover:bg-gray-200" onClick={()=>context.setIsSidebarOpen(!context.isSidebarOpen)}><MdOutlineDoubleArrow className={`text-[18px] ${context.isSidebarOpen === true ? '-rotate-180' : 'rotate-0'} transition-all duration-300`} /></Button>
       </div>
 
       <div className="part2 w-[40%] flex items-center justify-end gap-5">
