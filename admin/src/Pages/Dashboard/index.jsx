@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import DashboardBoxes from '../../Components/DashboardBoxes'
-import { Button, Checkbox, FormControl, FormHelperText, InputLabel, MenuItem, Pagination, Tooltip } from '@mui/material'
+import { Button, Checkbox, FormControl, FormHelperText, InputLabel, MenuItem, Pagination } from '@mui/material'
+import { Tooltip } from '@mui/material'
 import { FiPlus } from "react-icons/fi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Badge from '../../Components/Badge';
@@ -17,7 +18,8 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Select from '@mui/material/Select';
-import { GoPlus } from "react-icons/go";
+import { GoDotFill, GoPlus } from "react-icons/go";
+import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -94,7 +96,81 @@ const Dashboard = () => {
     setPage(0);
   };
 
-
+  const [chartData1, setChartData1] = useState([
+    {
+      name: "JANUARY",
+      Total_Users: 4000,
+      Total_Sales: 2400,
+      amt: 2400,
+    },
+    {
+      name: "FEBRUARY",
+      Total_Users: 3000,
+      Total_Sales: 1398,
+      amt: 2210,
+    },
+    {
+      name: "MARCH",
+      Total_Users: 2000,
+      Total_Sales: 9800,
+      amt: 2290,
+    },
+    {
+      name: "APRIL",
+      Total_Users: 2780,
+      Total_Sales: 3908,
+      amt: 2000,
+    },
+    {
+      name: "MAY",
+      Total_Users: 1890,
+      Total_Sales: 4800,
+      amt: 2181,
+    },
+    {
+      name: "JUNE",
+      Total_Users: 2390,
+      Total_Sales: 3800,
+      amt: 2500,
+    },
+    {
+      name: "JULY",
+      Total_Users: 3490,
+      Total_Sales: 4300,
+      amt: 2100,
+    },
+    {
+      name: "AUGUST",
+      Total_Users: 5490,
+      Total_Sales: 4900,
+      amt: 2100,
+    },
+    {
+      name: "SEPTEMBER",
+      Total_Users: 8490,
+      Total_Sales: 4700,
+      amt: 2100,
+    },
+    {
+      name: "OCTOBER",
+      Total_Users: 7490,
+      Total_Sales: 6300,
+      amt: 2100,
+    },
+    {
+      name: "NOVEMBER",
+      Total_Users: 9490,
+      Total_Sales: 2300,
+      amt: 2100,
+    },
+    {
+      name: "DECEMBER",
+      Total_Users: 5490,
+      Total_Sales: 7300,
+      amt: 2100,
+    },
+  ]
+  );
 
 
   return (
@@ -1606,7 +1682,36 @@ const Dashboard = () => {
         </div>
       </div>
 
+      <div className="card my-4 bg-white border rounded-md px-1">
+        <div className='flex items-center justify-between px-5 pb-2 pt-5'>
+          <h2 className='text-[20px] font-bold'>Total Sales & Total Users</h2>
+        </div>
 
+        <div className='flex items-center justify-start px-5 pt-2 pb-5 gap-5'>
+          <span className='flex items-center'><span><GoDotFill className='text-violet-500' /></span>Total Sales</span>
+          <span className='flex items-center'><span><GoDotFill className='text-green-500' /></span>Total Users</span>
+        </div>
+
+        <LineChart
+          width={1000}
+          height={500}
+          data={chartData1}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="none" />
+          <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
+          <RechartTooltip contentStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Line type="monotone" dataKey="Total_Sales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
+          <Line type="monotone" dataKey="Total_Users" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
+        </LineChart>
+      </div>
 
 
     </>
