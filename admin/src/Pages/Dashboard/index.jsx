@@ -203,9 +203,9 @@ const Dashboard = () => {
                 onChange={handleChangeCategoryFilterValue}
               >
                 <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={10}>Men</MenuItem>
+                <MenuItem value={20}>Women</MenuItem>
+                <MenuItem value={30}>Kids</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -567,9 +567,9 @@ const Dashboard = () => {
                 onChange={handleChangeCategoryFilterValue}
               >
                 <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={10}>T-Shirt</MenuItem>
+                <MenuItem value={20}>Jeans</MenuItem>
+                <MenuItem value={30}>Jurkins</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -1691,26 +1691,29 @@ const Dashboard = () => {
           <span className='flex items-center'><span><GoDotFill className='text-violet-500' /></span>Total Sales</span>
           <span className='flex items-center'><span><GoDotFill className='text-green-500' /></span>Total Users</span>
         </div>
-
-        <LineChart
-          width={1000}
-          height={500}
-          data={chartData1}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="none" />
-          <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-          <YAxis tick={{ fontSize: 12 }} />
-          <RechartTooltip contentStyle={{ fontSize: 12 }} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Line type="monotone" dataKey="Total_Sales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="Total_Users" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
-        </LineChart>
+        <div style={{ width: '100%', height: '500px' }}>
+          <ResponsiveContainer>
+            <LineChart
+              width={1000}
+              height={500}
+              data={chartData1}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="none" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <RechartTooltip contentStyle={{ fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Line type="monotone" dataKey="Total_Sales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="Total_Users" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
 

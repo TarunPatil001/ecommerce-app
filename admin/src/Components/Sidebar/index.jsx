@@ -25,7 +25,7 @@ const Sidebar = () => {
       <div className={`sidebar fixed top-0 left-0 bg-[#fff] ${context.isSidebarOpen === true ? 'w-[18%] z-[50]' : 'w-[0%]'} h-full border-r p-2`}>
         <div className="py-2 w-full px-4">
           <Link to="/">
-            <img src="https://ecme-react.themenate.net/img/logo/logo-light-full.png" alt="logo" className='w-[120px]' />
+            <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="logo" className='w-[200px]' />
           </Link>
         </div>
 

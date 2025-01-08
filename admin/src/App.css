@@ -53,6 +53,12 @@ body {
   border-radius: 15px;
 }
 
+.custom-btn{
+  background-color: var(--bg-primary) !important;
+  color: #ffffff !important;
+  padding: 5px 20px !important;
+}
+
 .MuiBadge-badge {
   background: var(--bg-primary) !important;
 }
@@ -67,3 +73,17 @@ body {
 }
 
 th.MuiTableCell-root{@apply bg-gray-100 font-bold py-1}
+
+a.active button{
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.custom-credential-btn{
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.css-rizt0-MuiTypography-root{
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
