@@ -26,7 +26,7 @@ const UploadBox = (props) => {
       <h4 className="text-[14px] text-center font-medium">
         Drop your image here or <span className="text-blue-500">click to browse</span>
       </h4>
-      <input {...getInputProps()} className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-50" />
+      <input {...getInputProps()} accept="image/*,video/*" className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-50" />
     </div>
   );
 };

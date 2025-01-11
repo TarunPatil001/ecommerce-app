@@ -103,7 +103,7 @@ function App() {
           <section className="main">
             <Header />
             <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+              <div className={`sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
                 <Sidebar />
               </div>
               <div className={`contentRight ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
