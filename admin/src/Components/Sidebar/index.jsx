@@ -26,12 +26,10 @@ const Sidebar = () => {
   const menuMapping = {
     "/": "Dashboard",
     "/homeSlider/list": "Home Banners List",
-    "/homeSlider/add": "Add Home Banners",
     "/users": "Users",
     "/products": "Product List",
-    "/category": "Categories List",
-    "/category/subCategory": "Sub-Categories List",
-    "/category/subCategory/add": "Add a Sub-Category",
+    "/category/list": "Categories List",
+    "/subCategory/list": "Sub-Categories List",
     "/orders": "Orders",
     "/logout": "Logout",
   };
@@ -85,12 +83,10 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                  <Link to="/homeSlider/add">
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Home Banners' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Home Banners')}>
-                      <GoDotFill className={`${selectedMenu === 'Add Home Banners' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add Home Banner" })}>
+                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
                       <span>Add Home Banner</span>
                     </Button>
-                  </Link>
                 </li>
               </ul>
             </Collapse>
@@ -125,7 +121,7 @@ const Sidebar = () => {
                 
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add Product" })}>
                       <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                      <span>Product Upload</span>
+                      <span>Add Product</span>
                     </Button>
                    
                 </li>
@@ -143,7 +139,7 @@ const Sidebar = () => {
             <Collapse isOpened={subMenuIndex3}>
               <ul className='w-full'>
                 <li className='w-full'>
-                  <Link to="/category">
+                  <Link to="/category/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Categories List')}>
                       <GoDotFill className={`${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
                       <span>Categories List</span>
@@ -151,15 +147,13 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                  <Link to="/category/add">
-                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add a Category' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add a Category')}>
-                      <GoDotFill className={`${selectedMenu === 'Add a Category' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add New Category" })}>
+                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
                       <span>Add a Category</span>
                     </Button>
-                  </Link>
                 </li>
                 <li className='w-full'>
-                  <Link to="/category/subCategory">
+                  <Link to="/subCategory/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Sub-Categories List')}>
                       <GoDotFill className={`${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
                       <span>Sub-Categories List</span>
@@ -167,12 +161,10 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                  <Link to="/category/subCategory/add">
-                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add a Sub-Category' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add a Sub-Category')}>
-                      <GoDotFill className={`${selectedMenu === 'Add a Sub-Category' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add New SubCategory" })}>
+                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
                       <span>Add a Sub-Category</span>
                     </Button>
-                  </Link>
                 </li>
               </ul>
             </Collapse>
