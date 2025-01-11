@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { Button, Rating } from '@mui/material';
 import UploadBox from '../../Components/UploadBox';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDropzone } from 'react-dropzone';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoClose } from "react-icons/io5";
 import { FaCloudUploadAlt } from 'react-icons/fa';
@@ -53,13 +52,20 @@ const AddProduct = () => {
     const handleFileUpload = (files) => {
         setUploadedFiles((prevFiles) => {
             const updatedFiles = [...prevFiles, ...files];
+            console.log("Files added:", files); // Log the new files
+            console.log("Updated uploadedFiles:", updatedFiles); // Log the updated state
             return updatedFiles;
         });
     };
 
     // Remove a file by its index
     const handleRemoveFile = (index) => {
-        setUploadedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+        setUploadedFiles((prevFiles) => {
+            const updatedFiles = prevFiles.filter((_, i) => i !== index);
+            console.log(`File at index ${index} removed.`); // Log removal
+            console.log("Updated uploadedFiles:", updatedFiles); // Log updated state
+            return updatedFiles;
+        });
     };
 
     const handleFormSubmit = (e) => {
@@ -97,10 +103,17 @@ const AddProduct = () => {
         setUploadedFiles([]);
     };
 
+    // Clean up object URLs on component unmount
+    useEffect(() => {
+        return () => {
+            uploadedFiles.forEach((file) => URL.revokeObjectURL(file));
+        };
+    }, [uploadedFiles]);
+
 
     return (
         <section className='p-8'>
-            <form action="" ref={formRef} onSubmit={handleFormSubmit} className='form py-3'>
+            <form action="#" ref={formRef} onSubmit={handleFormSubmit} className='form py-3'>
                 <h3 className='text-[24px] font-bold mb-2'>Create Product</h3>
 
                 <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Basic Information</h3>
@@ -362,16 +375,10 @@ const AddProduct = () => {
                         ))}
 
                         {/* UploadBox column */}
-                        {
-                            uploadedFiles.length > 0 ? (
-                                <UploadBox multiple={true} onDrop={handleFileUpload} />
-                            ) : (
-                                <div className='col-span-8'>
-                                    <UploadBox multiple={true} onDrop={handleFileUpload} />
-                                </div>
-                            )
+                        <div className={uploadedFiles.length > 0 ? 'col-span-1' : 'col-span-8'}>
+                            <UploadBox multiple={true} onDrop={handleFileUpload} />
+                        </div>
 
-                        }
                     </div>
                 </div>
 

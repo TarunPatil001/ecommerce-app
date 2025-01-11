@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { MyContext } from '../../App'
 import DashboardBoxes from '../../Components/DashboardBoxes'
-import { Button, Checkbox, FormControl, FormHelperText, InputLabel, MenuItem, Pagination } from '@mui/material'
+import { Button, Checkbox, FormControl, InputLabel, MenuItem, Pagination } from '@mui/material'
 import { Tooltip } from '@mui/material'
 import { FiPlus } from "react-icons/fi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -9,7 +9,7 @@ import Badge from '../../Components/Badge';
 import { Link } from 'react-router-dom';
 import ProgressBar from '../../Components/ProgressBar';
 import { MdOutlineEdit } from 'react-icons/md';
-import { IoCloudDownloadOutline, IoEyeOutline } from 'react-icons/io5';
+import { IoEyeOutline } from 'react-icons/io5';
 import { RiDeleteBin6Line, RiDownloadCloud2Line } from "react-icons/ri";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -20,7 +20,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Select from '@mui/material/Select';
 import { GoDotFill, GoPlus } from "react-icons/go";
-import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -43,20 +43,6 @@ const columns = [
   },
   { id: 'sales', label: 'SALES', minWidth: 130, align: 'center' },
   { id: 'action', label: 'ACTION', minWidth: 130, align: 'center' },
-];
-
-
-function createData(id, product, category, subCategory, price, sales, action) {
-  return { id, product, category, subCategory, price, sales, action };
-}
-
-const rows = [
-  createData(1, 'T-Shirt', 'Clothing', 'Men Clothing', 19.99, 200, 'Edit'),
-  createData(2, 'Kurta', 'Clothing', 'Ethnic Wear', 24.99, 150, 'Edit'),
-  createData(3, 'Jeans', 'Clothing', 'Men Clothing', 49.99, 300, 'Edit'),
-  createData(4, 'Dress', 'Clothing', 'Women Clothing', 59.99, 120, 'Edit'),
-  createData(5, 'Shoes', 'Footwear', 'Men', 89.99, 80, 'Edit'),
-  createData(6, 'Saree', 'Clothing', 'Women Clothing', 29.99, 220, 'Edit'),
 ];
 
 

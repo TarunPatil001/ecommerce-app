@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { MdDashboard, MdOutlineLogout } from 'react-icons/md'
 import { Link, useLocation } from 'react-router-dom'
 import { TbSlideshow } from "react-icons/tb";
@@ -25,8 +25,8 @@ const Sidebar = () => {
   // Define a mapping of paths to menu names
   const menuMapping = {
     "/": "Dashboard",
-    "/homeBanners": "Home Banners List",
-    "/homeBanners/add": "Add Home Banners",
+    "/homeSlider/list": "Home Banners List",
+    "/homeSlider/add": "Add Home Banners",
     "/users": "Users",
     "/products": "Product List",
     "/category": "Categories List",
@@ -77,7 +77,7 @@ const Sidebar = () => {
             <Collapse isOpened={subMenuIndex1}>
               <ul className='w-full'>
                 <li className='w-full'>
-                  <Link to="/homeBanners">
+                  <Link to="/homeSlider/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Home Banners List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Home Banners List')}>
                       <GoDotFill className={`${selectedMenu === 'Home Banners List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
                       <span>Home Banners List</span>
@@ -85,7 +85,7 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                  <Link to="/homeBanners/add">
+                  <Link to="/homeSlider/add">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Home Banners' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Home Banners')}>
                       <GoDotFill className={`${selectedMenu === 'Add Home Banners' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
                       <span>Add Home Banner</span>

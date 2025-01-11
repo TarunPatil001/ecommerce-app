@@ -1,7 +1,5 @@
 import { Button, Checkbox, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
-import React, { useContext, useState } from 'react'
-import { FaPlus } from 'react-icons/fa'
-import { FiPlus } from 'react-icons/fi'
+import { useContext, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
@@ -37,7 +35,6 @@ const columns = [
 const Products = () => {
 
     const context = useContext(MyContext);
-    const [isOpenOrder, setIsOpenOrder] = useState(null);
     const totalStock = 250;
     const currentSales = 241;
 
@@ -45,13 +42,6 @@ const Products = () => {
     const salePercentage = (currentSales / totalStock) * 100;
     const remainStock = totalStock - currentSales;
 
-    const isShowOrderedProduct = (index) => {
-        if (isOpenOrder === index) {
-            setIsOpenOrder(null);
-        } else {
-            setIsOpenOrder(index);
-        }
-    }
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);

@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Badge, Button, Divider, IconButton } from '@mui/material';
-import { AiOutlineMenuFold } from "react-icons/ai";
-import { IoSearchOutline } from "react-icons/io5";
 import { FaRegBell, FaRegUser } from "react-icons/fa";
 import { styled } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';

@@ -10,17 +10,14 @@ import Products from './Pages/Products';
 import AddProduct from './Pages/Products/addProduct';
 
 import Dialog from '@mui/material/Dialog';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { IoCloseOutline } from "react-icons/io5";
 import Slide from '@mui/material/Slide';
-import { Button } from '@mui/material';
+import HomeSliderBanners from './Components/HomeSliderBanners';
+import AddHomeSlide from './Components/HomeSliderBanners/addHomeSlide';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -96,19 +93,18 @@ function App() {
       ),
     },
     {
-      path: "/product/upload",
+      path: "/homeSlider/list",
       exact: true,
       element: (
         <>
           <section className="main">
             <Header />
             <div className='contentMain flex'>
-              <div className={`sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
                 <Sidebar />
               </div>
-              <div className={`contentRight ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
-
-                <AddProduct />
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <HomeSliderBanners />
               </div>
             </div>
           </section>
@@ -157,6 +153,11 @@ function App() {
             {
               isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />
             }
+            
+            {
+              isOpenFullScreenPanel?.model === "Add Home Slide" && <AddHomeSlide />
+            }
+          
           </div>
 
         </Dialog>
