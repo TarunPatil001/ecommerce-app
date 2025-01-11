@@ -24,6 +24,9 @@ import AddSubCategory from './Pages/Category/addSubCategory';
 import HomeSliderBanners from './Pages/HomeSliderBanners';
 import AddHomeSlide from './Pages/HomeSliderBanners/addHomeSlide';
 import Orders from './Pages/Orders';
+import ForgotPassword from './Pages/ForgotPassword';
+import VerifyAccount from './Pages/VerifyAccount';
+import ChangePassword from './Pages/ChangePassword';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -68,6 +71,33 @@ function App() {
       element: (
         <>
           <SignUp />
+        </>
+      ),
+    },
+    {
+      path: "/forgot-password",
+      exact: true,
+      element: (
+        <>
+          <ForgotPassword />
+        </>
+      ),
+    },
+    {
+      path: "/verify-account",
+      exact: true,
+      element: (
+        <>
+          <VerifyAccount />
+        </>
+      ),
+    },
+    {
+      path: "/change-password",
+      exact: true,
+      element: (
+        <>
+          <ChangePassword />
         </>
       ),
     },

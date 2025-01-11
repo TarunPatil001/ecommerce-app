@@ -8,7 +8,7 @@ import { MdOutlineMarkEmailRead, MdPhone } from 'react-icons/md';
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
-    { id: 'userImg', label: 'USER IMAGE', minWidth: 100, align: 'left' },
+    { id: 'userImg', label: 'USER IMAGE', minWidth: 200, align: 'left' },
     { id: 'userName', label: 'USER NAME', minWidth: 150, align: 'left' },
     {
         id: 'userEmail',
@@ -98,20 +98,85 @@ const Users = () => {
                                     <span className='flex items-center gap-1'><MdPhone className='text-[20px]' />+91-8956232356</span>
                                     
                                 </TableCell>
-                                
-                                {/* <TableCell style={{ minWidth: columns.minWidth }}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="View Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
+                               
+                            </TableRow>
+                           
+                            <TableRow>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <Checkbox {...label} size='small' />
+                                </TableCell>
+                                <TableCell width={100}>
+                                    <div className="flex items-start gap-4 w-[100px]">
+                                        <div className='img w-[65px] h-[65px] overflow-hidden rounded-md shadow-md group'>
+                                            <Link to="">
+                                                <img src="https://mui.com/static/images/avatar/1.jpg" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
+                                            </Link>
+                                        </div>
                                     </div>
-                                </TableCell> */}
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    Raj Patel
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdOutlineMarkEmailRead className='text-[20px]' />rajpatel59958@gmail.com</span>
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdPhone className='text-[20px]' />+91-8956232356</span>
+                                    
+                                </TableCell>
+                               
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <Checkbox {...label} size='small' />
+                                </TableCell>
+                                <TableCell width={100}>
+                                    <div className="flex items-start gap-4 w-[100px]">
+                                        <div className='img w-[65px] h-[65px] overflow-hidden rounded-md shadow-md group'>
+                                            <Link to="">
+                                                <img src="https://mui.com/static/images/avatar/1.jpg" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    Raj Patel
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdOutlineMarkEmailRead className='text-[20px]' />rajpatel59958@gmail.com</span>
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdPhone className='text-[20px]' />+91-8956232356</span>
+                                    
+                                </TableCell>
+                               
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <Checkbox {...label} size='small' />
+                                </TableCell>
+                                <TableCell width={100}>
+                                    <div className="flex items-start gap-4 w-[100px]">
+                                        <div className='img w-[65px] h-[65px] overflow-hidden rounded-md shadow-md group'>
+                                            <Link to="">
+                                                <img src="https://mui.com/static/images/avatar/1.jpg" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    Raj Patel
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdOutlineMarkEmailRead className='text-[20px]' />rajpatel59958@gmail.com</span>
+                                </TableCell>
+                                <TableCell style={{ minWidth: columns.minWidth }}>
+                                    <span className='flex items-center gap-1'><MdPhone className='text-[20px]' />+91-8956232356</span>
+                                    
+                                </TableCell>
+                               
                             </TableRow>
 
                         </TableBody>
