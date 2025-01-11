@@ -142,7 +142,7 @@ const Header = () => {
 
           ) : (
 
-            <Button className='custom-btn !rounded-full'>Login</Button>
+            <Button className='custom-btn !rounded-full !capitalize'>Sign In</Button>
           
           )
         }

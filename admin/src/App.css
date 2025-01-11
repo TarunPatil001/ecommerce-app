@@ -36,6 +36,7 @@ body {
   background: rgba(0,0,0,0.3) !important;
 }
 
+
 .customScroll::-webkit-scrollbar {
   width: 3px !important;
   height: 3px !important;
@@ -87,3 +88,33 @@ a.active button{
   font-size: 14px !important;
   font-weight: 500 !important;
 }
+
+.MuiAppBar-colorPrimary{
+  background: #f1f1f1 !important;
+  color: black !important;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+.MuiSelect-select{
+  background: #fff !important;
+}
+
+.custom-shadow{
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; 
+}
+.lazy-load-image-background.blur.lazy-load-image-loaded {
+  height: 100%;
+  width: 100%;
+}
+
+.css-1ygil4i-MuiToolbar-root{
+  min-height: 56px !important;
+}
+
