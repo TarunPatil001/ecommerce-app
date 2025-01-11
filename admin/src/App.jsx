@@ -16,13 +16,15 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { IoCloseOutline } from "react-icons/io5";
 import Slide from '@mui/material/Slide';
-import HomeSliderBanners from './Components/HomeSliderBanners';
-import AddHomeSlide from './Components/HomeSliderBanners/addHomeSlide';
-import CategoryList from './Components/Category';
-import AddCategory from './Components/Category/addCategory';
-import SubCategoryList from './Components/Category/subCategoryList';
-import AddSubCategory from './Components/Category/addSubCategory';
 import Users from './Pages/Users';
+import CategoryList from './Pages/Category';
+import AddCategory from './Pages/Category/addCategory';
+import SubCategoryList from './Pages/Category/subCategoryList';
+import AddSubCategory from './Pages/Category/addSubCategory';
+import HomeSliderBanners from './Pages/HomeSliderBanners';
+import AddHomeSlide from './Pages/HomeSliderBanners/addHomeSlide';
+import Orders from './Pages/Orders';
+
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -167,6 +169,25 @@ function App() {
               </div>
               <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
                 <Users />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
+    {
+      path: "/orders",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className='contentMain flex'>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+                <Sidebar />
+              </div>
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <Orders />
               </div>
             </div>
           </section>

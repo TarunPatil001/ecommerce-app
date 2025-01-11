@@ -11,7 +11,8 @@ import { MyContext } from '../../App'
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
-    { id: 'image', label: 'IMAGE', minWidth: 250, align: 'left' },
+    { id: 'image', label: 'IMAGE', minWidth: 150, align: 'left' },
+    { id: 'categoryName', label: 'CATEGORY NAME', minWidth: 150, align: 'left' },
     { id: 'action', label: 'Action', minWidth: 100, align: 'left' },
 ];
 
@@ -80,59 +81,7 @@ const CategoryList = () => {
                                 </TableCell>
 
                                 <TableCell width={100}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="View Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-                                <TableCell width={100}>
-                                    <div className="flex items-start gap-4 w-[80px]">
-                                        <div className='img w-full h-auto overflow-hidden rounded-md shadow-md group'>
-                                            <Link to="/product/458457">
-                                                <img src="https://api.spicezgold.com/download/file_1734525239704_foot.png" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </TableCell>
-
-                                <TableCell width={100}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="View Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-                                <TableCell width={100}>
-                                    <div className="flex items-start gap-4 w-[80px]">
-                                        <div className='img w-full h-auto overflow-hidden rounded-md shadow-md group'>
-                                            <Link to="/product/458457">
-                                                <img src="https://api.spicezgold.com/download/file_1734525239704_foot.png" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
-                                            </Link>
-                                        </div>
-                                    </div>
+                                    <span>Men</span>
                                 </TableCell>
 
                                 <TableCell width={100}>

@@ -2,8 +2,8 @@ import { Button } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCloudUploadAlt } from 'react-icons/fa'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
-import UploadBox from '../UploadBox'
 import { IoClose } from 'react-icons/io5'
+import UploadBox from '../../Components/UploadBox'
 
 const AddHomeSlide = () => {
 

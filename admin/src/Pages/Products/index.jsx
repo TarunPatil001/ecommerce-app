@@ -94,7 +94,7 @@ const Products = () => {
                     </div>
 
                     <div className='col w-[20%]'>
-                        <SearchBox/>
+                        <SearchBox searchName="products" />
                     </div>
 
                 </div>

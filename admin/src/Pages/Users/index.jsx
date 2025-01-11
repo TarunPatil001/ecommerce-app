@@ -48,7 +48,7 @@ const Users = () => {
                     </div>
 
                     <div className='col w-[40%]'>
-                        <SearchBox />
+                        <SearchBox searchName="user email" />
                     </div>
 
                 </div>
