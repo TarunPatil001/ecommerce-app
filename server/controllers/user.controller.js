@@ -344,7 +344,6 @@ export async function userAvatarController(request, response) {
   }
 }
 
-
 // Controller for removing an image from Cloudinary
 export async function removeImageFromCloudinary(request, response) {
   try {
@@ -712,7 +711,6 @@ export async function refreshToken(request, response) {
     });
   }
 }
-
 
 // get user login details
 export async function userDetails(request, response) {
