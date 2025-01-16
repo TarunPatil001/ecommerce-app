@@ -1,6 +1,5 @@
-import ProductModel from "../models/product.modal.js";
+import ProductModel from "../models/product.model.js";
 import { v2 as cloudinary } from "cloudinary";
-import { error } from "console";
 import fs from "fs";
 
 cloudinary.config({
@@ -746,26 +745,82 @@ export async function getProduct(request, response) {
 }
 
 // Controller for removing an image from Cloudinary for product
+// export async function removeImageFromCloudinary(request, response) {
+//   const imgUrl = request.query.img;
+
+//   const urlArr = imgUrl.split("/");
+//   const image = urlArr[urlArr.length - 1];
+
+//   const imageName = image.split(".")[0];
+
+//   if (imageName) {
+//     const result = await cloudinary.uploader.destroy(
+//       imageName,
+//       (error, result) => {}
+//     );
+//     if (result) {
+//       return response.status(200).json({
+//         message: "Image removed successfully",
+//         success: true,
+//         error: false,
+//       });
+//     }
+//   }
+// }
+
 export async function removeImageFromCloudinary(request, response) {
-  const imgUrl = request.query.img;
+  try {
+    const imgUrl = request.query.img;
 
-  const urlArr = imgUrl.split("/");
-  const image = urlArr[urlArr.length - 1];
+    // Validate if imgUrl exists and has the correct format
+    if (!imgUrl) {
+      return response.status(400).json({
+        message: "Image URL is required",
+        success: false,
+        error: true,
+      });
+    }
 
-  const imageName = image.split(".")[0];
+    // Extract the image name (remove the folder path)
+    const urlArr = imgUrl.split("/");
+    const image = urlArr[urlArr.length - 1]; // 'sample-image.jpg'
+    const imageName = image.split(".")[0]; // 'sample-image'
 
-  if (imageName) {
-    const result = await cloudinary.uploader.destroy(
-      imageName,
-      (error, result) => {}
-    );
-    if (result) {
+    // Folder path to be included in the destroy API call
+    const folderPath = 'ecommerceApp/uploads/';
+
+    // Ensure the imageName is valid and the URL is correct
+    if (!imageName) {
+      return response.status(400).json({
+        message: "Invalid image URL",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Call Cloudinary API to destroy the image (including folder path)
+    const result = await cloudinary.uploader.destroy(`${folderPath}${imageName}`);
+
+    if (result.result === "ok") {
       return response.status(200).json({
         message: "Image removed successfully",
         success: true,
         error: false,
       });
+    } else {
+      return response.status(500).json({
+        message: "Failed to remove image from Cloudinary",
+        success: false,
+        error: true,
+      });
     }
+  } catch (error) {
+    console.error("Error removing image from Cloudinary:", error);
+    return response.status(500).json({
+      message: "Server error",
+      success: false,
+      error: true,
+    });
   }
 }
 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const cartProductSchema = mongoose.Schema({
     productId:{
         type:mongoose.Schema.ObjectId,
-        ref: "product"
+        ref: "Product"
     },
     quantity:{
         type:Number,

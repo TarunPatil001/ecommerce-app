@@ -4,7 +4,7 @@ import sendEmailFun from "../config/sendEmail.js";
 import VerificationEmail from "../utils/verifyEmailTemplate.js";
 import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
-import UserModel from "../models/user.modal.js";
+import UserModel from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
 

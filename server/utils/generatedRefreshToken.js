@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import UserModel from "../models/user.modal.js"; // Ensure UserModel is imported
+import UserModel from "../models/user.model.js"; // Ensure UserModel is imported
 
 const generatedRefreshToken = async (userId) => {
   try {
