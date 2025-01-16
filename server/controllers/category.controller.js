@@ -1,6 +1,5 @@
-import CategoryModel from "../models/category.model.js";
+import CategoryModel from "../models/category.modal.js";
 import { v2 as cloudinary } from "cloudinary";
-import { error } from "console";
 import fs from "fs";
 
 cloudinary.config({
@@ -10,8 +9,8 @@ cloudinary.config({
   secure: true,
 });
 
-var imagesArr = [];
 
+var imagesArr = [];
 export async function uploadCategoryImages(request, response) {
   try {
     imagesArr = [];
@@ -150,6 +149,7 @@ export async function getCategories(request, response) {
       success: true,
       data: rootCategories, // Return the root categories with their children
     });
+    
   } catch (error) {
     console.error("Error getting categories:", error.message || error);
     return response.status(500).json({

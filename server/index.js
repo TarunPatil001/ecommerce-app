@@ -8,6 +8,7 @@ import helmet from "helmet";
 import connectDB from "./config/connectDb.js";
 import userRouter from './route/user.route.js';
 import categoryRouter from "./route/category.route.js";
+import productRouter from "./route/product.route.js";
 
 const app = express();
 
@@ -24,7 +25,6 @@ app.use(
 );
 
 app.get("/", (request, response) => {
-  // server to client
   response.json({
     message: "Server is running at " + process.env.PORT,
   });
@@ -32,10 +32,10 @@ app.get("/", (request, response) => {
 
 app.use('/api/user', userRouter);
 app.use('/api/category', categoryRouter);
+app.use('/api/product', productRouter);
 
-
-connectDB().then(()=>{
-    app.listen(process.env.PORT, ()=>{
-        console.log("Server is running at port ", process.env.PORT);
-    })
-})
+connectDB().then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log("Server is running at port ", process.env.PORT);
+  });
+});
