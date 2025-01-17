@@ -11,16 +11,18 @@ import { Button, Dialog, DialogContent } from '@mui/material';
 import { IoCloseOutline } from 'react-icons/io5';
 import ProductZoom from './components/ProductZoom';
 import ProductDetailsContent from './components/ProductDetailsContent';
+import toast, { Toaster } from 'react-hot-toast';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
 import CartPage from './Pages/Cart';
 import Verify from './Pages/Verify';
-import { Toaster } from 'react-hot-toast';
 import ForgotPassword from './Pages/ForgotPassword';
 import Checkout from './Pages/Checkout';
 import MyAccount from './Pages/MyAccount';
 import Wishlist from './Pages/Wishlist';
 import Orders from './Pages/Orders';
+
+
 
 const MyContext = createContext();
 
@@ -33,7 +35,8 @@ function App() {
   const [platformFee, setPlatformFee] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
   const [isLogin, setIsLogin] = useState(true);
-  
+  const apiUrl = import.meta.env.VITE_API_URL;
+
 
   // callback from cartPanel
   const handleCartItemQtyChange = (newQty) => {
@@ -56,46 +59,72 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
+  // openAlertBox function
+  const openAlertBox = (status, msg) => {
+    if (status === "success") {
+      toast.success(msg);
+    } else if (status === "error") {
+      toast.error(msg);
+    } else if (status === "loading") {
+      toast.loading(msg, { id: "loadingToast" });
+    }
+  };
+
+
+  // Consolidated values for context/provider
   const values = {
+    // Cart-related states and handlers
     cartItemsQty,
     platformFee,
     shippingFee,
-    openCartPanel,
-    isLogin,
     handleCartItemQtyChange,
     handlePlatformFeeChange,
     handleShippingFeeChange,
     setCartItemsQty,
     setPlatformFee,
     setShippingFee,
+
+    // Modal-related state and handlers
     setOpenProductDetailsModal,
+
+    // Cart panel visibility
+    openCartPanel,
     toggleCartPanel,
     setOpenCartPanel,
+
+    // User authentication
+    isLogin,
     setIsLogin,
+
+    // Utility functions
+    openAlertBox,
   };
 
   return (
-    <BrowserRouter>
-      <MyContext.Provider value={values}>
-        <Header />
-        <Navigation />
-        <Routes>
-          <Route path={"/"} exact={true} element={<Home />} />
-          <Route path={"/productListing"} exact={true} element={<ProductListing />} />
-          <Route path={"/productDetails/:id"} exact={true} element={<ProductDetails />} />
-          <Route path={"/login"} exact={true} element={<Login />} />
-          <Route path={"/register"} exact={true} element={<Register />} />
-          <Route path={"/cart"} exact={true} element={<CartPage />} />
-          <Route path={"/verify"} exact={true} element={<Verify />} />
-          <Route path={"/forgot-password"} exact={true} element={<ForgotPassword />} />
-          <Route path={"/checkout"} exact={true} element={<Checkout />} />
-          <Route path={"/my-account"} exact={true} element={<MyAccount />} />
-          <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
-          <Route path={"/my-orders"} exact={true} element={<Orders />} />
-        </Routes>
-        <Footer />
-        <Toaster />
-      </MyContext.Provider>
+    <>
+      <BrowserRouter>
+        <MyContext.Provider value={values}>
+          <Header />
+          <Navigation />
+          <Routes>
+            <Route path={"/"} exact={true} element={<Home />} />
+            <Route path={"/productListing"} exact={true} element={<ProductListing />} />
+            <Route path={"/productDetails/:id"} exact={true} element={<ProductDetails />} />
+            <Route path={"/login"} exact={true} element={<Login />} />
+            <Route path={"/register"} exact={true} element={<Register />} />
+            <Route path={"/cart"} exact={true} element={<CartPage />} />
+            <Route path={"/verify"} exact={true} element={<Verify />} />
+            <Route path={"/forgot-password"} exact={true} element={<ForgotPassword />} />
+            <Route path={"/checkout"} exact={true} element={<Checkout />} />
+            <Route path={"/my-account"} exact={true} element={<MyAccount />} />
+            <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
+            <Route path={"/my-orders"} exact={true} element={<Orders />} />
+          </Routes>
+          <Footer />
+        </MyContext.Provider>
+      </BrowserRouter>
+
+      <Toaster />
 
       <Dialog
         open={openProductDetailsModal}
@@ -130,8 +159,8 @@ function App() {
         </DialogContent>
       </Dialog>
 
-      
-    </BrowserRouter>
+    </>
+
   );
 }
 

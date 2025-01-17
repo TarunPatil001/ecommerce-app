@@ -535,6 +535,18 @@ nav ul button:hover {
   border: 2px solid gray !important;
 }
 
+/* ---------------Button Primary Black  ---------------------- */
+.buttonDisabled{
+  background: #fec5ae !important;
+  color: #ffffff !important;
+}
+
+/* ---------------Button Circular  ---------------------- */
+button .MuiCircularProgress-root{
+  width: 26px !important;
+  height: 26px !important;
+}
+
 /* --------- ProductDetails ----------- */
 
 .iiz__zoom-img--visible{
