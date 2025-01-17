@@ -94,6 +94,77 @@ export async function registerUserController(request, response) {
   }
 }
 
+export async function resendOtpController(request, response) {
+  try {
+    const { email } = request.body;
+
+    if (!email) {
+      return response.status(400).json({
+        message: "Please provide your email address.",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      return response.status(404).json({
+        message: "User not found with this email.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Check if the email is already verified
+    if (user.verify_email === true) {
+      return response.status(400).json({
+        message: "Email already verified. OTP cannot be resent.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Generate a new OTP, regardless of whether the previous one is expired or not
+    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Update OTP and expiration time (extend for another 10 minutes)
+    user.otp = verifyCode;
+    user.otpExpires = Date.now() + 600000; // 10 minutes
+
+    await user.save();
+
+    // Send verification email with the new OTP
+    const emailSent = await sendEmailFun(
+      email,
+      "Email verification code: " + verifyCode,
+      "",
+      VerificationEmail(user.name, verifyCode)
+    );
+
+    if (!emailSent) {
+      return response.status(500).json({
+        message: "Failed to resend verification email",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      success: true,
+      error: false,
+      message: "Verification email resent successfully.",
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
 export async function verifyEmailController(request, response) {
   try {
     const { email, otp } = request.body;
@@ -561,7 +632,7 @@ export async function verifyForgotPasswordOtp(request, response) {
         success: false,
       });
     }
-    
+
     if (!email || !otp) {
       return response.status(400).json({
         message: "Provide both email and OTP.",
@@ -569,7 +640,7 @@ export async function verifyForgotPasswordOtp(request, response) {
         success: false,
       });
     }
-    
+
     if (otp !== user.otp) {
       return response.status(400).json({
         message: "Invalid OTP.",
@@ -600,7 +671,6 @@ export async function verifyForgotPasswordOtp(request, response) {
       success: true,
       user: updatedUser, // Return the updated user
     });
-    
   } catch (error) {
     // Log the error and send response
     console.error(error);
@@ -648,8 +718,8 @@ export async function resetPassword(request, response) {
 
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(confirmPassword, salt);
-    
-    user.password = hashedPassword;    
+
+    user.password = hashedPassword;
     await user.save();
 
     return response.status(200).json({
@@ -657,7 +727,6 @@ export async function resetPassword(request, response) {
       error: false,
       success: true,
     });
-
   } catch (error) {
     console.error(error);
     return response.status(500).json({
@@ -670,7 +739,9 @@ export async function resetPassword(request, response) {
 
 export async function refreshToken(request, response) {
   try {
-    const refreshToken = request.cookies.refreshToken || request?.header?.authorization?.split(" ")[1]; // Bearer token
+    const refreshToken =
+      request.cookies.refreshToken ||
+      request?.header?.authorization?.split(" ")[1]; // Bearer token
 
     if (!refreshToken) {
       return response.status(401).json({
@@ -681,7 +752,10 @@ export async function refreshToken(request, response) {
     }
 
     // Verify the refresh token
-    const verifyToken = await jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN);
+    const verifyToken = await jwt.verify(
+      refreshToken,
+      process.env.SECRET_KEY_REFRESH_TOKEN
+    );
 
     const userId = verifyToken?._id;
     const newAccessToken = await generatedAccessToken(userId);
@@ -698,10 +772,9 @@ export async function refreshToken(request, response) {
       error: false,
       success: true,
       data: {
-        accessToken: newAccessToken
-      }
+        accessToken: newAccessToken,
+      },
     });
-
   } catch (error) {
     console.error(error);
     return response.status(401).json({
@@ -726,7 +799,9 @@ export async function userDetails(request, response) {
       });
     }
 
-    const user = await UserModel.findById(userId).select('-password -refresh_token');
+    const user = await UserModel.findById(userId).select(
+      "-password -refresh_token"
+    );
 
     // Check if the user was found
     if (!user) {
@@ -741,9 +816,8 @@ export async function userDetails(request, response) {
       message: "User details successfully retrieved.",
       error: false,
       success: true,
-      data: user
+      data: user,
     });
-
   } catch (error) {
     // Log the detailed error
     console.error("Error getting user details:", error);
@@ -753,9 +827,7 @@ export async function userDetails(request, response) {
       message: "An error occurred while getting user details.",
       error: true,
       success: false,
-      details: error.message // Include error details for better debugging
+      details: error.message, // Include error details for better debugging
     });
   }
 }
-
-

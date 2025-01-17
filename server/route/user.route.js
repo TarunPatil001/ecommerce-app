@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import {forgotPasswordController, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
+import {forgotPasswordController, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resendOtpController, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
 import auth from '../middlewares/auth.js';
 import upload from '../middlewares/multer.js';
 
 const userRouter = Router();
 userRouter.post('/register', registerUserController);
+userRouter.post('/resend-otp', resendOtpController);
 userRouter.post('/verifyEmail', verifyEmailController);
 userRouter.post('/login', loginUserController);
 userRouter.get('/logout', auth, logoutController);
