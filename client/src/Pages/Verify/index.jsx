@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import OtpBox from '../../components/OtpBox'
 import { Button, CircularProgress } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { postData } from '../../utils/api';
 import { MyContext } from '../../App';
@@ -15,9 +15,32 @@ const Verify = () => {
         setOtp(value)
     };
 
-    const sendOtp = () => {
-        toast.success("Resend verification code!");
-    }
+    const sendOtp = async () => {
+        console.log("Sending OTP to: ", localStorage.getItem("User email")); // Check email value
+        toast.promise(
+            postData("/api/user/resend-otp", {
+                email: localStorage.getItem("User email"),
+            }),
+            {
+                loading: "Resending OTP...",
+                success: (res) => {
+                    console.log("OTP resend response: ", res); // Log response data
+                    if (res?.success) {
+                        return res?.message;
+                    } else {
+                        console.error("Failed to resend OTP:", res?.message); // Log failure
+                        throw new Error(res?.message || "Failed to resend OTP.");
+                    }
+                },
+                error: (err) => {
+                    console.error("Error resending OTP:", err); // Log error
+                    return err.message || "An error occurred while resending OTP.";
+                },
+            }
+        );
+    };
+
+
 
     const verifyOTP = async (e) => {
         e.preventDefault();
@@ -76,7 +99,7 @@ const Verify = () => {
                                 </Button>
                             </div>
                         </form>
-                        <p className="text-center pt-2 text-[14px]">Didn&apos;t get the code? <Link to=""><span className="font-semibold underline underline-offset-2 cursor-pointer link" onClick={sendOtp}>Resend code</span></Link></p>
+                        <p className="text-center pt-2 text-[14px]">Didn&apos;t get the code? <span className="font-semibold underline underline-offset-2 cursor-pointer link" onClick={sendOtp}>Resend code</span></p>
                     </div>
                 </div>
             </section>
