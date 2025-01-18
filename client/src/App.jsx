@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -21,6 +21,7 @@ import Checkout from './Pages/Checkout';
 import MyAccount from './Pages/MyAccount';
 import Wishlist from './Pages/Wishlist';
 import Orders from './Pages/Orders';
+import { fetchDataFromApi } from './utils/api';
 
 
 
@@ -34,8 +35,9 @@ function App() {
   const [cartItemsQty, setCartItemsQty] = useState(0);
   const [platformFee, setPlatformFee] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
+  const [userData, setUserData] = useState(null);
 
 
   // callback from cartPanel
@@ -58,6 +60,21 @@ function App() {
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
+
+  useEffect(()=>{
+    const token = localStorage.getItem('accessToken');
+    if(token!==undefined && token!==null && token!==''){
+      setIsLogin(true);
+
+      fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res)=>{
+        console.log(res);
+        setUserData(res.data);
+      })
+
+      }else{
+        setIsLogin(false);
+      }
+  }, [isLogin]);
 
   // openAlertBox function
   const openAlertBox = (status, msg) => {
@@ -95,6 +112,10 @@ function App() {
     // User authentication
     isLogin,
     setIsLogin,
+
+    // User details
+    userData,
+    setUserData,
 
     // Utility functions
     openAlertBox,

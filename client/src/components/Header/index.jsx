@@ -16,6 +16,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import { TbLogout } from "react-icons/tb";
 import { IoMdHeart } from "react-icons/io";
+import { fetchDataFromApi } from "../../utils/api";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -39,6 +40,20 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const logout = () => {
+    setAnchorEl(null);
+
+    fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+      console.log(res);
+      if (res?.error === false) {
+        context.setIsLogin(false);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+    })
+  }
+
 
   return (
     <header className="bg-white">
@@ -93,14 +108,14 @@ const Header = () => {
           </div>
 
           {/* --------  Header > Register, Login | [ Compare, Wishlist, Cart ] -------- */}
-          <div className="col3 w-[30%] flex items-center pl-7">
-            <ul className="flex items-center justify-end gap-3 w-full">
+          <div className="col3 w-[30%] flex items-center justify-end pl-7">
+            <ul className="flex items-center justify-end gap-3 w-auto">
               <li className="list-none w-full">
                 {
                   context.isLogin === false ?
                     (
 
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-end">
                         <Link to="/login" className="link transition text-[15px] font-[500]">Login</Link>
                         <span className="line !h-[20px] mx-2 !w-[0.5px]"></span>
                         <Link to="/register" className="link transition text-[15px] font-[500]">Register</Link>
@@ -108,15 +123,15 @@ const Header = () => {
 
                     ) : (
                       <>
-                        <div className="myAccountWrap flex items-center justify-start gap-2 cursor-pointer bg-gray-100 hover:bg-gray-200 transition-all duration-300 rounded-md" onClick={handleClick}>
+                        <div className="myAccountWrap px-1 flex items-center justify-end gap-2 rounded-md hover:bg-slate-100 cursor-pointer transition-all duration-300" onClick={handleClick}>
                           <div className="w-[35px] p-1">
                             <div className="w-[35px] h-[35px] rounded-full overflow-hidden border flex items-center justify-center border-[rgb(180,180,180)]">
-                              <img src={context.username ? `https://t3.ftcdn.net/jpg/02/50/84/98/360_F_250849890_qxH2MudfMq5AFSqHrOp5oA9NqykT14Ti.jpg` : `https://ui-avatars.com/api/?name=Elon+Musk`} alt="user image" className="h-full w-full object-cover" />
+                              <img src={context?.userData?.avatar !== "" ? `${context?.userData?.avatar}` : `https://ui-avatars.com/api/?name=${context?.userData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
                             </div>
                           </div>
-                          <div className="flex items-start flex-col w-full p-1">
-                            <span className="font-bold text-[14px] line-clamp-1 uppercase link transition-all duration-200">Elon Musk</span>
-                            <span className="font-normal text-[12px] line-clamp-1 link transition-all duration-200">elonmusk123@gmail.com</span>
+                          <div className="flex items-start flex-col  p-1">
+                            <span className="font-bold text-[14px] line-clamp-1 uppercase link transition-all duration-200">{context?.userData?.name}</span>
+                            <span className="font-medium text-[12px] line-clamp-1 link transition-all duration-200">{context?.userData?.email}</span>
                           </div>
                         </div>
 
@@ -182,12 +197,12 @@ const Header = () => {
                             </MenuItem>
                           </Link>
                           <Divider />
-                            <MenuItem onClick={handleClose}>
-                              <ListItemIcon>
-                                <TbLogout className="w-[20px] h-[20px] text-[var(--text-light)]" />
-                              </ListItemIcon>
-                              Logout
-                            </MenuItem>
+                          <MenuItem onClick={logout}>
+                            <ListItemIcon>
+                              <TbLogout className="w-[20px] h-[20px] text-[var(--text-light)]" />
+                            </ListItemIcon>
+                            Logout
+                          </MenuItem>
                         </Menu>
                       </>
                     )

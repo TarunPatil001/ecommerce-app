@@ -55,7 +55,8 @@ const Verify = () => {
                 loading: "Verifying OTP... Please wait.",
                 success: (res) => {
                     if (res?.error === false) {
-                        // Navigate to forgot-password page before returning success message
+                        // Navigate to login if verification is successful
+                        localStorage.removeItem("User email");
                         navigate("/login"); // Use navigate for redirection
                         return res?.message;  // Success message shown in toast
                     } else {
