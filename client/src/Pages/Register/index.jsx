@@ -34,25 +34,45 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Array to store missing fields
         let missingFields = [];
-    
+
         // Validate form fields
         if (!formFields.name) missingFields.push("Full Name");
         if (!formFields.email) missingFields.push("Email Id");
         if (!formFields.password) missingFields.push("Password");
-    
+
         // If any required fields are missing, show a single alert and exit
         if (missingFields.length > 0) {
             const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
             context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
             return; // Stop further execution
         }
-    
+
+        // Check if an email already exists in localStorage
+        const storedEmail = localStorage.getItem("User email");
+
+        if (storedEmail) {
+            if (storedEmail !== formFields.email) {
+                // Notify the user about the conflict
+                // Optionally, provide an option to clear the stored email
+                const confirmSwitch = window.confirm("Another user already exists on this profile. Do you want to switch to a new user? This will clear the current user data for this site.");
+
+                if (confirmSwitch) {
+                    localStorage.clear();
+                    // Proceed with registration or login for the new user
+                } else {
+                    return; // Stop further execution if the user doesn't confirm the switch
+                }
+            }
+        } else {
+            // Continue with the registration or login process
+        }
+
         // Start loading and disable the fields
         setIsLoading(true);
-    
+
         try {
             // Wrap the registration API call inside a toast.promise
             const result = await toast.promise(
@@ -63,8 +83,13 @@ const Register = () => {
                         if (res && res.error === false) {
                             localStorage.setItem("User email", formFields.email);
                             setFormFields({ name: "", email: "", password: "" });
+                            // Set OTP expiration time and trigger timer
+                            const currentTime = Date.now();
+                            const otpExpirationTime = currentTime + 5 * 60 * 1000; // OTP expires in 5 minutes
+                            localStorage.setItem("OTP_EXPIRES", otpExpirationTime); // Store the OTP expiration time
                             navigate("/verify"); // Navigate to verification page
                             return res?.message;
+
                         } else {
                             throw new Error(res?.message || "Oops! Server is slow. Try again!");
                         }
@@ -89,8 +114,8 @@ const Register = () => {
             setIsLoading(false);
         }
     };
-    
-    
+
+
 
     return (
         <div>

@@ -31,55 +31,160 @@ const Login = () => {
         }));
     };
 
-    const forgetPassword = () => {
-        if (formFields.email !== "") {
-            ""
-        } else {
-            ""
-        }
-        context.openAlertBOx("success", "Email sent successfully");
-        navigate("/verify");
-    }
-
-    const handleSubmit = async (e) => {
+    const forgetPassword = async (e) => {
         e.preventDefault();
-    
+
         // Array to store missing fields
         let missingFields = [];
-    
+
         // Validate form fields
         if (!formFields.email) missingFields.push("Email Id");
-        if (!formFields.password) missingFields.push("Password");
-    
+
         // If any required fields are missing, show a single alert and exit
         if (missingFields.length > 0) {
             const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
             context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
             return; // Stop further execution
         }
-    
+
+        // Check if an email already exists in localStorage
+        const storedEmail = localStorage.getItem("User email");
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        if (storedEmail) {
+            if (storedEmail !== formFields.email || accessToken && refreshToken) {
+                // Notify the user about the conflict
+                // Optionally, provide an option to clear the stored email
+                const confirmSwitch = window.confirm("Another user already exists on this profile. Do you want to switch to a new user? This will clear the current user data for this site.");
+
+                if (confirmSwitch) {
+                    localStorage.clear();
+                    // Proceed with registration or login for the new user
+                } else {
+                    return; // Stop further execution if the user doesn't confirm the switch
+                }
+            }
+        } else {
+            // Continue with the registration or login process
+        }
+
         // Start loading and disable the fields
         setIsLoading(true);
-    
+
+        try {
+            // Validate form fields
+            if (!formFields.email) {
+                context.openAlertBox("error", "Email Id is required.");
+                return;
+            }
+
+            // Login API call wrapped with toast.promise
+            const result = await toast.promise(
+                postData("/api/user/forgot-password", formFields, { withCredentials: true }),
+                {
+                    loading: "OTP is sending... Please wait.",
+                    success: (res) => {
+                        if (res && res.error === false) {
+                            localStorage.setItem("User email", formFields.email);
+                            localStorage.setItem("actionType", "forgot-password");
+                            // Set OTP expiration time and trigger timer
+                            const currentTime = Date.now();
+                            const otpExpirationTime = currentTime + 5 * 60 * 1000; // OTP expires in 5 minutes
+                            localStorage.setItem("OTP_EXPIRES", otpExpirationTime); // Store the OTP expiration time
+
+                            // Clear form fields and store tokens
+                            setFormFields({ email: "", password: "" });
+                            navigate("/verify"); // Navigate to the verify page
+                            return formFields.email ? `OTP sent to ${formFields.email}` : res?.message || "An unexpected error occurred";
+
+                        } else {
+                            throw new Error(res?.message || "Oops! Server is slow. Try again!");
+                        }
+                    },
+                    error: (err) => {
+                        // Ensure err.response exists and check the message structure
+                        const errorMessage = err?.response?.data?.message || err.message || "An unexpected error occurred. Please try again.";
+                        return errorMessage;
+                    },
+                }
+            ).then((res) => {
+                console.log(res);
+                // Add any additional success actions here
+            }).catch((err) => {
+                console.error(err);
+            });
+        } catch (err) {
+            // Final fallback for unexpected errors
+            return err.message || "An error occurred during login.";
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Array to store missing fields
+        let missingFields = [];
+
+        // Validate form fields
+        if (!formFields.email) missingFields.push("Email Id");
+        if (!formFields.password) missingFields.push("Password");
+
+        // If any required fields are missing, show a single alert and exit
+        if (missingFields.length > 0) {
+            const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
+            context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
+            return; // Stop further execution
+        }
+
+        // Check if an email already exists in localStorage
+        const storedEmail = localStorage.getItem("User email");
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        if (storedEmail) {
+            if (storedEmail !== formFields.email || accessToken && refreshToken) {
+                // Notify the user about the conflict
+                // Optionally, provide an option to clear the stored email
+                const confirmSwitch = window.confirm("Another user already exists on this profile. Do you want to switch to a new user? This will clear the current user data for this site.");
+
+                if (confirmSwitch) {
+                    localStorage.clear();
+                    // Proceed with registration or login for the new user
+                } else {
+                    return; // Stop further execution if the user doesn't confirm the switch
+                }
+            }
+        } else {
+            // Continue with the registration or login process
+        }
+
+        // Start loading and disable the fields
+        setIsLoading(true);
+
         try {
             // Validate form fields
             if (!formFields.email || !formFields.password) {
                 context.openAlertBox("error", "Email and password are required.");
                 return;
             }
-    
+
             // Login API call wrapped with toast.promise
             const result = await toast.promise(
-                postData("/api/user/login", formFields, {withCredentials: true}),
+                postData("/api/user/login", formFields, { withCredentials: true }),
                 {
                     loading: "Logging in... Please wait.",
                     success: (res) => {
                         if (res && res.error === false) {
+                            localStorage.setItem("User email", formFields.email);
                             // Clear form fields and store tokens
                             setFormFields({ email: "", password: "" });
                             localStorage.setItem("accessToken", res?.data?.accessToken);
                             localStorage.setItem("refreshToken", res?.data?.refreshToken);
-    
+
                             // Update login state and navigate
                             context.setIsLogin(true);
                             navigate("/"); // Navigate to home page
@@ -107,7 +212,7 @@ const Login = () => {
             setIsLoading(false);
         }
     };
-    
+
 
     return (
         <div>
@@ -131,7 +236,8 @@ const Login = () => {
                                     }
                                 </Button>
                             </div>
-                            <a className="cursor-pointer text-[14px] font-medium text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8" onClick={forgetPassword} disabled={isLoading} >Forgot Password?</a>
+
+                            <a className={`cursor-pointer text-[14px] font-medium text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8 ${isLoading ? 'pointer-events-none opacity-50' : ''}`} onClick={forgetPassword}>Forgot Password?</a>
 
                             <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} !w-full !text-[15px] !font-semibold !mt-4`}>
                                 {

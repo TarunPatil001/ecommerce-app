@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Search from "./../Search/index";
 import Badge from '@mui/material/Badge';
@@ -32,7 +31,7 @@ const Header = () => {
 
   const context = useContext(MyContext);
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,8 +47,7 @@ const Header = () => {
       console.log(res);
       if (res?.error === false) {
         context.setIsLogin(false);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        localStorage.clear();
       }
     })
   }

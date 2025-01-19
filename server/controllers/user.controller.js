@@ -49,7 +49,7 @@ export async function registerUserController(request, response) {
       password: hashedPassword,
       name: name,
       otp: verifyCode,
-      otpExpires: Date.now() + 600000, // 10 minutes
+      otpExpires: Date.now() + 300000, // 5 minutes
     });
 
     await user.save();
@@ -125,12 +125,23 @@ export async function resendOtpController(request, response) {
       });
     }
 
-    // Generate a new OTP, regardless of whether the previous one is expired or not
+    // Check if OTP has expired
+    const currentTime = Date.now();
+    if (user.otpExpires && currentTime < user.otpExpires) {
+      return response.status(400).json({
+        message:
+          "OTP has not yet expired. Please wait before requesting a new OTP.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Generate a new OTP if the previous one has expired
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Update OTP and expiration time (extend for another 10 minutes)
+    // Update OTP and expiration time (extend for another 5 minutes)
     user.otp = verifyCode;
-    user.otpExpires = Date.now() + 600000; // 10 minutes
+    user.otpExpires = currentTime + 300000; // 5 minutes
 
     await user.save();
 
@@ -153,8 +164,9 @@ export async function resendOtpController(request, response) {
     return response.status(200).json({
       success: true,
       error: false,
-      message: "Verification email resent successfully.",
+      message: `OTP resent to ${user.email}`,
     });
+
   } catch (error) {
     return response.status(500).json({
       message: error.message || error,
@@ -163,7 +175,6 @@ export async function resendOtpController(request, response) {
     });
   }
 }
-
 
 export async function verifyEmailController(request, response) {
   try {
@@ -178,11 +189,36 @@ export async function verifyEmailController(request, response) {
       });
     }
 
+    if (!email) {
+      return response.status(400).json({
+        message: "Please provide email",
+        error: true,
+        success: false,
+      });
+    }
+    
+    if (!otp) {
+      return response.status(400).json({
+        message: "Enter OTP send to your email",
+        error: true,
+        success: false,
+      });
+    }
+    
+    if(!email || !otp) {
+      return response.status(400).json({
+        message: "Please provide both email and OTP.",
+        error: true,
+        success: false,
+      });
+    }
+
     const isCodeValid = user.otp === otp;
     const isNotExpired = user.otpExpires > Date.now();
 
+
     if (isCodeValid && isNotExpired) {
-      (user.verify_email = true), (user.otp = null), (user.otpExpires = null);
+      (user.verify_email = true ), (user.otp = null), (user.otpExpires = null);
       await user.save();
       return response.status(200).json({
         message: "Email verified successfully",
@@ -530,7 +566,7 @@ export async function updateUserDetails(request, response) {
         verify_email:
           email && email !== userExist.email ? false : userExist.verify_email,
         otp: verifyCode || null,
-        otpExpires: verifyCode ? Date.now() + 600000 : userExist.otpExpires,
+        otpExpires: verifyCode ? Date.now() + 300000 : userExist.otpExpires,
       },
       { new: true }
     );
@@ -584,26 +620,38 @@ export async function forgotPasswordController(request, response) {
         error: true,
         success: false,
       });
-    } else {
-      // Generate a random verification code
-      let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      user.otp = verifyCode;
-      user.otpExpires = Date.now() + 600000;
-
-      await user.save();
-
-      // Send the verification email
-      await sendEmailFun(
-        email,
-        `Email verification code: ${verifyCode}`,
-        "", // Optional text content
-        VerificationEmail(user.name, verifyCode) // Pass the HTML template
-      );
     }
 
+    // Check if OTP has expired
+    const currentTime = Date.now();
+    if (user.otpExpires && currentTime < user.otpExpires) {
+      return response.status(400).json({
+        message:
+          "OTP has not yet expired. Please wait before requesting a new OTP.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Generate a new OTP if the previous one has expired
+    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Update OTP and expiration time (extend for another 5 minutes)
+    user.otp = verifyCode;
+    user.otpExpires = currentTime + 300000; // 5 minutes
+
+    await user.save();
+
+    // Send the verification email
+    await sendEmailFun(
+      email,
+      `Email verification code: ${verifyCode}`,
+      "", // Optional text content
+      VerificationEmail(user.name, verifyCode) // Pass the HTML template
+    );
+
     return response.json({
-      message: "Password reset link sent to your email.",
+      message: "Please reset your password.",
       error: false,
       success: true,
     });
@@ -633,9 +681,25 @@ export async function verifyForgotPasswordOtp(request, response) {
       });
     }
 
-    if (!email || !otp) {
+    if (!email) {
       return response.status(400).json({
-        message: "Provide both email and OTP.",
+        message: "Please provide email",
+        error: true,
+        success: false,
+      });
+    }
+    
+    if (!otp) {
+      return response.status(400).json({
+        message: "Enter OTP send to your email",
+        error: true,
+        success: false,
+      });
+    }
+    
+    if(!email || !otp) {
+      return response.status(400).json({
+        message: "Please provide both email and OTP.",
         error: true,
         success: false,
       });
@@ -660,6 +724,7 @@ export async function verifyForgotPasswordOtp(request, response) {
     }
 
     // Clear OTP and OTP expiry
+    user.verify_email = true;
     user.otp = "";
     user.otpExpires = "";
 

@@ -61,22 +61,61 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
-  useEffect(()=>{
-    const token = localStorage.getItem('accessToken');
-    if(token!==undefined && token!==null && token!==''){
-      setIsLogin(true);
+  // useEffect(()=>{
+  //   const token = localStorage.getItem('accessToken');
+  //   if(token!==undefined && token!==null && token!==''){
+  //     setIsLogin(true);
 
-      fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res)=>{
-        console.log(res);
-        setUserData(res.data);
-      })
+  //     fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res)=>{
+  //       console.log(res);
+  //       setUserData(res.data);
+  //     })
 
-      }else{
-        setIsLogin(false);
-      }
-  }, [isLogin]);
+  //     }else{
+  //       setIsLogin(false);
+  //     }
+  // }, [isLogin]);
 
   // openAlertBox function
+  
+
+   // Sync login state with localStorage and other tabs using the storage event
+   useEffect(() => {
+    // Function to set the login state based on access token
+    const updateLoginState = () => {
+      const token = localStorage.getItem('accessToken');
+      
+      if (token && token !== '') {
+        setIsLogin(true);
+        fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res) => {
+          setUserData(res.data);
+        });
+      } else {
+        setIsLogin(false);
+        setUserData(null);  // Optionally clear user data
+      }
+    };
+
+    // Call on initial render to sync the state
+    updateLoginState();
+
+    // Listen for changes in localStorage (across all tabs)
+    const handleStorageChange = (e) => {
+      if (e.key === 'accessToken') {
+        updateLoginState();  // Update login state when accessToken changes
+      }
+    };
+
+    // Add listener for localStorage changes (across all tabs)
+    window.addEventListener('storage', handleStorageChange);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [isLogin]); // Empty array to run only once when the component mounts
+  
+  
   const openAlertBox = (status, msg) => {
     if (status === "success") {
       toast.success(msg);
