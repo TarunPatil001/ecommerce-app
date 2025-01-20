@@ -1,4 +1,5 @@
 import ProductModel from "../models/product.model.js";
+import CategoryModel from './../models/category.model.js';
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
@@ -45,6 +46,9 @@ export async function uploadProductImages(request, response) {
     });
   }
 }
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 export async function createProduct(request, response) {
   try {
@@ -100,6 +104,11 @@ export async function createProduct(request, response) {
   }
 }
 
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // get all products
 export async function getAllProducts(request, response) {
   try {
@@ -148,6 +157,12 @@ export async function getAllProducts(request, response) {
     });
   }
 }
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 
 // get all products by categoryId
 export async function getAllProductsByCategoryId(request, response) {
@@ -200,6 +215,12 @@ export async function getAllProductsByCategoryId(request, response) {
   }
 }
 
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // get all products by categoryName
 export async function getAllProductsByCategoryName(request, response) {
   try {
@@ -250,6 +271,10 @@ export async function getAllProductsByCategoryName(request, response) {
     });
   }
 }
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by subCategoryId
 export async function getAllProductsBySubCategoryId(request, response) {
@@ -302,6 +327,13 @@ export async function getAllProductsBySubCategoryId(request, response) {
   }
 }
 
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // get all products by subCategoryName
 export async function getAllProductsBySubCategoryName(request, response) {
   try {
@@ -352,6 +384,14 @@ export async function getAllProductsBySubCategoryName(request, response) {
     });
   }
 }
+
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 
 // get all products by thirdSubCategoryId
 export async function getAllProductsByThirdSubCategoryId(request, response) {
@@ -404,6 +444,9 @@ export async function getAllProductsByThirdSubCategoryId(request, response) {
   }
 }
 
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // get all products by thirdSubCategoryName
 export async function getAllProductsByThirdSubCategoryName(request, response) {
   try {
@@ -454,6 +497,11 @@ export async function getAllProductsByThirdSubCategoryName(request, response) {
     });
   }
 }
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by price
 export async function getAllProductsByPrice(request, response) {
@@ -516,6 +564,12 @@ export async function getAllProductsByPrice(request, response) {
     page: 0,
   });
 }
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by rating
 export async function getAllProductsByRating(request, response) {
@@ -591,6 +645,10 @@ export async function getAllProductsByRating(request, response) {
   }
 }
 
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // get all products count
 export async function getAllProductsCount(request, response) {
   try {
@@ -623,6 +681,12 @@ export async function getAllProductsCount(request, response) {
     });
   }
 }
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 // get all featured products
 export async function getAllFeaturedProducts(request, response) {
@@ -659,60 +723,207 @@ export async function getAllFeaturedProducts(request, response) {
   }
 }
 
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+
+//? main file code
 // delete product
+// export async function deleteProduct(request, response) {
+//   try {
+//     const productId = request.params.id; // Get the product ID from the request parameters
+
+//     // Find the product in the database and populate category field
+//     const product = await ProductModel.findById(productId).populate("category");
+
+//     if (!product) {
+//       return response.status(404).json({
+//         message: "Product not found",
+//         success: false,
+//       });
+//     }
+
+//     const images = product.images;
+
+//     let img = "";
+//     for (img of images) {
+//       const imgUrl = img;
+//       const urlArr = imgUrl.split("/");
+//       const image = urlArr[urlArr.length - 1];
+
+//       const imageName = image.split(".")[0];
+
+//       if (imageName) {
+//         cloudinary.uploader.destroy(imageName, (error, result) => {});
+//       }
+//     }
+
+//     // Delete the product from the database
+//     const deletedProduct = await ProductModel.findByIdAndDelete(productId);
+
+//     if (!deletedProduct) {
+//       return response.status(404).json({
+//         message: "Failed to delete product",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Product deleted successfully",
+//       success: true,
+//       error: false,
+//     });
+//   } catch (error) {
+//     console.error("Error in deleting product:", error.message || error);
+//     return response.status(500).json({
+//       message: error.message || "An error occurred during product deletion.",
+//       success: false,
+//     });
+//   }
+// }
+
+
+// working code
+// delete product
+// export async function deleteProduct(request, response) {
+//   try {
+//     const productId = request.params.id; // Get the product ID from the request parameters
+
+//     // Find the product in the database
+//     const product = await ProductModel.findById(productId).populate("category");
+
+//     if (!product) {
+//       return response.status(404).json({
+//         message: "Product not found",
+//         success: false,
+//       });
+//     }
+
+//     const images = product.images; // Assuming `product.images` contains array of objects with `public_id`
+
+//     // Loop through the images and delete them from Cloudinary
+//     for (const img of images) {
+//       if (img.public_id) {
+//         try {
+//           await cloudinary.uploader.destroy(img.public_id); // Use public_id to delete
+//         } catch (error) {
+//           console.error(`Failed to delete image ${img.public_id}:`, error.message);
+//         }
+//       }
+//     }
+
+//     // Delete the product from the database
+//     const deletedProduct = await ProductModel.findByIdAndDelete(productId);
+
+//     if (!deletedProduct) {
+//       return response.status(404).json({
+//         message: "Failed to delete product",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Product deleted successfully",
+//       success: true,
+//       error: false,
+//     });
+//   } catch (error) {
+//     console.error("Error in deleting product:", error.message || error);
+//     return response.status(500).json({
+//       message: error.message || "An error occurred during product deletion.",
+//       success: false,
+//     });
+//   }
+// }
+
+
+// Helper function to extract public ID from Cloudinary URL
+function extractPublicId(imageUrl) {
+  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(.*?)\.[a-zA-Z0-9]+$/;
+  const match = imageUrl.match(regex);
+
+  if (match && match[1]) {
+    console.log(`Extracted public ID: ${match[1]}`);  // Log the public ID
+    return match[1];
+  }
+
+  return null;
+}
+
 export async function deleteProduct(request, response) {
   try {
-    const productId = request.params.id; // Get the product ID from the request parameters
-
-    // Find the product in the database and populate category field
-    const product = await ProductModel.findById(productId).populate("category");
+    const productId = request.params.id;
+    const product = await ProductModel.findById(productId);
 
     if (!product) {
       return response.status(404).json({
-        message: "Product not found",
+        message: "Product not found.",
         success: false,
+        error: true,
       });
     }
 
-    const images = product.images;
+    let cloudinaryMessages = [];
 
-    let img = "";
-    for (img of images) {
-      const imgUrl = img;
-      const urlArr = imgUrl.split("/");
-      const image = urlArr[urlArr.length - 1];
+    for (let i = 0; i < product.images.length; i++) {
+      const imageUrl = product.images[i];
+      const publicId = extractPublicId(imageUrl);
 
-      const imageName = image.split(".")[0];
+      if (!publicId) {
+        cloudinaryMessages.push(`Failed to extract public ID for image ${i + 1}.`);
+        continue;
+      }
 
-      if (imageName) {
-        cloudinary.uploader.destroy(imageName, (error, result) => {});
+      // Add the folder path for Cloudinary deletion
+      const fullPublicId = `ecommerceApp/uploads/${publicId}`;
+      console.log(`Attempting to delete image with full public ID: ${fullPublicId}`);
+
+      // Delete image from Cloudinary and check the response
+      const result = await cloudinary.uploader.destroy(fullPublicId);
+
+      console.log('Cloudinary delete result:', result);  // Log the entire result
+
+      if (result.result === 'ok') {
+        cloudinaryMessages.push(`Image ${i + 1} deleted successfully from Cloudinary.`);
+      } else {
+        cloudinaryMessages.push(`Failed to delete image ${i + 1} from Cloudinary. Error: ${result.error ? result.error.message : 'Unknown error'}`);
       }
     }
 
-    // Delete the product from the database
     const deletedProduct = await ProductModel.findByIdAndDelete(productId);
 
     if (!deletedProduct) {
-      return response.status(404).json({
-        message: "Failed to delete product",
+      return response.status(400).json({
+        message: "Product deletion failed.",
         success: false,
         error: true,
       });
     }
 
     return response.status(200).json({
-      message: "Product deleted successfully",
+      message: "Product and associated images deleted successfully.",
       success: true,
       error: false,
+      cloudinaryMessages: cloudinaryMessages,
     });
   } catch (error) {
-    console.error("Error in deleting product:", error.message || error);
     return response.status(500).json({
-      message: error.message || "An error occurred during product deletion.",
-      success: false,
+      message: error.message || error,
+      error: true,
+      status: false,
     });
   }
 }
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
 
 // get single products
 export async function getProduct(request, response) {
@@ -744,6 +955,11 @@ export async function getProduct(request, response) {
   }
 }
 
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // Controller for removing an image from Cloudinary for product
 // export async function removeImageFromCloudinary(request, response) {
 //   const imgUrl = request.query.img;
@@ -767,6 +983,7 @@ export async function getProduct(request, response) {
 //     }
 //   }
 // }
+
 
 export async function removeImageFromCloudinary(request, response) {
   try {
@@ -824,14 +1041,110 @@ export async function removeImageFromCloudinary(request, response) {
   }
 }
 
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+// export async function updateProduct(request, response) {
+//   try {
+//     const product = await ProductModel.findByIdAndUpdate(
+//       request.params.id,
+//       {
+//         name: request.body.name,
+//         description: request.body.description,
+//         images: imagesArr.length > 0 ? imagesArr : undefined, // Only update images if new ones are provided
+//         brand: request.body.brand,
+//         price: request.body.price,
+//         oldPrice: request.body.oldPrice,
+//         categoryName: request.body.categoryName,
+//         categoryId: request.body.categoryId,
+//         subCategoryId: request.body.subCategoryId,
+//         thirdSubCategoryId: request.body.thirdSubCategoryId,
+//         category: request.body.category,
+//         countInStock: request.body.countInStock,
+//         rating: request.body.rating,
+//         isFeatured: request.body.isFeatured,
+//         discount: request.body.discount,
+//         productRam: request.body.productRam,
+//         size: request.body.size,
+//         productWeight: request.body.productWeight,
+//       },
+//       { new: true } // Return the updated document
+//     );
+
+//     if (!product) {
+//       return response.status(404).json({
+//         error: true,
+//         success: false,
+//         message: "Product can not be updated!",
+//       });
+//     }
+
+//     imagesArr = [];
+
+//     return response.status(200).json({
+//       message: "Product updated successfully.",
+//       success: true,
+//       product: product,
+//     });
+
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || "An error occurred during product update.",
+//       success: false,
+//       error: error.message || error,
+//     });
+//   }
+// }
+
 export async function updateProduct(request, response) {
   try {
-    const product = await ProductModel.findByIdAndUpdate(
-      request.params.id,
+    const productId = request.params.id;
+    const product = await ProductModel.findById(productId);
+
+    if (!product) {
+      return response.status(404).json({
+        error: true,
+        success: false,
+        message: "Product not found!",
+      });
+    }
+
+    // Collect Cloudinary messages to track success/failures
+    let cloudinaryMessages = [];
+
+    // If new images are provided, delete old ones from Cloudinary
+    if (imagesArr.length > 0) {
+      // First, delete old images from Cloudinary
+      for (let i = 0; i < product.images.length; i++) {
+        const oldImageUrl = product.images[i];
+        const publicId = extractPublicId(oldImageUrl);
+
+        if (publicId) {
+          const result = await cloudinary.uploader.destroy(`ecommerceApp/uploads/${publicId}`);
+          if (result.result === 'ok') {
+            cloudinaryMessages.push(`Successfully deleted old image: ${publicId}`);
+          } else {
+            cloudinaryMessages.push(`Failed to delete old image: ${publicId}`);
+          }
+        }
+      }
+
+      // After deleting old images, set the new images
+      product.images = imagesArr;
+    } else {
+      // If no new images are provided, keep the old ones
+      cloudinaryMessages.push("No new images provided, keeping the old ones.");
+    }
+
+    // Update product details
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
       {
         name: request.body.name,
         description: request.body.description,
-        images: imagesArr.length > 0 ? imagesArr : undefined, // Only update images if new ones are provided
+        images: imagesArr.length > 0 ? imagesArr : product.images, // Keep old images if none provided
         brand: request.body.brand,
         price: request.body.price,
         oldPrice: request.body.oldPrice,
@@ -851,20 +1164,22 @@ export async function updateProduct(request, response) {
       { new: true } // Return the updated document
     );
 
-    if (!product) {
-      return response.status(404).json({
+    if (!updatedProduct) {
+      return response.status(400).json({
         error: true,
         success: false,
-        message: "Product can not be updated!",
+        message: "Product update failed!",
       });
     }
 
+    // Clear the images array after update
     imagesArr = [];
 
     return response.status(200).json({
       message: "Product updated successfully.",
       success: true,
-      product: product,
+      cloudinaryMessages: cloudinaryMessages,
+      product: updatedProduct,
     });
 
   } catch (error) {
@@ -875,3 +1190,6 @@ export async function updateProduct(request, response) {
     });
   }
 }
+
+
+// ----------------------------------------------------------------------------------------------------------------------
