@@ -61,7 +61,7 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
-  // useEffect(()=>{
+    // useEffect(()=>{
   //   const token = localStorage.getItem('accessToken');
   //   if(token!==undefined && token!==null && token!==''){
   //     setIsLogin(true);
@@ -115,7 +115,7 @@ function App() {
     };
   }, [isLogin]); // Empty array to run only once when the component mounts
   
-  
+
   const openAlertBox = (status, msg) => {
     if (status === "success") {
       toast.success(msg);

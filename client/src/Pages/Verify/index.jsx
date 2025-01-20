@@ -13,10 +13,12 @@ const Verify = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [timer, setTimer] = useState(0); // Initial timer state
     const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
-
+    
     const handleOtpChange = (value) => {
         setOtp(value);
     };
+    
+    const actionType = localStorage.getItem("actionType");
 
     useEffect(() => {
         // Get the OTP expiration time from localStorage
@@ -51,7 +53,7 @@ const Verify = () => {
 
     const sendOtp = async (e) => {
         e.preventDefault();
-        const actionType = localStorage.getItem("actionType");
+        
         console.log("Resending OTP to: ", localStorage.getItem("User email"));
 
         if (actionType !== "forgot-password") {
@@ -123,8 +125,6 @@ const Verify = () => {
     const verifyOTP = async (e) => {
         e.preventDefault();
 
-        const actionType = localStorage.getItem("actionType");
-
         if (actionType !== "forgot-password") {
             // Use toast.promise to handle loading, success, and error states
             toast.promise(
@@ -153,6 +153,7 @@ const Verify = () => {
             ).then((res) => {
                 // Add any additional actions after the promise resolves (if needed)
                 console.log("OTP Verification Completed:", res);
+                
             }).catch((err) => {
                 // Add any additional actions for handling errors here
                 console.error("OTP Verification Error:", err);
@@ -169,7 +170,6 @@ const Verify = () => {
                 success: (res) => {
                     if (res?.error === false) {
                         // Navigate to login if verification is successful
-                        localStorage.removeItem("User email")
                         localStorage.removeItem("OTP_EXPIRES");
                         navigate("/forgot-password"); // Use navigate for redirection
                         return res?.message;  // Success message shown in toast
@@ -185,6 +185,7 @@ const Verify = () => {
         ).then((res) => {
             // Add any additional actions after the promise resolves (if needed)
             console.log("OTP Verification Completed:", res);
+            console.log("res?.user?.email = ", res?.user?.email)
         }).catch((err) => {
             // Add any additional actions for handling errors here
             console.error("OTP Verification Error:", err);

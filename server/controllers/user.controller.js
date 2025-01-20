@@ -772,8 +772,20 @@ export async function resetPassword(request, response) {
       });
     }
 
-    // Verify the newPassword and confirmPassword
-    if (newPassword !== confirmPassword) {
+    // validate and Verify the newPassword and confirmPassword
+    if (!newPassword) {
+      return response.status(400).json({
+        message: "Please enter the new password.",
+        error: true,
+        success: false,
+      });
+    } else if (!confirmPassword) {
+      return response.status(400).json({
+        message: "Please enter the confirm password.",
+        error: true,
+        success: false,
+      });
+    } else if (newPassword !== confirmPassword) {
       return response.status(400).json({
         message: "Passwords do not match.",
         error: true,
