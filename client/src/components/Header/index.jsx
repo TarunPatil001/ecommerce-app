@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Search from "./../Search/index";
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
@@ -30,7 +30,9 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const Header = () => {
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
 
+  const [loginData, setLoginData] = useState({ avatar:'', name: '', email: '' });
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -40,14 +42,26 @@ const Header = () => {
     setAnchorEl(null);
   };
 
+
+  useEffect(() => {
+    if (context.isLogin) {
+      setLoginData({
+        avatar: context?.userData?.avatar,
+        name: context?.userData?.name,
+        email: context?.userData?.email,
+      });
+    }
+  }, [context.isLogin, context?.userData?.avatar, context?.userData?.email, context?.userData?.name, context]);
+
+
   const logout = () => {
     setAnchorEl(null);
 
     fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
-      console.log(res);
       if (res?.error === false) {
         context.setIsLogin(false);
         localStorage.clear();
+        navigate("/");
       }
     })
   }
@@ -124,12 +138,12 @@ const Header = () => {
                         <div className="myAccountWrap px-1 flex items-center justify-end gap-2 rounded-md hover:bg-slate-100 cursor-pointer transition-all duration-300" onClick={handleClick}>
                           <div className="w-[35px] p-1">
                             <div className="w-[35px] h-[35px] rounded-full overflow-hidden border flex items-center justify-center border-[rgb(180,180,180)]">
-                              <img src={context?.userData?.avatar !== "" ? `${context?.userData?.avatar}` : `https://ui-avatars.com/api/?name=${context?.userData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
+                              <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
                             </div>
                           </div>
                           <div className="flex items-start flex-col  p-1">
-                            <span className="font-bold text-[14px] line-clamp-1 uppercase link transition-all duration-200">{context?.userData?.name}</span>
-                            <span className="font-medium text-[12px] line-clamp-1 link transition-all duration-200">{context?.userData?.email}</span>
+                            <span className="font-bold text-[14px] line-clamp-1 uppercase link transition-all duration-200">{loginData?.name}</span>
+                            <span className="font-medium text-[12px] line-clamp-1 link transition-all duration-200">{loginData?.email}</span>
                           </div>
                         </div>
 

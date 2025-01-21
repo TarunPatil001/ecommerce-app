@@ -6,6 +6,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { MdOutlineDoubleArrow, MdOutlineLogout } from "react-icons/md";
 import { MyContext } from "../../App";
+import { useNavigate } from 'react-router-dom';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -20,6 +21,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const Header = () => {
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
   const [anchorMyAcc, setAnchorMyAcc] = useState(null);
   const openMyAcc = Boolean(anchorMyAcc);
 
@@ -57,6 +59,9 @@ const Header = () => {
     };
   }, [lastScrollY]);
 
+  const navigateToSignIn = () => {
+    navigate("/sign-in");
+  };
 
   return (
     <header className={`w-full h-auto py-2 shadow-md ${context.isSidebarOpen === true ? 'pl-72' : 'pl-5'} bg-[#fff] pr-7 flex items-center justify-between z-[50] transition-all duration-300 ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
@@ -140,7 +145,7 @@ const Header = () => {
 
           ) : (
 
-            <Button className='custom-btn !rounded-full !capitalize'>Sign In</Button>
+            <Button className='custom-btn !rounded-full !capitalize' onClick={navigateToSignIn}>Sign In</Button>
           
           )
         }

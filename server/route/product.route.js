@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, deleteProduct, getAllFeaturedProducts, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageFromCloudinary, updateProduct, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, deleteAllUnWantedImages, deleteProduct, getAllFeaturedProducts, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageFromCloudinary, updateProduct, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -9,6 +9,9 @@ const productRouter = Router();
 
 // Upload product images
 productRouter.post("/upload-product-images", auth, upload.array("images"), uploadProductImages);
+
+// remove image from cloudinary
+productRouter.delete("/deleteImage", auth, removeImageFromCloudinary);
 
 // Create a new product
 productRouter.post("/create-product", auth, createProduct);
@@ -52,11 +55,10 @@ productRouter.delete("/:id", auth, deleteProduct);
 // get single product
 productRouter.get("/:id", getProduct);
 
-// remove image from cloudinary
-productRouter.delete("/deleteImage", auth, removeImageFromCloudinary);
-
 // update product
 productRouter.put("/updateProduct/:id", auth, updateProduct);
  
+// Create a new product
+productRouter.post("/deleteAllUnWantedImages", auth, deleteAllUnWantedImages);
 
 export default productRouter;

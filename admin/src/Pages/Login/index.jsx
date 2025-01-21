@@ -28,7 +28,8 @@ const Login = () => {
 
     return (
 
-        <section className='bg-white w-full h-full'>
+        <section className='w-full h-full bg-white'>
+            <img src="/pattern.webp" alt="bg_img" className='w-full h-full fixed top-0 left-0 opacity-5' />
             <header className='w-full py-2 px-10 fixed top-5 left-0 flex items-center justify-between !z-50'>
                 <Link to="/">
                     <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="" className='w-[200px]' />
@@ -42,8 +43,6 @@ const Login = () => {
                     </NavLink>
                 </div>
             </header>
-            <img src="/pattern.webp" alt="bg_img" className='w-full fixed top-0 left-0 opacity-5' />
-
             <div className='loginBox card w-[600px] h-auto mx-auto pt-20 relative !z-50 pb-20'>
                 <div className='text-center'>
                     <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo-short.18ca02a8.svg" alt="" className='m-auto' />
@@ -92,11 +91,11 @@ const Login = () => {
                         <h4 className='mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]'>Password</h4>
                         <div className="relative w-full">
                             <input type={isPasswordShow === true ? "text" : "password"} placeholder='Enter your password' required className='mt-2 w-full h-[50px] px-4 text-[16px] font-medium border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:!border-[rgba(0,0,0,0.7)] focus:outline-none' />
-                            <Button className='!absolute !top-[15px] !right-[10px] z-50 !rounded-full !w-[35px] !h-[35px] !min-w-[35px] !text-[rgba(0,0,0,0.8)] !text-[18px]' onClick={()=>setIsPasswordShow(!isPasswordShow)}>
+                            <Button className='!absolute !top-[15px] !right-[10px] z-50 !rounded-full !w-[35px] !h-[35px] !min-w-[35px] !text-[rgba(0,0,0,0.8)] !text-[18px]' onClick={() => setIsPasswordShow(!isPasswordShow)}>
                                 {
                                     isPasswordShow === true ? (<FaRegEye />) : (<FaRegEyeSlash />)
                                 }
-                                </Button>
+                            </Button>
                         </div>
                     </div>
                     <div className='form-group mb-4 w-full flex items-center justify-between'>
@@ -111,10 +110,10 @@ const Login = () => {
                     <Button className='w-full custom-btn !capitalize !text-[16px]'>Sign in</Button>
                     <Link to="/sign-up"><p className='flex items-center justify-center gap-2 text-[rgba(0,0,0,0.6)] text-[16px] mt-5'>Don’t have an account?<span className='text-black font-semibold'>Sign Up</span></p></Link>
                 </form>
-
             </div>
-
         </section>
+
+
     )
 }
 

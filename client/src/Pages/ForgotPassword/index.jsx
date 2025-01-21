@@ -148,8 +148,6 @@ const ForgotPassword = () => {
                                     isLoading ? <CircularProgress color="inherit" /> : "Reset Password"
                                 }
                             </Button>
-                            {/* <Button type='submit' className="buttonPrimaryBlack !w-full !text-[15px] !font-semibold !mb-4 !capitalize" disabled={isLoading}>Reset Password</Button> */}
-
 
                         </form>
                     </div>

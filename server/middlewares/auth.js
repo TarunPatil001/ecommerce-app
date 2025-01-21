@@ -2,13 +2,13 @@ import jwt from "jsonwebtoken";
 
 const auth = async (request, response, next) => {
   try {
-    var token =
+    const token =
       request.cookies.accessToken ||
-      request?.header?.authorization?.split("")[1];
+      request?.headers?.authorization?.split(" ")[1];
 
-      if (!token) {
-        token = request.query.token;
-      }
+      // if (!token) {
+      //   token = request.query.token;
+      // }
 
     if (!token) {
       return response
@@ -30,6 +30,7 @@ const auth = async (request, response, next) => {
 
     request.userId = decode.id;
     next();
+    
   } catch (error) {
     return response.status(500).json({
       msg: "You have not login", // error.message || error,

@@ -910,6 +910,7 @@ export async function deleteProduct(request, response) {
       error: false,
       cloudinaryMessages: cloudinaryMessages,
     });
+
   } catch (error) {
     return response.status(500).json({
       message: error.message || error,
@@ -918,8 +919,6 @@ export async function deleteProduct(request, response) {
     });
   }
 }
-
-
 
 
 
@@ -960,6 +959,7 @@ export async function getProduct(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
+//? regular code
 // Controller for removing an image from Cloudinary for product
 // export async function removeImageFromCloudinary(request, response) {
 //   const imgUrl = request.query.img;
@@ -985,11 +985,68 @@ export async function getProduct(request, response) {
 // }
 
 
+// export async function removeImageFromCloudinary(request, response) {
+//   try {
+//     const imgUrl = request.query.img;
+
+//     // Validate if imgUrl exists and has the correct format
+//     if (!imgUrl) {
+//       return response.status(400).json({
+//         message: "Image URL is required",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     // Extract the image name (remove the folder path)
+//     const urlArr = imgUrl.split("/");
+//     const image = urlArr[urlArr.length - 1]; // 'sample-image.jpg'
+//     const imageName = image.split(".")[0]; // 'sample-image'
+
+//     // Folder path to be included in the destroy API call
+//     const folderPath = 'ecommerceApp/uploads/';
+
+//     // Ensure the imageName is valid and the URL is correct
+//     if (!imageName) {
+//       return response.status(400).json({
+//         message: "Invalid image URL",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     // Call Cloudinary API to destroy the image (including folder path)
+//     const result = await cloudinary.uploader.destroy(`${folderPath}${imageName}`);
+
+//     if (result.result === "ok") {
+//       return response.status(200).json({
+//         message: "Image removed successfully",
+//         success: true,
+//         error: false,
+//       });
+//     } else {
+//       return response.status(500).json({
+//         message: "Failed to remove image from Cloudinary",
+//         success: false,
+//         error: true,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error removing image from Cloudinary:", error);
+//     return response.status(500).json({
+//       message: "Server error",
+//       success: false,
+//       error: true,
+//     });
+//   }
+// }
+
 export async function removeImageFromCloudinary(request, response) {
   try {
-    const imgUrl = request.query.img;
+    console.log("Request Query:", request.query); // Log the incoming request query
 
-    // Validate if imgUrl exists and has the correct format
+    const { imgUrl } = request.query;
+
     if (!imgUrl) {
       return response.status(400).json({
         message: "Image URL is required",
@@ -998,25 +1055,27 @@ export async function removeImageFromCloudinary(request, response) {
       });
     }
 
-    // Extract the image name (remove the folder path)
+    // Extract folder path and image name
+    const folderPath = "ecommerceApp/uploads/"; // Make sure this matches the folder path in Cloudinary
     const urlArr = imgUrl.split("/");
-    const image = urlArr[urlArr.length - 1]; // 'sample-image.jpg'
-    const imageName = image.split(".")[0]; // 'sample-image'
 
-    // Folder path to be included in the destroy API call
-    const folderPath = 'ecommerceApp/uploads/';
-
-    // Ensure the imageName is valid and the URL is correct
-    if (!imageName) {
+    // Ensure the URL structure is valid
+    if (urlArr.length < 2) {
       return response.status(400).json({
-        message: "Invalid image URL",
+        message: "Invalid image URL format",
         success: false,
         error: true,
       });
     }
 
-    // Call Cloudinary API to destroy the image (including folder path)
-    const result = await cloudinary.uploader.destroy(`${folderPath}${imageName}`);
+    const image = urlArr[urlArr.length - 1]; // The image file name with version (e.g., "v1737394954/ecommerc.jpg")
+    const imageName = image.split(".")[0]; // Extract the image name without extension
+    const publicId = `${folderPath}${imageName}`; // Build the full public ID
+
+    console.log("Deleting image with public ID:", publicId);
+
+    // Attempt to delete the image from Cloudinary
+    const result = await cloudinary.uploader.destroy(publicId);
 
     if (result.result === "ok") {
       return response.status(200).json({
@@ -1024,17 +1083,18 @@ export async function removeImageFromCloudinary(request, response) {
         success: true,
         error: false,
       });
-    } else {
-      return response.status(500).json({
-        message: "Failed to remove image from Cloudinary",
-        success: false,
-        error: true,
-      });
     }
+
+    return response.status(404).json({
+      message: "Image not found in Cloudinary",
+      success: false,
+      error: true,
+    });
   } catch (error) {
-    console.error("Error removing image from Cloudinary:", error);
+    console.error("Error in removeImageFromCloudinary:", error);
+
     return response.status(500).json({
-      message: "Server error",
+      message: "Failed to remove image",
       success: false,
       error: true,
     });
@@ -1193,3 +1253,49 @@ export async function updateProduct(request, response) {
 
 
 // ----------------------------------------------------------------------------------------------------------------------
+
+// delete all unwanted images from cloudinary
+
+export async function deleteAllUnWantedImages(req, res) {
+  try {
+    console.log("Fetching all products from DB...");
+    const products = await ProductModel.find();
+    console.log("Products fetched:", products);
+
+    const linkedImages = new Set();
+    products.forEach((product) => {
+      product.images.forEach((img) => {
+        linkedImages.add(img);
+      });
+    });
+    console.log("Linked images:", linkedImages);
+
+    console.log("Fetching images from Cloudinary...");
+    const cloudinaryImages = await cloudinary.api.resources({
+      type: "upload",
+      prefix: "ecommerceApp/uploads",
+    });
+    console.log("Cloudinary images fetched:", cloudinaryImages);
+
+    const imagesToDelete = cloudinaryImages.resources.filter(
+      (img) => !linkedImages.has(img.secure_url)
+    );
+    console.log("Images to delete:", imagesToDelete);
+
+    for (const img of imagesToDelete) {
+      console.log("Deleting image:", img.public_id);
+      await cloudinary.uploader.destroy(img.public_id);
+    }
+
+    return res.status(200).json({
+      message: "Unwanted images deleted successfully.",
+    });
+  } catch (error) {
+    console.log("Error:", error);
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      status: false,
+    });
+  }
+}

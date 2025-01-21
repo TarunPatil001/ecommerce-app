@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, useReducer } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -38,6 +38,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
+  const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
   // callback from cartPanel
@@ -61,59 +62,64 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
-    // useEffect(()=>{
-  //   const token = localStorage.getItem('accessToken');
-  //   if(token!==undefined && token!==null && token!==''){
-  //     setIsLogin(true);
+  useEffect(()=>{
+    const token = localStorage.getItem('accessToken');
+    if(token!==undefined && token!==null && token!==''){
+      setIsLogin(true);
 
-  //     fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res)=>{
-  //       console.log(res);
-  //       setUserData(res.data);
-  //     })
+      fetchDataFromApi(`/api/user/user-details`).then((res)=>{
+        setUserData(res.data);
+        console.log(res?.response?.data?.error);
+        if(res?.response?.data?.error === true){
+          if (res?.response?.data?.message === "You have not login") {
+            localStorage.clear();
+            openAlertBox("error", "Your session has expired. Please login again.");
+            setIsLogin(false);
+          }
+        }
+      })
 
-  //     }else{
-  //       setIsLogin(false);
-  //     }
-  // }, [isLogin]);
-
-  // openAlertBox function
+      }else{
+        setIsLogin(false);
+      }
+  }, [isLogin]);
   
 
    // Sync login state with localStorage and other tabs using the storage event
-   useEffect(() => {
-    // Function to set the login state based on access token
-    const updateLoginState = () => {
-      const token = localStorage.getItem('accessToken');
+  //  useEffect(() => {
+  //   // Function to set the login state based on access token
+  //   const updateLoginState = () => {
+  //     const token = localStorage.getItem('accessToken');
       
-      if (token && token !== '') {
-        setIsLogin(true);
-        fetchDataFromApi(`/api/user/user-details?token=${token}`).then((res) => {
-          setUserData(res.data);
-        });
-      } else {
-        setIsLogin(false);
-        setUserData(null);  // Optionally clear user data
-      }
-    };
+  //     if (token !== undefined && token !== null && token !== '') {
+  //       setIsLogin(true);
+  //       fetchDataFromApi(`/api/user/user-details`).then((res) => {
+  //         setUserData(res.data);
+  //       });
+  //     } else {
+  //       setIsLogin(false);
+  //       setUserData(null);  // Optionally clear user data
+  //     }
+  //   };
 
-    // Call on initial render to sync the state
-    updateLoginState();
+  //   // Call on initial render to sync the state
+  //   updateLoginState();
 
-    // Listen for changes in localStorage (across all tabs)
-    const handleStorageChange = (e) => {
-      if (e.key === 'accessToken') {
-        updateLoginState();  // Update login state when accessToken changes
-      }
-    };
+  //   // Listen for changes in localStorage (across all tabs)
+  //   const handleStorageChange = (e) => {
+  //     if (e.key === 'accessToken') {
+  //       updateLoginState();  // Update login state when accessToken changes
+  //     }
+  //   };
 
-    // Add listener for localStorage changes (across all tabs)
-    window.addEventListener('storage', handleStorageChange);
+  //   // Add listener for localStorage changes (across all tabs)
+  //   window.addEventListener('storage', handleStorageChange);
 
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [isLogin]); // Empty array to run only once when the component mounts
+  //   // Cleanup event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener('storage', handleStorageChange);
+  //   };
+  // }, [isLogin]); // Empty array to run only once when the component mounts
   
 
   const openAlertBox = (status, msg) => {
@@ -158,6 +164,11 @@ function App() {
 
     // Utility functions
     openAlertBox,
+
+    
+    isReducer,
+    forceUpdate,
+
   };
 
   return (

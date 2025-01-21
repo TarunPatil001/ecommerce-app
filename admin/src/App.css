@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --font-family: "Assistant", serif;
   --letter-spacing: 0px;
@@ -16,11 +20,11 @@
   scroll-behavior: smooth;
 }
 
-*,
+/* *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
+} */
 
 body {
   font-family: var(--font-family) !important;

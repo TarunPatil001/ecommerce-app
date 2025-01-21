@@ -365,8 +365,94 @@ export async function logoutController(request, response) {
   }
 }
 
+// --------------------------------------------------------------------------------------
+
 // image upload function
-var imagesArr = [];
+// var imagesArr = [];
+// Controller to handle user avatar upload and update
+// export async function userAvatarController(request, response) {
+//   try {
+//     const userId = request.userId; // Extracted from auth middleware
+//     const images = request.files; // Extracted from multer middleware
+
+//     // Validate that exactly one image is provided
+//     if (!images || images.length !== 1) {
+//       return response.status(400).json({
+//         message: "Please upload exactly one image file.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Find the user by ID
+//     const user = await UserModel.findOne({ _id: userId });
+
+//     if (!user) {
+//       return response.status(404).json({
+//         message: "User not found.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Check if the user already has an avatar
+//     if (user.avatar) {
+//       const imgUrl = user.avatar;
+
+//       // Extract the public_id of the existing avatar from its URL
+//       const urlArr = imgUrl.split("/");
+//       const avatarImage = urlArr[urlArr.length - 1];
+//       const publicId = `ecommerceApp/uploads/${avatarImage.split(".")[0]}`;
+
+//       // Remove the existing avatar from Cloudinary
+//       const result = await cloudinary.uploader.destroy(publicId);
+
+//       if (result.result !== "ok") {
+//         return response.status(400).json({
+//           message: "Failed to remove the existing avatar.",
+//           error: true,
+//           success: false,
+//         });
+//       }
+//     }
+
+//     // Upload the new avatar to Cloudinary
+//     const options = {
+//       folder: "ecommerceApp/uploads", // Specify the folder in Cloudinary
+//       use_filename: true,
+//       unique_filename: false,
+//       overwrite: false,
+//     };
+
+//     // Use the Promise-based API correctly
+//     const uploadedImage = await cloudinary.uploader.upload(
+//       images[0].path,
+//       options
+//     );
+
+//     // Delete the local file after successful upload
+//     await fs.unlink(images[0].path);
+
+//     // Update the user's avatar in the database
+//     user.avatar = uploadedImage.secure_url;
+//     await user.save();
+
+//     return response.status(200).json({
+//       _id: userId,
+//       avatar: user.avatar,
+//       message: "Avatar updated successfully.",
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.error("Error in userAvatarController:", error.message || error);
+//     return response.status(500).json({
+//       message: error.message || "An error occurred during avatar upload.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 // Controller to handle user avatar upload and update
 export async function userAvatarController(request, response) {
   try {
@@ -377,6 +463,28 @@ export async function userAvatarController(request, response) {
     if (!images || images.length !== 1) {
       return response.status(400).json({
         message: "Please upload exactly one image file.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Validate the file type
+    const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const uploadedImageType = images[0].mimetype;
+    if (!validImageTypes.includes(uploadedImageType)) {
+      return response.status(400).json({
+        message: "Invalid file type. Only JPG, JPEG, PNG, or WEBP files are allowed.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Validate the file size (max 5MB for example)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const uploadedImageSize = images[0].size;
+    if (uploadedImageSize > maxSize) {
+      return response.status(400).json({
+        message: "File is too large. Maximum allowed size is 5MB.",
         error: true,
         success: false,
       });
@@ -451,6 +559,7 @@ export async function userAvatarController(request, response) {
   }
 }
 
+
 // Controller for removing an image from Cloudinary
 export async function removeImageFromCloudinary(request, response) {
   try {
@@ -514,6 +623,9 @@ export async function removeImageFromCloudinary(request, response) {
     });
   }
 }
+
+
+// --------------------------------------------------------------------------------------
 
 export async function updateUserDetails(request, response) {
   try {
@@ -585,7 +697,13 @@ export async function updateUserDetails(request, response) {
       message: "User updated successfully.",
       error: false,
       success: true,
-      user: updatedUser,
+      user: {
+        name: updatedUser.name,
+        _id: updatedUser._id,
+        email: updatedUser.email,
+        mobile: updatedUser.mobile,
+        avatar: updatedUser.avatar,
+      },
     });
   } catch (error) {
     console.error("Error updating user details:", error.message || error);

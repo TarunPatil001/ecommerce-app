@@ -17,7 +17,7 @@ const Verify = () => {
     const handleOtpChange = (value) => {
         setOtp(value);
     };
-    
+
     const actionType = localStorage.getItem("actionType");
 
     useEffect(() => {
@@ -185,7 +185,6 @@ const Verify = () => {
         ).then((res) => {
             // Add any additional actions after the promise resolves (if needed)
             console.log("OTP Verification Completed:", res);
-            console.log("res?.user?.email = ", res?.user?.email)
         }).catch((err) => {
             // Add any additional actions for handling errors here
             console.error("OTP Verification Error:", err);

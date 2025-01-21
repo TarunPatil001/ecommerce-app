@@ -239,7 +239,7 @@ const Login = () => {
 
                             <a className={`cursor-pointer text-[14px] font-medium text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8 ${isLoading ? 'pointer-events-none opacity-50' : ''}`} onClick={forgetPassword}>Forgot Password?</a>
 
-                            <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} !w-full !text-[15px] !font-semibold !mt-4`}>
+                            <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} !w-full !text-[15px] !font-semibold !mt-4`} disabled={isLoading}>
                                 {
                                     isLoading ? <CircularProgress color="inherit" /> : "Sign In"
                                 }
