@@ -166,7 +166,6 @@ export async function resendOtpController(request, response) {
       error: false,
       message: `OTP resent to ${user.email}`,
     });
-
   } catch (error) {
     return response.status(500).json({
       message: error.message || error,
@@ -196,7 +195,7 @@ export async function verifyEmailController(request, response) {
         success: false,
       });
     }
-    
+
     if (!otp) {
       return response.status(400).json({
         message: "Enter OTP send to your email",
@@ -204,8 +203,8 @@ export async function verifyEmailController(request, response) {
         success: false,
       });
     }
-    
-    if(!email || !otp) {
+
+    if (!email || !otp) {
       return response.status(400).json({
         message: "Please provide both email and OTP.",
         error: true,
@@ -216,9 +215,8 @@ export async function verifyEmailController(request, response) {
     const isCodeValid = user.otp === otp;
     const isNotExpired = user.otpExpires > Date.now();
 
-
     if (isCodeValid && isNotExpired) {
-      (user.verify_email = true ), (user.otp = null), (user.otpExpires = null);
+      (user.verify_email = true), (user.otp = null), (user.otpExpires = null);
       await user.save();
       return response.status(200).json({
         message: "Email verified successfully",
@@ -469,11 +467,17 @@ export async function userAvatarController(request, response) {
     }
 
     // Validate the file type
-    const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const validImageTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
     const uploadedImageType = images[0].mimetype;
     if (!validImageTypes.includes(uploadedImageType)) {
       return response.status(400).json({
-        message: "Invalid file type. Only JPG, JPEG, PNG, or WEBP files are allowed.",
+        message:
+          "Invalid file type. Only JPG, JPEG, PNG, or WEBP files are allowed.",
         error: true,
         success: false,
       });
@@ -559,7 +563,6 @@ export async function userAvatarController(request, response) {
   }
 }
 
-
 // Controller for removing an image from Cloudinary
 export async function removeImageFromCloudinary(request, response) {
   try {
@@ -623,7 +626,6 @@ export async function removeImageFromCloudinary(request, response) {
     });
   }
 }
-
 
 // --------------------------------------------------------------------------------------
 
@@ -806,7 +808,7 @@ export async function verifyForgotPasswordOtp(request, response) {
         success: false,
       });
     }
-    
+
     if (!otp) {
       return response.status(400).json({
         message: "Enter OTP send to your email",
@@ -814,8 +816,8 @@ export async function verifyForgotPasswordOtp(request, response) {
         success: false,
       });
     }
-    
-    if(!email || !otp) {
+
+    if (!email || !otp) {
       return response.status(400).json({
         message: "Please provide both email and OTP.",
         error: true,
@@ -868,7 +870,7 @@ export async function verifyForgotPasswordOtp(request, response) {
 export async function resetPassword(request, response) {
   try {
     // Extract data from the request body
-    const { email, newPassword, confirmPassword } = request.body;
+    const { email, oldPassword, newPassword, confirmPassword } = request.body;
 
     // Validate the input
     if (!email || !newPassword || !confirmPassword) {
@@ -888,6 +890,30 @@ export async function resetPassword(request, response) {
         error: true,
         success: false,
       });
+    }
+
+    // If the user is logged in (authToken exists), verify the old password
+    if (user.refresh_token && user.refresh_token.trim() !== "") {
+      if (!oldPassword) {
+        return response.status(400).json({
+          message: "Please enter the old password.",
+          error: true,
+          success: false,
+        });
+      }
+
+      // Verify the password
+      const isPasswordValid = await bcryptjs.compare(
+        oldPassword,
+        user.password
+      );
+      if (!isPasswordValid) {
+        return response.status(400).json({
+          message: "Invalid old password.",
+          error: true,
+          success: false,
+        });
+      }
     }
 
     // validate and Verify the newPassword and confirmPassword
