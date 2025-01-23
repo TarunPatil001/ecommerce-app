@@ -77,7 +77,7 @@ const SignUp = () => {
         }
 
         // Check if an email already exists in localStorage
-        const storedEmail = localStorage.getItem("admin-email");
+        const storedEmail = localStorage.getItem("User email");
 
         if (storedEmail) {
             if (storedEmail !== formFields.email) {
@@ -107,7 +107,7 @@ const SignUp = () => {
                     loading: "Registering... Please wait.",
                     success: (res) => {
                         if (res && res.error === false) {
-                            localStorage.setItem("admin-email", formFields.email);
+                            localStorage.setItem("User email", formFields.email);
                             setFormFields({ name: "", email: "", password: "" });
                             // Set OTP expiration time and trigger timer
                             const currentTime = Date.now();

@@ -22,7 +22,7 @@ const ChangePassword = () => {
     const confirmPasswordRef = useRef(null);
 
     const [formFields, setFormFields] = useState({
-        email: localStorage.getItem('admin-email'),
+        email: localStorage.getItem('User email'),
         newPassword: '',
         confirmPassword: '',
     });

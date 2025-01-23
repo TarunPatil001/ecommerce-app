@@ -18,7 +18,7 @@ const VerifyAccount = () => {
     const [otp, setOtp] = useState("");
     const [timer, setTimer] = useState(0); // Initial timer state
     const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
-    const email = localStorage.getItem("admin-email") || "your-email@example.com"; // Get email from localStorage or use default
+    const email = localStorage.getItem("User email") || "your-email@example.com"; // Get email from localStorage or use default
     const [name, domain] = email.split("@"); // Split email into name and domain
     const maskedName =
         name.length > 3
@@ -65,12 +65,12 @@ const VerifyAccount = () => {
     const sendOtp = async (e) => {
         e.preventDefault();
 
-        console.log("Resending OTP to: ", localStorage.getItem("admin-email"));
+        console.log("Resending OTP to: ", localStorage.getItem("User email"));
 
         if (actionType !== "forgot-password") {
             toast.promise(
                 postData("/api/user/resend-otp", {
-                    email: localStorage.getItem("admin-email"),
+                    email: localStorage.getItem("User email"),
                 }),
                 {
                     loading: "Resending OTP...",
@@ -101,7 +101,7 @@ const VerifyAccount = () => {
         } else {
             toast.promise(
                 postData("/api/user/forgot-password", {
-                    email: localStorage.getItem("admin-email"),
+                    email: localStorage.getItem("User email"),
                 }),
                 {
                     loading: "Resending OTP...",
@@ -140,7 +140,7 @@ const VerifyAccount = () => {
             // Use toast.promise to handle loading, success, and error states
             toast.promise(
                 postData("/api/user/verifyEmail", {
-                    email: localStorage.getItem("admin-email"),
+                    email: localStorage.getItem("User email"),
                     otp: otp,
                 }),
                 {
@@ -148,7 +148,7 @@ const VerifyAccount = () => {
                     success: (res) => {
                         if (res?.error === false) {
                             // Navigate to login if verification is successful
-                            localStorage.removeItem("admin-email");
+                            localStorage.removeItem("User email");
                             localStorage.removeItem("OTP_EXPIRES");
                             navigate("/sign-in"); // Use navigate for redirection
                             return res?.message;  // Success message shown in toast
@@ -173,7 +173,7 @@ const VerifyAccount = () => {
             // Use toast.promise to handle loading, success, and error states
             toast.promise(
                 postData("/api/user/verify-forgot-password-otp", {
-                    email: localStorage.getItem("admin-email"),
+                    email: localStorage.getItem("User email"),
                     otp: otp,
                 }),
                 {

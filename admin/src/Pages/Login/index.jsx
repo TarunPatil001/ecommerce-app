@@ -109,7 +109,7 @@ const Login = () => {
                     loading: "Logging in... Please wait.",
                     success: (res) => {
                         if (res && res.error === false) {
-                            localStorage.setItem("admin-email", formFields.email);
+                            localStorage.setItem("User email", formFields.email);
                             // Clear form fields and store tokens
                             setFormFields({ email: "", password: "" });
                             localStorage.setItem("accessToken", res?.data?.accessToken);

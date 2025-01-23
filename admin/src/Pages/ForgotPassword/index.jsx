@@ -67,7 +67,7 @@ const ForgotPassword = () => {
                     loading: "OTP is sending... Please wait.",
                     success: (res) => {
                         if (res && res.error === false) {
-                            localStorage.setItem("admin-email", formFields.email);
+                            localStorage.setItem("User email", formFields.email);
                             localStorage.setItem("actionType", "forgot-password");
                             // Set OTP expiration time and trigger timer
                             const currentTime = Date.now();
