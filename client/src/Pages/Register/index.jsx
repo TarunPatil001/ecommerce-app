@@ -158,7 +158,7 @@ const Register = () => {
                             </div>
                             <div className="form-group w-full mb-2 relative">
                                 <TextField
-                                    type={isShowPassword === true ? 'text' : 'password'}
+                                    type={isLoading ? 'password' : (isShowPassword ? 'text' : 'password')}
                                     name="password"
                                     id="password"
                                     label="Password"

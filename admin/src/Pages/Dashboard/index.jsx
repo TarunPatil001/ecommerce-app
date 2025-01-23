@@ -6,7 +6,7 @@ import { Tooltip } from '@mui/material'
 import { FiPlus } from "react-icons/fi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Badge from '../../Components/Badge';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ProgressBar from '../../Components/ProgressBar';
 import { MdOutlineEdit } from 'react-icons/md';
 import { IoEyeOutline } from 'react-icons/io5';
@@ -21,6 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import Select from '@mui/material/Select';
 import { GoDotFill, GoPlus } from "react-icons/go";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { useEffect } from 'react'
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -49,6 +50,7 @@ const columns = [
 const Dashboard = () => {
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
   const [isOpenOrder, setIsOpenOrder] = useState(null);
   const totalStock = 250;
   const currentSales = 241;
@@ -56,6 +58,17 @@ const Dashboard = () => {
   // Calculate percentage
   const salePercentage = (currentSales / totalStock) * 100;
   const remainStock = totalStock - currentSales;
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token !== undefined && token !== null && token !== '') {
+        context?.setIsLogin(true);
+    } else {
+        navigate("/sign-in");
+    }
+}, [context, navigate]);
+
 
   const isShowOrderedProduct = (index) => {
     if (isOpenOrder === index) {

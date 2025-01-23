@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { MdOutlineDoubleArrow, MdOutlineLogout } from "react-icons/md";
 import { MyContext } from "../../App";
 import { useNavigate } from 'react-router-dom';
+import { fetchDataFromApi } from '../../utils/api';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -22,6 +23,8 @@ const Header = () => {
 
   const context = useContext(MyContext);
   const navigate = useNavigate();
+
+  const [loginData, setLoginData] = useState({ avatar: '', name: '', email: '' });
   const [anchorMyAcc, setAnchorMyAcc] = useState(null);
   const openMyAcc = Boolean(anchorMyAcc);
 
@@ -63,6 +66,39 @@ const Header = () => {
     navigate("/sign-in");
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token !== undefined && token !== null && token !== '') {
+        context?.setIsLogin(true);
+    } else {
+        navigate("/");
+    }
+}, [context, navigate]);
+
+  useEffect(() => {
+    if (context.isLogin) {
+      setLoginData({
+        avatar: context?.userData?.avatar,
+        name: context?.userData?.name,
+        email: context?.userData?.email,
+      });
+    }
+  }, [context.isLogin, context?.userData]);
+
+
+  const logout = () => {
+    setAnchorMyAcc(null);
+
+    fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+      if (res?.error === false) {
+        context.setIsLogin(false);
+        localStorage.clear();
+        navigate("/");
+      }
+    })
+  }
+
+
   return (
     <header className={`w-full h-auto py-2 shadow-md ${context.isSidebarOpen === true ? 'pl-72' : 'pl-5'} bg-[#fff] pr-7 flex items-center justify-between z-[50] transition-all duration-300 ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
       <div className="part1">
@@ -81,7 +117,7 @@ const Header = () => {
 
             <div className="relative">
               <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer" onClick={handleClickMyAcc}>
-                <img src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg" alt="" className="w-full h-full object-cover rounded-full" />
+              <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
               </div>
 
               <Menu
@@ -124,11 +160,11 @@ const Header = () => {
                 <MenuItem onClick={handleCloseMyAcc}>
                   <div className="flex items-center gap-3">
                     <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer">
-                      <img src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg" alt="" className="w-full h-full object-cover rounded-full" />
+                    <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
                     </div>
                     <div className="info">
-                      <h3 className='text-[14px] font-bold leading-5'>Angelina Gotelli</h3>
-                      <p className='text-[12px] opacity-70'>admin-01@ecme.com</p>
+                      <h3 className='text-[14px] font-bold leading-5'>{loginData?.name}</h3>
+                      <p className='text-[12px] opacity-70'>{loginData?.email}</p>
                     </div>
                   </div>
                 </MenuItem>
@@ -137,7 +173,7 @@ const Header = () => {
                   <FaRegUser className='text-[14px]' /> <span className='text-[14px]'>Profile</span>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleCloseMyAcc} className='flex items-center gap-3'>
+                <MenuItem onClick={()=>{handleCloseMyAcc();logout();}} className='flex items-center gap-3'>
                   <MdOutlineLogout className='text-[15px]' /> <span className='text-[14px]'>Sign out</span>
                 </MenuItem>
               </Menu>
@@ -146,7 +182,7 @@ const Header = () => {
           ) : (
 
             <Button className='custom-btn !rounded-full !capitalize' onClick={navigateToSignIn}>Sign In</Button>
-          
+
           )
         }
 

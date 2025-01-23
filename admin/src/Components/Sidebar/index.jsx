@@ -1,7 +1,7 @@
 import { Button } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { MdDashboard, MdOutlineLogout } from 'react-icons/md'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { TbSlideshow } from "react-icons/tb";
 import { LuUsers } from "react-icons/lu";
 import { RiProductHuntLine } from "react-icons/ri";
@@ -11,10 +11,12 @@ import { FaAngleDown } from "react-icons/fa6";
 import { Collapse } from 'react-collapse';
 import { GoDotFill } from "react-icons/go";
 import { MyContext } from '../../App';
+import { fetchDataFromApi } from '../../utils/api';
 
 const Sidebar = () => {
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
 
   const location = useLocation(); // Hook to get the current location
   const [selectedMenu, setSelectedMenu] = useState("");
@@ -44,7 +46,19 @@ const Sidebar = () => {
     if (currentMenu.includes("Home Banners")) setSubMenuIndex1(true);
     if (currentMenu.includes("Product")) setSubMenuIndex2(true);
     if (currentMenu.includes("Categories")) setSubMenuIndex3(true);
-  }, [location.pathname]);
+  }, [menuMapping]);
+
+
+  const logout = () => {
+      fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+        if (res?.error === false) {
+          context.setIsLogin(false);
+          localStorage.clear();
+          navigate("/sign-in");
+        }
+      })
+    }
+
 
   return (
     <>
@@ -180,11 +194,9 @@ const Sidebar = () => {
           </li>
 
           <li>
-            <Link to="/logout">
-              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Logout')}><MdOutlineLogout className='text-[25px]' />
+              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => {setSelectedMenu('Logout'); logout();}}><MdOutlineLogout className='text-[25px]' />
                 <span>Logout</span>
               </Button>
-            </Link>
           </li>
 
         </ul>

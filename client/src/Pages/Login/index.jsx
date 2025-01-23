@@ -149,7 +149,7 @@ const Login = () => {
             if (storedEmail !== formFields.email || accessToken && refreshToken) {
                 // Notify the user about the conflict
                 // Optionally, provide an option to clear the stored email
-                const confirmSwitch = window.confirm("Another user already exists on this profile. Do you want to switch to a new user? This will clear the current user data for this site.");
+                const confirmSwitch = window.confirm("Another admin account already exists on this profile. Do you want to switch to a new admin account? This will clear the current admin data for this site.");
 
                 if (confirmSwitch) {
                     localStorage.clear();
@@ -226,7 +226,7 @@ const Login = () => {
                                 <TextField type="email" id="email" label="Email Id" name="email" placeholder="Enter email" variant="outlined" className="custom-textfield w-full mb-5" value={formFields.email} disabled={isLoading} onChange={onChangeInput} />
                             </div>
                             <div className="form-group w-full mb-5 relative">
-                                <TextField type={isShowPassword === true ? 'text' : 'password'} id="password" name="password" label="Password" placeholder="Enter password" variant="outlined" className="custom-textfield w-full mb-5" value={formFields.password} disabled={isLoading} onChange={onChangeInput} />
+                                <TextField type={isLoading ? 'password' : (isShowPassword ? 'text' : 'password')} id="password" name="password" label="Password" placeholder="Enter password" variant="outlined" className="custom-textfield w-full mb-5" value={formFields.password} disabled={isLoading} onChange={onChangeInput} />
                                 <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword(!isShowPassword)} disabled={isLoading} >
                                     {
                                         isShowPassword === false ?
@@ -260,3 +260,8 @@ const Login = () => {
 }
 
 export default Login
+
+
+
+
+

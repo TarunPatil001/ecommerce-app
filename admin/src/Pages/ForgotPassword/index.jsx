@@ -1,10 +1,108 @@
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@mui/material'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { HiLogin } from "react-icons/hi";
 import { PiUserCirclePlusLight } from "react-icons/pi";
+import { useContext } from 'react';
+import { MyContext } from '../../App';
+import CircularProgress from '@mui/material/CircularProgress';
+import toast from 'react-hot-toast';
+import { postData } from '../../utils/api';
 
 
 const ForgotPassword = () => {
+
+    const context = useContext(MyContext);
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [timer, setTimer] = useState(0); // Initial timer state
+    const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
+    const [formFields, setFormFields] = useState({
+        email: '',
+    });
+
+    const emailRef = useRef(null);
+
+
+    const onChangeInput = (e) => {
+        const { name, value } = e.target;
+        setFormFields((formFields) => ({
+            ...formFields,
+            [name]: value,
+        }));
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Array to store missing fields
+        let missingFields = [];
+
+        // Validate form fields
+        if (!formFields.email) missingFields.push("Email Id");
+
+        // If any required fields are missing, show a single alert and exit
+        if (missingFields.length > 0) {
+            const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
+            context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
+            if (!formFields.email) emailRef.current.focus();
+            return; // Stop further execution
+        }
+
+
+        setIsLoading(true);
+
+        try {
+            // Validate form fields
+            if (!formFields.email) {
+                context.openAlertBox("error", "Email Id is required.");
+                return;
+            }
+
+            // Login API call wrapped with toast.promise
+            const result = await toast.promise(
+                postData("/api/user/forgot-password", formFields, { withCredentials: true }),
+                {
+                    loading: "OTP is sending... Please wait.",
+                    success: (res) => {
+                        if (res && res.error === false) {
+                            localStorage.setItem("admin-email", formFields.email);
+                            localStorage.setItem("actionType", "forgot-password");
+                            // Set OTP expiration time and trigger timer
+                            const currentTime = Date.now();
+                            const otpExpirationTime = currentTime + 5 * 60 * 1000; // OTP expires in 5 minutes
+                            localStorage.setItem("OTP_EXPIRES", otpExpirationTime); // Store the OTP expiration time
+
+                            // Clear form fields and store tokens
+                            setFormFields({ email: "", password: "" });
+                            navigate("/verify-account"); // Navigate to the verify page
+
+
+                        } else {
+                            throw new Error(res?.message || "Oops! Server is slow. Try again!");
+                        }
+                    },
+                    error: (err) => {
+                        // Ensure err.response exists and check the message structure
+                        const errorMessage = err?.response?.data?.message || err.message || "An unexpected error occurred. Please try again.";
+                        return errorMessage;
+                    },
+                }
+            ).then((res) => {
+                console.log(res);
+                // Add any additional success actions here
+            }).catch((err) => {
+                console.error(err);
+            });
+        } catch (err) {
+            // Final fallback for unexpected errors
+            return err.message || "An error occurred during reset password";
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
 
     return (
 
@@ -33,12 +131,20 @@ const ForgotPassword = () => {
                     Reset your password.
                 </h1>
 
-                <form action='#' className='w-full px-8 mt-3'>
+                <form action='#' className='w-full px-8 mt-3' onSubmit={handleSubmit}>
                     <div className='form-group mb-4 w-full'>
                         <h4 className='mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]'>Email</h4>
-                        <input type="email" placeholder='Enter your email' required className='mt-2 w-full h-[50px] px-4 text-[16px] font-medium border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:!border-[rgba(0,0,0,0.7)] focus:outline-none' />
+                        <input type="email" placeholder='Enter your email' className='mt-2 w-full h-[50px] px-4 text-[16px] font-medium border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:!border-[rgba(0,0,0,0.7)] focus:outline-none' name="email" ref={emailRef} value={formFields.email} disabled={isLoading} onChange={onChangeInput} />
                     </div>
-                    <Button className='w-full custom-btn !capitalize !text-[16px]'>Reset Password</Button>
+                    <Button
+                        type="submit"
+                        className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} w-full !capitalize !text-[15px]`}
+                        disabled={isLoading} // Disable submit button when loading
+                    >
+                        {
+                            isLoading ? <CircularProgress color="inherit" /> : "Change Password"
+                        }
+                    </Button>
                     <Link to="/sign-in"><p className='flex items-center justify-center gap-2 text-[rgba(0,0,0,0.6)] text-[16px] mt-5'>Don’t want to reset?<span className='text-black font-semibold'>Sign In</span></p></Link>
                 </form>
 

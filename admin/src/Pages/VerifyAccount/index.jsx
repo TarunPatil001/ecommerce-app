@@ -1,19 +1,24 @@
-import { Button, Checkbox } from '@mui/material'
-import { useState } from 'react'
+import { Button, CircularProgress } from '@mui/material'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { HiLogin } from "react-icons/hi";
 import { PiUserCirclePlusLight } from "react-icons/pi";
-import LoadingButton from '@mui/lab/LoadingButton';
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook, FaRegEyeSlash } from "react-icons/fa";
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { FaRegEye } from "react-icons/fa";
 import OtpBox from '../../Components/OtpBox';
+import { useContext } from 'react';
+import { MyContext } from '../../App';
+import toast from 'react-hot-toast';
+import { postData } from '../../utils/api';
 
 
 const VerifyAccount = () => {
 
-    const email = "rajpatel59958@gmail.com"; // Replace this with the email you'd like to mask
+    const context = useContext(MyContext);
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [timer, setTimer] = useState(0); // Initial timer state
+    const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
+    const email = localStorage.getItem("admin-email") || "your-email@example.com"; // Get email from localStorage or use default
     const [name, domain] = email.split("@"); // Split email into name and domain
     const maskedName =
         name.length > 3
@@ -21,22 +26,182 @@ const VerifyAccount = () => {
             : name; // If name is short, show it as is
     const maskedEmail = `${maskedName}@${domain}`; // Combine masked name with domain
 
-    const [otp, setOtp] = useState("");
-    const history = useNavigate();
     const handleOtpChange = (value) => {
         setOtp(value)
     };
 
-    const sendOtp = () => {
-        // toast.success("Resend verification code!");
-    }
+    const actionType = localStorage.getItem("actionType");
 
-    const verifyOTP = (e) => {
+    useEffect(() => {
+        // Get the OTP expiration time from localStorage
+        const otpExpiresTime = localStorage.getItem("OTP_EXPIRES");
+
+        if (otpExpiresTime) {
+            const currentTime = Date.now();
+            const remainingTime = Math.max(0, Math.floor((otpExpiresTime - currentTime) / 1000)); // Calculate the remaining time in seconds
+            setTimer(remainingTime);
+        }
+
+        // Handle timer countdown
+        let interval;
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prevTimer) => {
+                    const newTimer = prevTimer - 1;
+                    if (newTimer <= 0) {
+                        // If the timer reaches 0, remove OTP expiration from localStorage
+                        localStorage.removeItem("OTP_EXPIRES");
+                    }
+                    return Math.max(newTimer, 0); // Ensure timer doesn't go below 0
+                });
+            }, 1000);
+        }
+
+        // Cleanup on component unmount
+        return () => clearInterval(interval);
+    }, [timer]); // Re-run effect whenever timer changes
+
+
+    const sendOtp = async (e) => {
         e.preventDefault();
-        alert(otp);
-        history("/forgot-password");
-        // toast.success("Code verified!");
-    }
+
+        console.log("Resending OTP to: ", localStorage.getItem("admin-email"));
+
+        if (actionType !== "forgot-password") {
+            toast.promise(
+                postData("/api/user/resend-otp", {
+                    email: localStorage.getItem("admin-email"),
+                }),
+                {
+                    loading: "Resending OTP...",
+                    success: (res) => {
+                        console.log("OTP resend response: ", res); // Log response data
+                        if (res?.success) {
+                            // Set new expiration time (e.g., 5 minutes from now)
+                            const newExpirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+                            localStorage.setItem("OTP_EXPIRES", newExpirationTime);
+
+                            // Reset timer
+                            setTimer(300); // 5 minutes in seconds
+
+                            setIsOtpResent(true); // Update OTP resend state
+                            return res?.message;
+                        } else {
+                            console.error("Failed to resend OTP:", res?.message); // Log failure
+                            throw new Error(res?.message || "Failed to resend OTP.");
+                        }
+                    },
+                    error: (err) => {
+                        console.error("Error resending OTP:", err); // Log error
+                        return err.message || "An error occurred while resending OTP.";
+                    },
+                }
+            );
+
+        } else {
+            toast.promise(
+                postData("/api/user/forgot-password", {
+                    email: localStorage.getItem("admin-email"),
+                }),
+                {
+                    loading: "Resending OTP...",
+                    success: (res) => {
+                        console.log("OTP resend response: ", res); // Log response data
+                        if (res?.success) {
+                            // Set new expiration time (e.g., 5 minutes from now)
+                            const newExpirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+                            localStorage.setItem("OTP_EXPIRES", newExpirationTime);
+
+                            // Reset timer
+                            setTimer(300); // 5 minutes in seconds
+
+                            setIsOtpResent(true); // Update OTP resend state
+                            return res?.message;
+                        } else {
+                            console.error("Failed to resend OTP:", res?.message); // Log failure
+                            throw new Error(res?.message || "Failed to resend OTP.");
+                        }
+                    },
+                    error: (err) => {
+                        console.error("Error resending OTP:", err); // Log error
+                        return err.message || "An error occurred while resending OTP.";
+                    },
+                }
+            );
+        }
+
+    };
+
+
+    const verifyOTP = async (e) => {
+        e.preventDefault();
+
+        if (actionType !== "forgot-password") {
+            // Use toast.promise to handle loading, success, and error states
+            toast.promise(
+                postData("/api/user/verifyEmail", {
+                    email: localStorage.getItem("admin-email"),
+                    otp: otp,
+                }),
+                {
+                    loading: "Verifying OTP... Please wait.",
+                    success: (res) => {
+                        if (res?.error === false) {
+                            // Navigate to login if verification is successful
+                            localStorage.removeItem("admin-email");
+                            localStorage.removeItem("OTP_EXPIRES");
+                            navigate("/sign-in"); // Use navigate for redirection
+                            return res?.message;  // Success message shown in toast
+                        } else {
+                            // Throw an error to be handled by the error section
+                            throw new Error(res?.message || "Verification failed. Please try again.");
+                        }
+                    },
+                    error: (err) => {
+                        return err.message || "An unexpected error occurred. Please try again."; // This will display the toast error message
+                    },
+                }
+            ).then((res) => {
+                // Add any additional actions after the promise resolves (if needed)
+                console.log("OTP Verification Completed:", res);
+
+            }).catch((err) => {
+                // Add any additional actions for handling errors here
+                console.error("OTP Verification Error:", err);
+            });
+        } else {
+            // Use toast.promise to handle loading, success, and error states
+            toast.promise(
+                postData("/api/user/verify-forgot-password-otp", {
+                    email: localStorage.getItem("admin-email"),
+                    otp: otp,
+                }),
+                {
+                    loading: "Verifying OTP... Please wait.",
+                    success: (res) => {
+                        if (res?.error === false) {
+                            // Navigate to login if verification is successful
+                            localStorage.removeItem("OTP_EXPIRES");
+                            navigate("/change-password"); // Use navigate for redirection
+                            return res?.message;  // Success message shown in toast
+                        } else {
+                            // Throw an error to be handled by the error section
+                            throw new Error(res?.message || "Verification failed. Please try again.");
+                        }
+                    },
+                    error: (err) => {
+                        return err.message || "An unexpected error occurred. Please try again."; // This will display the toast error message
+                    },
+                }
+            ).then((res) => {
+                // Add any additional actions after the promise resolves (if needed)
+                console.log("OTP Verification Completed:", res);
+            }).catch((err) => {
+                // Add any additional actions for handling errors here
+                console.error("OTP Verification Error:", err);
+            });
+        }
+    };
 
     return (
 
@@ -71,11 +236,30 @@ const VerifyAccount = () => {
                         <OtpBox length={6} onChange={handleOtpChange} />
                     </div>
                     <div className="flex justify-center w-[300px] m-auto mt-4">
-                        <Button type="submit" className="custom-btn w-full !capitalize flex gap-1">Verify<span className="!uppercase">OTP</span></Button>
+                        <Button type="submit" className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} w-full !capitalize flex gap-1`} disabled={isLoading}>
+                            {isLoading ? <CircularProgress color="inherit" /> : "Verify OTP"}
+                        </Button>
                     </div>
                 </form>
                 <br />
-                <p className="text-center pt-2 text-[14px]">Didn&apos;t get the code? <Link to=""><span className="font-semibold underline underline-offset-2 cursor-pointer link" onClick={sendOtp}>Resend code</span></Link></p>
+                {/* <p className="text-center pt-2 text-[14px]">Didn&apos;t get the code? <Link to=""><span className="font-semibold underline underline-offset-2 cursor-pointer link" onClick={sendOtp}>Resend code</span></Link></p> */}
+                <p className="text-center pt-2 text-[14px]">
+                    Didn&apos;t get the code?{" "}
+                    <span
+                        className={`font-semibold cursor-pointer ${timer > 0 ? 'text-gray-500' : ''}`}
+                        onClick={sendOtp}
+                        disabled={timer > 0} // Disable resend button if OTP is being resent
+                    >
+                        <span>
+                            {timer > 0
+                                ? <>
+                                    <span className="link underline underline-offset-4 transition-all">Resend code</span> in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+                                </>
+                                : <span className="link underline underline-offset-4 transition-all">Resend code</span>
+                            }
+                        </span>
+                    </span>
+                </p>
 
 
             </div>

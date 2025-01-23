@@ -27,6 +27,9 @@ import Orders from './Pages/Orders';
 import ForgotPassword from './Pages/ForgotPassword';
 import VerifyAccount from './Pages/VerifyAccount';
 import ChangePassword from './Pages/ChangePassword';
+import toast, { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { fetchDataFromApi } from './utils/api';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -39,6 +42,8 @@ function App() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const [userData, setUserData] = useState(null);
 
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
@@ -226,20 +231,61 @@ function App() {
     },
   ]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token !== undefined && token !== null && token !== '') {
+      setIsLogin(true);
+
+      fetchDataFromApi(`/api/user/user-details`).then((res) => {
+        setUserData(res.data);
+        // console.log(res?.response?.data?.error);
+        if (res?.response?.data?.error === true) {
+          if (res?.response?.data?.message === "You have not login") {
+            localStorage.clear();
+            openAlertBox("error", "Your session has expired. Please login again.");
+            setIsLogin(false);
+          }
+        }
+      })
+
+    } else {
+      setIsLogin(false);
+    }
+  }, [isLogin]);
+
+  const openAlertBox = (status, msg) => {
+    if (status === "success") {
+      toast.success(msg);
+    } else if (status === "error") {
+      toast.error(msg);
+    } else if (status === "loading") {
+      toast.loading(msg, { id: "loadingToast" });
+    }
+  };
+
   const values = {
     isSidebarOpen,
     setIsSidebarOpen,
+    
+    // User authentication
     isLogin,
     setIsLogin,
+    
     isOpenFullScreenPanel,
     setIsOpenFullScreenPanel,
+
+    // User details
+    userData,
+    setUserData,
+
+    // Utility functions
+    openAlertBox,
   };
 
   return (
     <>
       <MyContext.Provider value={values}>
         <RouterProvider router={router} />
-
         <Dialog
           fullScreen
           open={isOpenFullScreenPanel.open}
@@ -262,15 +308,15 @@ function App() {
             </Toolbar>
           </AppBar>
           <div className='mt-5 p-4'>
-            
+
             {
               isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />
             }
-            
+
             {
               isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />
             }
-            
+
             {
               isOpenFullScreenPanel?.model === "Add New Category" && <AddCategory />
             }
@@ -278,11 +324,12 @@ function App() {
             {
               isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />
             }
-          
+
           </div>
 
         </Dialog>
 
+        <Toaster />
       </MyContext.Provider>
     </>
   )

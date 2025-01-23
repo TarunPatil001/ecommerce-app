@@ -6,6 +6,7 @@
   --font-family: "Assistant", serif;
   --letter-spacing: 0px;
   --bg-primary: rgb(56, 114, 250);
+  --bg-primary-light: rgb(214, 226, 253);
   --bg-hover-primary: rgb(242, 246, 255);
   --bg-light-hover: rgb(241, 241, 241);
   --bg-active: rgb(233, 243, 255);
@@ -69,6 +70,17 @@ body {
   background-color: var(--bg-primary) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
+}
+.custom-btn-disabled{
+  background-color: var(--bg-primary-light) !important;
+  color: #ffffff !important;
+  padding: 5px 20px !important;
+}
+
+/* ---------------Button Circular  ---------------------- */
+button .MuiCircularProgress-root{
+  width: 26px !important;
+  height: 26px !important;
 }
 
 .MuiBadge-badge {
