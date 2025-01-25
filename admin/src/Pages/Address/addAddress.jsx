@@ -1,15 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FaCloudUploadAlt } from 'react-icons/fa';
-import { IoClose } from 'react-icons/io5';
-import { Button, CircularProgress, MenuItem } from '@mui/material';
-import Select from '@mui/material/Select';
-import { PhoneInput } from 'react-international-phone';
-import { useContext } from 'react';
 import { MyContext } from '../../App';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { fetchDataFromApi, postData } from '../../utils/api';
-
+import { PhoneInput } from 'react-international-phone';
 
 const AddAddress = () => {
 
@@ -31,42 +24,13 @@ const AddAddress = () => {
     });
 
 
-    useEffect(() => {
-        if (context?.userData?._id) {
-            setFormFields((prevState) => ({
-                ...prevState,
-                userId: context?.userData?._id,
-            }));
-        }
-    }, [context?.userData]); // Remove formFields from the dependency array
-    
-
-    useEffect(() => {
-        formFields.userId = context?.userData?._id
-    }, [context?.userData, formFields])
 
 
-    useEffect(() => {
-        if (context?.userData?._id !== undefined && context?.userData?._id !== '') {
-            
-            fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
-                console.log(res);
-            })
-            
-            setUserId(context?.userData?._id);
-            setFormFields({
-                address_line1: context?.userData?.address_line1,
-                city: context?.userData?.city,
-                state: context?.userData?.state,
-                pincode: context?.userData?.pincode,
-                country: context?.userData?.country,
-                mobile: context?.userData?.mobile,
-                status: context?.userData?.status,
-            });
-            // setFormFields({ mobile: `"${context?.userData?.mobile}"` });
-            setPhone(`"${context?.userData?.mobile}"`);  // Set initial phone value from user data
-        }
-    }, [context]);
+
+
+
+
+
 
 
     const handleStatusChange = (event) => {
@@ -85,99 +49,26 @@ const AddAddress = () => {
             ...formFields,
             [name]: value,
         }));
-
-    };
-
-    const handleDiscard = () => {
-        // Reset the form state and other variables
-        setFormFields({
-            address_line1: '',
-            city: '',
-            state: '',
-            pincode: '',
-            country: '',
-            mobile: '',
-            status: '',
-            userId: '',
-        });
-        setPhone(''); // Reset phone separately
-        setStatus(''); // Reset status
-        if (formRef.current) {
-            formRef.current.reset(); // Reset the form elements
-        }
-        console.log("Form fields have been reset.");
     };
 
 
+    const handleSubmit = () => {
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
 
-        if (!formFields.address_line1) {
-            context.openAlertBox("error", "Please enter address line 1");
-            return;
-        }
-        if (!formFields.city) {
-            context.openAlertBox("error", "Please enter city");
-            return;
-        }
-        if (!formFields.state) {
-            context.openAlertBox("error", "Please enter state");
-            return;
-        }
-        if (!formFields.pincode) {
-            context.openAlertBox("error", "Please enter pincode");
-            return;
-        }
-        if (!formFields.country) {
-            context.openAlertBox("error", "Please enter country");
-            return;
-        }
-        if (!formFields.mobile) {
-            context.openAlertBox("error", "Please enter mobile");
-            return;
-        }
-        if (status === "") {
-            context.openAlertBox("error", "Select status");
-            return;
-        }
+        
+    }
 
-        setIsLoading(true);
 
-        try {
-            const result = await toast.promise(
-                postData("/api/address/add-address", formFields, { withCredentials: true }),
-                {
-                    loading: "Submitting address... Please wait.",
-                    success: (res) => {
-                        if (res?.success) {
-                            // Handle success logic here
-                            return res.message || "Address added successfully!";
-                        } else {
-                            throw new Error(res?.message || "An unexpected error occurred.");
-                        }
-                    },
-                    error: (err) => {
-                        // Check if err.response exists, else fallback to err.message
-                        const errorMessage = err?.response?.data?.message || err.message || "Failed to add address. Please try again.";
-                        return errorMessage;
-                    },
-                }
-            );
-            console.log("Result:", result);
-        } catch (err) {
-            console.error("Error:", err);
-            toast.error(err?.message || "An unexpected error occurred.");
-        } finally {
-            setIsLoading(false);
-        }
-
-    };
+  const handleDiscard = () => {
+    // Reset the form elements and uploaded file
+    console.log("Discard action, file cleared.");
+    formRef.current.reset();
+  };
 
 
 
-    return (
-        <div>
+  return (
+    <div>
             <section className='p-8'>
                 <form
                     action="#"
@@ -185,7 +76,6 @@ const AddAddress = () => {
                     onSubmit={handleSubmit}
                     className='form py-3'>
                     <h3 className='text-[24px] font-bold mb-2'>Add New Address</h3>
-
                     <div className="grid grid-cols-2 p-5 pt-1 mb-4 gap-4">
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Address Line 1</h3>
@@ -229,7 +119,6 @@ const AddAddress = () => {
                             </Select>
                         </div>
                     </div>
-
                     <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
                         <Button
                             type="reset"
@@ -238,7 +127,6 @@ const AddAddress = () => {
                         >
                             <FaCloudUploadAlt className='text-[20px]' />Discard
                         </Button>
-
                         <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                             {
                                 isLoading ? <CircularProgress color="inherit" /> : <><FaCloudUploadAlt className='text-[20px]' />Create</>
@@ -248,7 +136,7 @@ const AddAddress = () => {
                 </form>
             </section>
         </div>
-    );
+  );
 };
 
 export default AddAddress;

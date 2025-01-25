@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { MyContext } from '../../App';
-import { CircularProgress, TextField, Button, Divider, RadioGroup, FormControlLabel, Radio, FormLabel, Checkbox } from '@mui/material';
+import { CircularProgress, Button, Radio } from '@mui/material';
 import { FiUpload } from 'react-icons/fi';
 import { useEffect } from 'react';
-import { editData, fetchDataFromApi, postData, uploadImage } from '../../utils/api';
+import { editData, postData, uploadImage } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -13,8 +13,6 @@ import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
 
 const Profile = () => {
 
@@ -22,7 +20,6 @@ const Profile = () => {
     const navigate = useNavigate();
     const nameRef = useRef(null);
     const emailRef = useRef(null);
-    const mobileRef = useRef(null);
     const oldPasswordRef = useRef(null);
     const newPasswordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
@@ -73,16 +70,7 @@ const Profile = () => {
     }, [context, navigate]);
 
     useEffect(() => {
-        if (context?.userData?._id !== undefined && context?.userData?._id !== '') {
-
-
-            // Fetch addresses when the component mounts
-            fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
-                if (res?.data) {
-                    setAddress(res.data); // Store the fetched addresses in state
-                    setSelectAddress(res.data[0]?.address_line1); // Set the first address as the default selected
-                }
-            });
+        if (context?.userData?._id !== '' && context?.userData?._id !== null && context?.userData?._id !== undefined) {
 
             setUserId(context?.userData?._id);
             setFormFields({
@@ -153,23 +141,20 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // // Array to store missing fields
-        // const missingFields = [];
+        if (formFields.name === "") {
+            context.openAlertBox("error", "Please enter your full name.");
+            return;
+        }
 
-        // // Validate form fields
-        // if (!formFields.name) missingFields.push("Full Name");
-        // if (!formFields.email) missingFields.push("Email ID");
-        // // if (!phone.mobile) missingFields.push("Mobile");
+        if (formFields.email === "") {
+            context.openAlertBox("error", "Please enter your email ID.");
+            return;
+        }
 
-        // // If any required fields are missing, show a single alert and exit
-        // if (missingFields.length > 0) {
-        //     const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
-        //     context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
-        //     if (!formFields.name) nameRef.current.focus();
-        //     else if (!formFields.email) emailRef.current.focus();
-        //     // else if (!phone.mobile) mobileRef.current.focus();
-        //     return; // Stop further execution
-        // }
+        if (formFields.mobile === "") {
+            context.openAlertBox("error", "Please enter your mobile number.");
+            return;
+        }
 
         // Start a toast.promise for handling loading, success, and error states
         try {
@@ -273,12 +258,6 @@ const Profile = () => {
         }
     };
 
-
-
-    const handleChange = (event) => {
-        setSelectAddress(event.target.value);
-        alert(event.target.value);
-    };
 
 
     return (
