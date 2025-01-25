@@ -46,6 +46,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
+  const [address, setAddress] = useState([]);
 
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
@@ -299,6 +300,9 @@ function App() {
 
     // Utility functions
     openAlertBox,
+
+    address,
+    setAddress,
   };
 
   return (

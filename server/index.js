@@ -12,6 +12,7 @@ import productRouter from "./route/product.route.js";
 import cartProductRouter from "./route/cartProduct.route.js";
 import wishlistRouter from "./route/wishlist.route.js";
 import { addAddressController } from "./controllers/address.controller.js";
+import addressRouter from "./route/address.route.js";
 // import addressRouter from "./route/address.route.js";
 
 const app = express();
@@ -39,7 +40,9 @@ app.use('/api/category', categoryRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cartProduct', cartProductRouter);
 app.use('/api/wishlist', wishlistRouter);
-app.use('/api/address', addAddressController);
+// app.use('/api/address', addAddressController);
+app.use('/api/address', addressRouter);
+
 
 connectDB().then(() => {
   app.listen(process.env.PORT, () => {

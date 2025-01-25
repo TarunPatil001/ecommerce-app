@@ -4,7 +4,7 @@ import { FaCloudUploadAlt } from 'react-icons/fa';
 import { MyContext } from '../../App';
 import { PhoneInput } from 'react-international-phone';
 import toast from 'react-hot-toast';
-import { postData } from '../../utils/api';
+import { fetchDataFromApi, postData } from '../../utils/api';
 
 const AddAddress = () => {
 
@@ -24,15 +24,17 @@ const AddAddress = () => {
         mobile: '',
         status: '',
         userId: '',
+        selected: false,
     });
 
 
-    useEffect(()=>{
+    useEffect(() => {
         setFormFields((prevState) => ({
             ...prevState,
             userId: context?.userData?._id,
         }));
-    },[context?.userData, formFields])
+    }, [context?.userData]);
+
 
 
     const handleStatusChange = (event) => {
@@ -81,7 +83,7 @@ const AddAddress = () => {
             context.openAlertBox("error", "Please enter mobile");
             return;
         }
-        
+
         setIsLoading(true);
 
         try {
@@ -92,7 +94,13 @@ const AddAddress = () => {
                     success: (res) => {
                         if (res?.success) {
                             // Handle success logic here
+                            // Fetch addresses when the component mounts
+                            fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
+                                context?.setAddress(res.data); // Store the fetched addresses in state
+                                // console.log(res);
+                            });
                             return res.message || "Address added successfully!";
+
                         } else {
                             throw new Error(res?.message || "An unexpected error occurred.");
                         }
@@ -112,29 +120,33 @@ const AddAddress = () => {
             setIsLoading(false);
         }
 
-        // console.log(formFields);
-        // postData("/api/address/add-address", formFields, { withCredentials: true }).then((res)=>{
-        //     if (res?.error !== true) {
-        //         setIsLoading(false);
-        //         context.openAlertBox("success", res?.data?.message || "Address added successfully!");
-        //     }else{
-        //         context.openAlertBox("error", res?.data?.message || "An unexpected error occurred.");
-        //         setIsLoading(false);
-        //     }
-        // })
     }
 
 
-  const handleDiscard = () => {
-    // Reset the form elements and uploaded file
-    console.log("Discard action, file cleared.");
-    formRef.current.reset();
-  };
+    const handleDiscard = () => {
+        // Reset the form state and other variables
+        setFormFields({
+            address_line1: '',
+            city: '',
+            state: '',
+            pincode: '',
+            country: '',
+            mobile: '',
+            status: '',
+            userId: '',
+        });
+        setPhone(''); // Reset phone separately
+        setStatus(''); // Reset status
+        if (formRef.current) {
+            formRef.current.reset(); // Reset the form elements
+        }
+        console.log("Form fields have been reset.");
+    };
 
 
 
-  return (
-    <div>
+    return (
+        <div>
             <section className='p-8'>
                 <form
                     action="#"
@@ -165,7 +177,7 @@ const AddAddress = () => {
                         </div>
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Mobile No.</h3>
-                            <PhoneInput defaultCountry="in" preferredCountries={["in"]} value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevState)=>({ ...prevState, mobile: phone }))}} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "cursor-not-allowed pointer-events-none" : ""}`} disabled={isLoading} />
+                            <PhoneInput defaultCountry="in" preferredCountries={["in"]} value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevState) => ({ ...prevState, mobile: phone })) }} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "cursor-not-allowed pointer-events-none" : ""}`} disabled={isLoading} />
                         </div>
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Status</h3>
@@ -201,7 +213,7 @@ const AddAddress = () => {
                 </form>
             </section>
         </div>
-  );
+    );
 };
 
 export default AddAddress;

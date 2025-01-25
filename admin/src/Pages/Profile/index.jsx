@@ -3,7 +3,7 @@ import { MyContext } from '../../App';
 import { CircularProgress, Button, Radio } from '@mui/material';
 import { FiUpload } from 'react-icons/fi';
 import { useEffect } from 'react';
-import { editData, postData, uploadImage } from '../../utils/api';
+import { editData, fetchDataFromApi, postData, uploadImage } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -27,7 +27,7 @@ const Profile = () => {
     const [preview, setPreview] = useState(null);  // Preview for image before uploading
     const [avatar, setAvatar] = useState(null);  // Actual avatar URL fetched from the server
     const [address, setAddress] = useState([]);
-    const [selectAddress, setSelectAddress] = useState('');
+    const [selectedValue, setSelectedValue] = useState('');
     const [uploading, setUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
@@ -72,7 +72,14 @@ const Profile = () => {
 
     useEffect(() => {
         if (context?.userData?._id !== '' && context?.userData?._id !== null && context?.userData?._id !== undefined) {
-
+            
+            // Fetch addresses when the component mounts
+            fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
+                    setAddress(res.data); // Store the fetched addresses in state
+                    context?.setAddress(res.data); // Store the fetched addresses in state
+                // console.log(res);
+            });
+            
             setUserId(context?.userData?._id);
             setFormFields({
                 name: context?.userData?.name,
@@ -82,7 +89,7 @@ const Profile = () => {
             setChangePassword({
                 email: context?.userData?.email,
             });
-            // setFormFields({ mobile: `"${context?.userData?.mobile}"` });
+
             setPhone(`"${context?.userData?.mobile}"`);  // Set initial phone value from user data
         }
     }, [context?.userData]);
@@ -260,6 +267,11 @@ const Profile = () => {
     };
 
 
+    const handleChange = (event) => {
+        setSelectedValue(event.target.value);
+    };
+
+
 
     return (
         <>
@@ -371,14 +383,14 @@ const Profile = () => {
                                     }`}
                             >
                                 {address.length > 0 ? (
-                                    address.map((item, index) => {
+                                    address.map((address, index) => {
                                         const fullAddress =
-                                            item.address_line1 + ", " +
-                                            item.city + ", " +
-                                            item.state + ", " +
-                                            item.pincode + ", " +
-                                            item.country + ", " +
-                                            item.mobile;
+                                            address.address_line1 + ", " +
+                                            address.city + ", " +
+                                            address.state + ", " +
+                                            address.pincode + ", " +
+                                            address.country + ", " +
+                                            address.mobile;
 
                                         return (
                                             <label
@@ -387,8 +399,8 @@ const Profile = () => {
                                             >
                                                 <Radio
                                                     name="address"
-                                                    checked={selectAddress === fullAddress}
-                                                    value={fullAddress}
+                                                    checked={selectedValue === (address?._id)}
+                                                    value={address?._id}
                                                     onChange={handleChange}
                                                 />
                                                 <span>{fullAddress}</span>
