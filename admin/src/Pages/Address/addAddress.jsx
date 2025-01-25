@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import { MyContext } from '../../App';
 import { PhoneInput } from 'react-international-phone';
+import toast from 'react-hot-toast';
+import { postData } from '../../utils/api';
 
 const AddAddress = () => {
 
@@ -12,6 +14,7 @@ const AddAddress = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState("");
     const [status, setStatus] = useState("");
+
     const [formFields, setFormFields] = useState({
         address_line1: '',
         city: '',
@@ -24,21 +27,19 @@ const AddAddress = () => {
     });
 
 
-
-
-
-
-
-
-
+    useEffect(()=>{
+        setFormFields((prevState) => ({
+            ...prevState,
+            userId: context?.userData?._id,
+        }));
+    },[context?.userData, formFields])
 
 
     const handleStatusChange = (event) => {
-        const { value } = event.target;
-        setStatus(value);
-        setFormFields((prevFields) => ({
-            ...prevFields,
-            status: value, // Update only the status field
+        setStatus(event.target.value);
+        setFormFields((prevState) => ({
+            ...prevState,
+            status: event.target.value, // Update only the status field
         }));
     };
 
@@ -52,10 +53,75 @@ const AddAddress = () => {
     };
 
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
 
+        e.preventDefault();
 
+        if (formFields.address_line1 === "") {
+            context.openAlertBox("error", "Please enter address line 1");
+            return;
+        }
+        if (formFields.city === "") {
+            context.openAlertBox("error", "Please enter city");
+            return;
+        }
+        if (formFields.state === "") {
+            context.openAlertBox("error", "Please enter state");
+            return;
+        }
+        if (formFields.pincode === "") {
+            context.openAlertBox("error", "Please enter pincode");
+            return;
+        }
+        if (formFields.country === "") {
+            context.openAlertBox("error", "Please enter country");
+            return;
+        }
+        if (phone === "") {
+            context.openAlertBox("error", "Please enter mobile");
+            return;
+        }
         
+        setIsLoading(true);
+
+        try {
+            const result = await toast.promise(
+                postData("/api/address/add-address", formFields, { withCredentials: true }),
+                {
+                    loading: "Submitting address... Please wait.",
+                    success: (res) => {
+                        if (res?.success) {
+                            // Handle success logic here
+                            return res.message || "Address added successfully!";
+                        } else {
+                            throw new Error(res?.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        // Check if err.response exists, else fallback to err.message
+                        const errorMessage = err?.response?.data?.message || err.message || "Failed to add address. Please try again.";
+                        return errorMessage;
+                    },
+                }
+            );
+            console.log("Result:", result);
+        } catch (err) {
+            console.error("Error:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+
+        // console.log(formFields);
+        // postData("/api/address/add-address", formFields, { withCredentials: true }).then((res)=>{
+        //     if (res?.error !== true) {
+        //         setIsLoading(false);
+        //         context.openAlertBox("success", res?.data?.message || "Address added successfully!");
+        //     }else{
+        //         context.openAlertBox("error", res?.data?.message || "An unexpected error occurred.");
+        //         setIsLoading(false);
+        //     }
+        // })
     }
 
 
@@ -99,7 +165,7 @@ const AddAddress = () => {
                         </div>
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Mobile No.</h3>
-                            <PhoneInput defaultCountry="in" preferredCountries={["in"]} name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevFields) => ({ ...prevFields, mobile: phone, })); }} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "cursor-not-allowed pointer-events-none" : ""}`} disabled={isLoading} />
+                            <PhoneInput defaultCountry="in" preferredCountries={["in"]} value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevState)=>({ ...prevState, mobile: phone }))}} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "cursor-not-allowed pointer-events-none" : ""}`} disabled={isLoading} />
                         </div>
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Status</h3>
@@ -107,7 +173,6 @@ const AddAddress = () => {
                                 value={status}
                                 onChange={handleStatusChange}
                                 displayEmpty
-                                name='status'
                                 inputProps={{ "aria-label": "Without label" }}
                                 className={`w-full h-[40px]`}
                             >

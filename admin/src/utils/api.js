@@ -24,6 +24,7 @@ export const postData = async (url, formData) => {
   }
 };
 
+
 export const fetchDataFromApi = async (url) => {
   try {
     const params = {

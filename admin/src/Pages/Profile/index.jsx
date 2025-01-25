@@ -69,6 +69,7 @@ const Profile = () => {
         }
     }, [context, navigate]);
 
+
     useEffect(() => {
         if (context?.userData?._id !== '' && context?.userData?._id !== null && context?.userData?._id !== undefined) {
 

@@ -1020,7 +1020,7 @@ export async function userDetails(request, response) {
       });
     }
 
-    const user = await UserModel.findById(userId).select("-password -refresh_token");
+    const user = await UserModel.findById(userId).select("-password -refresh_token").populate('address_details');
 
     // Check if the user was found
     if (!user) {
