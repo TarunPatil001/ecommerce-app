@@ -66,19 +66,22 @@ const AccountSidebar = () => {
             <div className="col-1 w-[20%]">
                 <div className="card bg-white shadow-md rounded-md sticky top-20">
                     <div className="w-full p-5 flex items-center justify-center flex-col">
-                        <div className="w-[110px] h-[110px] overflow-hidden rounded-full mb-4 relative group flex items-center justify-center border bg-white">
-                            {uploading === true ? (
-                                <CircularProgress color="inherit" />
-                            ) : (
-                                <img
-                                    src={preview || avatar || `https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png`}
-                                    alt="profile"
-                                    className="w-full h-full object-cover"
-                                />
-                            )}
-                            <div className="overlay w-full h-full absolute top-0 left-0 z-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center opacity-0 rounded-full group-hover:opacity-100 duration-300 transition-all">
-                                <FiUpload className="text-white text-[22px] group-hover:scale-125 duration-300 transition-all" />
-                                <input type="file" id="" className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2 " name="avatar" accept='image/*' onChange={(e) => onChangeFile(e, "/api/user/user-avatar")} />
+                        <div className='w-[110px] h-[110px] border p-1 relative rounded-full overflow-hidden shadow-xl flex items-center justify-center mb-2'>
+                            <div className="w-full h-full overflow-hidden group rounded-full shadow relative flex items-center justify-center bg-gray-300">
+
+                                {uploading === true ? (
+                                    <CircularProgress color="inherit" />
+                                ) : (
+                                    <img
+                                        src={preview || avatar || `https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png`}
+                                        alt="profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
+                                <div className="overlay w-full h-full absolute top-0 left-0 z-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center opacity-0 rounded-full group-hover:opacity-100 duration-300 transition-all">
+                                    <FiUpload className="text-white text-[22px] group-hover:scale-125 duration-300 transition-all" />
+                                    <input type="file" id="" className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2 " name="avatar" accept='image/*' onChange={(e) => onChangeFile(e, "/api/user/user-avatar")} />
+                                </div>
                             </div>
                         </div>
                         <h3 className="font-bold text-[16px] line-clamp-1">{context?.userData?.name}</h3>

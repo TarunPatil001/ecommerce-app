@@ -65,6 +65,10 @@ const Header = () => {
   const navigateToSignIn = () => {
     navigate("/sign-in");
   };
+  
+  const navigateToProfile = () => {
+    navigate("/profile");
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -169,7 +173,7 @@ const Header = () => {
                   </div>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleCloseMyAcc} className='flex items-center gap-3'>
+                <MenuItem onClick={()=>{handleCloseMyAcc();navigateToProfile();}} className='flex items-center gap-3'>
                   <FaRegUser className='text-[14px]' /> <span className='text-[14px]'>Profile</span>
                 </MenuItem>
                 <Divider />

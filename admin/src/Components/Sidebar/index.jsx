@@ -10,6 +10,7 @@ import { IoBagCheckOutline } from "react-icons/io5";
 import { FaAngleDown } from "react-icons/fa6";
 import { Collapse } from 'react-collapse';
 import { GoDotFill } from "react-icons/go";
+import { BiSolidUserDetail } from "react-icons/bi";
 import { MyContext } from '../../App';
 import { fetchDataFromApi } from '../../utils/api';
 
@@ -29,6 +30,7 @@ const Sidebar = () => {
     "/": "Dashboard",
     "/homeSlider/list": "Home Banners List",
     "/users": "Users",
+    "/profile": "Profile",
     "/products": "Product List",
     "/category/list": "Categories List",
     "/subCategory/list": "Sub-Categories List",
@@ -111,6 +113,14 @@ const Sidebar = () => {
             <Link to="/users">
               <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Users' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Users')}><LuUsers className='text-[25px]' />
                 <span>Users</span>
+              </Button>
+            </Link>
+          </li>
+          
+          <li>
+            <Link to="/profile">
+              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Profile' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Profile')}><BiSolidUserDetail className='text-[25px]' />
+                <span>Profile</span>
               </Button>
             </Link>
           </li>

@@ -30,6 +30,8 @@ import ChangePassword from './Pages/ChangePassword';
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 import { fetchDataFromApi } from './utils/api';
+import Profile from './Pages/Profile';
+import AddAddress from './Pages/Address/addAddress';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -229,6 +231,25 @@ function App() {
         </>
       ),
     },
+    {
+      path: "/profile",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className='contentMain flex'>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+                <Sidebar />
+              </div>
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <Profile />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
   ]);
 
   useEffect(() => {
@@ -323,6 +344,10 @@ function App() {
 
             {
               isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />
+            }
+            
+            {
+              isOpenFullScreenPanel?.model === "Add New Address" && <AddAddress />
             }
 
           </div>
