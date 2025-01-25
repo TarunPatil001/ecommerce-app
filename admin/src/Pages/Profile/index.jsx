@@ -72,14 +72,14 @@ const Profile = () => {
 
     useEffect(() => {
         if (context?.userData?._id !== '' && context?.userData?._id !== null && context?.userData?._id !== undefined) {
-            
+
             // Fetch addresses when the component mounts
             fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
-                    setAddress(res.data); // Store the fetched addresses in state
-                    context?.setAddress(res.data); // Store the fetched addresses in state
+                setAddress(res.data); // Store the fetched addresses in state
+                context?.setAddress(res.data); // Store the fetched addresses in state
                 // console.log(res);
             });
-            
+
             setUserId(context?.userData?._id);
             setFormFields({
                 name: context?.userData?.name,
@@ -377,7 +377,7 @@ const Profile = () => {
                         </div>
 
 
-                        <div className="col">
+                        {/* <div className="col">
                             <div
                                 className={`w-full h-full flex flex-col items-center justify-center gap-2 mt-2 text-md ${isLoading ? 'cursor-not-allowed' : ''
                                     }`}
@@ -411,7 +411,51 @@ const Profile = () => {
                                     <p>No addresses found.</p>
                                 )}
                             </div>
+                        </div> */}
+
+                        <div className="col">
+                            <div
+                                className={`w-full h-full flex flex-col items-center justify-center gap-2 mt-2 text-md ${isLoading ? 'cursor-not-allowed' : ''
+                                    }`}
+                            >
+                                {Array.isArray(address) && address.length > 0 ? (
+                                    address.map((address, index) => {
+                                        const fullAddress =
+                                            address.address_line1 +
+                                            ', ' +
+                                            address.city +
+                                            ', ' +
+                                            address.state +
+                                            ', ' +
+                                            address.pincode +
+                                            ', ' +
+                                            address.country +
+                                            ', ' +
+                                            address.mobile;
+
+                                        return (
+                                            <label
+                                                key={index}
+                                                className="border-2 border-dashed addressBox w-full flex items-center justify-start p-3 rounded-md cursor-pointer"
+                                            >
+                                                <Radio
+                                                    name="address"
+                                                    checked={selectedValue === address?._id}
+                                                    value={address?._id}
+                                                    onChange={handleChange}
+                                                />
+                                                <span>{fullAddress}</span>
+                                            </label>
+                                        );
+                                    })
+                                ) : (
+                                    <p>No addresses found.</p>
+                                )}
+                            </div>
                         </div>
+
+
+
                     </div>
                 </div>
             </div>

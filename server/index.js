@@ -40,7 +40,6 @@ app.use('/api/category', categoryRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cartProduct', cartProductRouter);
 app.use('/api/wishlist', wishlistRouter);
-// app.use('/api/address', addAddressController);
 app.use('/api/address', addressRouter);
 
 
