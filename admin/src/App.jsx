@@ -47,6 +47,7 @@ function App() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
   const [address, setAddress] = useState([]);
+  const [addressIdNo, setAddressIdNo] = useState(null);
 
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
@@ -286,11 +287,11 @@ function App() {
   const values = {
     isSidebarOpen,
     setIsSidebarOpen,
-    
+
     // User authentication
     isLogin,
     setIsLogin,
-    
+
     isOpenFullScreenPanel,
     setIsOpenFullScreenPanel,
 
@@ -303,6 +304,9 @@ function App() {
 
     address,
     setAddress,
+
+    addressIdNo,
+    setAddressIdNo,
   };
 
   return (
@@ -332,25 +336,16 @@ function App() {
           </AppBar>
           <div className='mt-5 p-4'>
 
-            {
-              isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />
-            }
+            {isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />}
 
-            {
-              isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />
-            }
+            {isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />}
 
-            {
-              isOpenFullScreenPanel?.model === "Add New Category" && <AddCategory />
-            }
+            {isOpenFullScreenPanel?.model === "Add New Category" && <AddCategory />}
 
-            {
-              isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />
-            }
-            
-            {
-              isOpenFullScreenPanel?.model === "Add New Address" && <AddAddress />
-            }
+            {isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />}
+
+            {isOpenFullScreenPanel?.model === "Address Details" && <AddAddress />}
+
 
           </div>
 
