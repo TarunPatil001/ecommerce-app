@@ -96,39 +96,62 @@ const Profile = () => {
 
 
     const onChangeFile = async (e, apiEndPoint) => {
+        
         try {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const validFormats = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-
-            if (!validFormats.includes(file.type)) {
-                context.openAlertBox("error", "Please select a valid image (JPEG/JPG/PNG/WEBP).");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('avatar', file);
-
-            setUploading(true);
-            const previewUrl = URL.createObjectURL(file);
-            setPreview(previewUrl); // Show temporary preview while uploading
-
-            // Call the API to upload the avatar
-            const response = await uploadImage(apiEndPoint, formData);
-            if (response && response.data && response.data.avatar) {
-                context.openAlertBox("success", "Avatar updated successfully!");
-                setAvatar(response.data.avatar); // Update with the final avatar URL after upload
-                setPreview(response.data.avatar); // Set preview to the updated avatar URL
-            } else {
-                context.openAlertBox("error", "Failed to update avatar.");
-            }
-        } catch (error) {
+            const result = await toast.promise(
+              (async () => {
+                const file = e.target.files[0];
+                if (!file) {
+                  throw new Error("No file selected.");
+                }
+          
+                const validFormats = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+                if (!validFormats.includes(file.type)) {
+                  throw new Error("Please select a valid image (JPEG/JPG/PNG/WEBP).");
+                }
+          
+                const formData = new FormData();
+                formData.append("avatar", file);
+          
+                setUploading(true);
+          
+                const previewUrl = URL.createObjectURL(file);
+                setPreview(previewUrl); // Temporary preview
+          
+                // Call the API and validate the response
+                const response = await uploadImage(apiEndPoint, formData);
+                console.log("API Response Debug:", response); // Debug API response
+          
+                if (response?.avatar) {
+                  setAvatar(response.avatar); // Update state with the final avatar URL
+                  setPreview(response.avatar); // Update preview with the uploaded avatar
+                  return "Avatar updated successfully!";
+                } else {
+                  console.error("Unexpected response format:", response);
+                  throw new Error("Failed to update avatar.");
+                }
+              })(),
+              {
+                loading: "Uploading image... Please wait.",
+                success: (message) => message,
+                error: (err) => {
+                  console.error("Toast error handler debug:", err);
+                  const errorMessage =
+                    err?.response?.data?.message || err.message || "An error occurred while uploading your image.";
+                  return errorMessage;
+                },
+              }
+            );
+          
+            console.log("Result:", result); // Log success message
+            // context.openAlertBox("success", result); // Show success alert
+          } catch (error) {
             console.error("Error while uploading file:", error);
-            context.openAlertBox("error", "An error occurred while uploading your image.");
-        } finally {
-            setUploading(false); // Stop uploading spinner
-        }
+            // context.openAlertBox("error", error?.message || "An unexpected error occurred.");
+          } finally {
+            setUploading(false); // Stop spinner
+          }
+        
     };
 
 

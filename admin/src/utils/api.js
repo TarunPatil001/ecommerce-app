@@ -120,6 +120,8 @@ export const fetchDataFromApi = async (url) => {
   }
 };
 
+
+
 /** Image Upload (PUT) */
 export const uploadImage = async (url, formData) => {
   try {
@@ -136,6 +138,7 @@ export const uploadImage = async (url, formData) => {
   }
 };
 
+
 /** Edit Data (PUT) */
 export const editData = async (url, updatedData) => {
   try {
@@ -151,3 +154,5 @@ export const editData = async (url, updatedData) => {
     return error.response ? error.response.data : { message: error.message, error: true };
   }
 };
+
+// --------------------------------------------------------------------------------------------------------------------------
