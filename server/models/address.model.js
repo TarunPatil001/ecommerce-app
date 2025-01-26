@@ -31,10 +31,16 @@ const addressSchema = mongoose.Schema({
         type:Boolean,
         default: true
     },
-    userId:{
-        type:String,
-        default: ""
+    // userId:{
+    //     type:String,
+    //     default: ""
+    // }
+    userId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User", // Reference the UserModel
+        required: true,
     }
+    
 },{
     timestamps:true
 })

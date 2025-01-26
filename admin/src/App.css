@@ -9,6 +9,8 @@
   --bg-primary-light: rgb(214, 226, 253);
   --bg-hover-primary: rgb(242, 246, 255);
   --bg-light-hover: rgb(241, 241, 241);
+  --bg-primary-update: rgb(11, 169, 0);
+  --bg-primary-update-light: rgb(204, 255, 201);
   --bg-active: rgb(233, 243, 255);
   --text-active: var(--bg-primary);
   --text-light: #535665;
@@ -73,6 +75,17 @@ body {
 }
 .custom-btn-disabled{
   background-color: var(--bg-primary-light) !important;
+  color: #ffffff !important;
+  padding: 5px 20px !important;
+}
+
+.custom-btn-update{
+  background-color: var(--bg-primary-update) !important;
+  color: #ffffff !important;
+  padding: 5px 20px !important;
+}
+.custom-btn-update-disabled{
+  background-color: var(--bg-primary-update-light) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
 }

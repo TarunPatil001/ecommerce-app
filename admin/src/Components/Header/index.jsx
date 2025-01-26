@@ -162,7 +162,7 @@ const Header = () => {
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
                 <MenuItem onClick={handleCloseMyAcc}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3 h-[40px]">
                     <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer">
                     <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
                     </div>
@@ -172,13 +172,13 @@ const Header = () => {
                     </div>
                   </div>
                 </MenuItem>
-                <Divider />
-                <MenuItem onClick={()=>{handleCloseMyAcc();navigateToProfile();}} className='flex items-center gap-3'>
-                  <FaRegUser className='text-[14px]' /> <span className='text-[14px]'>Profile</span>
+                <hr />
+                <MenuItem onClick={()=>{handleCloseMyAcc();navigateToProfile();}} className='flex items-center justify-center gap-3 h-[40px]'>
+                  <FaRegUser className='text-[14px]' /> <span className='flex items-center justify-center text-[14px]'>Profile</span>
                 </MenuItem>
-                <Divider />
-                <MenuItem onClick={()=>{handleCloseMyAcc();logout();}} className='flex items-center gap-3'>
-                  <MdOutlineLogout className='text-[15px]' /> <span className='text-[14px]'>Sign out</span>
+                <hr />
+                <MenuItem onClick={()=>{handleCloseMyAcc();logout();}} className='flex items-center justify-center gap-3 h-[40px]'>
+                  <MdOutlineLogout className='text-[15px]' /> <span className='flex items-center justify-center text-[14px]'>Sign out</span>
                 </MenuItem>
               </Menu>
             </div>
