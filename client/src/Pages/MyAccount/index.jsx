@@ -4,10 +4,16 @@ import AccountSidebar from '../../components/AccountSidebar'
 import { MyContext } from '../../App'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { editData } from '../../utils/api'
+import { editData, fetchDataFromApi } from '../../utils/api'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import { postData } from './../../utils/api';
 import { Collapse } from 'react-collapse'
+import { MuiPhone } from '../../components/MuiPhone'
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
+
+
+
 
 const MyAccount = () => {
 
@@ -21,6 +27,8 @@ const MyAccount = () => {
     const [isShowPassword2, setIsShowPassword2] = useState(false);
     const [isShowPassword3, setIsShowPassword3] = useState(false);
     const [userId, setUserId] = useState("");
+    const [address, setAddress] = useState([]);
+    const [phone, setPhone] = useState('')
     const [formFields, setFormFields] = useState({
         name: '',
         email: '',
@@ -55,75 +63,77 @@ const MyAccount = () => {
     }, [context, navigate]);
 
     useEffect(() => {
-        if (context?.userData?._id !== undefined && context?.userData?._id !== null && context?.userData?._id !== '') {
+        // Only run the effect when user data is available
+        if (context?.userData?._id) {
+
+            // Fetch addresses when the component mounts or userData changes
+            fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
+                setAddress(res.data); // Store the fetched addresses in state
+                context?.setAddress(res.data); // Store the fetched addresses in context
+            });
+
+            // Set user data in state
             setUserId(context?.userData?._id);
             setFormFields({
                 name: context?.userData?.name,
                 email: context?.userData?.email,
-                mobile: context?.userData?.mobile,
             });
+
             setChangePassword({
                 email: context?.userData?.email,
             });
+
+            const validPhone = context?.userData?.mobile ? String(context?.userData?.mobile) : "";
+            setPhone(validPhone);
+            // setPhone(`${context?.userData?.mobile}`);  // Set initial phone value from user data
         }
-    }, [context]);
+    }, [context?.userData]);  // Only re-run when context?.userData changes
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Array to store missing fields
-        const missingFields = [];
+        if (formFields.name === "") {
+            context.openAlertBox("error", "Please enter your full name.");
+            return;
+        }
 
-        // Validate form fields
-        if (!formFields.name) missingFields.push("Full Name");
-        if (!formFields.email) missingFields.push("Email ID");
-        if (!formFields.mobile) missingFields.push("Mobile");
+        if (formFields.email === "") {
+            context.openAlertBox("error", "Please enter your email ID.");
+            return;
+        }
 
-        // If any required fields are missing, show a single alert and exit
-        if (missingFields.length > 0) {
-            const missingFieldsList = missingFields.join(", ").replace(/, ([^,]*)$/, " and $1");
-            context.openAlertBox("error", `Please enter your ${missingFieldsList}`);
-            return; // Stop further execution
+        if (formFields.mobile === "") {
+            context.openAlertBox("error", "Please enter your mobile number.");
+            return;
         }
 
         // Start a toast.promise for handling loading, success, and error states
         try {
-            await toast.promise(
-                (async () => {
-                    setIsLoading(true); // Start loading
-
-                    // API call to update data
-                    const response = await editData(`/api/user/${userId}`, formFields, { withCredentials: true });
-
-                    if (response?.status === 200 && response?.data?.error === false) {
-                        // Success: Profile updated
+            const result = await toast.promise(
+                editData(`/api/user/${userId}`, formFields, { withCredentials: true }), {
+                loading: "Updating profile... Please wait.",
+                success: (res) => {
+                    if (res?.success) {
                         navigate("/"); // Redirect to the home page
-                        return response;
+                        return res.message || "Profile updated successfully!";
                     } else {
-                        // Failure: Throw an error to be caught by toast.promise
-                        const errorMessage = response?.data?.message || "Failed to update profile";
-                        throw new Error(errorMessage);
+                        throw new Error(res?.message || "An unexpected error occurred.");
                     }
-                })(),
-                {
-                    pending: "Updating profile...", // Loading message
-                    success: (response) => response?.data?.message || "Profile updated successfully!", // Success message
-                    error: {
-                        render({ data }) {
-                            return data.message || "Failed to update profile"; // Custom error message
-                        },
-                    },
-                }
+                },
+                error: (err) => {
+                    // Check if err.response exists, else fallback to err.message
+                    const errorMessage = err?.response?.data?.message || err.message || "Failed to update profile. Please try again.";
+                    return errorMessage;
+                },
+            }
             );
-        } catch (error) {
-            console.error("Error updating profile:", error);
-
-            // Display error message
-            const errorMessage = error?.response?.data?.message || "Failed to update profile";
-            context.openAlertBox("error", errorMessage);
+            console.log("Result:", result);
+        } catch (err) {
+            console.error("Error:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setIsLoading(false); // Stop loading
+            setIsLoading(false);
         }
     };
 
@@ -146,7 +156,7 @@ const MyAccount = () => {
             return; // Stop further execution
         }
 
-       // Start loading and disable the fields
+        // Start loading and disable the fields
         setIsLoading2(true);
 
         try {
@@ -191,10 +201,10 @@ const MyAccount = () => {
         <section className="py-10 w-full">
             <div className="container flex gap-5">
                 <AccountSidebar />
-                <div className="col-2 w-[50%]">
+                <div className="col-2 w-[100%]">
                     <div className="card bg-white p-5 shadow-md rounded-md mb-5">
                         <div className="flex items-center mb-2">
-                            <h2 className="pb-0 font-semibold">My Profile</h2>
+                            <h2 className="pb-0 font-bold text-[20px]">My Account</h2>
                             <Button className='!ml-auto' onClick={() => setIsChangePasswordFormShow(!isChangePasswordFormShow)}>Change Password</Button>
                         </div>
                         <Divider />
@@ -209,7 +219,7 @@ const MyAccount = () => {
                             </div>
                             <div className="flex items-center gap-5 mt-4">
                                 <div className="w-[50%]">
-                                    <TextField type='tel' label="Mobile No." variant="outlined" size="small" className="custom-textfield w-full" name="mobile" value={formFields.mobile} disabled={isLoading} onChange={onChangeInput} />
+                                    <MuiPhone margin="dense" defaultCountry="in" name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields(prevState => ({ ...prevState, mobile: phone })); }} disabled={isLoading} type="text" className={`!w-full h-[40px] flex items-center custom-textfield ${isLoading === true ? "!cursor-not-allowed" : ""}`} fullWidth variant="outlined" size="small" />
                                 </div>
                                 <div className="w-[50%]"></div>
                             </div>
@@ -221,6 +231,8 @@ const MyAccount = () => {
                                         }
                                     </Button>
                                     <Button type='reset' className="buttonPrimaryWhite w-full" disabled={isLoading}>Cancel</Button>
+                                </div>
+                                <div className="flex gap-5 w-[50%]">
                                 </div>
                             </div>
                         </form>

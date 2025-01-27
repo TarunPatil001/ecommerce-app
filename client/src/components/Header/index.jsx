@@ -5,7 +5,7 @@ import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import { MdOutlineShoppingCart } from "react-icons/md";
-import { FaRegHeart, FaUserCircle } from "react-icons/fa";
+import { FaMapMarkerAlt, FaRegHeart, FaUserCircle } from "react-icons/fa";
 import { IoBagCheck, IoGitCompareOutline } from "react-icons/io5";
 import Tooltip from '@mui/material/Tooltip';
 import { MyContext } from "../../App";
@@ -51,7 +51,7 @@ const Header = () => {
         email: context?.userData?.email,
       });
     }
-  }, [context.isLogin, context?.userData?.avatar, context?.userData?.email, context?.userData?.name, context]);
+  }, [context.isLogin, context?.userData?.avatar, context?.userData?.email, context?.userData?.name, context, context?.isReducer]);
 
 
   const logout = () => {
@@ -190,6 +190,14 @@ const Header = () => {
                                 <FaUserCircle className="w-[20px] h-[20px] text-[var(--text-light)]" />
                               </ListItemIcon>
                               My Account
+                            </MenuItem>
+                          </Link>
+                          <Link to="/my-addresses">
+                            <MenuItem onClick={handleClose}>
+                              <ListItemIcon>
+                                <FaMapMarkerAlt className="w-[20px] h-[20px] text-[var(--text-light)]" />
+                              </ListItemIcon>
+                              Addresses
                             </MenuItem>
                           </Link>
                           <Link to="/my-orders">

@@ -21,6 +21,7 @@ export const addAddressController = async (request, response) => {
 
     // Normalize 'status' to Boolean
     const normalizedStatus = status === true || status === "true" ? true : false;
+    const normalizedSelected = normalizedStatus ? true : false;
 
     // Validate required fields
     if (!userId) {
@@ -47,6 +48,14 @@ export const addAddressController = async (request, response) => {
         error: true,
         success: false,
       });
+    }
+
+    // If the status is true, set all other addresses' status to false
+    if (normalizedStatus) {
+      await AddressModel.updateMany(
+        { userId, status: true }, // Find all addresses with status: true for the user
+        { $set: { status: false, selected: false } } // Set their status and selected to false
+      );
     }
 
     // Check if the address already exists
@@ -77,7 +86,7 @@ export const addAddressController = async (request, response) => {
       mobile,
       status: normalizedStatus, // Use the normalized 'status'
       userId,
-      selected: normalizedStatus, // 'selected' is set based on 'status'
+      selected: normalizedSelected, // 'selected' is set based on 'status'
     });
 
     // Save the address to the database

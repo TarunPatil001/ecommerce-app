@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Button, CircularProgress } from '@mui/material'
 import { NavLink } from 'react-router-dom'
 import { FiUpload } from 'react-icons/fi'
-import { FaUserCircle } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaUserCircle } from 'react-icons/fa'
 import { IoMdHeart } from 'react-icons/io'
 import { IoBagCheck } from 'react-icons/io5'
 import { TbLogout } from 'react-icons/tb'
 import { MyContext } from '../../App'
 import { uploadImage } from '../../utils/api'
+import toast from 'react-hot-toast'
 
 const AccountSidebar = () => {
 
@@ -25,39 +26,63 @@ const AccountSidebar = () => {
     }, [context?.userData?.avatar]); // Re-fetch when only the avatar in context changes
 
     const onChangeFile = async (e, apiEndPoint) => {
+
         try {
-            const file = e.target.files[0];
-            if (!file) return;
+            const result = await toast.promise(
+                (async () => {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        throw new Error("No file selected.");
+                    }
 
-            const validFormats = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+                    const validFormats = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+                    if (!validFormats.includes(file.type)) {
+                        throw new Error("Please select a valid image (JPEG/JPG/PNG/WEBP).");
+                    }
 
-            if (!validFormats.includes(file.type)) {
-                context.openAlertBox("error", "Please select a valid image (JPEG/JPG/PNG/WEBP).");
-                return;
-            }
+                    const formData = new FormData();
+                    formData.append("avatar", file);
 
-            const formData = new FormData();
-            formData.append('avatar', file);
+                    setUploading(true);
 
-            setUploading(true);
-            const previewUrl = URL.createObjectURL(file);
-            setPreview(previewUrl); // Show temporary preview while uploading
+                    const previewUrl = URL.createObjectURL(file);
+                    setPreview(previewUrl); // Temporary preview
 
-            // Call the API to upload the avatar
-            const response = await uploadImage(apiEndPoint, formData);
-            if (response && response.data && response.data.avatar) {
-                context.openAlertBox("success", "Avatar updated successfully!");
-                setAvatar(response.data.avatar); // Update with the final avatar URL after upload
-                setPreview(response.data.avatar); // Set preview to the updated avatar URL
-            } else {
-                context.openAlertBox("error", "Failed to update avatar.");
-            }
+                    // Call the API and validate the response
+                    const response = await uploadImage(apiEndPoint, formData);
+                    console.log("API Response Debug:", response); // Debug API response
+
+                    if (response?.avatar) {
+                        setAvatar(response.avatar); // Update state with the final avatar URL
+                        setPreview(response.avatar); // Update preview with the uploaded avatar
+                        context?.forceUpdate();
+                        return "Avatar updated successfully!";
+                    } else {
+                        console.error("Unexpected response format:", response);
+                        throw new Error("Failed to update avatar.");
+                    }
+                })(),
+                {
+                    loading: "Uploading image... Please wait.",
+                    success: (message) => message,
+                    error: (err) => {
+                        console.error("Toast error handler debug:", err);
+                        const errorMessage =
+                            err?.response?.data?.message || err.message || "An error occurred while uploading your image.";
+                        return errorMessage;
+                    },
+                }
+            );
+
+            console.log("Result:", result); // Log success message
+            // context.openAlertBox("success", result); // Show success alert
         } catch (error) {
             console.error("Error while uploading file:", error);
-            context.openAlertBox("error", "An error occurred while uploading your image.");
+            // context.openAlertBox("error", error?.message || "An unexpected error occurred.");
         } finally {
-            setUploading(false); // Stop uploading spinner
+            setUploading(false); // Stop spinner
         }
+
     };
 
 
@@ -91,6 +116,11 @@ const AccountSidebar = () => {
                         <li className="w-full">
                             <NavLink to="/my-account" exact={true} activeClassName="isActive">
                                 <Button className="!py-2 flex items-center !text-left !justify-start gap-2 w-full !rounded-none !capitalize !text-[rgba(0,0,0,0.8)] !text-[16px]"><FaUserCircle className="text-[20px]" />My Account</Button>
+                            </NavLink>
+                        </li>
+                        <li className="w-full">
+                            <NavLink to="/my-addresses" exact={true} activeClassName="isActive">
+                                <Button className="!py-2 flex items-center !text-left !justify-start gap-2 w-full !rounded-none !capitalize !text-[rgba(0,0,0,0.8)] !text-[16px]"><FaMapMarkerAlt className="text-[20px]" />Addresses</Button>
                             </NavLink>
                         </li>
                         <li className="w-full">

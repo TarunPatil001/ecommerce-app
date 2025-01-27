@@ -22,6 +22,7 @@ import MyAccount from './Pages/MyAccount';
 import Wishlist from './Pages/Wishlist';
 import Orders from './Pages/Orders';
 import { fetchDataFromApi } from './utils/api';
+import Address from './Pages/MyAccount/address';
 
 
 
@@ -38,6 +39,8 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
+  const [address, setAddress] = useState([]);
+  const [addressIdNo, setAddressIdNo] = useState(null);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
@@ -169,6 +172,12 @@ function App() {
     isReducer,
     forceUpdate,
 
+    address,
+    setAddress,
+
+    addressIdNo,
+    setAddressIdNo,
+
   };
 
   return (
@@ -190,6 +199,7 @@ function App() {
             <Route path={"/my-account"} exact={true} element={<MyAccount />} />
             <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
             <Route path={"/my-orders"} exact={true} element={<Orders />} />
+            <Route path={"/my-addresses"} exact={true} element={<Address />} />
           </Routes>
           <Footer />
         </MyContext.Provider>

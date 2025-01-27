@@ -17,6 +17,7 @@ import { IoIosSave } from 'react-icons/io';
 import { MuiPhone } from '../../components/MuiPhone';
 
 
+
 const Address = () => {
 
     const context = useContext(MyContext);
@@ -97,7 +98,7 @@ const Address = () => {
                 });
         }
     }, [context?.userData, context?.isReducer]);
-    
+
 
     // Effect for handling address edits and populating form fields
     useEffect(() => {
@@ -483,7 +484,7 @@ const Address = () => {
                 <div className="container flex gap-5">
                     <AccountSidebar />
                     <div className="col-2 w-[100%]">
-                        <div className="card bg-white p-5  shadow-md rounded-md mb-5">
+                        <div className="card bg-white p-5 shadow-md rounded-md mb-5">
                             <div className="flex items-center mb-2">
                                 <h2 className="pb-0 font-bold text-[20px]">Address Details</h2>
                             </div>
@@ -674,26 +675,28 @@ const Address = () => {
                             size="small"
                         />
 
-                        {/* {
-                            addressIdForEdit === undefined ? (
-                                ""
-                            ) : ( */}
-                                <Select
-                                    value={status}  // Ensure the status is converted to string
-                                    onChange={handleStatusChange}
-                                    displayEmpty
-                                    inputProps={{ "aria-label": "Without label" }}
-                                    className="h-[40px] mt-2 "
-                                    fullWidth
-                                    size='small'
-                                    margin="dense"
-                                    variant="outlined"
-                                >
-                                    <MenuItem value="" disabled>Select Status</MenuItem>
-                                    <MenuItem value="true">Active</MenuItem>
-                                    <MenuItem value="false">Inactive</MenuItem>
-                                </Select>
-                            {/* )} */}
+
+                        <Select
+                            value={status} // Ensure the status is converted to string
+                            onChange={handleStatusChange}
+                            displayEmpty
+                            inputProps={{ "aria-label": "Without label" }}
+                            className="h-[40px] mt-2"
+                            fullWidth
+                            size="small"
+                            margin="dense"
+                            variant="outlined"
+                            sx={{
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'var(--bg-primary) !important', // Set the focus border color
+                                },
+                            }}
+                        >
+                            <MenuItem value="" disabled>Select Status</MenuItem>
+                            <MenuItem value="true">Active</MenuItem>
+                            <MenuItem value="false">Inactive</MenuItem>
+                        </Select>
+
 
                     </div>
 

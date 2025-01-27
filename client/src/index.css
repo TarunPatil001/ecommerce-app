@@ -685,3 +685,25 @@ input[type=number]::-webkit-outer-spin-button {
 .myAccountTabs li a:before{content: ''; width: 3px; height: 50%; position: absolute; top: 50%x; left: 0px; background: var(--bg-primary); transition: all 0.3s ease-in-out; opacity: 0;}
 .myAccountTabs li a.active::before{height: 100%; opacity: 1; top: 0px;}
 .myAccountTabs li a.active button svg{color: var(--bg-primary) !important; opacity: 1 !important;}
+
+
+.react-international-phone-input-container .react-international-phone-input {
+  width: 100%;
+  height: 40px !important;
+  border-radius: 0px 6px 6px 0px !important;
+  font-size: 16px !important;
+  -webkit-border-radius: 0px 6px 6px 0px !important;
+  -moz-border-radius: 0px 6px 6px 0px !important;
+  -ms-border-radius: 0px 6px 6px 0px !important;
+  -o-border-radius: 0px 6px 6px 0px !important;
+}
+
+.react-international-phone-input-container .react-international-phone-country-selector-button {
+  padding: 0px 5px !important;
+  height: 40px !important;
+  border-radius: 6px 0px 0px 6px !important;
+  -webkit-border-radius: 6px 0px 0px 6px !important;
+  -moz-border-radius: 6px 0px 0px 6px !important;
+  -ms-border-radius: 6px 0px 0px 6px !important;
+  -o-border-radius: 6px 0px 0px 6px !important;
+}
