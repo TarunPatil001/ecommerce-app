@@ -6,6 +6,9 @@ import { Link } from 'react-router-dom'
 import { MdOutlineEdit } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import { MyContext } from '../../App'
+import { useEffect } from 'react'
+import { deleteData, fetchDataFromApi } from '../../utils/api'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -19,9 +22,41 @@ const columns = [
 const CategoryList = () => {
 
     const context = useContext(MyContext);
- 
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const [catData, setCatData] = useState([]);
+
+
+    useEffect(() => {
+        fetchDataFromApi("/api/category").then((res) => {
+            console.log(res?.data);
+            setCatData(res?.data);
+        })
+    }, [setCatData, context?.isReducer]);
+
+    const handleEditCategory = (categoryId, categoryName) => {
+        console.log("CatListPage - Category ID :", categoryId);
+        console.log("CatListPage - Category Name :", categoryName);
+
+        context.setIsOpenFullScreenPanel({
+            open: true,
+            model: "Category Details",
+            categoryId: categoryId, 
+            categoryName: categoryName,
+        });
+    };
+
+    const handleDeleteCategory = (categoryId) => {
+        console.log("CatListPage - Category ID :", categoryId);
+        deleteData(`/api/category/${categoryId}`).then((res)=>{
+            console.log(res);
+            context?.forceUpdate();
+        })
+        
+    };
+    
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -38,7 +73,7 @@ const CategoryList = () => {
                 <h2 className='text-[20px] font-bold'>Category List<span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[30%] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Add New Category'})}><GoPlus className='text-[20px]' />Add New Category</Button>
+                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px]' />Category Details</Button>
                 </div>
             </div>
 
@@ -66,38 +101,48 @@ const CategoryList = () => {
 
                         <TableBody>
 
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-                                <TableCell width={100}>
-                                    <div className="flex items-start gap-4 w-[80px]">
-                                        <div className='img w-full h-auto overflow-hidden rounded-md shadow-md group'>
-                                            <Link to="/product/458457">
-                                                <img src="https://api.spicezgold.com/download/file_1734525239704_foot.png" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </TableCell>
+                            {
+                                catData?.length !== 0 && catData?.map((item, index) => {
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Checkbox {...label} size='small' />
+                                            </TableCell>
+                                            <TableCell width={100}>
+                                                <div className='shadow w-[80px] h-[80px] overflow-hidden rounded-md flex items-center justify-center'>
+                                                    <Link to="/product/458457">
+                                                        <div className='flex items-center justify-center'>
+                                                            <LazyLoadImage
+                                                                alt="product_img"
+                                                                effect="blur"
+                                                                src={item.images[0]}
+                                                                className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
+                                                            />
+                                                        </div>
+                                                    </Link>
+                                                </div>
+                                            </TableCell>
 
-                                <TableCell width={100}>
-                                    <span>Men</span>
-                                </TableCell>
+                                            <TableCell width={100}>
+                                                <span>{item?.name}</span>
+                                            </TableCell>
 
-                                <TableCell width={100}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="View Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                                            <TableCell width={100}>
+                                                <div className='flex items-center gap-2'>
+                                                    <Tooltip title="Edit Product" arrow placement="top">
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => {handleEditCategory(item?._id, item?.name);}}><MdOutlineEdit className='text-[35px]' /></Button>
+                                                    </Tooltip>
+                                                    <Tooltip title="Delete Product" arrow placement="top">
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => handleDeleteCategory(item?._id)}><RiDeleteBin6Line className='text-[35px]' /></Button>
+                                                    </Tooltip>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            }
+
+
 
                         </TableBody>
                     </Table>

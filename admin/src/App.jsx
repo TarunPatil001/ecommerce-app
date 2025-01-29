@@ -32,6 +32,7 @@ import { useEffect } from 'react';
 import { fetchDataFromApi } from './utils/api';
 import Profile from './Pages/Profile';
 import AddAddress from './Pages/Address/addAddress';
+import { useReducer } from 'react';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -48,6 +49,10 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
+  const [categoryIdNo, setCategoryIdNo] = useState(null);
+
+
+  const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
@@ -307,6 +312,12 @@ function App() {
 
     addressIdNo,
     setAddressIdNo,
+
+    categoryIdNo,
+    setCategoryIdNo,
+
+    isReducer,
+    forceUpdate,
   };
 
   return (
@@ -340,7 +351,7 @@ function App() {
 
             {isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />}
 
-            {isOpenFullScreenPanel?.model === "Add New Category" && <AddCategory />}
+            {isOpenFullScreenPanel?.model === "Category Details" && <AddCategory />}
 
             {isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />}
 

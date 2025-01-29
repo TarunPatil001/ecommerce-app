@@ -171,7 +171,7 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add New Category" })}>
+                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Category Details" })}>
                       <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
                       <span>Add a Category</span>
                     </Button>

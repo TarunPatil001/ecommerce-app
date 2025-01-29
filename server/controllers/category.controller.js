@@ -90,7 +90,7 @@ export async function createCategory(request, response) {
       message: "Category created successfully.",
       error: false,
       success: true,
-      category: category,
+      data: category,
     });
   } catch (error) {
     console.error("Error creating category:", error.message || error);
@@ -172,14 +172,14 @@ export async function getCategoriesCount(request, response) {
         message: "No categories found",
         error: true,
         success: false,
-        categoryCount: categoryCount,
+        data: categoryCount,
       });
     } else {
       response.send({
         message: "Categories count retrieved successfully",
         error: false,
         success: true,
-        categoryCount: categoryCount,
+        data: categoryCount,
       });
     }
   } catch (error) {
@@ -207,7 +207,7 @@ export async function getSubCategoriesCount(request, response) {
         message: "No subcategories found",
         error: false,
         success: true,
-        subCategoryCount,
+        data: subCategoryCount,
       });
     }
 
@@ -215,7 +215,7 @@ export async function getSubCategoriesCount(request, response) {
       message: "Subcategory count retrieved successfully",
       error: false,
       success: true,
-      subCategoryCount,
+      data: subCategoryCount,
     });
   } catch (error) {
     console.error("Error getting subcategory count:", error.message || error);
@@ -244,7 +244,7 @@ export async function getCategory(request, response) {
       message: "Category retrieved successfully",
       error: false,
       success: true,
-      category,
+      data: category,
     });
   } catch (error) {
     console.error("Error getting category:", error.message || error);
@@ -257,6 +257,54 @@ export async function getCategory(request, response) {
 }
 
 // Controller for removing an image from Cloudinary
+// export async function removeCategoryImageFromCloudinary(request, response) {
+//   try {
+//     const imgUrl = request.query.img;
+
+//     if (!imgUrl) {
+//       return response.status(400).json({
+//         message: "Image URL is required.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const urlArr = imgUrl.split("/");
+//     const imageName = urlArr[urlArr.length - 1].split(".")[0];
+//     const publicId = `ecommerceApp/uploads/${imageName}`;
+
+//     if (imageName) {
+//       const res = await cloudinary.uploader.destroy(publicId);
+
+//       if (res.result !== "ok") {
+//         return response.status(500).json({
+//           message: "An error occurred during image removal.",
+//           error: true,
+//           success: false,
+//         });
+//       }
+
+//       return response.status(200).json({
+//         message: "Image removed successfully.",
+//         success: true,
+//       });
+//     } else {
+//       return response.status(400).json({
+//         message: "Invalid image name.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error removing image:", error.message || error);
+//     return response.status(500).json({
+//       message: error.message || "An error occurred while removing the image.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 export async function removeCategoryImageFromCloudinary(request, response) {
   try {
     const imgUrl = request.query.img;
@@ -269,16 +317,21 @@ export async function removeCategoryImageFromCloudinary(request, response) {
       });
     }
 
+    console.log("Received Image URL:", imgUrl);
+
     const urlArr = imgUrl.split("/");
     const imageName = urlArr[urlArr.length - 1].split(".")[0];
     const publicId = `ecommerceApp/uploads/${imageName}`;
 
+    console.log("Extracted Public ID:", publicId);
+
     if (imageName) {
       const res = await cloudinary.uploader.destroy(publicId);
+      console.log("Cloudinary Response:", res);
 
       if (res.result !== "ok") {
         return response.status(500).json({
-          message: "An error occurred during image removal.",
+          message: `Error deleting image from Cloudinary: ${res.result}`,
           error: true,
           success: false,
         });
@@ -304,6 +357,7 @@ export async function removeCategoryImageFromCloudinary(request, response) {
     });
   }
 }
+
 
 // delete category
 export async function deleteCategory(request, response) {
@@ -444,7 +498,7 @@ export async function updateCategory(request, response) {
     return response.status(200).json({
       message: "Category updated successfully.",
       success: true,
-      category: updatedCategory,
+      data: updatedCategory,
     });
   } catch (error) {
     console.error("Error in updateCategory:", error.message || error);

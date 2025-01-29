@@ -138,6 +138,41 @@ export const uploadImage = async (url, formData) => {
   }
 };
 
+/** Image Upload (POST) */
+export const uploadImagePost = async (url, formData) => {
+  try {
+    const response = await axios.post(apiUrl + url, formData, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "multipart/form-data", // Required for file uploads
+      },
+    });
+    console.log('Image uploaded:', response.data);
+    return response.data; // Return response data (e.g., image URL)
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return error.response ? error.response.data : { message: error.message, error: true };
+  }
+};
+
+/** Image delete (DELETE) */
+export const deleteImages = async (url, image) => {
+  try {
+    const response = await axios.delete(apiUrl + url, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json", // Required for file uploads
+      },
+    });
+    console.log('Image removed:', response.data);
+    return response.data; // Return response data (e.g., image URL)
+  } catch (error) {
+    console.error("Error removing image:", error);
+    return error.response ? error.response.data : { message: error.message, error: true };
+  }
+};
+
+
 
 /** Edit Data (PUT) */
 export const editData = async (url, updatedData) => {
@@ -154,5 +189,32 @@ export const editData = async (url, updatedData) => {
     return error.response ? error.response.data : { message: error.message, error: true };
   }
 };
+
+
+
+/** Delete Data (DELETE) */
+export const deleteData = async (url) => {
+  try {
+    const response = await axios.delete(apiUrl + url, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",  
+      },
+    });
+    return response.data; // Return response data
+  } catch (error) {
+    console.error("Error deleting data:", error);
+    return error.response ? error.response.data : { message: error.message, error: true };
+  }
+};
+
+
+
+
+
+
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------------
