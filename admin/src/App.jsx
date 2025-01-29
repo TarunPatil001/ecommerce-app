@@ -50,7 +50,7 @@ function App() {
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [categoryIdNo, setCategoryIdNo] = useState(null);
-
+  const [catData, setCatData] = useState([]);
 
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -279,6 +279,15 @@ function App() {
     }
   }, [isLogin]);
 
+  useEffect(() => {
+    fetchDataFromApi("/api/category").then((res) => {
+        console.log(res?.data);
+        setCatData(res?.data);
+    })
+}, [setCatData, isReducer]);
+
+
+
   const openAlertBox = (status, msg) => {
     if (status === "success") {
       toast.success(msg);
@@ -315,6 +324,9 @@ function App() {
 
     categoryIdNo,
     setCategoryIdNo,
+
+    catData,
+    setCatData,
 
     isReducer,
     forceUpdate,

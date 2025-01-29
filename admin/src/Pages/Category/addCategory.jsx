@@ -23,7 +23,7 @@ const AddCategory = () => {
   const [uploadedFile, setUploadedFile] = useState(null); // Use a single state to store the uploaded file
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
-  const [isLoading3, setIsLoading3] = useState(false);
+  // const [isLoading3, setIsLoading3] = useState(false);
   const [previews, setPreviews] = useState([]);
 
   const [formFields, setFormFields] = useState({
@@ -148,6 +148,16 @@ const AddCategory = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    if (formFields.name === "") {
+      context.openAlertBox("error", "Please enter category name.");
+      return;
+    }
+
+    if (previews?.length === 0) {
+      context.openAlertBox("error", "Please select category image.");
+      return;
+    }
+
     try {
       const result = await toast.promise(
         editData(`/api/category/${context?.categoryIdNo}`, {
@@ -190,7 +200,7 @@ const AddCategory = () => {
       if (!image) {
         throw new Error("Invalid image.");
       }
-
+      
       // Delete the image from Cloudinary or backend
       const response = await deleteImages(`/api/category/delete-category-image?img=${image}`);
 
@@ -256,14 +266,10 @@ const AddCategory = () => {
               Choose a category photo or simply drag and drop
             </span>
 
-            {/* Preview the uploaded file */}
-            {/* {uploadedFile && (
-            )} */}
-
             {
               previews?.length !== 0 && previews.map((image, index) => {
                 return (
-                  <div className="border p-2 rounded-md flex flex-col items-center bg-white h-[200px] relative" key={index}>
+                  <div className="border p-2 rounded-md flex flex-col items-center bg-white h-full relative" key={index}>
                     <span
                       className='absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all'
                       onClick={() => handleRemoveImage(image, index)}
@@ -284,7 +290,6 @@ const AddCategory = () => {
                       }
                     </div>
                   </div>
-
                 )
               }
               )}
@@ -316,10 +321,10 @@ const AddCategory = () => {
                   <Button
                     type="reset"
                     onClick={handleDiscard}
-                    className={`${isLoading3 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`}
+                    className={`${isLoading2 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading2}
                   >
                     {
-                      isLoading3 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
+                      isLoading2 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
                     }
                   </Button>
                   <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>

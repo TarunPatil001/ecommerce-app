@@ -30,6 +30,7 @@ const SubCategoryList = () => {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [chipData, setChipData] = useState([]);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -40,8 +41,6 @@ const SubCategoryList = () => {
         setPage(0);
     };
 
-
-    const [chipData, setChipData] = useState([]);
 
     // Simulate fetching data using mock data
     useEffect(() => {

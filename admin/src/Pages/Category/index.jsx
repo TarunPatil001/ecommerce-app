@@ -7,8 +7,9 @@ import { MdOutlineEdit } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import { MyContext } from '../../App'
 import { useEffect } from 'react'
-import { deleteData, fetchDataFromApi } from '../../utils/api'
+import { deleteData, editData, fetchDataFromApi } from '../../utils/api'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import toast from 'react-hot-toast'
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -25,38 +26,7 @@ const CategoryList = () => {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-
-    const [catData, setCatData] = useState([]);
-
-
-    useEffect(() => {
-        fetchDataFromApi("/api/category").then((res) => {
-            console.log(res?.data);
-            setCatData(res?.data);
-        })
-    }, [setCatData, context?.isReducer]);
-
-    const handleEditCategory = (categoryId, categoryName) => {
-        console.log("CatListPage - Category ID :", categoryId);
-        console.log("CatListPage - Category Name :", categoryName);
-
-        context.setIsOpenFullScreenPanel({
-            open: true,
-            model: "Category Details",
-            categoryId: categoryId, 
-            categoryName: categoryName,
-        });
-    };
-
-    const handleDeleteCategory = (categoryId) => {
-        console.log("CatListPage - Category ID :", categoryId);
-        deleteData(`/api/category/${categoryId}`).then((res)=>{
-            console.log(res);
-            context?.forceUpdate();
-        })
-        
-    };
-    
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -66,6 +36,54 @@ const CategoryList = () => {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+
+    const handleEditCategory = (categoryId, categoryName) => {
+        console.log("CatListPage - Category ID :", categoryId);
+        console.log("CatListPage - Category Name :", categoryName);
+
+        context.setIsOpenFullScreenPanel({
+            open: true,
+            model: "Category Details",
+            categoryId: categoryId,
+            categoryName: categoryName,
+        });
+    };
+
+    const handleDeleteCategory = async (e, categoryId) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            const result = await toast.promise(
+                deleteData(`/api/category/${categoryId}`),
+                {
+                    loading: "Deleting category... Please wait.",
+                    success: (res) => {
+                        if (res?.success) {
+                            fetchDataFromApi("/api/category").then((updatedData) => {
+                                context?.setCatData(updatedData?.data);
+                            });
+                            return res.message || "Category deleted successfully!";
+                        } else {
+                            throw new Error(res?.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        return err?.response?.data?.message || err.message || "Failed to delete category. Please try again.";
+                    },
+                }
+            );
+
+            console.log("Delete Result:", result);
+        } catch (err) {
+            console.error("Error in handleDeleteCategory:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     return (
         <>
@@ -102,7 +120,7 @@ const CategoryList = () => {
                         <TableBody>
 
                             {
-                                catData?.length !== 0 && catData?.map((item, index) => {
+                                context?.catData?.length !== 0 && context?.catData?.map((item, index) => {
                                     return (
                                         <TableRow key={index}>
                                             <TableCell>
@@ -130,10 +148,10 @@ const CategoryList = () => {
                                             <TableCell width={100}>
                                                 <div className='flex items-center gap-2'>
                                                     <Tooltip title="Edit Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => {handleEditCategory(item?._id, item?.name);}}><MdOutlineEdit className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditCategory(item?._id, item?.name); }}><MdOutlineEdit className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                     <Tooltip title="Delete Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => handleDeleteCategory(item?._id)}><RiDeleteBin6Line className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => { handleDeleteCategory(e, item?._id) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                 </div>
                                             </TableCell>
