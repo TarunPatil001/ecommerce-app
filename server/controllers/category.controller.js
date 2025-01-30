@@ -145,49 +145,7 @@ export async function createCategory(request, response) {
   }
 }
 
-
-// export async function createCategory(request, response) {
-//   try {
-//     // Create a new category document
-//     let category = new CategoryModel({
-//       name: request.body.name,
-//       images: imagesArr,
-//       parentCategoryId: request.body.parentCategoryId,
-//       parentCategoryName: request.body.parentCategoryName,
-//     });
-
-//     if (!category) {
-//       return response.status(500).json({
-//         message: "Category not created",
-//         error: true,
-//         success: false,
-//       });
-//     }
-
-//     // Save the category to the database
-//     category = await category.save();
-//     imagesArr = []; // Reset the images array for the next request
-
-//     return response.status(200).json({
-//       message: "Category created successfully.",
-//       error: false,
-//       success: true,
-//       data: category,
-//     });
-//   } catch (error) {
-//     console.error("Error creating category:", error.message || error);
-//     return response.status(500).json({
-//       message: error.message || "An error occurred during category creation.",
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
-
-// get all categories
-
-
-
+// Get all categories  
 export async function getCategories(request, response) {
   try {
     // Fetch all categories from the database

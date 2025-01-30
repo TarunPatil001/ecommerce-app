@@ -47,7 +47,7 @@ const Checkout = () => {
                             <div className="flex items-center flex-col py-2 pb-10 px-5 gap-4">
                                 <div className="w-full flex justify-between gap-5">
                                     <TextField id="pincode" label="Pin Code" name="pincode" required variant="outlined" inputProps={{ maxLength: 6, inputMode: 'numeric' }} className="custom-textfield w-full mb-5" size="small" />
-                                    <TextField id="state" label="State" name="state" required variant="outlined" className="custom-textfield w-full mb-5" size="small" />
+                                    <TextField id="status" label="Status" name="status" required variant="outlined" className="custom-textfield w-full mb-5" size="small" />
                                 </div>
                             </div>
                         </div>
