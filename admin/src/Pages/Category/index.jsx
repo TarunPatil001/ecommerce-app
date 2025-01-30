@@ -91,7 +91,7 @@ const CategoryList = () => {
                 <h2 className='text-[20px] font-bold'>Category List<span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[30%] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px]' />Category Details</Button>
+                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px]' />Add Category</Button>
                 </div>
             </div>
 
@@ -126,17 +126,16 @@ const CategoryList = () => {
                                             <TableCell>
                                                 <Checkbox {...label} size='small' />
                                             </TableCell>
+
                                             <TableCell width={100}>
-                                                <div className='shadow w-[80px] h-[80px] overflow-hidden rounded-md flex items-center justify-center'>
-                                                    <Link to="/product/458457">
-                                                        <div className='flex items-center justify-center'>
-                                                            <LazyLoadImage
-                                                                alt="product_img"
-                                                                effect="blur"
-                                                                src={item.images[0]}
-                                                                className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
-                                                            />
-                                                        </div>
+                                                <div className='shadow w-[150px] h-[80px] overflow-hidden rounded-md flex items-center justify-center'>
+                                                    <Link to="/product/458457" className='w-full h-full overflow-hidden flex items-center justify-center'>
+                                                        <LazyLoadImage
+                                                            alt="product_img"
+                                                            effect="blur"
+                                                            src={item.images[0]}
+                                                            className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
+                                                        />
                                                     </Link>
                                                 </div>
                                             </TableCell>

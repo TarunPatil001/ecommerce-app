@@ -116,7 +116,7 @@ const AddCategory = () => {
     try {
       const result = await toast.promise(
         postData(`/api/category/create-category`, formFields), {
-        loading: "Updating profile... Please wait.",
+        loading: "Adding category... Please wait.",
         success: (res) => {
           if (res?.success) {
             context?.forceUpdate();

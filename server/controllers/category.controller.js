@@ -10,10 +10,14 @@ cloudinary.config({
 });
 
 
-var imagesArr = [];
+// Declare imagesArr with let instead of const, so it can be modified
+let imagesArr = [];
+
 export async function uploadCategoryImages(request, response) {
   try {
-    imagesArr = [];
+    // Clear the images array at the beginning of the upload process
+    imagesArr = []; // This is fine with 'let'
+
     const image = request.files; // Extracted from multer middleware
 
     if (!image || image.length === 0) {
@@ -41,10 +45,7 @@ export async function uploadCategoryImages(request, response) {
         // Delete the local image after uploading it to Cloudinary
         await fs.promises.unlink(image[i].path); // Use async unlink for better performance
       } catch (uploadError) {
-        console.error(
-          "Error uploading image to Cloudinary:",
-          uploadError.message || uploadError
-        );
+        console.error("Error uploading image to Cloudinary:", uploadError.message || uploadError);
         // Continue uploading other images even if one fails
       }
     }
@@ -66,14 +67,43 @@ export async function uploadCategoryImages(request, response) {
 
 export async function createCategory(request, response) {
   try {
-    // Create a new category document
+    const { name, parentCategoryId, parentCategoryName } = request.body;
+
+    // Step 1: If there's a parent category, validate the parentCategoryId and parentCategoryName
+    if (parentCategoryId) {
+      const parentCategory = await CategoryModel.findById(parentCategoryId);
+
+      // If parent category doesn't exist
+      if (!parentCategory) {
+        return response.status(400).json({
+          message: "Parent category does not exist.",
+          error: true,
+          success: false,
+        });
+      }
+
+      // Step 2: Ensure that the parentCategoryName matches the parentCategoryId
+      if (parentCategory.name !== parentCategoryName) {
+        return response.status(400).json({
+          message: "parentCategoryName does not match parentCategoryId.",
+          error: true,
+          success: false,
+        });
+      }
+    } else {
+      // If no parentCategoryId, it's a root category, set parentCategoryName to null
+      request.body.parentCategoryName = null;
+    }
+
+    // Step 3: Create a new category document
     let category = new CategoryModel({
-      name: request.body.name,
-      images: imagesArr,
-      parentCategoryId: request.body.parentCategoryId,
-      parentCategoryName: request.body.parentCategoryName,
+      name: name, // Use the destructured 'name' instead of request.body.name
+      images: imagesArr, // Use the global imagesArr
+      parentCategoryId: parentCategoryId || null, // Handle the case when there's no parentCategoryId
+      parentCategoryName: request.body.parentCategoryName || null, // Ensure parentCategoryName is null if no parentCategoryId
     });
 
+    // Step 4: Ensure the category is created
     if (!category) {
       return response.status(500).json({
         message: "Category not created",
@@ -82,16 +112,29 @@ export async function createCategory(request, response) {
       });
     }
 
-    // Save the category to the database
+    // Step 5: Save the category to the database
     category = await category.save();
-    imagesArr = []; // Reset the images array for the next request
 
-    return response.status(200).json({
-      message: "Category created successfully.",
-      error: false,
-      success: true,
-      data: category,
-    });
+    // Clear the images array after saving the category to avoid issues with future requests
+    imagesArr = []; // Reset the array
+
+    if (!parentCategoryId) {
+      return response.status(200).json({
+        // Return success response
+        message: "Category created successfully.",
+        error: false,
+        success: true,
+        data: category,
+      });
+    } else {
+      return response.status(200).json({
+        // Return success response
+        message: "SubCategory created successfully.",
+        error: false,
+        success: true,
+        data: category,
+      });
+    }
   } catch (error) {
     console.error("Error creating category:", error.message || error);
     return response.status(500).json({
@@ -102,7 +145,49 @@ export async function createCategory(request, response) {
   }
 }
 
+
+// export async function createCategory(request, response) {
+//   try {
+//     // Create a new category document
+//     let category = new CategoryModel({
+//       name: request.body.name,
+//       images: imagesArr,
+//       parentCategoryId: request.body.parentCategoryId,
+//       parentCategoryName: request.body.parentCategoryName,
+//     });
+
+//     if (!category) {
+//       return response.status(500).json({
+//         message: "Category not created",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Save the category to the database
+//     category = await category.save();
+//     imagesArr = []; // Reset the images array for the next request
+
+//     return response.status(200).json({
+//       message: "Category created successfully.",
+//       error: false,
+//       success: true,
+//       data: category,
+//     });
+//   } catch (error) {
+//     console.error("Error creating category:", error.message || error);
+//     return response.status(500).json({
+//       message: error.message || "An error occurred during category creation.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 // get all categories
+
+
+
 export async function getCategories(request, response) {
   try {
     // Fetch all categories from the database
@@ -149,7 +234,7 @@ export async function getCategories(request, response) {
       success: true,
       data: rootCategories, // Return the root categories with their children
     });
-    
+
   } catch (error) {
     console.error("Error getting categories:", error.message || error);
     return response.status(500).json({
@@ -257,54 +342,6 @@ export async function getCategory(request, response) {
 }
 
 // Controller for removing an image from Cloudinary
-// export async function removeCategoryImageFromCloudinary(request, response) {
-//   try {
-//     const imgUrl = request.query.img;
-
-//     if (!imgUrl) {
-//       return response.status(400).json({
-//         message: "Image URL is required.",
-//         error: true,
-//         success: false,
-//       });
-//     }
-
-//     const urlArr = imgUrl.split("/");
-//     const imageName = urlArr[urlArr.length - 1].split(".")[0];
-//     const publicId = `ecommerceApp/uploads/${imageName}`;
-
-//     if (imageName) {
-//       const res = await cloudinary.uploader.destroy(publicId);
-
-//       if (res.result !== "ok") {
-//         return response.status(500).json({
-//           message: "An error occurred during image removal.",
-//           error: true,
-//           success: false,
-//         });
-//       }
-
-//       return response.status(200).json({
-//         message: "Image removed successfully.",
-//         success: true,
-//       });
-//     } else {
-//       return response.status(400).json({
-//         message: "Invalid image name.",
-//         error: true,
-//         success: false,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Error removing image:", error.message || error);
-//     return response.status(500).json({
-//       message: error.message || "An error occurred while removing the image.",
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
-
 export async function removeCategoryImageFromCloudinary(request, response) {
   try {
     const imgUrl = request.query.img;
@@ -357,7 +394,6 @@ export async function removeCategoryImageFromCloudinary(request, response) {
     });
   }
 }
-
 
 // delete category
 export async function deleteCategory(request, response) {

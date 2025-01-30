@@ -1,86 +1,324 @@
-import { Button, MenuItem, Select } from '@mui/material';
-import React, { useRef, useState } from 'react';
+
+/*
+
+import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
+import React, { useContext, useRef, useState } from 'react';
 import { FaCloudUploadAlt } from 'react-icons/fa';
+import { MyContext } from '../../App';
+import toast from 'react-hot-toast';
+import { postData } from '../../utils/api';
+import { IoIosSave } from 'react-icons/io';
+import { RiResetLeftFill } from 'react-icons/ri';
 
 const AddSubCategory = () => {
-  const formRef = useRef(null);
-  const [subCategory, setSubCategory] = useState('');
 
-  const handleChangeSubCategory = (event) => {
-    setSubCategory(event.target.value);
+  const context = useContext(MyContext);
+
+  const nameInputRef = useRef(null);
+  const nameInputRef2 = useRef(null);
+  const categorySelectRef = useRef(null);
+  const categorySelectRef2 = useRef(null);
+
+  const [productCategory, setProductCategory] = useState('');
+  const [productCategory2, setProductCategory2] = useState('');
+  const [isLoadingReset1, setIsLoadingReset1] = useState(false);
+  const [isLoadingReset2, setIsLoadingReset2] = useState(false);
+  const [isLoadingSave1, setIsLoadingSave1] = useState(false);
+  const [isLoadingSave2, setIsLoadingSave2] = useState(false);
+
+
+
+  const [formFields, setFormFields] = useState({
+    name: '',
+    parentCategoryName: null,
+    parentCategoryId: null,
+  });
+
+  const [formFields2, setFormFields2] = useState({
+    name: '',
+    parentCategoryName: null,
+    parentCategoryId: null,
+  });
+
+
+
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields((formFields) => ({
+      ...formFields,
+      [name]: value,
+    }));
+  };
+
+  const onChangeInput2 = (e) => {
+    const { name, value } = e.target;
+    setFormFields2((formFields2) => ({
+      ...formFields2,
+      [name]: value,
+    }));
   };
 
 
-  const handleFormSubmit = (e) => {
+
+  const selectedCatFun = (categoryId, categoryName) => {
+    console.log(categoryName);
+    console.log(categoryId);
+
+    // Avoid direct mutation and ensure the update is conditional
+    setFormFields((prevFormFields) => {
+      // Only update if there's a change to avoid unnecessary re-renders
+      if (prevFormFields.parentCategoryId !== categoryId || prevFormFields.parentCategoryName !== categoryName) {
+        return {
+          ...prevFormFields,
+          parentCategoryName: categoryName,
+          parentCategoryId: categoryId,
+        };
+      }
+      return prevFormFields;
+    });
+  };
+
+  const selectedCatFun2 = (categoryId2, categoryName2) => {
+    console.log(categoryName2);
+    console.log(categoryId2);
+
+    // Avoid direct mutation and ensure the update is conditional
+    setFormFields2((prevFormFields2) => {
+      // Only update if there's a change to avoid unnecessary re-renders
+      if (prevFormFields2.parentCategoryId !== categoryId2 || prevFormFields2.parentCategoryName !== categoryName2) {
+        return {
+          ...prevFormFields2,
+          parentCategoryName: categoryName2,
+          parentCategoryId: categoryId2,
+        };
+      }
+      return prevFormFields2;
+    });
+  };
+
+
+
+  const handleChangeProductCategory = (event) => {
+    const value = event.target.value;
+
+    // Update both parentCategoryId and productCategory in state
+    setFormFields((prevFormFields) => ({
+      ...prevFormFields,
+      parentCategoryId: value,
+    }));
+
+    // Optionally, update the productCategory state if needed
+    setProductCategory(value);
+  };
+
+  const handleChangeProductCategory2 = (event) => {
+    const value = event.target.value;
+
+    // Update both parentCategoryId and productCategory in state
+    setFormFields2((prevFormFields2) => ({
+      ...prevFormFields2,
+      parentCategoryId: value,
+    }));
+
+    // Optionally, update the productCategory state if needed
+    setProductCategory2(value);
+  };
+
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // Handle your form submission logic here
 
-    // Optionally handle the submission here (e.g., make API calls)
+    if (formFields.name === "") {
+      context.openAlertBox("error", "Please enter sub-category name.");
+      nameInputRef.current?.focus();
+      return;
+    }
 
-    // Reset form state and uploaded file after successful submission
-    formRef.current.reset(); // Reset the form elements\
-    setSubCategory('');
+    if (productCategory === '') {
+      context.openAlertBox("error", "Please select product category");
+      categorySelectRef.current?.focus();
+      return;
+    }
+
+    setIsLoadingSave1(true);
+    // Start a toast.promise for handling loading, success, and error states
+    try {
+      const result = await toast.promise(
+        postData(`/api/category/create-category`, formFields), {
+        loading: "Adding sub-category... Please wait.",
+        success: (res) => {
+          if (res?.success) {
+            context?.forceUpdate();
+            handleDiscard();
+            return res.message || "Sub-Category added successfully!";
+          } else {
+            throw new Error(res?.message || "An unexpected error occurred.");
+          }
+        },
+        error: (err) => {
+          // Check if err.response exists, else fallback to err.message
+          const errorMessage = err?.response?.data?.message || err.message || "Failed to add sub-category. Please try again.";
+          return errorMessage;
+        },
+      }
+      );
+      console.log("Result:", result);
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error(err?.message || "An unexpected error occurred.");
+    } finally {
+      // setTimeout(() => {
+      setIsLoadingSave1(false);
+      //   context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
+      // }, 500);
+    }
   };
+
 
   const handleDiscard = () => {
-    setSubCategory('');
-    // Reset the form elements and uploaded file
-    console.log("Discard action, file cleared.");
-    formRef.current.reset();
+    setProductCategory('');
+    setFormFields({
+      name: '',
+      parentCategoryName: null,
+      parentCategoryId: null,
+    });
   };
+
+
+
 
   return (
     <div>
       <section className='p-8'>
         <form
           action="#"
-          ref={formRef}
           onSubmit={handleFormSubmit}
           className='form py-3'>
-          <h3 className='text-[24px] font-bold mb-2'>Create New SubCategory</h3>
+          <h3 className='text-[24px] font-bold mb-2'>Create New Sub-Category</h3>
 
-          <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
-          <div className="grid grid-cols-2 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+          <h3 className='text-[18px] font-bold mb-2'>Basic Information(2<sup>nd</sup> Level Sub-Category)</h3>
+          <div className="grid grid-cols-2 gap-4 relative border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
             <div className='col'>
-              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Category</h3>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Parent Category</h3>
               <Select
                 labelId="productCategoryDropDownLabel"
                 id="productCategoryDropDown"
                 size="small"
-                value={subCategory}
-                onChange={handleChangeSubCategory}
+                value={productCategory}
+                onChange={handleChangeProductCategory}
                 className="w-full !text-[14px]"
                 displayEmpty
+                inputRef={categorySelectRef}
                 inputProps={{ 'aria-label': 'Without label' }}
               >
                 <MenuItem value="" disabled>
-                  Select product category
+                  Select parent category
                 </MenuItem>
-                <MenuItem value={10}>Fashion</MenuItem>
-                <MenuItem value={20}>Beauty</MenuItem>
-                <MenuItem value={30}>Wellness</MenuItem>
+                {
+                  context?.catData?.length > 0 && context?.catData?.map((item, index) => (
+                    <MenuItem
+                      key={index}
+                      value={item?._id}
+                      onClick={() => selectedCatFun(item?._id, item?.name)} // Pass the function reference
+                    >
+                      {item?.name}
+                    </MenuItem>
+                  ))
+                }
               </Select>
+
             </div>
             <div className='col'>
-              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>SubCategory Name</h3>
-              <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='SubCategory title' />
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>2<sup>nd</sup> Level Sub-Category Name</h3>
+              <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='SubCategory title' name="name" value={formFields.name} onChange={onChangeInput} ref={nameInputRef} />
             </div>
-          </div>
+            <div className='col col-span-full flex items-center justify-center gap-5'>
+              <Button
+                type="reset"
+                onClick={handleDiscard}
+                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
+              >
+                {
+                  isLoadingReset1 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
+                }
+              </Button>
 
-          <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
-            <Button
-              type="reset"
-              onClick={handleDiscard}
-              className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
-            >
-              <FaCloudUploadAlt className='text-[20px]' />Discard
-            </Button>
-            <Button
-              type="submit"
-              className='custom-btn w-[150px] h-[40px] flex items-center justify-center gap-2'
-            >
-              <FaCloudUploadAlt className='text-[20px]' />Create
-            </Button>
+              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
+                {
+                  isLoadingSave1 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                }
+              </Button>
+            </div>
+
+          </div>
+        </form>
+
+
+
+        <form
+          action="#"
+          onSubmit={handleFormSubmit}
+          className='form py-3'>
+          <h3 className='text-[24px] font-bold mb-2'>Create New Third-Sub-Category</h3>
+
+          <h3 className='text-[18px] font-bold mb-2'>Basic Information(3<sup>rd</sup> Level Sub-Category)</h3>
+          <div className="grid grid-cols-2 gap-4 relative border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+            <div className='col'>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Parent Category(2<sup>nd</sup> Level Sub-Category)</h3>
+              <Select
+                labelId="productCategoryDropDownLabel2"
+                id="productCategoryDropDown2"
+                size="small"
+                value={productCategory2}
+                onChange={handleChangeProductCategory2}
+                className="w-full !text-[14px]"
+                displayEmpty
+                inputRef={categorySelectRef2}
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                <MenuItem value="" className='!text-gray-400'>
+                  Select parent category (2<sup>nd</sup>&nbsp;Level)
+                </MenuItem>
+                {
+                  context?.catData?.length > 0 && context?.catData?.map((item, index) => (
+                    item?.children?.length !== 0 && item?.children?.map((item2, index) => {
+                      return (
+                        <MenuItem
+                          key={index}
+                          value={item2?._id}
+                          onClick={() => selectedCatFun2(item2?._id, item2?.name)} // Pass the function reference
+                        >
+                          {item2?.name}
+                        </MenuItem>
+                      )
+                    })
+                  ))
+                }
+              </Select>
+
+            </div>
+            <div className='col'>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>3<sup>rd</sup> Level Sub-Category Name</h3>
+              <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='SubCategory title' name="name" value={formFields2.name} onChange={onChangeInput2} ref={nameInputRef2} />
+            </div>
+            <div className='col col-span-full flex items-center justify-center gap-5'>
+              <Button
+                type="reset"
+                onClick={handleDiscard}
+                className={`${isLoadingReset2 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset2}
+              >
+                {
+                  isLoadingReset2 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
+                }
+              </Button>
+
+              <Button type='submit' className={`${isLoadingSave2 === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave2}>
+                {
+                  isLoadingSave2 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                }
+              </Button>
+            </div>
+
           </div>
         </form>
       </section>
@@ -89,3 +327,290 @@ const AddSubCategory = () => {
 };
 
 export default AddSubCategory;
+
+*/
+
+
+// -------------------------------------------------------------------------------------------------------------------
+
+
+import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
+import React, { useContext, useRef, useState } from 'react';
+import { MyContext } from '../../App';
+import toast from 'react-hot-toast';
+import { postData } from '../../utils/api';
+import { IoIosSave } from 'react-icons/io';
+import { RiResetLeftFill } from 'react-icons/ri';
+import { GrPowerReset } from "react-icons/gr";
+
+const AddSubCategory = () => {
+
+  const context = useContext(MyContext);
+
+  const nameInputRef = useRef(null);
+  const categorySelectRef = useRef(null);
+  const categorySelectRef2 = useRef(null);
+
+  const [productCategory, setProductCategory] = useState('');
+  const [productCategory2, setProductCategory2] = useState('');
+  const [isLoadingReset1, setIsLoadingReset1] = useState(false);
+  const [isLoadingSave1, setIsLoadingSave1] = useState(false);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+
+
+
+  const [formFields, setFormFields] = useState({
+    name: '',
+    parentCategoryName: null,
+    parentCategoryId: null,
+  });
+
+
+
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields((formFields) => ({
+      ...formFields,
+      [name]: value,
+    }));
+  };
+
+
+
+  const selectedCatFun = (categoryId, categoryName) => {
+    setFormFields({
+      ...formFields,
+      parentCategoryName: categoryName,
+      parentCategoryId: categoryId,
+    });
+    setProductCategory(categoryId);
+    setProductCategory2(""); // Reset second dropdown when first changes
+    const selectedCategory = context?.catData?.find(cat => cat._id === categoryId);
+    setFilteredCategories(selectedCategory?.children || []);
+  };
+
+  const selectedCatFun2 = (categoryId2, categoryName2) => {
+    setFormFields({
+      ...formFields,
+      parentCategoryName: categoryName2,
+      parentCategoryId: categoryId2,
+    });
+    setProductCategory2(categoryId2);
+  };
+
+
+  const handleChangeProductCategory = (event) => {
+    const selectedCategoryId = event.target.value;
+    setProductCategory(selectedCategoryId);
+    setProductCategory2(""); // Reset second dropdown when first changes
+
+    // Find selected category's children
+    const selectedCategory = context?.catData?.find(
+      (cat) => cat._id === selectedCategoryId
+    );
+    setFilteredCategories(selectedCategory?.children || []);
+  };
+
+  const handleChangeProductCategory2 = (event) => {
+    setProductCategory2(event.target.value);
+  };
+
+
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formFields.name === "") {
+      context.openAlertBox("error", "Please enter sub-category name.");
+      nameInputRef.current?.focus();
+      return;
+    }
+
+    if (!productCategory) {
+      context.openAlertBox("error", "Please select a parent category.");
+      categorySelectRef.current?.focus();
+      return;
+    }
+
+    // If second-level category is selected, use it as parent, otherwise use first-level
+    const parentCategoryId = productCategory2 || productCategory;
+    const parentCategoryName = context?.catData
+      ?.flatMap(cat => [cat, ...(cat.children || [])])
+      .find(cat => cat._id === parentCategoryId)?.name || null;
+
+    const submissionData = {
+      name: formFields.name,
+      parentCategoryId,
+      parentCategoryName,
+    };
+
+    setIsLoadingSave1(true);
+
+    try {
+      const result = await toast.promise(
+        postData(`/api/category/create-category`, submissionData),
+        {
+          loading: "Adding sub-category... Please wait.",
+          success: (res) => {
+            if (res?.success) {
+              context?.forceUpdate();
+              handleDiscard();
+              return res.message || "Sub-Category added successfully!";
+            } else {
+              throw new Error(res?.message || "An unexpected error occurred.");
+            }
+          },
+          error: (err) => {
+            return err?.response?.data?.message || "Failed to add sub-category.";
+          },
+        }
+      );
+      console.log("Result:", result);
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error(err?.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoadingSave1(false);
+    }
+  };
+
+
+
+  const handleDiscard = () => {
+    setProductCategory('');
+    setProductCategory2('');
+    setFilteredCategories([]);
+    setFormFields({
+      name: '',
+      parentCategoryName: null,
+      parentCategoryId: null,
+    });
+  };
+
+  const handleResetCategory2 = () => {
+    setProductCategory2(""); // Reset second dropdown
+    setFilteredCategories([]); // Optionally reset the filtered categories
+  };
+
+
+
+
+
+  return (
+    <div>
+      <section className='p-8'>
+        <form
+          action="#"
+          onSubmit={handleFormSubmit}
+          className='form py-3'>
+          <h3 className='text-[24px] font-bold mb-2'>Create New Sub-Category</h3>
+
+          <div className="flex flex-row items-center gap-5 mb-2">
+            <h3 className='text-[18px] font-bold'>Basic Information(Sub-Category)</h3>
+            <span className='text-gray-400'><b>Note: </b>Categories Levels (Parent Level / 2<sup>nd</sup> Level / 3<sup>rd</sup> Level)</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+            <div className='col col-span-full'>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Sub-Category Name</h3>
+
+              <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='SubCategory title' name="name" value={formFields.name} onChange={onChangeInput} ref={nameInputRef} />
+
+            </div>
+
+
+            <div className='col'>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Parent Category</h3>
+
+              <Select
+                labelId="productCategoryDropDownLabel"
+                id="productCategoryDropDown"
+                size="small"
+                value={productCategory}
+                onChange={handleChangeProductCategory}
+                className="w-full !text-[14px]"
+                displayEmpty
+                inputRef={categorySelectRef}
+                inputProps={{ 'aria-label': 'Without label' }}
+              >
+                <MenuItem value="" disabled>
+                  Select parent category
+                </MenuItem>
+                {
+                  context?.catData?.map((item) => (
+                    <MenuItem key={item._id} value={item._id} onClick={selectedCatFun}>
+                      {item.name}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+
+            </div>
+
+            <div className='col'>
+              <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Parent Category(2<sup>nd</sup> Level Sub-Category)</h3>
+
+              <div className='flex gap-2'>
+
+                <Select
+                  labelId="productCategoryDropDownLabel2"
+                  id="productCategoryDropDown2"
+                  size="small"
+                  value={productCategory2}
+                  onChange={handleChangeProductCategory2} // Update second dropdown value
+                  className="w-full !text-[14px]"
+                  displayEmpty
+                  inputRef={categorySelectRef2}
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+
+                  <MenuItem value="" disabled>
+                    Select parent category (2<sup>nd</sup>&nbsp;Level)
+                  </MenuItem>
+
+                  {filteredCategories.map((item2) => (
+                    <MenuItem key={item2._id} value={item2._id} onClick={() => selectedCatFun2(item2._id, item2.name)}>
+                      {item2.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+                <Button
+                  className='!bg-gray-400 !text-white !text-[18px] !w-[20px] !min-w-[40px]'
+                  onClick={handleResetCategory2} // Reset button handler
+                >
+                  <GrPowerReset />
+                </Button>
+              </div>
+            </div>
+
+            <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+              <Button
+                type="reset"
+                onClick={handleDiscard}
+                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
+              >
+                {
+                  isLoadingReset1 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
+                }
+              </Button>
+
+              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
+                {
+                  isLoadingSave1 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                }
+              </Button>
+            </div>
+          </div>
+        </form>
+
+      </section>
+    </div>
+  );
+};
+
+export default AddSubCategory;
+
+
+
+
+

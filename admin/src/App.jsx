@@ -278,6 +278,7 @@ function App() {
       setIsLogin(false);
     }
   }, [isLogin]);
+  
 
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
@@ -365,7 +366,7 @@ function App() {
 
             {isOpenFullScreenPanel?.model === "Category Details" && <AddCategory />}
 
-            {isOpenFullScreenPanel?.model === "Add New SubCategory" && <AddSubCategory />}
+            {isOpenFullScreenPanel?.model === "Sub-Category Details" && <AddSubCategory />}
 
             {isOpenFullScreenPanel?.model === "Address Details" && <AddAddress />}
 

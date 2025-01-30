@@ -1,173 +1,108 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Badge, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
-import { GoPlus } from 'react-icons/go'
-import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
-import { Link } from 'react-router-dom'
-import { MdOutlineEdit } from 'react-icons/md'
-import { IoCloseOutline, IoEyeOutline } from 'react-icons/io5'
-import { styled } from '@mui/material/styles';
-import Chip from '@mui/material/Chip';
-import Paper from '@mui/material/Paper';
-import { MyContext } from '../../App'
+import { Button } from '@mui/material'
+import React, { useContext, useState } from 'react'
+import { MyContext } from '../../App';
+import { GoPlus } from 'react-icons/go';
+import EditSubCategoryBox from './editSubCategoryBox';
+import { IoChevronDownOutline } from 'react-icons/io5';
+import { Collapse } from 'react-collapse';
 
-
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
-const columns = [
-    { id: 'image', label: 'CATEGORY IMAGE', minWidth: 250, align: 'left' },
-    { id: 'categoryName', label: 'CATEGORY NAME', minWidth: 250, align: 'left' },
-    { id: 'subCategoryName', label: 'SUB CATEGORY NAME', minWidth: 400, align: 'left' },
-    { id: 'action', label: 'Action', minWidth: 100, align: 'left' },
-];
-
-const ListItem = styled('li')(({ theme }) => ({
-    margin: theme.spacing(0.5),
-}));
 
 const SubCategoryList = () => {
 
     const context = useContext(MyContext);
+    const [isOpen, setIsOpen] = useState(0);
 
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [chipData, setChipData] = useState([]);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
+    const expend = (index) => {
+        setIsOpen((prev) => (prev === index ? null : index));
     };
 
 
-    // Simulate fetching data using mock data
-    useEffect(() => {
-        const fetchData = () => {
-            // Mock data (Replace with your real data later)
-            const mockData = [
-                { key: 0, label: 'React' },
-                { key: 1, label: 'JavaScript' },
-                { key: 2, label: 'CSS' },
-                { key: 3, label: 'HTML' },
-                { key: 4, label: 'HTML' },
-            ];
-
-            // Set the mock data to chipData state
-            setChipData(mockData);
-        };
-
-        fetchData(); // Call the simulated fetch function
-    }, []); // Empty dependency array means this will run once when the component mounts
-
-    // Handle the delete action
-    const handleDelete = (data) => () => {
-        setChipData((prevChipData) => prevChipData.filter((item) => item.key !== data.key));
-    };
 
     return (
         <>
             <div className='flex items-center justify-between px-5 pt-3'>
                 <h2 className='text-[20px] font-bold'>Sub Category List<span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[30%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Add New SubCategory' })}><GoPlus className='text-[20px]' />Add New SubCategory</Button>
+                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Sub-Category Details' })}><GoPlus className='text-[20px]' />Add Sub-Category</Button>
                 </div>
             </div>
 
-            <div className="card my-4 bg-white border rounded-md px-1 pt-1">
+            <div className='card my-4 pt-5 pb-5 px-5 shadow-md sm:rounded-lg bg-white'>
+                {
+                    context?.catData?.length !== 0 &&
+                    <ul className='w-full'>
+                        {
+                            context?.catData?.map((firstLevelCat, index) => {
+                                return (
 
-                <TableContainer className='max-h-[440px] customScroll'>
-                    <Table stickyHeader aria-label="sticky table">
-
-                        <TableHead>
-                            <TableRow>
-                                <TableCell className="px-6 py-2 text-left w-[60px]">
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-                                {columns.map((column) => (
-                                    <TableCell
-                                        width={column.minWidth}
-                                        key={column.id}
-                                        align={column.align}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-
-                                <TableCell width={100}>
-                                    <div className="flex items-start gap-4 w-[80px]">
-                                        <div className='img w-full h-auto overflow-hidden rounded-md shadow-md group'>
-                                            <Link to="/product/458457">
-                                                <img src="https://api.spicezgold.com/download/file_1734525239704_foot.png" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </TableCell>
-
-                                <TableCell>
-                                    <span className='inline-block rounded-md px-2 bg-slate-100 text-[14px] p-1'>Men</span>
-                                </TableCell>
-
-                                <TableCell>
-                                    <span className='flex flex-wrap'>
-                                        {chipData.map((data) => {
-                                            let icon;
-                                            // You can define your icon based on data or other conditions
-                                            return (
-                                                <ListItem key={data.key} className='list-none'>
-                                                    <Chip
-                                                        icon={icon}
-                                                        label={data.label}
-                                                        onDelete={handleDelete(data)}
-                                                        className={`!bg-[var(--bg-primary)] !text-white`}
+                                    <li className='w-full mb-1' key={index}>
+                                        <div className={`flex items-center w-full p-2 rounded-sm px-4 cursor-pointer ${isOpen === index ? "bg-blue-50" : "bg-[#f1f1f1]"}`} onClick={(e) => { e.stopPropagation(); expend(index); }}>
+                                            <span className='font-semibold flex items-center gap-4 text-[14px]'>
+                                                {firstLevelCat?.name}
+                                            </span>
+                                            <Button className='!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !bg-gray-50 !text-black !ml-auto' onClick={(e) => { e.stopPropagation(); expend(index); }}>
+                                                {
+                                                    <IoChevronDownOutline className={`text-[20px] transform transition-transform duration-300 ${isOpen === index ? "-rotate-180" : "rotate-0"}`}
                                                     />
-                                                </ListItem>
-                                            );
-                                        })}
-                                    </span>
-                                </TableCell>
-
-                                <TableCell width={100}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                                                }
+                                            </Button>
+                                        </div>
 
 
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-
-                <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
-                    component="div"
-                    count={10}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-
+                                        {
+                                            firstLevelCat?.children?.length !== 0 &&
+                                            <Collapse isOpened={isOpen === index}>
+                                                <ul className='w-full'>
+                                                    {
+                                                        firstLevelCat?.children?.map((subCat, index_) => {
+                                                            console.log('Sub Category Object:', subCat);  // Log the entire object
+                                                            console.log('Sub Category ID:', subCat?._id);   // Log the id
+                                                            return (
+                                                                <li className='w-full py-1' key={index_}>
+                                                                    <EditSubCategoryBox
+                                                                        name={subCat?.name}
+                                                                        id={subCat?._id}
+                                                                        catData={context?.catData}
+                                                                        index={index_}
+                                                                        selectedCat={subCat?.parentCategoryId}
+                                                                        selectedCatName={subCat?.parentCategoryName}
+                                                                    />
+                                                                    {subCat?.children?.length !== 0 &&
+                                                                        <ul className='pl-4'>
+                                                                            {
+                                                                                subCat?.children?.map((thirdLevel, index__) => {
+                                                                                    console.log('Third Level Category Object:', thirdLevel);  // Log the entire thirdLevel object
+                                                                                    console.log('Third Level Category ID:', thirdLevel?._id);   // Log the id
+                                                                                    return (
+                                                                                        <li className='w-full py-1' key={index__}>
+                                                                                            <EditSubCategoryBox
+                                                                                                name={thirdLevel?.name}
+                                                                                                id={thirdLevel?._id}
+                                                                                                catData={firstLevelCat?.children}
+                                                                                                index={index__}
+                                                                                                selectedCat={thirdLevel?.parentCategoryId}
+                                                                                                selectedCatName={thirdLevel?.parentCategoryName}
+                                                                                            />
+                                                                                        </li>
+                                                                                    );
+                                                                                })
+                                                                            }
+                                                                        </ul>
+                                                                    }
+                                                                </li>
+                                                            );
+                                                        })
+                                                    }
+                                                </ul>
+                                            </Collapse>
+                                        }
+                                    </li>
+                                )
+                            })
+                        }
+                    </ul>
+                }
             </div>
-
         </>
     )
 }
