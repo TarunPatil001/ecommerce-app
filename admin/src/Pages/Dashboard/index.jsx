@@ -180,7 +180,7 @@ const Dashboard = () => {
         <div className="info">
           <h1 className='text-[30px] font-bold leading-9 mb-2'>Good Morning, <br /> Cameron &#128075;</h1>
           <p className='text-[16px] mb-10'>Here’s What happening on your store today. See the statistics at once.</p>
-          <Button className='flex items-center gap-1 !capitalize !text-[14px] !font-medium !text-white !bg-[var(--text-active)] !p-2 !px-4' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Add Product'})}><FiPlus className='text-[18px]' />Add Product</Button>
+          <Button className='flex items-center gap-1 !capitalize !text-[14px] !font-medium !text-white !bg-[var(--text-active)] !p-2 !px-4' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Product Details'})}><FiPlus className='text-[18px]' />Add Product</Button>
         </div>
         <img src="/shop-illustration.webp" alt="image" className='w-[250px] object-cover' />
       </div>
@@ -213,7 +213,7 @@ const Dashboard = () => {
 
           <div className='col w-[50%] flex items-center justify-end gap-3'>
             <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-            <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Add Product'})}><GoPlus className='text-[20px]' />Add Product</Button>
+            <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Product Details'})}><GoPlus className='text-[20px]' />Add Product</Button>
           </div>
         </div>
 
@@ -577,7 +577,7 @@ const Dashboard = () => {
 
           <div className='col w-[50%] flex items-center justify-end gap-3'>
             <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-            <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Add Product'})}><GoPlus className='text-[20px]' />Add Product</Button>
+            <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Product Details'})}><GoPlus className='text-[20px]' />Add Product</Button>
           </div>
         </div>
 

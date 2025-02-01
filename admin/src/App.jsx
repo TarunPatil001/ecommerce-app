@@ -51,6 +51,7 @@ function App() {
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [categoryIdNo, setCategoryIdNo] = useState(null);
   const [catData, setCatData] = useState([]);
+  const [productIdNo, setProductIdNo] = useState(null);
 
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -329,6 +330,9 @@ function App() {
     catData,
     setCatData,
 
+    productIdNo,
+    setProductIdNo,
+
     isReducer,
     forceUpdate,
   };
@@ -360,7 +364,7 @@ function App() {
           </AppBar>
           <div className='mt-5 p-4'>
 
-            {isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />}
+            {isOpenFullScreenPanel?.model === "Product Details" && <AddProduct />}
 
             {isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />}
 

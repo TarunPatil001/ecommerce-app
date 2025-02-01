@@ -143,7 +143,7 @@ const Sidebar = () => {
                 </li>
                 <li className='w-full'>
                 
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add Product" })}>
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Product Details" })}>
                       <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
                       <span>Add Product</span>
                     </Button>

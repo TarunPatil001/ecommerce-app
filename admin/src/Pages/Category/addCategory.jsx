@@ -20,7 +20,6 @@ const AddCategory = () => {
 
   const context = useContext(MyContext);
   const formRef = useRef(null);
-  const [uploadedFile, setUploadedFile] = useState(null); // Use a single state to store the uploaded file
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
   // const [isLoading3, setIsLoading3] = useState(false);

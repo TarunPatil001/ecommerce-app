@@ -537,7 +537,7 @@ const AddSubCategory = () => {
                 </MenuItem>
                 {
                   context?.catData?.map((item) => (
-                    <MenuItem key={item._id} value={item._id} onClick={selectedCatFun}>
+                    <MenuItem key={item._id} value={item._id} onClick={() => selectedCatFun(item._id, item.name)}>
                       {item.name}
                     </MenuItem>
                   ))
