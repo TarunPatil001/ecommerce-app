@@ -17,17 +17,17 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
     { id: 'product', label: 'PRODUCT', minWidth: 150, align: 'left' },
-    { id: 'category', label: 'BROAD CATEGORY', minWidth: 150, align: 'left' },
+    { id: 'category', label: 'BROAD CATEGORY', minWidth: 200, align: 'left' },
     {
         id: 'subCategory',
         label: 'SUB CATEGORY',
-        minWidth: 150,
+        minWidth: 200,
         align: 'left'
     },
     {
         id: 'subCategory',
         label: 'SPECIFIC CATEGORY',
-        minWidth: 150,
+        minWidth: 200,
         align: 'left'
     },
     {
