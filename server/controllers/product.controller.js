@@ -57,6 +57,10 @@ cloudinary.config({
 // }
 
 
+
+// ? Final code
+
+
 var imagesArr = {}; // Store images per product ID, replace with database storage in production
 
 // Helper function to check if image exists in Cloudinary
@@ -136,6 +140,92 @@ export async function uploadProductImages(request, response) {
     });
   }
 }
+
+
+
+
+// var imagesArr = {}; // Store images per product ID
+
+// // Helper function to check if image exists in Cloudinary
+// async function checkImageExists(imageUrl) {
+//   try {
+//     const response = await axios.head(imageUrl); // HEAD request to check image existence
+//     return response.status === 200; // If status is 200, image exists
+//   } catch (error) {
+//     return false; // If request fails, image doesn't exist
+//   }
+// }
+
+// // Upload product images
+// export async function uploadProductImages(request, response) {
+//   try {
+//     const { productId } = request.body;
+//     const images = request.files;
+
+//     console.log("Received productId:", productId);
+
+//     if (!images || images.length === 0) {
+//       return response.status(400).json({ error: "No images provided" });
+//     }
+
+//     // Initialize imagesArr per product ID (replace with a database in production)
+//     if (!productId) {
+//       if (!imagesArr["new"]) imagesArr["new"] = new Set(); // Use Set to prevent duplicates
+//     } else {
+//       if (!imagesArr[productId]) imagesArr[productId] = new Set(); // Use Set for each product
+//     }
+
+//     // Upload images and update imagesArr after successful upload
+//     const uploadedImages = await Promise.all(
+//       images.map(async (file) => {
+//         try {
+//           const result = await cloudinary.uploader.upload(file.path, {
+//             folder: "ecommerceApp/uploads",
+//             use_filename: true,
+//             unique_filename: false,
+//             overwrite: false,
+//           });
+
+//           console.log("Uploaded image URL:", result.secure_url);
+
+//           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
+//           return result.secure_url; // Return uploaded image URL
+//         } catch (error) {
+//           console.log("Cloudinary upload error:", error);
+//           return null; // Return null in case of an error
+//         }
+//       })
+//     );
+
+//     // Filter out null values (failed uploads)
+//     const validImages = uploadedImages.filter(Boolean);
+
+//     // Add the valid images to the imagesArr (Set ensures no duplicates)
+//     if (productId) {
+//       validImages.forEach((url) => imagesArr[productId].add(url));
+//     } else {
+//       validImages.forEach((url) => imagesArr["new"].add(url));
+//     }
+
+//     // Convert Set to array for response
+//     const updatedImages = productId ? Array.from(imagesArr[productId]) : Array.from(imagesArr["new"]);
+
+//     // Debugging: Check imagesArr before returning response
+//     console.log("Updated imagesArr:", updatedImages);
+
+//     return response.status(200).json({
+//       images: updatedImages, // Send back the updated images array
+//     });
+
+//   } catch (error) {
+//     console.log("Server Error:", error);
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       status: false,
+//     });
+//   }
+// }
 
 
 
@@ -272,6 +362,105 @@ export async function uploadProductImages(request, response) {
 //   }
 // }
 
+// ? final code
+// export async function createProduct(request, response) {
+//   try {
+//     const {
+//       name,
+//       description,
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//     } = request.body;
+
+//     // Check if required fields are present
+//     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Missing required fields. Please provide all necessary product details.",
+//       });
+//     }
+
+//     // Ensure imagesArr is defined and contains images for the given productId or 'new'
+//     const imagesForProduct = request.body.productId
+//       ? imagesArr[request.body.productId]
+//       : imagesArr["new"];
+
+//     if (!imagesForProduct || imagesForProduct.length === 0) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Images array is missing or empty.",
+//       });
+//     }
+
+//     // Create new product object
+//     let product = new ProductModel({
+//       name,
+//       description,
+//       images: imagesForProduct,
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//     });
+
+//     // Save the product to the database
+//     product = await product.save();
+
+//     if (!product) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Product creation failed",
+//       });
+//     }
+
+//     // Clear images array after product creation
+//     imagesArr = {}; // Reset image array to avoid conflicts with subsequent uploads
+
+//     return response.status(200).json({
+//       message: "Product created successfully.",
+//       success: true,
+//       error: false,
+//       data: product,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || "Internal Server Error",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
 
 export async function createProduct(request, response) {
   try {
@@ -311,7 +500,7 @@ export async function createProduct(request, response) {
       ? imagesArr[request.body.productId]
       : imagesArr["new"];
 
-    if (!imagesForProduct || imagesForProduct.length === 0) {
+    if (!imagesForProduct || imagesForProduct.size === 0) {
       return response.status(400).json({
         error: true,
         success: false,
@@ -319,11 +508,14 @@ export async function createProduct(request, response) {
       });
     }
 
+    // Convert the Set to an array before saving it to the database
+    const imagesArray = Array.from(imagesForProduct);
+
     // Create new product object
     let product = new ProductModel({
       name,
       description,
-      images: imagesForProduct,
+      images: imagesArray, // Use the converted array of images
       brand,
       price,
       oldPrice,
@@ -354,8 +546,12 @@ export async function createProduct(request, response) {
       });
     }
 
-    // Clear images array after product creation
-    imagesArr = {}; // Reset image array to avoid conflicts with subsequent uploads
+    // Clear images array after product creation to avoid conflicts with subsequent uploads
+    if (request.body.productId) {
+      imagesArr[request.body.productId] = new Set(); // Reset the images for the specific product
+    } else {
+      imagesArr["new"] = new Set(); // Reset global "new" set
+    }
 
     return response.status(200).json({
       message: "Product created successfully.",
@@ -371,7 +567,6 @@ export async function createProduct(request, response) {
     });
   }
 }
-
 
 
 
@@ -1707,26 +1902,217 @@ export async function getProduct(request, response) {
 // }
 
 
+
+
+
+
+
+
+
+// works while update
 // Remove image from Cloudinary and update the database
+// export async function removeImageProductFromCloudinary(request, response) {
+//   try {
+//     const { imgUrl, productId } = request.query;  // Expecting both imgUrl and productId in query
+//     console.log("Request Query:", request.query);  // Log the incoming request query
+
+//     // Validate input
+//     if (!imgUrl || !productId) {
+//       return response.status(400).json({
+//         message: "Both imgUrl and productId are required",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log("img = ", imgUrl, "productId = ", productId); // Log the extracted values
+
+//     // Extract the public ID from the imgUrl
+//     const publicId = extractPublicId(imgUrl);
+
+//     if (!publicId) {
+//       return response.status(400).json({
+//         message: "Invalid image URL format",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log("Deleting image with public ID:", publicId);
+
+//     // Attempt to delete the image from Cloudinary
+//     const result = await cloudinary.uploader.destroy(publicId);
+
+//     if (result.result === "ok") {
+//       console.log("Image successfully deleted from Cloudinary:", imgUrl);
+
+//       // Image deleted from Cloudinary, now remove it from the product document in the database
+//       const product = await ProductModel.findById(productId);
+//       if (!product) {
+//         return response.status(404).json({
+//           message: "Product not found",
+//           success: false,
+//           error: true,
+//         });
+//       }
+
+//       console.log("Before update, product images in DB:", product.images);
+
+//       // Ensure only the image that matches the exact URL is removed
+//       const updatedImages = product.images.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
+
+//       // Check if the image exists in the database before updating
+//       if (updatedImages.length === product.images.length) {
+//         return response.status(404).json({
+//           message: "Image not found in the product database",
+//           success: false,
+//           error: true,
+//         });
+//       }
+
+//       console.log("After update, product images in DB:", updatedImages);
+
+//       // Update the product in the database
+//       product.images = updatedImages;
+//       await product.save();
+
+//       // Also update the imagesArr in-memory (or your state management) to reflect the changes
+//       if (imagesArr[productId]) {
+//         imagesArr[productId] = imagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
+//       }
+
+//       return response.status(200).json({
+//         message: "Image removed successfully from Cloudinary and database",
+//         success: true,
+//         error: false,
+//       });
+//     }
+
+//     // If the Cloudinary deletion result is not 'ok'
+//     return response.status(404).json({
+//       message: "Image not found in Cloudinary",
+//       success: false,
+//       error: true,
+//     });
+//   } catch (error) {
+//     console.error("Error in removeImageFromCloudinary:", error);
+
+//     return response.status(500).json({
+//       message: "Failed to remove image",
+//       success: false,
+//       error: true,
+//     });
+//   }
+// }
+
+
+// works while creating new product
+// Remove image from product or global state
+// export async function removeImageProductFromCloudinary(request, response) {
+//   try {
+//     const { imgUrl, productId } = request.query;
+
+//     // Validate input
+//     if (!imgUrl) {
+//       return response.status(400).json({ error: "Image URL is required" });
+//     }
+
+//     // Check if productId is provided
+//     if (productId) {
+//       // Ensure imagesArr[productId] is initialized before trying to remove the image
+//       if (imagesArr[productId] && imagesArr[productId].length > 0) {
+//         const index = imagesArr[productId].indexOf(imgUrl);
+//         if (index > -1) {
+//           imagesArr[productId].splice(index, 1); // Remove the image URL from the product-specific array
+//           console.log(`Image removed from product ${productId}`);
+//         } else {
+//           return response.status(404).json({ error: "Image URL not found in product images" });
+//         }
+//       } else {
+//         return response.status(404).json({ error: "Product not found or no images to remove" });
+//       }
+//     } else {
+//       // If no productId is provided, remove from global "new" set
+//       if (imagesArr["new"] && imagesArr["new"].includes(imgUrl)) {
+//         const index = imagesArr["new"].indexOf(imgUrl);
+//         imagesArr["new"].splice(index, 1); // Remove the image URL from the global array
+//         console.log("Image removed from global set");
+//       } else {
+//         return response.status(404).json({ error: "Image URL not found in global images" });
+//       }
+//     }
+
+//     // Handle Cloudinary removal
+//     const publicId = extractPublicId(imgUrl);
+//     if (publicId) {
+//       const result = await cloudinary.uploader.destroy(publicId);
+//       if (result.result === "ok") {
+//         console.log("Image successfully deleted from Cloudinary.");
+//       } else {
+//         return response.status(404).json({ error: "Image not found in Cloudinary" });
+//       }
+//     }
+
+//     return response.status(200).json({
+//       message: "Image removed successfully",
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.log("Error in removeImageProduct:", error);
+//     return response.status(500).json({ message: "Server error", success: false });
+//   }
+// }
+
+
+// Combined logic for both creating a new product and updating an existing product
 export async function removeImageProductFromCloudinary(request, response) {
   try {
     const { imgUrl, productId } = request.query;  // Expecting both imgUrl and productId in query
     console.log("Request Query:", request.query);  // Log the incoming request query
 
     // Validate input
-    if (!imgUrl || !productId) {
-      return response.status(400).json({
-        message: "Both imgUrl and productId are required",
-        success: false,
-        error: true,
-      });
+    if (!imgUrl) {
+      return response.status(400).json({ error: "Image URL is required" });
     }
 
-    console.log("img = ", imgUrl, "productId = ", productId); // Log the extracted values
+    // Handle image removal logic for both new and existing products
+    if (productId) {
+      // If productId is provided, handle for editing an existing product
+      const product = await ProductModel.findById(productId);
 
-    // Extract the public ID from the imgUrl
+      if (!product) {
+        return response.status(404).json({ error: "Product not found" });
+      }
+
+      // Remove the image from the product's image array
+      const updatedImages = product.images.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
+      if (updatedImages.length === product.images.length) {
+        return response.status(404).json({ error: "Image not found in product images" });
+      }
+
+      // Update the product in the database
+      product.images = updatedImages;
+      await product.save();
+
+      // Also update the imagesArr in-memory (or your state management) to reflect the changes
+      if (imagesArr[productId]) {
+        imagesArr[productId] = imagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
+      }
+
+      console.log("Image removed from product", productId);
+    } else {
+      // If no productId is provided, handle as new product
+      if (imagesArr["new"] && imagesArr["new"].includes(imgUrl)) {
+        const index = imagesArr["new"].indexOf(imgUrl);
+        imagesArr["new"].splice(index, 1);  // Remove from the global new set
+        console.log("Image removed from global set");
+      } else {
+        return response.status(404).json({ error: "Image URL not found in global images" });
+      }
+    }
+
+    // Extract the public ID from the imgUrl for Cloudinary deletion
     const publicId = extractPublicId(imgUrl);
-
     if (!publicId) {
       return response.status(400).json({
         message: "Invalid image URL format",
@@ -1742,46 +2128,9 @@ export async function removeImageProductFromCloudinary(request, response) {
 
     if (result.result === "ok") {
       console.log("Image successfully deleted from Cloudinary:", imgUrl);
-
-      // Image deleted from Cloudinary, now remove it from the product document in the database
-      const product = await ProductModel.findById(productId);
-      if (!product) {
-        return response.status(404).json({
-          message: "Product not found",
-          success: false,
-          error: true,
-        });
-      }
-
-      console.log("Before update, product images in DB:", product.images);
-
-      // Ensure only the image that matches the exact URL is removed
-      const updatedImages = product.images.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
-
-      // Check if the image exists in the database before updating
-      if (updatedImages.length === product.images.length) {
-        return response.status(404).json({
-          message: "Image not found in the product database",
-          success: false,
-          error: true,
-        });
-      }
-
-      console.log("After update, product images in DB:", updatedImages);
-
-      // Update the product in the database
-      product.images = updatedImages;
-      await product.save();
-
-      // Also update the imagesArr in-memory (or your state management) to reflect the changes
-      if (imagesArr[productId]) {
-        imagesArr[productId] = imagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
-      }
-
       return response.status(200).json({
-        message: "Image removed successfully from Cloudinary and database",
+        message: "Image removed successfully from Cloudinary and product",
         success: true,
-        error: false,
       });
     }
 
@@ -1792,8 +2141,7 @@ export async function removeImageProductFromCloudinary(request, response) {
       error: true,
     });
   } catch (error) {
-    console.error("Error in removeImageFromCloudinary:", error);
-
+    console.error("Error in removeImageProduct:", error);
     return response.status(500).json({
       message: "Failed to remove image",
       success: false,
@@ -1801,6 +2149,8 @@ export async function removeImageProductFromCloudinary(request, response) {
     });
   }
 }
+
+
 
 
 
