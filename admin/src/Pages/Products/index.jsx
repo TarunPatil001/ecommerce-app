@@ -1,10 +1,10 @@
-import { Button, Checkbox, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
+import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
 import { Link, useParams } from 'react-router-dom'
 import ProgressBar from '../../Components/ProgressBar'
-import { MdOutlineEdit } from 'react-icons/md'
+import { MdOutlineEdit, MdOutlineFilterListOff } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import SearchBox from '../../Components/SearchBox'
 import { MyContext } from '../../App'
@@ -17,57 +17,136 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
     { id: 'product', label: 'PRODUCT', minWidth: 150, align: 'left' },
-    { id: 'category', label: 'BROAD CATEGORY', minWidth: 200, align: 'left' },
+    { id: 'category', label: 'BROAD CATEGORY', minWidth: 170, align: 'left' },
     {
         id: 'subCategory',
         label: 'SUB CATEGORY',
-        minWidth: 200,
+        minWidth: 150,
         align: 'left'
     },
     {
         id: 'subCategory',
         label: 'SPECIFIC CATEGORY',
-        minWidth: 200,
+        minWidth: 180,
         align: 'left'
     },
     {
         id: 'price',
         label: 'PRICE',
         minWidth: 160,
-        align: 'center',
+        align: 'left',
         format: (value) => `$${value.toFixed(2)}`,
     },
     { id: 'sales', label: 'SALES', minWidth: 130, align: 'center' },
     { id: 'action', label: 'ACTION', minWidth: 130, align: 'center' },
 ];
 
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: "auto",
+        },
+    },
+};
+
+
+
 const Products = () => {
 
     const context = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(false);
-    const [productData, setProductData] = useState([]);
     const [categoryFilterValue, setCategoryFilterValue] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    // const [refreshData, setRefreshData] = useState(false); 
 
-    const { id } = useParams();
+    const [productData, setProductData] = useState([]);
+    // State to manage the selected categories for each level
+    const [productCategory, setProductCategory] = useState([]);
+    const [productCategory2, setProductCategory2] = useState([]);
+    const [productCategory3, setProductCategory3] = useState([]);
 
+    // Fetch product data when categories change
+    const fetchProducts = async () => {
+        try {
+            // Construct query parameters dynamically
+            const queryParams = new URLSearchParams();
+
+            // Append category, subcategory, and thirdSubCategory filters if they exist
+            if (productCategory.length > 0) {
+                queryParams.append("categoryIds", productCategory.join(","));
+            }
+            if (productCategory2.length > 0) {
+                queryParams.append("subCategoryIds", productCategory2.join(","));
+            }
+            if (productCategory3.length > 0) {
+                queryParams.append("thirdSubCategoryIds", productCategory3.join(","));
+            }
+
+            // Edge case: No categories selected, fetch all products
+            let query = "/api/product/get-all-products";
+
+            // Apply filters only when any category type is selected
+            if (queryParams.toString().length > 0) {
+                query = `/api/product/get-all-filtered-products?${queryParams.toString()}`;
+            }
+
+            // Append pagination and other filtering parameters
+            queryParams.append("page", page);
+            queryParams.append("perPage", rowsPerPage);
+            if (categoryFilterValue) {
+                queryParams.append("categoryFilter", categoryFilterValue);
+            }
+
+            // Fetch filtered data
+            const res = await fetchDataFromApi(query);
+            setProductData(res?.data || []);
+        } catch (error) {
+            console.error("Error fetching product data:", error);
+        }
+    };
 
     useEffect(() => {
-        getAllProduct();
-    }, [context?.isReducer])
-    
+        fetchProducts();
+    }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue]);
 
-    const getAllProduct = () => {
-        fetchDataFromApi("/api/product/get-all-products").then((res) => {
-            console.log(res);
-            if (res.error === false) {
-                setProductData(res?.data);
-            } else {
-                console.log(res.error);
-            }
-        })
-    }
+
+    // Handle changes for each category level
+    const handleChangeProductCategory = (event) => {
+        setProductCategory(event.target.value); // Update selected category
+    };
+
+    const handleChangeProductCategory2 = (event) => {
+        setProductCategory2(event.target.value); // Update selected subcategory 2
+    };
+
+    const handleChangeProductCategory3 = (event) => {
+        setProductCategory3(event.target.value); // Update selected subcategory 3
+    };
+
+
+    // Reset filters function
+    const resetFilters = () => {
+        setProductCategory([]);   // Clear category filter
+        setProductCategory2([]);  // Clear subcategory filter
+        setProductCategory3([]);  // Clear third subcategory filter
+        setCategoryFilterValue(""); // Clear any additional filter value
+    };
+
+
+
+
+
+
+
+
+
+
+
 
 
     const handleChangeCategoryFilterValue = (event) => {
@@ -92,7 +171,6 @@ const Products = () => {
         page > 0
             ? Math.max(0, (1 + page) * rowsPerPage - filteredProductData.length)
             : 0;
-
 
 
     const handleEditCategory = (productId, productName) => {
@@ -151,36 +229,174 @@ const Products = () => {
             <div className='flex items-center justify-between px-5 pt-3'>
                 <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
+                    <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize' onClick={resetFilters}><MdOutlineFilterListOff className='text-[18px]' />Reset Filters</Button>
                     <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><GoPlus className='text-[20px]' />Add Product</Button>
                 </div>
             </div>
 
-            <div className="card my-4 bg-white border rounded-md px-1 pt-5">
+            <div className="card my-4 bg-white border rounded-md px-1 pt-5 ">
 
-                <div className='flex items-center w-full px-5 justify-between'>
-                    <div className='col w-[20%]'>
-                        <h4 className='font-bold text-[14px] mb-2'>Category By</h4>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Sort by category</InputLabel>
+                <div className='flex w-full px-5 justify-between items-end gap-2'>
+
+                    <div className='col w-[35%]'>
+                        <SearchBox searchName="products" />
+                    </div>
+
+                    <div className='col w-[20%] ml-auto'>
+                        <h4 className='font-bold text-[14px] mb-2'>Broad Category By</h4>
+                        <FormControl fullWidth size="small">
                             <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={categoryFilterValue}
-                                label="Sort by category"
-                                onChange={handleChangeCategoryFilterValue}
+                                multiple
+                                labelId="productCategoryDropDownLabel"
+                                id="productCategoryDropDown"
+                                size="small"
+                                value={Array.isArray(productCategory) ? productCategory : []}
+                                onChange={handleChangeProductCategory}
+                                className="w-full !text-[14px]"
+                                displayEmpty
+                                MenuProps={MenuProps}
+                                renderValue={(selected) => {
+                                    if (selected.length === 0) {
+                                        return <em>Sort by broad category</em>;
+                                    }
+                                    return selected
+                                        .map((id) => {
+                                            const item = context.catData.find((cat) => cat._id === id);
+                                            return item ? item.name : "";
+                                        })
+                                        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                                        .join(", ");
+                                }}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value={10}>T-Shirt</MenuItem>
-                                <MenuItem value={20}>Jeans</MenuItem>
-                                <MenuItem value={30}>Jurkins</MenuItem>
+                                {context?.catData && context.catData.length > 0 ? (
+                                    context.catData
+                                        .sort((a, b) => a.name.localeCompare(b.name))
+                                        .map((item) => (
+                                            <MenuItem key={item._id} value={item._id}>
+                                                <Checkbox checked={productCategory.includes(item._id)} />
+                                                <ListItemText primary={item.name} />
+                                            </MenuItem>
+                                        ))
+                                ) : (
+                                    <MenuItem disabled>No Data Available!</MenuItem>
+                                )}
                             </Select>
                         </FormControl>
                     </div>
 
                     <div className='col w-[20%]'>
-                        <SearchBox searchName="products" />
+                        <h4 className='font-bold text-[14px] mb-2'>Sub-Category By</h4>
+                        <FormControl fullWidth size="small">
+                            <Select
+                                multiple
+                                labelId="productSubCategoryDropDownLabel"
+                                id="productSubCategoryDropDown"
+                                size="small"
+                                value={Array.isArray(productCategory2) ? productCategory2 : []}
+                                onChange={handleChangeProductCategory2}
+                                className="w-full !text-[14px]"
+                                displayEmpty
+                                MenuProps={MenuProps}
+                                renderValue={(selected) => {
+                                    if (selected.length === 0) {
+                                        return <em>Sort by subcategory</em>; // Placeholder when no subcategory is selected
+                                    }
+
+                                    // Map the selected IDs to their names
+                                    const selectedNames = selected
+                                        .map((id) => {
+                                            const item = context?.catData?.flatMap((cat) => cat.children || []).find((subCat) => subCat._id === id);
+                                            return item ? item.name : null;
+                                        })
+                                        .filter((name) => name !== null);  // Remove nulls if no match found
+
+                                    // Return sorted names, or display the placeholder if nothing was selected
+                                    return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by subcategory</em>;
+                                }}
+                            >
+                                {
+                                    context?.catData?.map((cat) => {
+                                        // Only display subcategories if they exist
+                                        return (
+                                            cat?.children?.length !== 0 ? (
+                                                cat?.children?.map((subCat) => {
+                                                    return (
+                                                        <MenuItem key={subCat._id} value={subCat._id}>
+                                                            <Checkbox checked={productCategory2.includes(subCat._id)} />
+                                                            <ListItemText primary={subCat.name} />
+                                                        </MenuItem>
+                                                    );
+                                                })
+                                            ) : (
+                                                <MenuItem key={cat._id} disabled>No Data Available!</MenuItem>
+                                            )
+                                        );
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+
                     </div>
+
+                    <div className='col w-[20%]'>
+                        <h4 className='font-bold text-[14px] mb-2'>Specific Category By</h4>
+                        <FormControl fullWidth size="small">
+                            <Select
+                                multiple
+                                labelId="productThirdCategoryDropDownLabel"
+                                id="productThirdCategoryDropDown"
+                                size="small"
+                                value={Array.isArray(productCategory3) ? productCategory3 : []}
+                                onChange={handleChangeProductCategory3}
+                                className="w-full !text-[14px]"
+                                displayEmpty
+                                MenuProps={MenuProps}
+                                renderValue={(selected) => {
+                                    if (selected.length === 0) {
+                                        return <em>Sort by third-level category</em>; // Placeholder when no items are selected
+                                    }
+                                    return selected
+                                        .map((id) => {
+                                            // Find the third-level category name by its ID
+                                            const thirdLevelCat = context?.catData?.flatMap(cat =>
+                                                cat?.children?.flatMap(subCat => subCat?.children || [])
+                                            ).find((thirdLevelCat) => thirdLevelCat._id === id);
+                                            return thirdLevelCat ? thirdLevelCat.name : ''; // Get the name of the third-level category
+                                        })
+                                        .filter((name) => name !== '') // Filter out empty names (if any IDs are not found)
+                                        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                                        .join(', '); // Join selected names into a comma-separated string
+                                }}
+                            >
+                                {
+                                    context?.catData?.map((cat) => {
+                                        // Check if this category has subcategories (children)
+                                        if (!cat?.children?.length) {
+                                            return <MenuItem key={cat._id} disabled>No Data Available!</MenuItem>;
+                                        }
+
+                                        return cat?.children?.map((subCat) => {
+                                            // Check if subcategory has third-level children
+                                            if (!subCat?.children?.length) {
+                                                return <MenuItem key={subCat._id} disabled>No Data Available!</MenuItem>;
+                                            }
+
+                                            return subCat?.children?.map((thirdLevelCat) => {
+                                                return (
+                                                    <MenuItem key={thirdLevelCat._id} value={thirdLevelCat._id}>
+                                                        <Checkbox checked={productCategory3.includes(thirdLevelCat._id)} />
+                                                        <ListItemText primary={thirdLevelCat.name} />
+                                                    </MenuItem>
+                                                );
+                                            });
+                                        });
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+
+                    </div>
+
 
                 </div>
 
@@ -242,14 +458,14 @@ const Products = () => {
                                                 {product?.thirdSubCategoryName}
                                             </TableCell>
                                             <TableCell style={{ minWidth: columns.minWidth }}>
-                                                <div className="flex flex-col items-center">
+                                                <div className="flex flex-col items-start justify-center gap-1">
                                                     <span className="price text-[var(--text-light)] text-[14px] font-bold flex items-center">
                                                         &#8377;<span>{new Intl.NumberFormat('en-IN').format(product?.price)}</span>
                                                     </span>
-                                                    <span className="oldPrice line-through text-[var(--text-light)] text-[12px] font-normal flex items-center ">
+                                                    <span className="oldPrice line-through text-[var(--text-light)] text-[12px] font-normal flex items-center">
                                                         &#8377;<span>{new Intl.NumberFormat('en-IN').format(product?.oldPrice)}</span>
                                                     </span>
-                                                    <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">({product?.discount}% OFF)</span>
+                                                    <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">{product?.discount}% OFF</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell style={{ minWidth: columns.minWidth }}>

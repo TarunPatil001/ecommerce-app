@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, deleteAllUnWantedImages, deleteMultipleProduct, deleteProduct, getAllFeaturedProducts, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageProductFromCloudinary, updateProduct, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, deleteAllUnWantedImages, deleteMultipleProduct, deleteProduct, getAllFeaturedProducts, getAllFilteredProducts, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageProductFromCloudinary, updateProduct, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -18,6 +18,9 @@ productRouter.post("/create-product", auth, createProduct);
 
 // Get all products
 productRouter.get("/get-all-products", getAllProducts);
+
+// Get all filtered products
+productRouter.get("/get-all-filtered-products", getAllFilteredProducts);
 
 // Get all products by categoryId
 productRouter.get("/get-all-products-byCategoryId/:id", getAllProductsByCategoryId);

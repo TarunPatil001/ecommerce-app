@@ -672,13 +672,140 @@ export async function getAllProducts(request, response) {
 
 
 
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+// Get all filtered products based on multiple categories, subcategories, or third subcategories
+export async function getAllFilteredProducts(request, response) {
+  try {
+    const page = parseInt(request.query.page) || 1; // Default to page 1
+    const perPage = parseInt(request.query.perPage) || 10000; // Default to fetching 10000 products
+    const totalPosts = await ProductModel.countDocuments();
+    const totalPages = Math.ceil(totalPosts / perPage);
+
+    if (page > totalPages) {
+      return response.status(404).json({
+        message: "Page not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Build dynamic filter query based on provided categoryIds, subCategoryIds, thirdSubCategoryIds
+    const filterQuery = {};
+
+    // Apply category filter if categoryIds are provided
+    if (request.query.categoryIds) {
+      const categoryIds = request.query.categoryIds.split(",");
+      filterQuery.categoryId = { $in: categoryIds };
+    }
+
+    // Apply subCategory filter if subCategoryIds are provided
+    if (request.query.subCategoryIds) {
+      const subCategoryIds = request.query.subCategoryIds.split(",");
+      filterQuery.subCategoryId = { $in: subCategoryIds };
+    }
+
+    // Apply thirdSubCategory filter if thirdSubCategoryIds are provided
+    if (request.query.thirdSubCategoryIds) {
+      const thirdSubCategoryIds = request.query.thirdSubCategoryIds.split(",");
+      filterQuery.thirdSubCategoryId = { $in: thirdSubCategoryIds };
+    }
+
+    // Fetch products that match the filters
+    const products = await ProductModel.find(filterQuery)
+      .populate("category")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    if (!products || products.length === 0) {
+      return response.status(404).json({
+        message: "No products found",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Products retrieved successfully",
+      error: false,
+      success: true,
+      data: products,
+      totalPages: totalPages,
+      page: page,
+    });
+  } catch (error) {
+    console.error("Error in getting filtered products: ", error.message || error);
+    return response.status(500).json({
+      message: error.message || "An error occurred during fetching products.",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+
+
 // ----------------------------------------------------------------------------------------------------------------------
 
 
 // get all products by categoryId
+// export async function getAllProductsByCategoryId(request, response) {
+//   try {
+//     const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+//     const perPage = parseInt(request.query.perPage) || 10000;
+//     const totalPosts = await ProductModel.countDocuments();
+//     const totalPages = Math.ceil(totalPosts / perPage);
+
+//     if (page > totalPages) {
+//       return response.status(404).json({
+//         message: "Page not found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const products = await ProductModel.find({
+//       categoryId: request.params.id,
+//     })
+//       .populate("category")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//       .exec();
+
+//     if (!products || products.length === 0) {
+//       return response.status(404).json({
+//         message: "No products found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Products retrieved successfully",
+//       error: false,
+//       success: true,
+//       data: products,
+//       totalPages: totalPages,
+//       page: page,
+//     });
+//   } catch (error) {
+//     console.error("Error in getting all products: ", error.message || error);
+//     return response.status(500).json({
+//       message:
+//         error.message || "An error occurred during getting all products.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 export async function getAllProductsByCategoryId(request, response) {
   try {
-    const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+    const page = parseInt(request.query.page) || 1;
     const perPage = parseInt(request.query.perPage) || 10000;
     const totalPosts = await ProductModel.countDocuments();
     const totalPages = Math.ceil(totalPosts / perPage);
@@ -691,8 +818,11 @@ export async function getAllProductsByCategoryId(request, response) {
       });
     }
 
+    // Split the category IDs if multiple are sent as a comma-separated string
+    const categoryIds = request.params.id.split(",");
+
     const products = await ProductModel.find({
-      categoryId: request.params.id,
+      categoryId: { $in: categoryIds }, // Match multiple categories
     })
       .populate("category")
       .skip((page - 1) * perPage)
@@ -718,8 +848,7 @@ export async function getAllProductsByCategoryId(request, response) {
   } catch (error) {
     console.error("Error in getting all products: ", error.message || error);
     return response.status(500).json({
-      message:
-        error.message || "An error occurred during getting all products.",
+      message: error.message || "An error occurred while getting all products.",
       error: true,
       success: false,
     });
@@ -788,9 +917,59 @@ export async function getAllProductsByCategoryName(request, response) {
 // ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by subCategoryId
+// export async function getAllProductsBySubCategoryId(request, response) {
+//   try {
+//     const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+//     const perPage = parseInt(request.query.perPage) || 10000;
+//     const totalPosts = await ProductModel.countDocuments();
+//     const totalPages = Math.ceil(totalPosts / perPage);
+
+//     if (page > totalPages) {
+//       return response.status(404).json({
+//         message: "Page not found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const products = await ProductModel.find({
+//       subCategoryId: request.query.subCategoryId,
+//     })
+//       .populate("category")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//       .exec();
+
+//     if (!products || products.length === 0) {
+//       return response.status(404).json({
+//         message: "No products found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Products retrieved successfully",
+//       error: false,
+//       success: true,
+//       data: products,
+//       totalPages: totalPages,
+//       page: page,
+//     });
+//   } catch (error) {
+//     console.error("Error in getting all products: ", error.message || error);
+//     return response.status(500).json({
+//       message:
+//         error.message || "An error occurred during getting all products.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 export async function getAllProductsBySubCategoryId(request, response) {
   try {
-    const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+    const page = parseInt(request.query.page) || 1;
     const perPage = parseInt(request.query.perPage) || 10000;
     const totalPosts = await ProductModel.countDocuments();
     const totalPages = Math.ceil(totalPosts / perPage);
@@ -803,8 +982,11 @@ export async function getAllProductsBySubCategoryId(request, response) {
       });
     }
 
+    // Split the subcategory IDs if multiple are sent as a comma-separated string
+    const subCategoryIds = request.params.id.split(",");
+
     const products = await ProductModel.find({
-      subCategoryId: request.query.subCategoryId,
+      subCategoryId: { $in: subCategoryIds }, // Match multiple subcategories
     })
       .populate("category")
       .skip((page - 1) * perPage)
@@ -830,14 +1012,12 @@ export async function getAllProductsBySubCategoryId(request, response) {
   } catch (error) {
     console.error("Error in getting all products: ", error.message || error);
     return response.status(500).json({
-      message:
-        error.message || "An error occurred during getting all products.",
+      message: error.message || "An error occurred while getting all products.",
       error: true,
       success: false,
     });
   }
 }
-
 
 
 
@@ -905,9 +1085,60 @@ export async function getAllProductsBySubCategoryName(request, response) {
 
 
 // get all products by thirdSubCategoryId
+// export async function getAllProductsByThirdSubCategoryId(request, response) {
+//   try {
+//     const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+//     const perPage = parseInt(request.query.perPage) || 10000;
+//     const totalPosts = await ProductModel.countDocuments();
+//     const totalPages = Math.ceil(totalPosts / perPage);
+
+//     if (page > totalPages) {
+//       return response.status(404).json({
+//         message: "Page not found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const products = await ProductModel.find({
+//       thirdSubCategoryId: request.query.thirdSubCategoryId,
+//     })
+//       .populate("category")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//       .exec();
+
+//     if (!products || products.length === 0) {
+//       return response.status(404).json({
+//         message: "No products found",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Products retrieved successfully",
+//       error: false,
+//       success: true,
+//       data: products,
+//       totalPages: totalPages,
+//       page: page,
+//     });
+//   } catch (error) {
+//     console.error("Error in getting all products: ", error.message || error);
+//     return response.status(500).json({
+//       message:
+//         error.message || "An error occurred during getting all products.",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
+
 export async function getAllProductsByThirdSubCategoryId(request, response) {
   try {
-    const page = parseInt(request.query.page) || 1; // Use request.query for URL query parameters
+    const page = parseInt(request.query.page) || 1;
     const perPage = parseInt(request.query.perPage) || 10000;
     const totalPosts = await ProductModel.countDocuments();
     const totalPages = Math.ceil(totalPosts / perPage);
@@ -920,8 +1151,11 @@ export async function getAllProductsByThirdSubCategoryId(request, response) {
       });
     }
 
+    // Split the third subcategory IDs if multiple are sent as a comma-separated string
+    const thirdSubCategoryIds = request.params.id.split(",");
+
     const products = await ProductModel.find({
-      thirdSubCategoryId: request.query.thirdSubCategoryId,
+      thirdSubCategoryId: { $in: thirdSubCategoryIds }, // Match multiple third subcategories
     })
       .populate("category")
       .skip((page - 1) * perPage)
@@ -947,13 +1181,13 @@ export async function getAllProductsByThirdSubCategoryId(request, response) {
   } catch (error) {
     console.error("Error in getting all products: ", error.message || error);
     return response.status(500).json({
-      message:
-        error.message || "An error occurred during getting all products.",
+      message: error.message || "An error occurred while getting all products.",
       error: true,
       success: false,
     });
   }
 }
+
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -2557,6 +2791,16 @@ export async function updateProduct(request, response) {
     // Update the product's images with the valid new image URLs
     product.images = validNewImages.length > 0 ? validNewImages : product.images;
 
+    // Filter and sort value arrays before updating
+    const filterValidValues = (array) => {
+      if (!Array.isArray(array)) return [];
+      return array.filter(Boolean).sort((a, b) => parseInt(a) - parseInt(b));
+    };
+
+    // Filter valid size options from the request body
+    const validSizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const filteredSize = validSizes.filter(size => request.body.size.includes(size));
+
     // Update the product details in the database
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
@@ -2578,9 +2822,9 @@ export async function updateProduct(request, response) {
         rating: request.body.rating,
         isFeatured: request.body.isFeatured,
         discount: request.body.discount,
-        productRam: request.body.productRam,
-        size: request.body.size,
-        productWeight: request.body.productWeight,
+        productRam: filterValidValues(request.body.productRam),
+        size: filteredSize,
+        productWeight: filterValidValues(request.body.productWeight),
       },
       { new: true } // Return the updated document
     );

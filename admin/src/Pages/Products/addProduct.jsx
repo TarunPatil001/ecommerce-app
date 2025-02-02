@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { Button, CircularProgress, Rating } from '@mui/material';
+import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, Rating } from '@mui/material';
 import UploadBox from '../../Components/UploadBox';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -83,7 +83,7 @@ const AddProduct = () => {
             images: previews, // Sync images with updated previews
         }));
     }, [previews]);
-    
+
 
 
     useEffect(() => {
@@ -574,24 +574,24 @@ const AddProduct = () => {
             if (!image) {
                 throw new Error("Invalid image.");
             }
-        
+
             if (!productIdNo) {
                 // If productIdNo doesn't exist, remove only by image URL
                 console.log("Removing image without productIdNo:", image);
-                
+
                 // Correct API request to delete image from Cloudinary
                 const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}`);
-        
+
                 if (response?.success) {
                     // Remove image from previews state
                     const updatedImages = previews.filter((img) => img !== image); // Compare by URL
-        
+
                     // Log the updated images to verify
                     console.log("Updated images after deletion:", updatedImages);
-        
+
                     // Update previews state
                     setPreviews(updatedImages);
-        
+
                     // Update formFields state for images
                     setFormFields((prevFields) => {
                         const updatedFormFields = {
@@ -601,7 +601,7 @@ const AddProduct = () => {
                         console.log("Updated formFields after deletion:", updatedFormFields);
                         return updatedFormFields;
                     });
-        
+
                     toast.success("Image removed successfully.");
                 } else {
                     throw new Error(response?.message || "Failed to remove image.");
@@ -609,19 +609,19 @@ const AddProduct = () => {
             } else {
                 // If productIdNo exists, need both imgUrl and productIdNo for the API request
                 console.log("Removing image with productIdNo:", image, "for product:", productIdNo);
-                
+
                 const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}&productId=${productIdNo}`);
-        
+
                 if (response?.success) {
                     // Remove image from previews state
                     const updatedImages = previews.filter((img) => img !== image); // Compare by URL
-        
+
                     // Log the updated images to verify
                     console.log("Updated images after deletion:", updatedImages);
-        
+
                     // Update previews state
                     setPreviews(updatedImages);
-        
+
                     // Update formFields state for images
                     setFormFields((prevFields) => {
                         const updatedFormFields = {
@@ -631,7 +631,7 @@ const AddProduct = () => {
                         console.log("Updated formFields after deletion:", updatedFormFields);
                         return updatedFormFields;
                     });
-        
+
                     toast.success("Image removed successfully.");
                 } else {
                     throw new Error(response?.message || "Failed to remove image.");
@@ -642,21 +642,21 @@ const AddProduct = () => {
             toast.error(error?.message || "An unexpected error occurred.");
         }
     };
-    
-    
-    
+
+
+
 
 
 
     const handleDiscard = async () => {
         await Promise.all(previews.map((image, index) => handleRemoveImage(image, index)));
-    
+
         // Reset the form and previews after deletions complete
         setFormFields({ name: '', images: [] });
         setPreviews([]);
         console.log("Discard action, file cleared.");
     };
-    
+
 
 
 
@@ -866,83 +866,91 @@ const AddProduct = () => {
                 <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5">
                     <div className='col position-relative overflow-hidden'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product RAMS</h3>
-                        <Select
-                            multiple
-                            labelId="productRAMSDropDownLabel"
-                            id="productRAMSDropDown"
-                            size="small"
-                            value={productRams}
-                            onChange={(event) => {
-                                handleChangeProductRams(event);
-                                handleSetProductRams(setProductRams, event.target.value);
-                            }}
-                            className="w-full !text-[14px] custom-dropdown"
-                            displayEmpty
-                            MenuProps={MenuProps}
-                            renderValue={(selected) => selected.length === 0 ? <em>None</em> : selected.join(", ")} // Show placeholder when empty
-                        >
-                            <MenuItem value="" disabled>
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={'4GB'}>4GB</MenuItem>
-                            <MenuItem value={'8GB'}>8GB</MenuItem>
-                            <MenuItem value={'16GB'}>16GB</MenuItem>
-                        </Select>
+                        <FormControl fullWidth size='small'>
+                            <Select
+                                multiple
+                                labelId="productRAMSDropDownLabel"
+                                id="productRAMSDropDown"
+                                size="small"
+                                value={productRams}
+                                onChange={(event) => {
+                                    handleChangeProductRams(event);
+                                    handleSetProductRams(setProductRams, event.target.value);
+                                }}
+                                className="w-full !text-[14px] custom-dropdown"
+                                displayEmpty
+                                MenuProps={MenuProps}
+                                renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => parseInt(a) - parseInt(b)).join(", "))}
+                            >
+                                {['4GB', '8GB', '16GB'].map((ram) => (
+                                    <MenuItem key={ram} value={ram}>
+                                        <Checkbox checked={productRams.includes(ram)} />
+                                        <ListItemText primary={ram} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </div>
 
                     <div className='col'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Weight</h3>
-                        <Select
-                            multiple
-                            labelId="productRAMSDropDownLabel"
-                            id="productRAMSDropDown"
-                            size="small"
-                            value={productWeight}
-                            onChange={(event) => {
-                                handleChangeProductWeight(event);
-                                handleSetProductWeight(setProductWeight, event.target.value);
-                            }}
-                            className="w-full !text-[14px] custom-dropdown"
-                            displayEmpty
-                            MenuProps={MenuProps} // assuming you have a valid MenuProps configuration
-                            renderValue={(selected) => selected.length === 0 ? <em>None</em> : selected.join(", ")}
-                        >
-                            <MenuItem value="" disabled>
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={'2KG'}>2KG</MenuItem>
-                            <MenuItem value={'4KG'}>4KG</MenuItem>
-                            <MenuItem value={'8KG'}>8KG</MenuItem>
-                        </Select>
+
+                        <FormControl fullWidth size='small'>
+                            <Select
+                                multiple
+                                labelId="productWeightDropDownLabel"
+                                id="productWeightDropDown"
+                                size="small"
+                                value={productWeight}
+                                onChange={(event) => {
+                                    handleChangeProductWeight(event);
+                                    handleSetProductWeight(setProductWeight, event.target.value);
+                                }}
+                                className="w-full !text-[14px] custom-dropdown"
+                                displayEmpty
+                                MenuProps={MenuProps} // Assuming you have a valid MenuProps configuration
+                                renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => parseInt(a) - parseInt(b)).join(", "))}
+                            >
+                                {['2KG', '4KG', '8KG'].map((weight) => (
+                                    <MenuItem key={weight} value={weight}>
+                                        <Checkbox checked={productWeight.includes(weight)} />
+                                        <ListItemText primary={weight} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+
                     </div>
 
                     <div className='col'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Size</h3>
-                        <Select
-                            multiple
-                            labelId="productSizeDropDownLabel"
-                            id="productSizeDropDown"
-                            size="small"
-                            value={productSize}
-                            onChange={(event) => {
-                                handleChangeProductSize(event);
-                                handleSetProductSize(setProductSize, event.target.value);
-                            }}
-                            className="w-full !text-[14px]"
-                            displayEmpty
-                            MenuProps={MenuProps}
-                            renderValue={(selected) => selected.length === 0 ? <em>None</em> : selected.join(", ")} // Show placeholder when empty
-                        >
-                            <MenuItem value="" disabled>
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={'S'}>S</MenuItem>
-                            <MenuItem value={'M'}>M</MenuItem>
-                            <MenuItem value={'L'}>L</MenuItem>
-                            <MenuItem value={'XL'}>XL</MenuItem>
-                            <MenuItem value={'XXL'}>XXL</MenuItem>
-                            <MenuItem value={'XXXL'}>XXXL</MenuItem>
-                        </Select>
+                        <FormControl fullWidth size='small'>
+                            <Select
+                                multiple
+                                labelId="productSizeDropDownLabel"
+                                id="productSizeDropDown"
+                                size="small"
+                                value={productSize}
+                                onChange={(event) => {
+                                    handleChangeProductSize(event);
+                                    handleSetProductSize(setProductSize, event.target.value);
+                                }}
+                                className="w-full !text-[14px] custom-dropdown"
+                                displayEmpty
+                                MenuProps={MenuProps}
+                                renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(a) - ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(b)).join(", "))}
+                            >
+
+                                {['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => (
+                                    <MenuItem key={size} value={size}>
+                                        <Checkbox checked={productSize.includes(size)} />
+                                        <ListItemText primary={size} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
                     </div>
 
 
