@@ -23,7 +23,7 @@ const ProductItem = () => {
       <div className="productItem rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)]">
         <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative">
 
-          <Link to="/">
+          <Link to="/productDetails/:id">
 
             {/* <ProductImageFlipChange firstImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/320-large_default/hummingbird-printed-t-shirt.jpg"} SecondImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/318-large_default/hummingbird-printed-t-shirt.jpg"} /> */}
             <ProductImageOpacityChange firstImg={"https://api.spicezgold.com/download/file_1734529474612_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-0-202304080900.webp"} SecondImg={"https://api.spicezgold.com/download/file_1734529474613_gespo-peach-solid-mandarin-collar-half-sleeve-casual-t-shirt-product-images-rvrtzhyumb-1-202304080900.jpg"} />

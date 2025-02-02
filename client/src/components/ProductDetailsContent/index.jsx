@@ -26,7 +26,7 @@ const ProductDetailsContent = () => {
         }
     }, [totalStocks]);
 
-   
+
     return (
         <>
             <h1 className="text-[24px] text-[var(--text-dark)] font-bold mb-1 productBrand"><Link to="/">Libas</Link></h1>
@@ -152,7 +152,7 @@ const ProductDetailsContent = () => {
 
             </div>
 
-           
+
         </>
     )
 }
