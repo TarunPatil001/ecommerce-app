@@ -69,6 +69,9 @@ const Products = () => {
     const [productCategory, setProductCategory] = useState([]);
     const [productCategory2, setProductCategory2] = useState([]);
     const [productCategory3, setProductCategory3] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+    const [thirdLevelCategories, setThirdLevelCategories] = useState([]);
+
 
     // Fetch product data when categories change
     const fetchProducts = async () => {
@@ -115,35 +118,115 @@ const Products = () => {
     }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue]);
 
 
-    // Handle changes for each category level
+    // Handle Category Change
     const handleChangeProductCategory = (event) => {
-        setProductCategory(event.target.value); // Update selected category
+        const selectedCategories = event.target.value;
+        setProductCategory(selectedCategories);
+
+        // If a category is removed, reset subcategories and third-level categories
+        if (selectedCategories.length === 0) {
+            setProductCategory2([]);
+            setProductCategory3([]);
+            setSubCategories([]);
+            setThirdLevelCategories([]);
+        } else {
+            // Filter subcategories based on the selected categories
+            const newSubCategories = filterSubCategories(selectedCategories);
+            setSubCategories(newSubCategories);
+
+            // If no subcategories are found, reset subcategory and third-level category selections
+            if (newSubCategories.length === 0) {
+                setProductCategory2([]);
+                setProductCategory3([]);
+                setThirdLevelCategories([]);
+            } else {
+                // Reset third-level categories if the selected subcategories are no longer valid
+                const validSubCategories = productCategory2.filter((subCatId) =>
+                    newSubCategories.some((subCat) => subCat._id === subCatId)
+                );
+                setProductCategory2(validSubCategories);
+
+                if (validSubCategories.length === 0) {
+                    setProductCategory3([]);
+                    setThirdLevelCategories([]);
+                } else {
+                    // Filter third-level categories based on the valid subcategories
+                    const newThirdLevelCategories = filterThirdLevelCategories(validSubCategories);
+                    setThirdLevelCategories(newThirdLevelCategories);
+
+                    // If no third-level categories are found, reset third-level category selections
+                    if (newThirdLevelCategories.length === 0) {
+                        setProductCategory3([]);
+                    } else {
+                        // Reset third-level categories if the selected third-level categories are no longer valid
+                        const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
+                            newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
+                        );
+                        setProductCategory3(validThirdLevelCategories);
+                    }
+                }
+            }
+        }
     };
 
+    // Handle Subcategory Change
     const handleChangeProductCategory2 = (event) => {
-        setProductCategory2(event.target.value); // Update selected subcategory 2
+        const selectedSubCategories = event.target.value;
+        setProductCategory2(selectedSubCategories);
+
+        // If a subcategory is removed, reset third-level categories
+        if (selectedSubCategories.length === 0) {
+            setProductCategory3([]);
+            setThirdLevelCategories([]);
+        } else {
+            // Filter third-level categories based on the selected subcategories
+            const newThirdLevelCategories = filterThirdLevelCategories(selectedSubCategories);
+            setThirdLevelCategories(newThirdLevelCategories);
+
+            // If no third-level categories are found, reset third-level category selections
+            if (newThirdLevelCategories.length === 0) {
+                setProductCategory3([]);
+            } else {
+                // Reset third-level categories if the selected third-level categories are no longer valid
+                const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
+                    newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
+                );
+                setProductCategory3(validThirdLevelCategories);
+            }
+        }
     };
 
+    // Handle Third-level Category Change
     const handleChangeProductCategory3 = (event) => {
-        setProductCategory3(event.target.value); // Update selected subcategory 3
+        const selectedThirdLevelCategories = event.target.value;
+        setProductCategory3(selectedThirdLevelCategories);
     };
 
+    // Filter Subcategories based on Category Selection
+    const filterSubCategories = (categoryIds) => {
+        if (!context?.catData) return [];
+        return context.catData
+            .filter((cat) => categoryIds.includes(cat._id))
+            .flatMap((cat) => cat.children || []);
+    };
+
+    // Filter Third-Level Categories based on Subcategory Selection
+    const filterThirdLevelCategories = (subCategoryIds) => {
+        if (!context?.catData) return [];
+        return context.catData
+            .flatMap((cat) => cat.children || [])
+            .filter((subCat) => subCategoryIds.includes(subCat._id))
+            .flatMap((subCat) => subCat.children || []);
+    };
 
     // Reset filters function
     const resetFilters = () => {
-        setProductCategory([]);   // Clear category filter
-        setProductCategory2([]);  // Clear subcategory filter
-        setProductCategory3([]);  // Clear third subcategory filter
-        setCategoryFilterValue(""); // Clear any additional filter value
+        setProductCategory([]); // Reset selected categories
+        setProductCategory2([]); // Reset selected subcategories
+        setProductCategory3([]); // Reset selected third-level categories
+        setSubCategories([]); // Clear subcategories
+        setThirdLevelCategories([]); // Clear third-level categories
     };
-
-
-
-
-
-
-
-
 
 
 
@@ -242,6 +325,7 @@ const Products = () => {
                         <SearchBox searchName="products" />
                     </div>
 
+                    {/* Category Dropdown */}
                     <div className='col w-[20%] ml-auto'>
                         <h4 className='font-bold text-[14px] mb-2'>Broad Category By</h4>
                         <FormControl fullWidth size="small">
@@ -249,12 +333,10 @@ const Products = () => {
                                 multiple
                                 labelId="productCategoryDropDownLabel"
                                 id="productCategoryDropDown"
-                                size="small"
                                 value={Array.isArray(productCategory) ? productCategory : []}
                                 onChange={handleChangeProductCategory}
-                                className="w-full !text-[14px]"
                                 displayEmpty
-                                MenuProps={MenuProps}
+                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
                                         return <em>Sort by broad category</em>;
@@ -284,6 +366,7 @@ const Products = () => {
                         </FormControl>
                     </div>
 
+                    {/* Subcategory Dropdown */}
                     <div className='col w-[20%]'>
                         <h4 className='font-bold text-[14px] mb-2'>Sub-Category By</h4>
                         <FormControl fullWidth size="small">
@@ -291,53 +374,38 @@ const Products = () => {
                                 multiple
                                 labelId="productSubCategoryDropDownLabel"
                                 id="productSubCategoryDropDown"
-                                size="small"
                                 value={Array.isArray(productCategory2) ? productCategory2 : []}
                                 onChange={handleChangeProductCategory2}
-                                className="w-full !text-[14px]"
                                 displayEmpty
-                                MenuProps={MenuProps}
+                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
-                                        return <em>Sort by subcategory</em>; // Placeholder when no subcategory is selected
+                                        return <em>Sort by subcategory</em>;
                                     }
-
-                                    // Map the selected IDs to their names
                                     const selectedNames = selected
                                         .map((id) => {
-                                            const item = context?.catData?.flatMap((cat) => cat.children || []).find((subCat) => subCat._id === id);
+                                            const item = subCategories.find((subCat) => subCat._id === id);
                                             return item ? item.name : null;
                                         })
-                                        .filter((name) => name !== null);  // Remove nulls if no match found
-
-                                    // Return sorted names, or display the placeholder if nothing was selected
+                                        .filter((name) => name !== null);
                                     return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by subcategory</em>;
                                 }}
                             >
-                                {
-                                    context?.catData?.map((cat) => {
-                                        // Only display subcategories if they exist
-                                        return (
-                                            cat?.children?.length !== 0 ? (
-                                                cat?.children?.map((subCat) => {
-                                                    return (
-                                                        <MenuItem key={subCat._id} value={subCat._id}>
-                                                            <Checkbox checked={productCategory2.includes(subCat._id)} />
-                                                            <ListItemText primary={subCat.name} />
-                                                        </MenuItem>
-                                                    );
-                                                })
-                                            ) : (
-                                                <MenuItem key={cat._id} disabled>No Data Available!</MenuItem>
-                                            )
-                                        );
-                                    })
-                                }
+                                {subCategories.length > 0 ? (
+                                    subCategories.map((item) => (
+                                        <MenuItem key={item._id} value={item._id}>
+                                            <Checkbox checked={productCategory2.includes(item._id)} />
+                                            <ListItemText primary={item.name} />
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <MenuItem disabled>No Data Available!</MenuItem>
+                                )}
                             </Select>
                         </FormControl>
-
                     </div>
 
+                    {/* Third-level Category Dropdown */}
                     <div className='col w-[20%]'>
                         <h4 className='font-bold text-[14px] mb-2'>Specific Category By</h4>
                         <FormControl fullWidth size="small">
@@ -345,56 +413,35 @@ const Products = () => {
                                 multiple
                                 labelId="productThirdCategoryDropDownLabel"
                                 id="productThirdCategoryDropDown"
-                                size="small"
                                 value={Array.isArray(productCategory3) ? productCategory3 : []}
                                 onChange={handleChangeProductCategory3}
-                                className="w-full !text-[14px]"
                                 displayEmpty
-                                MenuProps={MenuProps}
+                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
-                                        return <em>Sort by third-level category</em>; // Placeholder when no items are selected
+                                        return <em>Sort by third-level category</em>;
                                     }
-                                    return selected
+                                    const selectedNames = selected
                                         .map((id) => {
-                                            // Find the third-level category name by its ID
-                                            const thirdLevelCat = context?.catData?.flatMap(cat =>
-                                                cat?.children?.flatMap(subCat => subCat?.children || [])
-                                            ).find((thirdLevelCat) => thirdLevelCat._id === id);
-                                            return thirdLevelCat ? thirdLevelCat.name : ''; // Get the name of the third-level category
+                                            const item = thirdLevelCategories.find((thirdLevel) => thirdLevel._id === id);
+                                            return item ? item.name : null;
                                         })
-                                        .filter((name) => name !== '') // Filter out empty names (if any IDs are not found)
-                                        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
-                                        .join(', '); // Join selected names into a comma-separated string
+                                        .filter((name) => name !== null);
+                                    return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by third-level category</em>;
                                 }}
                             >
-                                {
-                                    context?.catData?.map((cat) => {
-                                        // Check if this category has subcategories (children)
-                                        if (!cat?.children?.length) {
-                                            return <MenuItem key={cat._id} disabled>No Data Available!</MenuItem>;
-                                        }
-
-                                        return cat?.children?.map((subCat) => {
-                                            // Check if subcategory has third-level children
-                                            if (!subCat?.children?.length) {
-                                                return <MenuItem key={subCat._id} disabled>No Data Available!</MenuItem>;
-                                            }
-
-                                            return subCat?.children?.map((thirdLevelCat) => {
-                                                return (
-                                                    <MenuItem key={thirdLevelCat._id} value={thirdLevelCat._id}>
-                                                        <Checkbox checked={productCategory3.includes(thirdLevelCat._id)} />
-                                                        <ListItemText primary={thirdLevelCat.name} />
-                                                    </MenuItem>
-                                                );
-                                            });
-                                        });
-                                    })
-                                }
+                                {thirdLevelCategories.length > 0 ? (
+                                    thirdLevelCategories.map((item) => (
+                                        <MenuItem key={item._id} value={item._id}>
+                                            <Checkbox checked={productCategory3.includes(item._id)} />
+                                            <ListItemText primary={item.name} />
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <MenuItem disabled>No Data Available!</MenuItem>
+                                )}
                             </Select>
                         </FormControl>
-
                     </div>
 
 
