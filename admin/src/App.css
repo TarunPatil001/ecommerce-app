@@ -14,7 +14,7 @@
   --bg-primary-update-light: rgb(204, 255, 201);
   --bg-active: rgb(233, 243, 255);
   --text-active: var(--bg-primary);
-  --text-light: #535665;
+  --text-light: #82848b;
 }
 
 * {
@@ -91,6 +91,20 @@ body {
   width: 26px !important;
   height: 26px !important;
 }
+
+
+/* --------- ProductDetails ----------- */
+
+.iiz__zoom-img--visible{
+  cursor: crosshair !important;
+}
+
+.iiz__img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+} 
+
 
 .MuiBadge-badge {
   background: var(--bg-primary) !important;
@@ -197,4 +211,16 @@ input[type=number]::-webkit-outer-spin-button {
   -moz-border-radius: 6px 0px 0px 6px !important;
   -ms-border-radius: 6px 0px 0px 6px !important;
   -o-border-radius: 6px 0px 0px 6px !important;
+}
+
+
+.separator {
+  display: inline-block;
+  margin: 0 2px;
+  color: rgba(0, 0, 0, 0.3);
+  font-weight: 200;
+}
+.separator::before {
+  content: "|";
+  margin: 0 10px;
 }

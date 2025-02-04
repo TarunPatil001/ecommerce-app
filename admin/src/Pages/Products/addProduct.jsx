@@ -662,12 +662,11 @@ const AddProduct = () => {
 
 
     return (
-        <section className='p-8'>
+        <section className='p-8 bg-gray-100'>
             <form action="#" ref={formRef} onSubmit={handleFormSubmit} className='form py-3'>
-                <h3 className='text-[24px] font-bold mb-2'>Create Product</h3>
-
+                <h3 className='text-[24px] font-bold mb-2'>{productIdNo === undefined ? ("Create ") : ("Update ")}Product</h3>
                 <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Basic Information</h3>
-                <div className='flex flex-col gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 mb-5'>
+                <div className='flex flex-col gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 mb-5'>
 
                     <div className="grid grid-cols-1">
 
@@ -793,7 +792,7 @@ const AddProduct = () => {
 
                 {/* <div className='flex flex-col gap-4  mb-2'></div> */}
                 <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Pricing & Stock</h3>
-                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5">
+                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
 
                     <div className='col'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Price</h3>
@@ -863,7 +862,7 @@ const AddProduct = () => {
                 </div>
 
                 <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Size & Rating</h3>
-                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5">
+                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
                     <div className='col position-relative overflow-hidden'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product RAMS</h3>
                         <FormControl fullWidth size='small'>
@@ -969,7 +968,7 @@ const AddProduct = () => {
                 <div className="col w-full px-0">
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
 
-                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
                         <span className='opacity-50 col-span-full text-[14px]'>Choose a product photo or simply drag and drop</span>
 
 
@@ -1023,9 +1022,7 @@ const AddProduct = () => {
                     </div>
                 </div>
 
-                <br />
-
-                <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+                <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
                     <Button
                         type="reset"
                         onClick={handleDiscard}

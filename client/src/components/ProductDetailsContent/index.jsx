@@ -11,7 +11,7 @@ const ProductDetailsContent = () => {
 
     const [productActionIndex, setProductActionIndex] = useState(null);
     const [checked, setChecked] = useState(false);
-    const [totalStocks, setTotalStocks] = useState(10); // Initialize state to hold totalStocks
+    const [totalStocks, setTotalStocks] = useState(0); // Initialize state to hold totalStocks
     const [quantity, setQuantity] = useState(totalStocks === 0 ? 0 : 1); // State to hold quantity in parent
 
     // Callback to handle quantity change in parent

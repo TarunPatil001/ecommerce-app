@@ -105,7 +105,7 @@ const UploadBox = (props) => {
       {...getRootProps()}
       className={`uploadBox p-3 rounded-md overflow-hidden border-2 border-dashed 
         ${isDragActive ? "border-blue-500" : "border-gray-300"} 
-        hover:border-blue-300  h-[200px] bg-gray-50 cursor-pointer hover:bg-gray-100 transition-all 
+        hover:border-blue-300  h-[200px] bg-white cursor-pointer hover:bg-gray-100 transition-all 
         flex flex-col items-center justify-center relative`}
     >
       {

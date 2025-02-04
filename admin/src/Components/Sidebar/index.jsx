@@ -1,7 +1,7 @@
 import { Button } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { MdDashboard, MdOutlineLogout } from 'react-icons/md'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { TbSlideshow } from "react-icons/tb";
 import { LuUsers } from "react-icons/lu";
 import { RiProductHuntLine } from "react-icons/ri";
@@ -24,6 +24,8 @@ const Sidebar = () => {
   const [subMenuIndex1, setSubMenuIndex1] = useState(false);
   const [subMenuIndex2, setSubMenuIndex2] = useState(false);
   const [subMenuIndex3, setSubMenuIndex3] = useState(false);
+
+  const {id} = useParams();
 
   // Define a mapping of paths to menu names
   const menuMapping = {
