@@ -1995,3 +1995,297 @@ export async function updateProductWeight(request, response) {
 
 
 
+
+// ===========================================================================================================================
+// ===========================================================================================================================
+
+// Product Size
+
+
+// Create productSize
+export async function createProductSize(request, response) {
+  try {
+    // Create new productSize
+    let productSize = new ProductSizeModel({
+      name : request.body.name,
+    });
+
+    // Save the product to the database
+    productSize = await productSize.save();
+
+    if (!productSize) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Product Size creation failed",
+      });
+    }
+
+    return response.status(200).json({
+      message: "Product Size created successfully.",
+      success: true,
+      error: false,
+      data: productSize,
+    });
+
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || "Internal Server Error",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+export async function getAllProductSize(request, response) {
+  try {
+    const page = parseInt(request.query.page) || 1;
+    const perPage = parseInt(request.query.perPage) || 10000; // Use 10 as default limit
+    const totalPosts = await ProductSizeModel.countDocuments();
+
+    if (totalPosts === 0) {
+      return response.status(404).json({
+        message: "No product size found",
+        error: true,
+        success: false,
+      });
+    }
+
+    const totalPages = Math.max(1, Math.ceil(totalPosts / perPage)); // Ensures at least 1 page
+
+    if (page > totalPages) {
+      return response.status(404).json({
+        message: "Page not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    const productSize = await ProductSizeModel.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    return response.status(200).json({
+      message: "Product size retrieved successfully",
+      error: false,
+      success: true,
+      data: productSize,
+      totalPages: totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    console.error("Error in getting all product size: ", error.message || error);
+    return response.status(500).json({
+      message: error.message || "An error occurred during getting all product size.",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+// get product weight by id
+export async function getProductSizeById(request, response) {
+  try {
+    const { id } = request.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.status(400).json({
+        message: "Invalid productSize ID",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Fetch the productSize by ID
+    const productSize  = await ProductSizeModel.findById(id);
+
+    if (!productSize) {
+      return response.status(404).json({
+        message: "Product Size not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Product Size retrieved successfully",
+      error: false,
+      success: true,
+      data: productSize,
+    });
+  } catch (error) {
+    console.error("Error in getting product size:", error);
+    return response.status(500).json({
+      message: error.message || "An error occurred while retrieving the product size.",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+export async function deleteProductSize(request, response) {
+  try {
+    const productSizeId = request.params.id;
+    const productSize = await ProductSizeModel.findById(productSizeId);
+
+    if (!productSize) {
+      return response.status(404).json({
+        message: "Product Size not found.",
+        success: false,
+        error: true,
+      });
+    }
+
+    const deletedProductSize = await ProductSizeModel.findByIdAndDelete(productSizeId);
+
+    if (!deletedProductSize) {
+      return response.status(400).json({
+        message: "Product Size deletion failed.",
+        success: false,
+        error: true,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Product Size deleted successfully.",
+      success: true,
+      error: false,
+    });
+
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      status: false,
+    });
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+// delete multiple product weight
+export async function deleteMultipleProductSize(req, res) {
+  try {
+    const { ids } = req.query;
+
+    // Check if ids exist and are valid
+    if (!ids) {
+      return res.status(400).json({
+        message: "No product size IDs provided.",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log("Received IDs:", ids);
+
+    // Convert comma-separated string to an array and trim spaces
+    const idArray = ids.split(',').map(id => id.trim());
+
+    // Validate the IDs
+    if (idArray.length === 0 || idArray.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({
+        message: "Invalid product size IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Fetch productRams before deletion
+    const productSize = await ProductSizeModel.find({ _id: { $in: idArray } });
+
+    if (productSize.length === 0) {
+      return res.status(404).json({
+        message: "No product size found with the provided IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log(`Found ${productSize.length} productSize for deletion.`);
+
+    // Delete products from the database
+    await ProductSizeModel.deleteMany({ _id: { $in: idArray } });
+
+    console.log("Product size(s) deleted successfully.");
+
+    return res.status(200).json({
+      message: "Product size(s) deleted successfully.",
+      success: true,
+      error: false,
+    });
+
+  } catch (error) {
+    console.error("Error deleting product size:", error); 
+    return res.status(500).json({
+      message: "Internal Server Error.",
+      success: false,
+      error: true,
+    });
+  }
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+export async function updateProductSize(request, response) {
+  try {
+    const productSizeId = request.params.id;
+    const productSize = await ProductSizeModel.findById(productSizeId);
+
+    if (!productSize) {
+      return response.status(404).json({
+        error: true,
+        success: false,
+        message: "Product size not found!",
+      });
+    }
+
+    // Update the product details in the database
+    const updatedProductSize = await ProductSizeModel.findByIdAndUpdate(
+      productSizeId,
+      {
+        name: request.body.name,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProductSize) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Product size update failed!",
+      });
+    }
+
+    return response.status(200).json({
+      message: "Product size updated successfully!",
+      success: true,
+      data: updatedProductSize,
+    });
+
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || "An error occurred during product size update.",
+      success: false,
+      error: error.message || error,
+    });
+  }
+}

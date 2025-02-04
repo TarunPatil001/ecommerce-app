@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, createProductRams, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductWeight, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductWeight, getProduct, getProductRamById, getProductWeightById, removeImageProductFromCloudinary, updateProduct, updateProductRams, updateProductWeight, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, createProductRams, createProductSize, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductSize, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductSize, deleteProductWeight, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductSize,  getAllProductWeight, getProduct, getProductRamById, getProductSizeById, getProductWeightById, removeImageProductFromCloudinary, updateProduct, updateProductRams, updateProductSize, updateProductWeight, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -117,6 +117,27 @@ productRouter.delete("/productWeight/:id", auth, deleteProductWeight);
 productRouter.post("/productWeight/delete-multiple-productWeight", auth, deleteMultipleProductWeight);
 
 
+// =======================================================================================================================
+
+// Product Size routes
+
+// create productSize 
+productRouter.post("/productSize/create", auth, createProductSize);
+
+// Get all productSize
+productRouter.get("/productSize/get-all-productSize", getAllProductSize);
+
+// Get productSize by id
+productRouter.get("/productRams/get-getProductSizeById/:id", getProductSizeById);
+
+// update productSize
+productRouter.put("/productSize/updateProductSize/:id", auth, updateProductSize);
+
+// delete productSize
+productRouter.delete("/productSize/:id", auth, deleteProductSize);
+
+// delete multiple productSize
+productRouter.post("/productSize/delete-multiple-productSize", auth, deleteMultipleProductSize);
 
 
 export default productRouter;
