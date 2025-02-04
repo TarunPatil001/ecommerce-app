@@ -203,6 +203,26 @@ export const deleteData = async (url) => {
 };
 
 
+/** Delete Data (POST) for multiple products */
+export const deleteMultipleData = async (url) => {
+  try {
+    const response = await axios.post(apiUrl + url, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json", // Setting content type as JSON
+      },
+    });
+
+    return response.data; // Return response data
+  } catch (error) {
+    console.error("Error deleting data:", error);
+    return error.response ? error.response.data : { message: error.message, error: true };
+  }
+};
+
+
+
+
 
 
 

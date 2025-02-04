@@ -2,6 +2,7 @@ import ProductModel from "../models/product.model.js";
 import CategoryModel from './../models/category.model.js';
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { mongoose } from 'mongoose';
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -18,54 +19,54 @@ cloudinary.config({
 // var imagesArr = [];
 
 // export async function uploadProductImages(request, response) {
-//   try {
-//     const image = request.files;
-
-//     // Upload the new images to Cloudinary
-//     const options = {
-//       folder: "ecommerceApp/uploads", // Specify the folder in Cloudinary
-//       use_filename: true,
-//       unique_filename: false,
-//       overwrite: false,
-//     };
-
-//     for (let i = 0; i < image?.length; i++) {
-//       const img = await cloudinary.uploader.upload(
-//         image[i].path,
-//         options,
-//         function (error, result) {
-//           if (error) {
-//             console.log(error);
-//             return response.status(500).json({ error: "Image upload failed" });
-//           }
-//           imagesArr.push(result.secure_url);
-//           fs.unlinkSync(`uploads/${request.files[i].filename}`);
-//         }
-//       );
-//     }
-
-//     return response.status(200).json({
-//       images: imagesArr,
-//     });
-//   } catch (error) {
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       status: false,
-//     });
-//   }
-// }
-
-
-
-// ? Final code
-
-
-var imagesArr = {}; // Store images per product ID, replace with database storage in production
-
-// Helper function to check if image exists in Cloudinary
-async function checkImageExists(imageUrl) {
-  try {
+  //   try {
+    //     const image = request.files;
+    
+    //     // Upload the new images to Cloudinary
+    //     const options = {
+      //       folder: "ecommerceApp/uploads", // Specify the folder in Cloudinary
+      //       use_filename: true,
+      //       unique_filename: false,
+      //       overwrite: false,
+      //     };
+      
+      //     for (let i = 0; i < image?.length; i++) {
+        //       const img = await cloudinary.uploader.upload(
+          //         image[i].path,
+          //         options,
+          //         function (error, result) {
+            //           if (error) {
+              //             console.log(error);
+              //             return response.status(500).json({ error: "Image upload failed" });
+              //           }
+              //           imagesArr.push(result.secure_url);
+              //           fs.unlinkSync(`uploads/${request.files[i].filename}`);
+              //         }
+              //       );
+              //     }
+              
+              //     return response.status(200).json({
+                //       images: imagesArr,
+                //     });
+                //   } catch (error) {
+                  //     return response.status(500).json({
+                    //       message: error.message || error,
+                    //       error: true,
+                    //       status: false,
+                    //     });
+                    //   }
+                    // }
+                    
+                    
+                    
+                    // ? Final code
+                    
+                    
+                    var imagesArr = {}; // Store images per product ID, replace with database storage in production
+                    
+                    // Helper function to check if image exists in Cloudinary
+                    async function checkImageExists(imageUrl) {
+                      try {
     const response = await axios.head(imageUrl); // HEAD request to check image existence
     return response.status === 200; // If status is 200, image exists
   } catch (error) {
@@ -78,20 +79,21 @@ export async function uploadProductImages(request, response) {
   try {
     const { productId } = request.body;
     const images = request.files;
-
+    
     console.log("Received productId:", productId);
-
+    console.log("Uploaded files:", images);
+    
     if (!images || images.length === 0) {
       return response.status(400).json({ error: "No images provided" });
     }
-
+    
     // Initialize imagesArr per product ID (replace with a database in production)
     if (!productId) {
-      if (!imagesArr["new"]) imagesArr["new"] = [];
+      if (!Array.isArray(imagesArr["new"])) imagesArr["new"] = []; // Ensure it's an array
     } else {
-      if (!imagesArr[productId]) imagesArr[productId] = [];
+      if (!Array.isArray(imagesArr[productId])) imagesArr[productId] = []; // Ensure it's an array
     }
-
+    
     // Upload images and update imagesArr after successful upload
     const uploadedImages = await Promise.all(
       images.map(async (file) => {
@@ -102,9 +104,9 @@ export async function uploadProductImages(request, response) {
             unique_filename: false,
             overwrite: false,
           });
-
+          
           console.log("Uploaded image URL:", result.secure_url);
-
+          
           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
           return result.secure_url; // Return uploaded image URL
         } catch (error) {
@@ -113,24 +115,25 @@ export async function uploadProductImages(request, response) {
         }
       })
     );
-
+    
     // Filter out null values (failed uploads)
     const validImages = uploadedImages.filter(Boolean);
-
+    console.log("Valid uploaded images:", validImages);
+    
     // Update imagesArr after all uploads are completed
     if (productId) {
       imagesArr[productId].push(...validImages);
     } else {
       imagesArr["new"].push(...validImages);
     }
-
+    
     // Debugging: Check imagesArr before returning response
     console.log("Updated imagesArr:", imagesArr);
-
+    
     return response.status(200).json({
       images: productId ? imagesArr[productId] : imagesArr["new"],
     });
-
+    
   } catch (error) {
     console.log("Server Error:", error);
     return response.status(500).json({
@@ -140,6 +143,8 @@ export async function uploadProductImages(request, response) {
     });
   }
 }
+
+
 
 
 
@@ -1683,56 +1688,81 @@ export async function deleteProduct(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
+
 // delete multiple products
-export async function deleteMultipleProduct(request, response) {
-  const { ids } = request.body;
-
-  if (!ids || !Array.isArray(ids)) {
-    return response.status(400).json({
-      message: "Invalid product IDs.",
-      success: false,
-      error: true,
-    });
-  }
-
+export async function deleteMultipleProduct(req, res) {
   try {
-    for (let i = 0; i < ids?.length; i++) {
-      const product = await ProductModel.findById(ids[i]);
+    const { ids } = req.query;
 
-      if (!product) {
-        // If the product doesn't exist, continue to the next one
-        continue;
-      }
-
-      const images = product.images;
-
-      // Loop through each image and delete it from Cloudinary
-      for (let img of images) {
-        const imgUrl = img;
-        const urlArr = imgUrl.split("/");
-        const image = urlArr[urlArr.length - 1];
-        const imageName = image.split(".")[0];
-
-        if (imageName) {
-          // Deleting the image from Cloudinary
-          await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
-        }
-      }
+    // Check if ids exist and are valid
+    if (!ids) {
+      return res.status(400).json({
+        message: "No product IDs provided.",
+        success: false,
+        error: true,
+      });
     }
 
-    // After deleting images, delete the products from the database
-    await ProductModel.deleteMany({ _id: { $in: ids } });
+    console.log("Received IDs:", ids);
 
-    return response.status(200).json({
+    // Convert comma-separated string to an array and trim spaces
+    const idArray = ids.split(',').map(id => id.trim());
+
+    // Validate the IDs
+    if (idArray.length === 0 || idArray.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({
+        message: "Invalid product IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Fetch products before deletion
+    const products = await ProductModel.find({ _id: { $in: idArray } });
+
+    if (products.length === 0) {
+      return res.status(404).json({
+        message: "No products found with the given IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log(`Found ${products.length} products for deletion.`);
+
+    // Delete images from Cloudinary, handling individual image deletion errors
+    const imageDeletePromises = products.flatMap((product) =>
+      product.images.map(async (imgUrl) => {
+        try {
+          const imageName = imgUrl.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
+          console.log(`Deleted image: ${imageName}`);
+        } catch (err) {
+          console.error(`Error deleting image ${imgUrl}:`, err);
+        }
+      })
+    );
+
+    // Wait for all image deletions to complete, continue even if some fail
+    await Promise.allSettled(imageDeletePromises);
+
+    // Delete products from the database
+    await ProductModel.deleteMany({ _id: { $in: idArray } });
+
+    console.log("Products deleted successfully.");
+
+    return res.status(200).json({
       message: "Product(s) deleted successfully.",
       success: true,
       error: false,
     });
+
   } catch (error) {
-    return response.status(500).json({
-      message: error.message || "Something went wrong.",
+    console.error("Error deleting products:", error);
+    return res.status(500).json({
+      message: "Internal Server Error.",
+      success: false,
       error: true,
-      status: false,
     });
   }
 }

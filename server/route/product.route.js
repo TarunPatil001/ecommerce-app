@@ -55,8 +55,8 @@ productRouter.get("/get-all-featuredProducts", getAllFeaturedProducts);
 // delete product
 productRouter.delete("/:id", auth, deleteProduct);
 
-// delete product
-productRouter.delete("/delete-multiple-products", auth, deleteMultipleProduct);
+// delete multiple products
+productRouter.post("/delete-multiple-products",  deleteMultipleProduct);
 
 // get single product
 productRouter.get("/:id", getProduct);

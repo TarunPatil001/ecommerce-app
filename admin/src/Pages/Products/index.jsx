@@ -1,16 +1,18 @@
 import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
-import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
+import { RiDeleteBin6Line, RiDownloadCloud2Line, RiResetLeftFill } from 'react-icons/ri'
 import { Link, useParams } from 'react-router-dom'
 import ProgressBar from '../../Components/ProgressBar'
 import { MdOutlineEdit, MdOutlineFilterListOff } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import SearchBox from '../../Components/SearchBox'
 import { MyContext } from '../../App'
-import { deleteData, fetchDataFromApi } from '../../utils/api'
+import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import toast from 'react-hot-toast'
+
+
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -72,6 +74,11 @@ const Products = () => {
     const [subCategories, setSubCategories] = useState([]);
     const [thirdLevelCategories, setThirdLevelCategories] = useState([]);
 
+    // States to manage selected rows and select all functionality
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+
+
 
     // Fetch product data when categories change
     const fetchProducts = async () => {
@@ -115,7 +122,7 @@ const Products = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue]);
+    }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue, context?.isReducer]);
 
 
     // Handle Category Change
@@ -229,6 +236,67 @@ const Products = () => {
     };
 
 
+    // Handle Select All
+    const handleSelectAll = () => {
+        console.log("Select All Clicked: ", selectAll);
+        if (selectAll) {
+            setSelectedRows([]); // Uncheck all, clear selected rows array
+            console.log("Unchecking all rows");
+        } else {
+            // Select all rows in the current page by storing only the _id
+            const allRows = productData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(product => product._id);
+            setSelectedRows(allRows); // Select all rows
+            console.log("Selecting all rows with IDs: ", allRows);
+        }
+        setSelectAll(!selectAll); // Toggle selectAll state
+    };
+
+
+    // Handle Row Select or Deselect
+    const handleRowCheckboxChange = (product) => {
+        console.log("Row Checkbox clicked for product: ", product);
+        const isProductSelected = selectedRows.includes(product._id);
+        console.log("Is Product Selected? ", isProductSelected);
+
+        const newSelectedRows = isProductSelected
+            ? selectedRows.filter(id => id !== product._id) // Remove product _id from selection
+            : [...selectedRows, product._id]; // Add product _id to selection
+
+        setSelectedRows(newSelectedRows);
+        console.log("Updated selected rows (IDs): ", newSelectedRows);
+
+        // Check if all rows are selected manually
+        if (newSelectedRows.length === productData.length) {
+            setSelectAll(true); // All rows are selected
+            console.log("All rows selected");
+        } else {
+            setSelectAll(false); // Not all rows selected
+            console.log("Not all rows selected");
+        }
+    };
+
+
+    // Handle the rendering of individual row checkboxes
+    const isRowSelected = (product) => selectedRows.includes(product._id);
+
+    useEffect(() => {
+        console.log("Selected rows (IDs) updated: ", selectedRows);
+    }, [selectedRows]);
+
+    useEffect(() => {
+        console.log("Select All status changed: ", selectAll);
+    }, [selectAll]);
+
+    useEffect(() => {
+        console.log("Product Data: ", productData);
+    }, [productData]);
+
+    useEffect(() => {
+        console.log("Page: ", page, "Rows Per Page: ", rowsPerPage);
+    }, [page, rowsPerPage]);
+
 
 
 
@@ -304,22 +372,74 @@ const Products = () => {
 
 
 
+    const handleDeleteSelectedRow = async (e, selectedRows) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            console.log("Selected Rows:", selectedRows);
+
+            // Validate selectedRows
+            if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
+                throw new Error("Invalid product IDs.");
+            }
+
+            // Convert array to comma-separated string
+            const idsQueryParam = selectedRows.join(',');
+
+            // Make DELETE request with query parameters
+            const result = await toast.promise(
+                deleteMultipleData(`/api/product/delete-multiple-products?ids=${idsQueryParam}`),
+                {
+                    loading: "Deleting product(s)... Please wait.",
+                    success: (response) => {  // Removed async from here
+                        if (response.success) {
+                            // Update UI to remove the deleted products
+                            setProductData((prevData) =>
+                                prevData.filter((product) => !selectedRows.includes(product._id))
+                            );
+                            setSelectedRows([]);
+                            return response.message || "Product(s) deleted successfully!";
+                        } else {
+                            throw new Error(response.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        return err.message || "Failed to delete product(s). Please try again.";
+                    },
+                }
+            );
+
+            console.log("Delete Result:", result);
+        } catch (err) {
+            console.error("Error in handleDeleteSelectedRow:", err);
+            toast.error(err.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+
+
+
+
 
 
 
     return (
         <>
-            <div className='flex items-center justify-between px-5 pt-3'>
-                <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">Material UI</span></h2>
-                <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize' onClick={resetFilters}><MdOutlineFilterListOff className='text-[18px]' />Reset Filters</Button>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><GoPlus className='text-[20px]' />Add Product</Button>
-                </div>
-            </div>
 
-            <div className="card my-4 bg-white border rounded-md px-1 pt-5 ">
+            <div className="card my-4 bg-white border rounded-md px-1">
 
-                <div className='flex w-full px-5 justify-between items-end gap-2'>
+                <div className='sticky top-0 left-0 z-10 mt-0 pt-16 flex w-full items-end justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
+                    <div className='flex items-center justify-between px-5 absolute left-2 top-2'>
+                        <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">Material UI</span></h2>
+                    </div>
+                    <div className='col ml-auto flex items-center justify-end gap-3 absolute right-2 top-2'>
+                        <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize' onClick={resetFilters}><MdOutlineFilterListOff className='text-[18px]' />Reset Filters</Button>
+                        <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><GoPlus className='text-[20px]' />Add Product</Button>
+                    </div>
 
                     <div className='col w-[35%]'>
                         <SearchBox searchName="products" />
@@ -336,7 +456,7 @@ const Products = () => {
                                 value={Array.isArray(productCategory) ? productCategory : []}
                                 onChange={handleChangeProductCategory}
                                 displayEmpty
-                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+                                MenuProps={MenuProps}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
                                         return <em>Sort by broad category</em>;
@@ -377,7 +497,7 @@ const Products = () => {
                                 value={Array.isArray(productCategory2) ? productCategory2 : []}
                                 onChange={handleChangeProductCategory2}
                                 displayEmpty
-                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+                                MenuProps={MenuProps}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
                                         return <em>Sort by subcategory</em>;
@@ -416,7 +536,7 @@ const Products = () => {
                                 value={Array.isArray(productCategory3) ? productCategory3 : []}
                                 onChange={handleChangeProductCategory3}
                                 displayEmpty
-                                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+                                MenuProps={MenuProps}
                                 renderValue={(selected) => {
                                     if (selected.length === 0) {
                                         return <em>Sort by third-level category</em>;
@@ -447,13 +567,16 @@ const Products = () => {
 
                 </div>
 
-                <TableContainer className='max-h-[440px] customScroll mt-5'>
+                <TableContainer className='customScroll mt-5'>
                     <Table stickyHeader aria-label="sticky table">
 
                         <TableHead>
                             <TableRow>
                                 <TableCell className="px-6 py-2 text-left">
-                                    <Checkbox {...label} size='small' />
+                                    <Checkbox
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                    />
                                 </TableCell>
                                 {columns.map((column) => (
                                     <TableCell
@@ -473,7 +596,10 @@ const Products = () => {
                                     .map((product, index) => (
                                         <TableRow key={index}>
                                             <TableCell style={{ minWidth: columns.minWidth }}>
-                                                <Checkbox {...label} size='small' />
+                                                <Checkbox
+                                                    checked={isRowSelected(product)}
+                                                    onChange={() => handleRowCheckboxChange(product)}
+                                                />
                                             </TableCell>
                                             <TableCell style={{ minWidth: columns.minWidth }}>
                                                 <div className="flex items-start gap-4 w-[350px]">
@@ -530,9 +656,11 @@ const Products = () => {
                                                         </Button>
                                                     </Tooltip>
                                                     <Tooltip title="View Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'>
-                                                            <IoEyeOutline className='text-[35px]' />
-                                                        </Button>
+                                                        <Link to={`/product/${product?._id}`}>
+                                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'>
+                                                                <IoEyeOutline className='text-[35px]' />
+                                                            </Button>
+                                                        </Link>
                                                     </Tooltip>
                                                     <Tooltip title="Delete Product" arrow placement="top">
                                                         <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => handleDeleteProduct(e, product?._id)}>
@@ -547,7 +675,7 @@ const Products = () => {
 
                             {productData.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={8} align="center">
+                                    <TableCell colSpan={8} align="center" style={{ height: 300 }}>
                                         <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
                                             &#128193; No Records Available
                                         </span>
@@ -556,7 +684,7 @@ const Products = () => {
                             )}
 
                             {emptyRows > 0 && (
-                                <TableRow style={{ height: 53 * emptyRows }}>
+                                <TableRow style={{ height: 15 * emptyRows }}>
                                     <TableCell colSpan={8}>
                                     </TableCell>
                                 </TableRow>
@@ -568,12 +696,33 @@ const Products = () => {
                     </Table>
                 </TableContainer>
 
+                {
+                    selectedRows.length > 0 &&
+
+                    <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
+                        {selectedRows.length > 0 && (
+                            <span>
+                                <span className='font-bold'>{selectedRows.length}</span> product{selectedRows.length > 1 ? 's' : ''} selected
+                            </span>
+                        )}
+                        <Button
+                            type="reset"
+                            onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
+                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                        >
+                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                        </Button>
+                    </div>
+
+                }
+
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
                     count={productData?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
+                    MenuProps={MenuProps}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
