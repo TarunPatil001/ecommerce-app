@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, deleteAllUnWantedImages, deleteMultipleProduct, deleteProduct, getAllFeaturedProducts, getAllFilteredProducts, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageProductFromCloudinary, updateProduct, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, createProductRams, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteProduct, deleteProductRams, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageProductFromCloudinary, updateProduct, updateProductRams, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -56,7 +56,7 @@ productRouter.get("/get-all-featuredProducts", getAllFeaturedProducts);
 productRouter.delete("/:id", auth, deleteProduct);
 
 // delete multiple products
-productRouter.post("/delete-multiple-products",  deleteMultipleProduct);
+productRouter.post("/delete-multiple-products", auth,  deleteMultipleProduct);
 
 // get single product
 productRouter.get("/:id", getProduct);
@@ -64,7 +64,23 @@ productRouter.get("/:id", getProduct);
 // update product
 productRouter.put("/updateProduct/:id", auth, updateProduct);
  
-// Create a new product
+// delete All UnWanted Images
 productRouter.post("/deleteAllUnWantedImages", auth, deleteAllUnWantedImages);
+
+// create product Rams 
+productRouter.post("/productRams/create", auth, createProductRams);
+
+// Get all products
+productRouter.get("/productRams/get-all-productRams", getAllProductRams);
+
+// update productRams
+productRouter.put("/productRams/updateProductRams/:id", auth, updateProductRams);
+
+// delete productRams
+productRouter.delete("/productRams/:id", auth, deleteProductRams);
+
+// delete multiple productRams
+productRouter.post("/productRams/delete-multiple-productRams", auth, deleteMultipleProductRams);
+
 
 export default productRouter;

@@ -206,7 +206,7 @@ export const deleteData = async (url) => {
 /** Delete Data (POST) for multiple products */
 export const deleteMultipleData = async (url) => {
   try {
-    const response = await axios.post(apiUrl + url, {
+    const response = await axios.post(apiUrl + url, {}, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json", // Setting content type as JSON

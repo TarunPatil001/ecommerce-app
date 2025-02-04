@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
+import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Select, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line, RiResetLeftFill } from 'react-icons/ri'
@@ -61,6 +61,7 @@ const Products = () => {
 
     const context = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [categoryFilterValue, setCategoryFilterValue] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -80,8 +81,8 @@ const Products = () => {
 
 
 
-    // Fetch product data when categories change
     const fetchProducts = async () => {
+        setLoading(true);
         try {
             // Construct query parameters dynamically
             const queryParams = new URLSearchParams();
@@ -117,10 +118,13 @@ const Products = () => {
             setProductData(res?.data || []);
         } catch (error) {
             console.error("Error fetching product data:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
+        // Fetch products when categories or filters change
         fetchProducts();
     }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue, context?.isReducer]);
 
@@ -569,7 +573,6 @@ const Products = () => {
 
                 <TableContainer className='customScroll mt-5'>
                     <Table stickyHeader aria-label="sticky table">
-
                         <TableHead>
                             <TableRow>
                                 <TableCell className="px-6 py-2 text-left">
@@ -591,89 +594,57 @@ const Products = () => {
                         </TableHead>
 
                         <TableBody>
-                            {
-                                productData?.length !== 0 && productData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Apply pagination
-                                    .map((product, index) => (
+
+
+                            {loading ? (
+                                <>
+                                    
+                                    {/* //Skeleton UI when loading */}
+                                    
+                                    {Array.from({ length: rowsPerPage }).map((_, index) => (
                                         <TableRow key={index}>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                <Checkbox
-                                                    checked={isRowSelected(product)}
-                                                    onChange={() => handleRowCheckboxChange(product)}
-                                                />
-                                            </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
+                                            <TableCell className="table-cell"><div className='flex items-center justify-center'><Skeleton variant="rectangular" width={18} height={18} /></div></TableCell>
+                                            <TableCell className="table-cell">
                                                 <div className="flex items-start gap-4 w-[350px]">
-                                                    <div className='img w-[50px] h-[50px] overflow-hidden rounded-md shadow-md group'>
-                                                        <Link to={`/product/${product?._id}`}>
-                                                            <LazyLoadImage
-                                                                alt="product_img"
-                                                                effect="blur"
-                                                                src={product.images[0]}
-                                                                className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
-                                                            />
-                                                        </Link>
+                                                    <div className="img w-[50px] h-[50px] overflow-hidden rounded-md shadow-md group">
+                                                        <Skeleton variant="rectangular" width={50} height={50} />
                                                     </div>
-                                                    <div className='info w-[75%] flex flex-col items-start gap-1'>
-                                                        <Link to={`/product/${product?._id}`}>
-                                                            <h3 className='text-[12px] font-bold leading-4 hover:text-[var(--text-active)]'>{product?.name}</h3>
-                                                        </Link>
-                                                        <span className='text-[12px]'>{product?.brand}</span>
+                                                    <div className="info w-[75%] flex flex-col items-start gap-1">
+                                                        <Skeleton variant="text" width="100%" />
+                                                        <Skeleton variant="text" width="50%" />
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                {product?.categoryName}
-                                            </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                {product?.subCategoryName}
-                                            </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                {product?.thirdSubCategoryName}
-                                            </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
+                                            <TableCell className="table-cell"><Skeleton variant="text" width="100%" /></TableCell>
+                                            <TableCell className="table-cell"><Skeleton variant="text" width="100%" /></TableCell>
+                                            <TableCell className="table-cell"><Skeleton variant="text" width="100%" /></TableCell>
+                                            <TableCell className="table-cell">
                                                 <div className="flex flex-col items-start justify-center gap-1">
-                                                    <span className="price text-[var(--text-light)] text-[14px] font-bold flex items-center">
-                                                        &#8377;<span>{new Intl.NumberFormat('en-IN').format(product?.price)}</span>
-                                                    </span>
-                                                    <span className="oldPrice line-through text-[var(--text-light)] text-[12px] font-normal flex items-center">
-                                                        &#8377;<span>{new Intl.NumberFormat('en-IN').format(product?.oldPrice)}</span>
-                                                    </span>
-                                                    <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">{product?.discount}% OFF</span>
+                                                    <Skeleton variant="text" width="60%" />
+                                                    <Skeleton variant="text" width="80%" />
+                                                    <Skeleton variant="text" width="60%" />
                                                 </div>
                                             </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                <p className='text-[14px] flex flex-col gap-1 justify-center text-center'>
-                                                    <span><span className='font-bold'>{product?.sale}</span> sold</span>
-                                                    <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
-                                                    <span><span className='text-[14px] font-bold'>{product?.countInStock - product?.sale}</span> remain</span>
-                                                </p>
+                                            <TableCell className="table-cell">
+                                                <div className="flex flex-col items-center justify-center gap-1">
+                                                    <Skeleton variant="text" width="60%" />
+                                                    <Skeleton variant="text" sx={{ fontSize: '5px' }} width="100%" />
+                                                    <Skeleton variant="text" width="60%" />
+                                                </div>
                                             </TableCell>
-                                            <TableCell style={{ minWidth: columns.minWidth }}>
-                                                <div className='flex items-center gap-2'>
-                                                    <Tooltip title="Edit Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditCategory(product?._id, product?.name); }}>
-                                                            <MdOutlineEdit className='text-[35px]' />
-                                                        </Button>
-                                                    </Tooltip>
-                                                    <Tooltip title="View Product" arrow placement="top">
-                                                        <Link to={`/product/${product?._id}`}>
-                                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'>
-                                                                <IoEyeOutline className='text-[35px]' />
-                                                            </Button>
-                                                        </Link>
-                                                    </Tooltip>
-                                                    <Tooltip title="Delete Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => handleDeleteProduct(e, product?._id)}>
-                                                            <RiDeleteBin6Line className='text-[35px]' />
-                                                        </Button>
-                                                    </Tooltip>
+                                            <TableCell className="table-cell">
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton variant="rectangular" width={35} height={35} />
+                                                    <Skeleton variant="rectangular" width={35} height={35} />
+                                                    <Skeleton variant="rectangular" width={35} height={35} />
                                                 </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                            }
+                                    ))}
+                                </>
 
-                            {productData.length === 0 && (
+                            ) : productData?.length === 0 ? (
+                                // No Records Available message after data is loaded but no data exists
                                 <TableRow>
                                     <TableCell colSpan={8} align="center" style={{ height: 300 }}>
                                         <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
@@ -681,7 +652,88 @@ const Products = () => {
                                         </span>
                                     </TableCell>
                                 </TableRow>
-                            )}
+                            ) : (
+                                // Actual data rendering
+                                productData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((product, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell className="table-cell">
+                                            <Checkbox checked={isRowSelected(product)} onChange={() => handleRowCheckboxChange(product)} />
+                                        </TableCell>
+                                        <TableCell className="table-cell">
+                                            <div className="flex items-start gap-4 w-[350px]">
+                                                <div className="img w-[50px] h-[50px] overflow-hidden rounded-md shadow-md group">
+                                                    <Link to={`/product/${product?._id}`}>
+                                                        <LazyLoadImage
+                                                            alt="product_img"
+                                                            effect="blur"
+                                                            src={product.images[0]}
+                                                            className="w-full h-full object-cover hover:scale-110 transition-all duration-300"
+                                                        />
+                                                    </Link>
+                                                </div>
+                                                <div className="info w-[75%] flex flex-col items-start gap-1">
+                                                    <Link to={`/product/${product?._id}`}>
+                                                        <h3 className="text-[12px] font-bold leading-4 hover:text-[var(--text-active)]">
+                                                            {product?.name}
+                                                        </h3>
+                                                    </Link>
+                                                    <span className="text-[12px]">{product?.brand}</span>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="table-cell">{product?.categoryName}</TableCell>
+                                        <TableCell className="table-cell">{product?.subCategoryName}</TableCell>
+                                        <TableCell className="table-cell">{product?.thirdSubCategoryName}</TableCell>
+                                        <TableCell className="table-cell">
+                                            <div className="flex flex-col items-start justify-center gap-1">
+                                                <span className="price text-[14px] font-bold flex items-center">
+                                                    &#8377;<span>{new Intl.NumberFormat("en-IN").format(product?.price)}</span>
+                                                </span>
+                                                <span className="oldPrice line-through text-[var(--text-light)] text-[12px] font-normal flex items-center">
+                                                    &#8377;<span>{new Intl.NumberFormat("en-IN").format(product?.oldPrice)}</span>
+                                                </span>
+                                                <span className="text-[12px] text-[var(--off-color)] font-medium">{product?.discount}% off</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="table-cell">
+                                            <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
+                                                <span>
+                                                    <span className="font-bold">{product?.sale}</span> sold
+                                                </span>
+                                                <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
+                                                <span>
+                                                    <span className="text-[14px] font-bold">{product?.countInStock - product?.sale}</span> remain
+                                                </span>
+                                            </p>
+                                        </TableCell>
+                                        <TableCell className="table-cell">
+                                            <div className="flex items-center gap-2">
+                                                <Tooltip title="Edit Product" arrow placement="top">
+                                                    <Button className="!h-[35px] !w-[35px] !min-w-[35px] !bg-blue-500 !text-white shadow" onClick={() => handleEditCategory(product?._id, product?.name)}>
+                                                        <MdOutlineEdit className="text-[35px]" />
+                                                    </Button>
+                                                </Tooltip>
+                                                <Tooltip title="View Product" arrow placement="top">
+                                                    <Link to={`/product/${product?._id}`}>
+                                                        <Button className="!h-[35px] !w-[35px] !min-w-[35px] !bg-yellow-400 !text-white shadow">
+                                                            <IoEyeOutline className="text-[35px]" />
+                                                        </Button>
+                                                    </Link>
+                                                </Tooltip>
+                                                <Tooltip title="Delete Product" arrow placement="top">
+                                                    <Button className="!h-[35px] !w-[35px] !min-w-[35px] !bg-red-500 !text-white shadow" onClick={(e) => handleDeleteProduct(e, product?._id)}>
+                                                        <RiDeleteBin6Line className="text-[35px]" />
+                                                    </Button>
+                                                </Tooltip>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+
+                            )
+
+                            }
+
 
                             {emptyRows > 0 && (
                                 <TableRow style={{ height: 15 * emptyRows }}>
@@ -695,6 +747,11 @@ const Products = () => {
 
                     </Table>
                 </TableContainer>
+
+
+
+
+
 
                 {
                     selectedRows.length > 0 &&

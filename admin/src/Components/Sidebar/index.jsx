@@ -25,7 +25,7 @@ const Sidebar = () => {
   const [subMenuIndex2, setSubMenuIndex2] = useState(false);
   const [subMenuIndex3, setSubMenuIndex3] = useState(false);
 
-  const {id} = useParams();
+  const { id } = useParams();
 
   // Define a mapping of paths to menu names
   const menuMapping = {
@@ -34,6 +34,7 @@ const Sidebar = () => {
     "/users": "Users",
     "/profile": "Profile",
     "/products": "Product List",
+    "/products/addProductRams": "Add Product Rams",
     "/category/list": "Categories List",
     "/subCategory/list": "Sub-Categories List",
     "/orders": "Orders",
@@ -54,14 +55,14 @@ const Sidebar = () => {
 
 
   const logout = () => {
-      fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
-        if (res?.error === false) {
-          context.setIsLogin(false);
-          localStorage.clear();
-          navigate("/sign-in");
-        }
-      })
-    }
+    fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+      if (res?.error === false) {
+        context.setIsLogin(false);
+        localStorage.clear();
+        navigate("/sign-in");
+      }
+    })
+  }
 
 
   return (
@@ -101,10 +102,10 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Add Home Banner" })}>
-                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                      <span>Add Home Banner</span>
-                    </Button>
+                  <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Add Home Banner" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add Home Banner</span>
+                  </Button>
                 </li>
               </ul>
             </Collapse>
@@ -118,7 +119,7 @@ const Sidebar = () => {
               </Button>
             </Link>
           </li>
-          
+
           <li>
             <Link to="/profile">
               <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Profile' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Profile')}><BiSolidUserDetail className='text-[25px]' />
@@ -143,17 +144,24 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
+
                 <li className='w-full'>
-                
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Product Details" })}>
-                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                      <span>Add Product</span>
+                  <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Product Details" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add Product</span>
+                  </Button>
+                </li>
+
+                <li className='w-full'>
+                  <Link to="/products/addProductRams">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Rams' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Rams')}>
+                      <GoDotFill className={`${selectedMenu === 'Add Product Rams' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Add Product RAMS</span>
                     </Button>
-                   
+                  </Link>
                 </li>
               </ul>
             </Collapse>
-
           </li>
 
           <li>
@@ -173,10 +181,10 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Category Details" })}>
-                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                      <span>Add a Category</span>
-                    </Button>
+                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Category Details" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add a Category</span>
+                  </Button>
                 </li>
                 <li className='w-full'>
                   <Link to="/subCategory/list">
@@ -187,10 +195,10 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li className='w-full'>
-                    <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() =>context.setIsOpenFullScreenPanel({ open: true, model: "Sub-Category Details" })}>
-                      <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                      <span>Add a Sub-Category</span>
-                    </Button>
+                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Sub-Category Details" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add a Sub-Category</span>
+                  </Button>
                 </li>
               </ul>
             </Collapse>
@@ -206,9 +214,9 @@ const Sidebar = () => {
           </li>
 
           <li>
-              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => {setSelectedMenu('Logout'); logout();}}><MdOutlineLogout className='text-[25px]' />
-                <span>Logout</span>
-              </Button>
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Logout'); logout(); }}><MdOutlineLogout className='text-[25px]' />
+              <span>Logout</span>
+            </Button>
           </li>
 
         </ul>
