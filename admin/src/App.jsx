@@ -35,6 +35,8 @@ import AddAddress from './Pages/Address/addAddress';
 import { useReducer } from 'react';
 import ProductDetails from './Pages/Products/productDetails';
 import AddRAMS from './Pages/Products/addRAMS';
+import AddWeight from './Pages/Products/addWeight';
+import AddSize from './Pages/Products/addSize';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -159,6 +161,44 @@ function App() {
               </div>
               <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
                 <AddRAMS />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
+    {
+      path: "/products/addProductWeight",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className='contentMain flex'>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+                <Sidebar />
+              </div>
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <AddWeight />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
+    {
+      path: "/products/addProductSize",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className='contentMain flex'>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+                <Sidebar />
+              </div>
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <AddSize />
               </div>
             </div>
           </section>

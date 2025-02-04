@@ -35,6 +35,8 @@ const Sidebar = () => {
     "/profile": "Profile",
     "/products": "Product List",
     "/products/addProductRams": "Add Product Rams",
+    "/products/addProductWeight": "Add Product Weight",
+    "/products/addProductSize": "Add Product Size",
     "/category/list": "Categories List",
     "/subCategory/list": "Sub-Categories List",
     "/orders": "Orders",
@@ -160,6 +162,25 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
+                
+                <li className='w-full'>
+                  <Link to="/products/addProductWeight">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Weight' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Weight')}>
+                      <GoDotFill className={`${selectedMenu === 'Add Product Weight' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Add Product Weight</span>
+                    </Button>
+                  </Link>
+                </li>
+                
+                <li className='w-full'>
+                  <Link to="/products/addProductSize">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Size' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Size')}>
+                      <GoDotFill className={`${selectedMenu === 'Add Product Size' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Add Product Size</span>
+                    </Button>
+                  </Link>
+                </li>
+
               </ul>
             </Collapse>
           </li>
