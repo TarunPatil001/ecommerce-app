@@ -1,11 +1,14 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, createProductRams, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteProduct, deleteProductRams, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount, getProduct, removeImageProductFromCloudinary, updateProduct, updateProductRams, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, createProductRams, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductWeight, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductWeight, getProduct, getProductRamById, getProductWeightById, removeImageProductFromCloudinary, updateProduct, updateProductRams, updateProductWeight, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
 const productRouter = Router();
+
+// ---------------------------------------------------------------------------------------------
+// Product Routes
 
 // Upload product images
 productRouter.post("/upload-product-images", auth, upload.array("images"), uploadProductImages);
@@ -67,11 +70,19 @@ productRouter.put("/updateProduct/:id", auth, updateProduct);
 // delete All UnWanted Images
 productRouter.post("/deleteAllUnWantedImages", auth, deleteAllUnWantedImages);
 
+
+// =======================================================================================================================
+
+// Product Rams routes
+
 // create product Rams 
 productRouter.post("/productRams/create", auth, createProductRams);
 
-// Get all products
+// Get all productRams
 productRouter.get("/productRams/get-all-productRams", getAllProductRams);
+
+// Get all productRams
+productRouter.get("/productRams/get-productRamsById/:id", getProductRamById);
 
 // update productRams
 productRouter.put("/productRams/updateProductRams/:id", auth, updateProductRams);
@@ -81,6 +92,31 @@ productRouter.delete("/productRams/:id", auth, deleteProductRams);
 
 // delete multiple productRams
 productRouter.post("/productRams/delete-multiple-productRams", auth, deleteMultipleProductRams);
+
+
+// =======================================================================================================================
+
+// Product Weight routes
+
+// create productWeight 
+productRouter.post("/productWeight/create", auth, createProductWeight);
+
+// Get all productWeight
+productRouter.get("/productWeight/get-all-productWeight", getAllProductWeight);
+
+// Get productWeight by id
+productRouter.get("/productRams/get-productWeightById/:id", getProductWeightById);
+
+// update productWeight
+productRouter.put("/productWeight/updateProductWeight/:id", auth, updateProductWeight);
+
+// delete productWeight
+productRouter.delete("/productWeight/:id", auth, deleteProductWeight);
+
+// delete multiple productWeight
+productRouter.post("/productWeight/delete-multiple-productWeight", auth, deleteMultipleProductWeight);
+
+
 
 
 export default productRouter;
