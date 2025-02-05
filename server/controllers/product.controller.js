@@ -1213,6 +1213,49 @@ export async function removeImageProductFromCloudinary(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
+// Function to parse RAM size into GB for sorting
+const parseRamSize = (ramSize) => {
+  const sizeValue = parseInt(ramSize);
+  if (ramSize.includes("TB")) {
+    return sizeValue * 1024; // Convert TB to GB
+  } else if (ramSize.includes("GB")) {
+    return sizeValue; // In GB
+  } else if (ramSize.includes("MB")) {
+    return sizeValue / 1024; // Convert MB to GB
+  }
+  return 0; // Default case if no match
+};
+
+// Function to get valid RAMs dynamically from DB and sort from small to large
+const getValidProductRams = async () => {
+  try {
+    const res = await ProductRamsModel.find().select("name"); // Fetch only RAM names
+
+    if (res.length === 0) {
+      console.log("No product RAMs found.");
+      return [];
+    }
+
+    // Extract RAM names from the database response
+    const validProductRams = res.map((ram) => ram.name);
+
+    // Sort RAM sizes from small to large by numerical value
+    const sortedValidProductRams = validProductRams.sort((a, b) => parseRamSize(a) - parseRamSize(b));
+
+    return sortedValidProductRams;
+
+  } catch (error) {
+    console.error("Error fetching product RAMs:", error);
+    return []; // Return empty array if there's an error
+  }
+};
+
+
+
+
+
+
+
 export async function updateProduct(request, response) {
   try {
     const productId = request.params.id;
@@ -1274,15 +1317,60 @@ export async function updateProduct(request, response) {
     // Update the product's images with the valid new image URLs
     product.images = validNewImages.length > 0 ? validNewImages : product.images;
 
-    // Filter and sort value arrays before updating
-    const filterValidValues = (array) => {
-      if (!Array.isArray(array)) return [];
-      return array.filter(Boolean).sort((a, b) => parseInt(a) - parseInt(b));
+
+
+
+    // Fetch valid RAMs dynamically
+    const validProductRams = await getValidProductRams(); // Assume this is a valid array like ["1TB", "16GB", "8GB"]
+
+    // Validate product RAMs from request body
+    const filteredProductRams = (request.body.productRam || [])
+      .filter((ram) => validProductRams.includes(ram)) // Filter valid RAMs
+      .sort((a, b) => parseRamSize(a) - parseRamSize(b)); // Sort RAMs from small to large
+
+    // Output the filtered and sorted valid RAMs
+    console.log("Filtered and Sorted Product Rams:", filteredProductRams);
+
+
+
+
+
+    // Dynamically fetch valid weights from DB
+    const validWeights = await ProductWeightModel.find({}); // Assuming weights are stored in this collection
+
+    // Create a mapping of weight names to their order in the database
+    const weightOrder = validWeights.reduce((acc, weight, index) => {
+      acc[weight.name] = index + 1;  // Assign order starting from 1
+      return acc;
+    }, {});
+
+    // Function to parse weight string to grams
+    const parseWeightToGrams = (weight) => {
+      const value = parseFloat(weight);  // Extract numeric part
+      if (weight.includes('kg')) {
+        return value * 1000;  // Convert kg to grams
+      }
+      return value;  // gm is already in grams
     };
 
-    // Filter valid size options from the request body
-    const validSizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-    const filteredSize = validSizes.filter(size => request.body.size.includes(size));
+    // Sort the productWeight array dynamically
+    const sortedWeights = (request.body.productWeight || [])  // Fallback to empty array if not provided
+      .filter((weight) => weightOrder[weight])  // Keep only valid weights from DB
+      .sort((a, b) => {
+        const weightAInGrams = parseWeightToGrams(a);  // Convert weight 'a' to grams
+        const weightBInGrams = parseWeightToGrams(b);  // Convert weight 'b' to grams
+
+        // Compare by weight in grams (not by the index in DB)
+        return weightAInGrams - weightBInGrams;
+      });
+
+    console.log("Sorted Weights:", sortedWeights);
+
+
+
+
+
+
 
     // Update the product details in the database
     const updatedProduct = await ProductModel.findByIdAndUpdate(
@@ -1305,9 +1393,9 @@ export async function updateProduct(request, response) {
         rating: request.body.rating,
         isFeatured: request.body.isFeatured,
         discount: request.body.discount,
-        productRam: filterValidValues(request.body.productRam),
-        size: filteredSize,
-        productWeight: filterValidValues(request.body.productWeight),
+        productRam: filteredProductRams, // Save the sorted product RAMs
+        productWeight: sortedWeights,
+        size: request.body.size, // Save the sorted sizes
       },
       { new: true } // Return the updated document
     );
@@ -1402,7 +1490,7 @@ export async function createProductRams(request, response) {
   try {
     // Create new productRams
     let productRams = new ProductRamsModel({
-      name : request.body.name,
+      name: request.body.name,
     });
 
     // Save the product to the database
@@ -1633,7 +1721,7 @@ export async function deleteMultipleProductRams(req, res) {
     });
 
   } catch (error) {
-    console.error("Error deleting product Rams:", error); 
+    console.error("Error deleting product Rams:", error);
     return res.status(500).json({
       message: "Internal Server Error.",
       success: false,
@@ -1706,7 +1794,7 @@ export async function createProductWeight(request, response) {
   try {
     // Create new productRams
     let productWeight = new ProductWeightModel({
-      name : request.body.name,
+      name: request.body.name,
     });
 
     // Save the product to the database
@@ -1809,7 +1897,7 @@ export async function getProductWeightById(request, response) {
     }
 
     // Fetch the productWeight by ID
-    const productWeight  = await ProductWeightModel.findById(id);
+    const productWeight = await ProductWeightModel.findById(id);
 
     if (!productWeight) {
       return response.status(404).json({
@@ -1934,7 +2022,7 @@ export async function deleteMultipleProductWeight(req, res) {
     });
 
   } catch (error) {
-    console.error("Error deleting product weights:", error); 
+    console.error("Error deleting product weights:", error);
     return res.status(500).json({
       message: "Internal Server Error.",
       success: false,
@@ -2007,7 +2095,7 @@ export async function createProductSize(request, response) {
   try {
     // Create new productSize
     let productSize = new ProductSizeModel({
-      name : request.body.name,
+      name: request.body.name,
     });
 
     // Save the product to the database
@@ -2107,7 +2195,7 @@ export async function getProductSizeById(request, response) {
     }
 
     // Fetch the productSize by ID
-    const productSize  = await ProductSizeModel.findById(id);
+    const productSize = await ProductSizeModel.findById(id);
 
     if (!productSize) {
       return response.status(404).json({
@@ -2232,7 +2320,7 @@ export async function deleteMultipleProductSize(req, res) {
     });
 
   } catch (error) {
-    console.error("Error deleting product size:", error); 
+    console.error("Error deleting product size:", error);
     return res.status(500).json({
       message: "Internal Server Error.",
       success: false,

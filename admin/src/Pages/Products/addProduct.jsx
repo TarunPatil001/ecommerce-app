@@ -21,7 +21,7 @@ const MenuProps = {
     PaperProps: {
         style: {
             maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
+            width: 120,
         },
     },
 };
@@ -39,6 +39,9 @@ const AddProduct = () => {
     const [filteredSubCategories, setFilteredSubCategories] = useState([]); // Filtered third-level categories
 
     const [isFeatured, setIsFeatured] = useState('');
+    const [productRamData, setProductRamData] = useState([]);
+    const [productWeightData, setProductWeightData] = useState([]);
+    const [productSizeData, setProductSizeData] = useState([]);
     const [productRams, setProductRams] = useState([]);
     const [productWeight, setProductWeight] = useState([]);
     const [productSize, setProductSize] = useState([]);
@@ -307,6 +310,57 @@ const AddProduct = () => {
     };
 
 
+    useEffect(() => {
+        fetchDataFromApi("/api/product/productRams/get-all-productRams").then((res) => {
+            console.log("Fetched RAM Data: ", res?.data); // Verify the structure
+            setProductRamData(res?.data);
+        });
+    }, [context?.isReducer]);
+
+
+
+    useEffect(() => {
+        fetchDataFromApi("/api/product/productWeight/get-all-productWeight").then((res) => {
+            console.log("Fetched Weight Data: ", res?.data); // Verify the structure
+            setProductWeightData(res?.data);
+        });
+    }, [context?.isReducer]);
+
+
+    useEffect(() => {
+        fetchDataFromApi("/api/product/productSize/get-all-productSize").then((res) => {
+            console.log("Fetched Size Data: ", res?.data); // Verify the structure
+            setProductSizeData(res?.data);
+        });
+    }, [context?.isReducer]);
+
+
+
+    const convertToBytes = (size) => {
+        const sizeMap = {
+            KB: 1,       // 1 KB = 1 byte
+            MB: 1024,    // 1 MB = 1024 KB
+            GB: 1024 * 1024, // 1 GB = 1024 MB
+            TB: 1024 * 1024 * 1024, // 1 TB = 1024 GB
+        };
+
+        const match = size.match(/^(\d+)(KB|MB|GB|TB)$/);
+        if (match) {
+            const value = parseInt(match[1], 10);
+            const unit = match[2];
+            return value * sizeMap[unit];
+        }
+        return 0; // Default if no match is found
+    };
+
+    const sortRamData = (ramData) => {
+        return ramData
+            .map((ram) => ram.name) // Extract the RAM names (e.g., "1GB", "4GB", etc.)
+            .sort((a, b) => convertToBytes(a) - convertToBytes(b)); // Sort based on the byte conversion
+    };
+
+    const sortedProductRamData = sortRamData(productRamData);
+
 
     const handleChangeProductRams = (event) => {
         const selectedValues = event.target.value;
@@ -321,21 +375,46 @@ const AddProduct = () => {
         setter(value.length > 0 ? value : []);
     };
 
+
+
+
+    const parseWeight = (weight) => {
+        const value = parseFloat(weight);
+        if (weight.includes('kg')) {
+            return value * 1000; // Convert kg to grams
+        }
+        return value;
+    };
+
+    const sortedWeights = [...productWeightData].sort((a, b) => {
+        return parseWeight(a.name) - parseWeight(b.name);
+    });
+
+    // Handle the weight selection change
     const handleChangeProductWeight = (event) => {
         const selectedValues = event.target.value;
-        setProductWeight(selectedValues);
+        handleSetProductWeight(setProductWeight, selectedValues);  // Use helper function for setting the weight
         setFormFields((prevFormFields) => ({
             ...prevFormFields,
             productWeight: selectedValues,
         }));
     };
 
+    // Set product weight (helper function)
     const handleSetProductWeight = (setter, value) => {
-        setter(value.length > 0 ? value : []);
+        setter(value.length > 0 ? value : []); // Ensure an array is set, or an empty array if nothing is selected
     };
 
+
+
+
+
+
+
     const handleChangeProductSize = (event) => {
-        const selectedValues = event.target.value;
+        const selectedValues = event.target.value; // Get selected sizes as an array
+        console.log("Selected Sizes:", selectedValues);
+
         setProductSize(selectedValues);
         setFormFields((prevFormFields) => ({
             ...prevFormFields,
@@ -343,9 +422,15 @@ const AddProduct = () => {
         }));
     };
 
+
     const handleSetProductSize = (setter, value) => {
         setter(value.length > 0 ? value : []);
     };
+
+
+
+
+
 
     const onChangeRating = (event, newValue) => {
         setProductRating(newValue);
@@ -374,7 +459,7 @@ const AddProduct = () => {
             return;
         }
         if (formFields.description === "") {
-            context.openAlertBox("error", "Please enter desciption");
+            context.openAlertBox("error", "Please enter description");
             return;
         }
         if (formFields.brand === "") {
@@ -879,9 +964,16 @@ const AddProduct = () => {
                                 className="w-full !text-[14px] custom-dropdown"
                                 displayEmpty
                                 MenuProps={MenuProps}
-                                renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => parseInt(a) - parseInt(b)).join(", "))}
+                                renderValue={(selected) => {
+                                    if (selected.length === 0) {
+                                        return <em>None</em>;
+                                    } else {
+                                        const sortedSelected = selected.slice().sort((a, b) => convertToBytes(a) - convertToBytes(b));
+                                        return sortedSelected.join(", ");
+                                    }
+                                }}
                             >
-                                {['4GB', '8GB', '16GB'].map((ram) => (
+                                {sortedProductRamData?.map((ram) => (
                                     <MenuItem key={ram} value={ram}>
                                         <Checkbox checked={productRams.includes(ram)} />
                                         <ListItemText primary={ram} />
@@ -908,12 +1000,32 @@ const AddProduct = () => {
                                 className="w-full !text-[14px] custom-dropdown"
                                 displayEmpty
                                 MenuProps={MenuProps} // Assuming you have a valid MenuProps configuration
-                                renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => parseInt(a) - parseInt(b)).join(", "))}
+                                renderValue={(selected) => {
+                                    if (selected.length === 0) return <em>None</em>;
+
+                                    // Sort the selected values (considering weight units like 'gm', 'kg', etc.)
+                                    const sortedSelected = selected
+                                        .slice()  // Make a copy of the array to avoid modifying the original
+                                        .sort((a, b) => {
+                                            const parseWeight = (weight) => {
+                                                const value = parseFloat(weight);
+                                                if (weight.includes('kg')) {
+                                                    return value * 1000; // Convert kg to grams
+                                                }
+                                                return value;
+                                            };
+
+                                            return parseWeight(a) - parseWeight(b); // Sort by numeric value in grams
+                                        });
+
+                                    return sortedSelected.join(", ");
+                                }}
+
                             >
-                                {['2KG', '4KG', '8KG'].map((weight) => (
-                                    <MenuItem key={weight} value={weight}>
-                                        <Checkbox checked={productWeight.includes(weight)} />
-                                        <ListItemText primary={weight} />
+                                {sortedWeights?.map((weight) => (
+                                    <MenuItem key={weight._id} value={weight.name}>
+                                        <Checkbox checked={productWeight.includes(weight.name)} />
+                                        <ListItemText primary={weight.name} />
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -941,11 +1053,11 @@ const AddProduct = () => {
                                 renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(a) - ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(b)).join(", "))}
                             >
 
-                                {['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => (
-                                    <MenuItem key={size} value={size}>
-                                        <Checkbox checked={productSize.includes(size)} />
-                                        <ListItemText primary={size} />
-                                    </MenuItem>
+                                {productSizeData?.map((size) => (
+                                    <MenuItem key={size._id} value={size.name}>
+                                        <Checkbox checked={productSize.includes(size.name)} />
+                                        <ListItemText primary={size.name} />
+                                    </MenuItem> 
                                 ))}
                             </Select>
                         </FormControl>
