@@ -1,4 +1,4 @@
-import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Select, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
+import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Rating, Select, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line, RiResetLeftFill } from 'react-icons/ri'
@@ -18,8 +18,18 @@ import toast from 'react-hot-toast'
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
-    { id: 'product', label: 'PRODUCT', minWidth: 150, align: 'left' },
-    { id: 'category', label: 'BROAD CATEGORY', minWidth: 170, align: 'left' },
+    {
+        id: 'product',
+        label: 'PRODUCT',
+        minWidth: 150,
+        align: 'left'
+    },
+    {
+        id: 'category',
+        label: 'BROAD CATEGORY',
+        minWidth: 170,
+        align: 'left'
+    },
     {
         id: 'subCategory',
         label: 'SUB CATEGORY',
@@ -35,12 +45,28 @@ const columns = [
     {
         id: 'price',
         label: 'PRICE',
-        minWidth: 160,
+        minWidth: 100,
         align: 'left',
         format: (value) => `$${value.toFixed(2)}`,
     },
-    { id: 'sales', label: 'SALES', minWidth: 130, align: 'center' },
-    { id: 'action', label: 'ACTION', minWidth: 130, align: 'center' },
+    {
+        id: 'sales',
+        label: 'SALES',
+        minWidth: 130,
+        align: 'center'
+    },
+    {
+        id: 'rating',
+        label: 'RATING',
+        minWidth: 100,
+        align: 'center'
+    },
+    {
+        id: 'action',
+        label: 'ACTION',
+        minWidth: 130,
+        align: 'center'
+    },
 ];
 
 
@@ -598,9 +624,9 @@ const Products = () => {
 
                             {loading ? (
                                 <>
-                                    
+
                                     {/* //Skeleton UI when loading */}
-                                    
+
                                     {Array.from({ length: rowsPerPage }).map((_, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="table-cell"><div className='flex items-center justify-center'><Skeleton variant="rectangular" width={18} height={18} /></div></TableCell>
@@ -630,6 +656,15 @@ const Products = () => {
                                                     <Skeleton variant="text" width="60%" />
                                                     <Skeleton variant="text" sx={{ fontSize: '5px' }} width="100%" />
                                                     <Skeleton variant="text" width="60%" />
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="table-cell">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <Skeleton variant="circular" width="15px" height="15px" />
+                                                    <Skeleton variant="circular" width="15px" height="15px" />
+                                                    <Skeleton variant="circular" width="15px" height="15px" />
+                                                    <Skeleton variant="circular" width="15px" height="15px" />
+                                                    <Skeleton variant="circular" width="15px" height="15px" />
                                                 </div>
                                             </TableCell>
                                             <TableCell className="table-cell">
@@ -704,6 +739,11 @@ const Products = () => {
                                                 <span>
                                                     <span className="text-[14px] font-bold">{product?.countInStock - product?.sale}</span> remain
                                                 </span>
+                                            </p>
+                                        </TableCell>
+                                        <TableCell className="table-cell">
+                                            <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
+                                            <Rating name="rating" size='small' defaultValue={product?.rating} max={5} readOnly />
                                             </p>
                                         </TableCell>
                                         <TableCell className="table-cell">
