@@ -30,6 +30,12 @@ const AddCategory = () => {
     images: [],
   });
 
+  useEffect(() => {
+    setFormFields((prev) => ({
+      ...prev,
+      images: previews, // Sync images with updated previews
+    }));
+  }, [previews]);
 
   useEffect(() => {
     const { categoryId, categoryName } = context.isOpenFullScreenPanel || {};
@@ -41,7 +47,7 @@ const AddCategory = () => {
       context.setCategoryIdNo(categoryId)
       setFormFields({
         name: "",
-        images: setPreviews([]),
+        images: [],
       });
       return; // Exit early if it's a new address
     }
@@ -199,7 +205,7 @@ const AddCategory = () => {
       if (!image) {
         throw new Error("Invalid image.");
       }
-      
+
       // Delete the image from Cloudinary or backend
       const response = await deleteImages(`/api/category/delete-category-image?img=${image}`);
 
@@ -294,15 +300,15 @@ const AddCategory = () => {
               )}
 
 
-            {/* Only show UploadBox if no file is uploaded */}
             {previews?.length === 0 && (
               <div className="col-span-8">
                 <UploadBox
                   multiple={false}
+                  // categoryId={context.categoryIdNo}
+                  images={previews}
                   onDrop={(acceptedFiles) => {
-                    // Handle file drop or selection in parent if needed (e.g., for previews)
                     const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-                    setPreviewFun(previewUrls); // Update the parent state with preview URLs
+                    setPreviewFun(previewUrls);
                   }}
                   name="images"
                   url={"/api/category/upload-category-images"}

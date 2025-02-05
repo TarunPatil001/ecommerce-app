@@ -65,6 +65,8 @@ export async function uploadCategoryImages(request, response) {
   }
 }
 
+
+
 export async function createCategory(request, response) {
   try {
     const { name, parentCategoryId, parentCategoryName } = request.body;
@@ -299,11 +301,33 @@ export async function getCategory(request, response) {
   }
 }
 
+
+// Helper function to extract publicId from image URL
+const extractPublicId = (imgUrl) => {
+  try {
+    const urlArr = imgUrl.split("/");
+    const imageName = urlArr[urlArr.length - 1].split(".")[0];
+    return `ecommerceApp/uploads/${imageName}`;
+  } catch (error) {
+    console.error("Error extracting public ID:", error);
+    return null;
+  }
+};
+
+// Function to check if an image exists in Cloudinary
+const checkImageExists = async (publicId) => {
+  try {
+    await cloudinary.api.resource(publicId);
+    return true; // Image exists
+  } catch (error) {
+    return false; // Image not found
+  }
+};
+
 // Controller for removing an image from Cloudinary
 export async function removeCategoryImageFromCloudinary(request, response) {
   try {
     const imgUrl = request.query.img;
-
     if (!imgUrl) {
       return response.status(400).json({
         message: "Image URL is required.",
@@ -314,35 +338,43 @@ export async function removeCategoryImageFromCloudinary(request, response) {
 
     console.log("Received Image URL:", imgUrl);
 
-    const urlArr = imgUrl.split("/");
-    const imageName = urlArr[urlArr.length - 1].split(".")[0];
-    const publicId = `ecommerceApp/uploads/${imageName}`;
-
-    console.log("Extracted Public ID:", publicId);
-
-    if (imageName) {
-      const res = await cloudinary.uploader.destroy(publicId);
-      console.log("Cloudinary Response:", res);
-
-      if (res.result !== "ok") {
-        return response.status(500).json({
-          message: `Error deleting image from Cloudinary: ${res.result}`,
-          error: true,
-          success: false,
-        });
-      }
-
-      return response.status(200).json({
-        message: "Image removed successfully.",
-        success: true,
-      });
-    } else {
+    const publicId = extractPublicId(imgUrl);
+    if (!publicId) {
       return response.status(400).json({
-        message: "Invalid image name.",
+        message: "Invalid image URL format.",
         error: true,
         success: false,
       });
     }
+
+    console.log("Extracted Public ID:", publicId);
+
+    // Check if image exists in Cloudinary
+    const exists = await checkImageExists(publicId);
+    if (!exists) {
+      return response.status(404).json({
+        message: "Image not found in Cloudinary.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Delete image from Cloudinary
+    const res = await cloudinary.uploader.destroy(publicId);
+    console.log("Cloudinary Response:", res);
+
+    if (res.result !== "ok") {
+      return response.status(500).json({
+        message: `Error deleting image from Cloudinary: ${res.result}`,
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Image removed successfully.",
+      success: true,
+    });
   } catch (error) {
     console.error("Error removing image:", error.message || error);
     return response.status(500).json({
@@ -353,7 +385,7 @@ export async function removeCategoryImageFromCloudinary(request, response) {
   }
 }
 
-// delete category
+// Controller for deleting a category and its images
 export async function deleteCategory(request, response) {
   try {
     const categoryId = request.params.id;
@@ -368,20 +400,20 @@ export async function deleteCategory(request, response) {
       });
     }
 
-    const categoryImages = Array.isArray(category.images)
-      ? category.images
-      : [];
+    const categoryImages = Array.isArray(category.images) ? category.images : [];
 
     // Delete images associated with the category from Cloudinary
-    const imageDeletePromises = categoryImages.map((imgUrl) => {
-      const urlArr = imgUrl.split("/");
-      const imageName = urlArr[urlArr.length - 1].split(".")[0];
-      const publicId = `ecommerceApp/uploads/${imageName}`;
-      return cloudinary.uploader.destroy(publicId);
-    });
-
-    // Wait for all image deletions to complete
-    await Promise.all(imageDeletePromises);
+    for (const imgUrl of categoryImages) {
+      const publicId = extractPublicId(imgUrl);
+      if (publicId) {
+        const exists = await checkImageExists(publicId);
+        if (exists) {
+          await cloudinary.uploader.destroy(publicId);
+        } else {
+          console.warn(`Image ${publicId} not found in Cloudinary.`);
+        }
+      }
+    }
 
     // Function to recursively delete subcategories
     const deleteSubcategories = async (parentCategoryId) => {
@@ -391,18 +423,19 @@ export async function deleteCategory(request, response) {
         // Recursively delete subcategories
         await deleteSubcategories(subCategory._id);
 
-        const subCategoryImages = Array.isArray(subCategory.images)
-          ? subCategory.images
-          : [];
-        const subImageDeletePromises = subCategoryImages.map((imgUrl) => {
-          const urlArr = imgUrl.split("/");
-          const imageName = urlArr[urlArr.length - 1].split(".")[0];
-          const publicId = `ecommerceApp/uploads/${imageName}`;
-          return cloudinary.uploader.destroy(publicId);
-        });
+        const subCategoryImages = Array.isArray(subCategory.images) ? subCategory.images : [];
+        for (const imgUrl of subCategoryImages) {
+          const publicId = extractPublicId(imgUrl);
+          if (publicId) {
+            const exists = await checkImageExists(publicId);
+            if (exists) {
+              await cloudinary.uploader.destroy(publicId);
+            } else {
+              console.warn(`Subcategory image ${publicId} not found in Cloudinary.`);
+            }
+          }
+        }
 
-        // Wait for all subcategory image deletions to complete
-        await Promise.all(subImageDeletePromises);
         // Delete the subcategory from the database
         await CategoryModel.findByIdAndDelete(subCategory._id);
       }
@@ -421,13 +454,15 @@ export async function deleteCategory(request, response) {
   } catch (error) {
     console.error("Error deleting category:", error.message || error);
     return response.status(500).json({
-      message:
-        error.message || "An error occurred while deleting the category.",
+      message: error.message || "An error occurred while deleting the category.",
       error: true,
       success: false,
     });
   }
 }
+
+
+
 
 // update Category
 export async function updateCategory(request, response) {
