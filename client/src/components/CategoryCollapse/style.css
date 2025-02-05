@@ -1,0 +1,4 @@
+.submenu-wrapper,
+.inner-submenu-wrapper {
+  transition: all 0.3s ease-in-out;
+}

@@ -12,8 +12,8 @@ const CategoryPanel = (props) => {
   };
 
   const DrawerList = () => (
-    <Box sx={{ width: 315 }} role="presentation" className="categoryPanel">
-      <h3 className="p-3 ml-3 text-[18px] font-[600] flex items-center justify-between">
+    <Box sx={{ width: 280 }} role="presentation" className="categoryPanel">
+      <h3 className="p-3 pl-8 pr-7 text-[16px] font-[800] flex items-center justify-between">
         Shop By Categories{" "}
         <RxCross2 
           onClick={toggleDrawer}
@@ -22,7 +22,10 @@ const CategoryPanel = (props) => {
       </h3>
       <Divider />
 
-      <CategoryCollapse/>
+      {
+        props?.categoryData?.length !==0 && 
+          <CategoryCollapse data={props?.categoryData} />
+      }
     </Box>
   );
 

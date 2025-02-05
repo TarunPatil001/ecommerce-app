@@ -28,6 +28,11 @@ const CategoryList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [isLoading, setIsLoading] = useState(false);
 
+    const handleChangeCategoryFilterValue = (event) => {
+        setCategoryFilterValue(event.target.value);
+        setPage(0); // Reset to first page on category change
+    };
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -36,6 +41,7 @@ const CategoryList = () => {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
 
 
     const handleEditCategory = (categoryId, categoryName) => {
@@ -97,7 +103,7 @@ const CategoryList = () => {
 
             <div className="card my-4 bg-white border rounded-md px-1 pt-1">
 
-                <TableContainer className='max-h-[440px] customScroll'>
+                <TableContainer className='customScroll max-h-[500px]'>
                     <Table stickyHeader aria-label="sticky table">
 
                         <TableHead>
@@ -120,7 +126,7 @@ const CategoryList = () => {
                         <TableBody>
 
                             {
-                                context?.catData?.length !== 0 && context?.catData?.map((item, index) => {
+                                context?.catData?.length !== 0 && context?.catData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
                                     return (
                                         <TableRow key={index}>
                                             <TableCell>
@@ -128,13 +134,13 @@ const CategoryList = () => {
                                             </TableCell>
 
                                             <TableCell width={100}>
-                                                <div className='shadow w-[150px] h-[80px] overflow-hidden rounded-md flex items-center justify-center'>
+                                                <div className='shadow w-[80px] h-[80px] p-1 overflow-hidden rounded-md flex items-center justify-center'>
                                                     <Link to="/product/458457" className='w-full h-full overflow-hidden flex items-center justify-center'>
                                                         <LazyLoadImage
                                                             alt="product_img"
                                                             effect="blur"
                                                             src={item.images[0]}
-                                                            className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
+                                                            className='w-full h-full object-contain hover:scale-110 !transition-all !duration-300'
                                                         />
                                                     </Link>
                                                 </div>
@@ -159,6 +165,17 @@ const CategoryList = () => {
                                 })
                             }
 
+                            {
+                                context?.catData?.length === 0 &&
+                                <TableRow>
+                                    <TableCell colSpan={8} align="center" style={{ height: 300 }}>
+                                        <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
+                                            &#128193; No Records Available
+                                        </span>
+                                    </TableCell>
+                                </TableRow>
+                            }
+
 
 
                         </TableBody>
@@ -166,9 +183,9 @@ const CategoryList = () => {
                 </TableContainer>
 
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={10}
+                    count={context?.catData?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

@@ -1,252 +1,115 @@
-import { useState } from 'react'
+import { useState } from "react";
+import { Button } from "@mui/material";
+import { FaRegSquareMinus, FaRegSquarePlus } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import { Collapse } from "react-collapse";
 
-import { Button } from "@mui/material"
-import { FaRegSquareMinus, FaRegSquarePlus } from "react-icons/fa6"
-import { Link } from "react-router-dom"
-
-const CategoryCollapse = () => {
-    const [submenuOpen, setSubmenuOpen] = useState({});
+const CategoryCollapse = ({ data = [] }) => {
+  const [submenuOpen, setSubmenuOpen] = useState({});
   const [innerSubmenuOpen, setInnerSubmenuOpen] = useState({});
 
-
-
   const toggleSubmenu = (index) => {
-    // Update the submenu state using the previous state (prev)
-    setSubmenuOpen((prev) => ({
-      // Spread the previous state to keep other submenus unchanged
-      ...prev,
+    setSubmenuOpen((prev) => {
+      const newState = {
+        ...prev,
+        [index]: !prev[index],
+      };
       
-      // Toggle the specific submenu at the given 'index'
-      // If it was open (true), it will become closed (false), and vice versa
-      [index]: !prev[index],
-    }));
+      // Close all inner submenus when the main submenu is toggled
+      if (!newState[index]) {
+        // Reset inner submenu state for this category
+        const newInnerState = { ...innerSubmenuOpen };
+        Object.keys(newInnerState)
+          .filter((key) => key.startsWith(`${index}-`))  // Match all inner submenus of this category
+          .forEach((key) => delete newInnerState[key]);
+        setInnerSubmenuOpen(newInnerState);
+      }
+      
+      return newState;
+    });
   };
-  
 
-  const toggleInnerSubmenu = (index) => {
+  const toggleInnerSubmenu = (parentIndex, childIndex) => {
+    const key = `${parentIndex}-${childIndex}`;
     setInnerSubmenuOpen((prev) => ({
       ...prev,
-      [index]: !prev[index],
+      [key]: !prev[key],
     }));
   };
 
+
   return (
-    <>
-      <div className="scroll">
-        <ul className="w-full !pl-3">
-          {/* Fashion Menu */}
-          <li key="fashion" className="list-none flex items-center relative flex-col ">
-            <Link to="/" className="w-full">
-              <Button
-                className="w-full !text-[16px] !font-[500] !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                disableRipple
-              >
-                Fashion
-              </Button>
-            </Link>
+    <div className="scroll">
+      <ul className="w-full">
+        {data.length > 0 &&
+          data.map((cat, index) => (
+            <li key={index} className="list-none flex flex-col relative">
+              <div className="flex items-center w-full">
+                <Link to="/" className="w-full" onClick={(e) => e.preventDefault()}>
+                  <Button className="w-full !pl-8 !rounded-none !text-[16px] !font-semibold !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]">
+                    {cat.name}
+                  </Button>
+                </Link>
+                {cat.children?.length > 0 && (
+                  <span
+                    className="absolute top-[10px] right-[32px] cursor-pointer"
+                    onClick={() => toggleSubmenu(index)}
+                    aria-label={`Toggle submenu for ${cat.name}`}
+                  >
+                    {submenuOpen[index] ? <FaRegSquareMinus /> : <FaRegSquarePlus />}
+                  </span>
+                )}
+              </div>
 
-            {submenuOpen[0] ? (
-              <FaRegSquareMinus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => toggleSubmenu(0)}
-              />
-            ) : (
-              <FaRegSquarePlus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => toggleSubmenu(0)}
-              />
-            )}
+              <Collapse isOpened={submenuOpen[index]}>
+                <ul className="w-full">
+                  {cat.children?.map((subcat, subIndex) => (
+                    <li key={`${index}-${subIndex}`} className="list-none relative">
+                      <div className="flex items-center w-full">
+                        <Link to="/" className="w-full" onClick={(e) => e.preventDefault()}>
+                          <Button
+                            className={`w-full !pl-[48px] !rounded-none !text-[14px] !font-medium !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]`}
 
-            {submenuOpen[0] && (
-              <ul className="submenu w-full pl-6 ">
-                <li key="mens" className="list-none relative">
-                  <Link to="/" className="w-full">
-                    <Button
-                      className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                      disableRipple
-                    >
-                      Men&apos;s
-                    </Button>
-                  </Link>
-                  {innerSubmenuOpen[0] ? (
-                    <FaRegSquareMinus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => toggleInnerSubmenu(0)}
-                    />
-                  ) : (
-                    <FaRegSquarePlus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => toggleInnerSubmenu(0)}
-                    />
-                  )}
+                          >
+                            {subcat.name}
+                          </Button>
+                        </Link>
+                        {subcat.children?.length > 0 && (
+                          <span
+                            className="absolute top-[10px] right-[32px] cursor-pointer"
+                            onClick={() => toggleInnerSubmenu(index, subIndex)}
+                            aria-label={`Toggle inner submenu for ${subcat.name}`}
+                          >
+                            {innerSubmenuOpen[`${index}-${subIndex}`] ? <FaRegSquareMinus /> : <FaRegSquarePlus />}
+                          </span>
+                        )}
+                      </div>
 
-                  {innerSubmenuOpen[0] && (
-                    <ul className="innerSubmenu w-full pl-6">
-                      <li key="mens-link-1" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s Shirt
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="mens-link-2" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s T-Shirt
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="mens-link-3" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s Jackets
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="mens-link-4" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s Cargo Pants
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="mens-link-5" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s Jeans
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="mens-link-6" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Men&apos;s Shoes
-                          </Button>
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              </ul>
-            )}
-          </li>
+                      <Collapse isOpened={innerSubmenuOpen[`${index}-${subIndex}`]}>
+                        <ul className="w-full">
+                          {subcat.children?.map((childSubCat, childIndex) => (
+                            <li key={`${index}-${subIndex}-${childIndex}`} className="list-none">
+                              <Link to="/" className="w-full" onClick={(e) => e.preventDefault()}>
+                                <Button
+                                  className="w-full !pl-[64px] !rounded-none !text-[14px] !font-normal !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
+          
+                                >
+                                  {childSubCat.name}
+                                </Button>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </Collapse>
+                    </li>
+                  ))}
+                </ul>
+              </Collapse>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
 
-          {/* Outerwear Menu */}
-          <li key="outerwear" className="list-none flex items-center relative flex-col">
-            <Link to="/" className="w-full">
-              <Button
-                className="w-full !text-[16px] !font-[500] !text-left !justify-start !p-3 !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                disableRipple
-              >
-                Electronic&apos;s
-              </Button>
-            </Link>
-
-            {submenuOpen[1] ? (
-              <FaRegSquareMinus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => toggleSubmenu(1)}
-              />
-            ) : (
-              <FaRegSquarePlus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => toggleSubmenu(1)}
-              />
-            )}
-
-            {submenuOpen[1] && (
-              <ul className="submenu w-full pl-6">
-                <li key="Laptop" className="list-none relative">
-                  <Link to="/" className="w-full">
-                    <Button
-                      className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                      disableRipple
-                    >
-                      Laptop
-                    </Button>
-                  </Link>
-                  {innerSubmenuOpen[1] ? (
-                    <FaRegSquareMinus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => toggleInnerSubmenu(1)}
-                    />
-                  ) : (
-                    <FaRegSquarePlus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => toggleInnerSubmenu(1)}
-                    />
-                  )}
-
-                  {innerSubmenuOpen[1] && (
-                    <ul className="innerSubmenu w-full pl-6">
-                      <li key="Laptop-link-1" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] mr-2 !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Lenovo
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="Laptop-link-2" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Dell
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="Laptop-link-3" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            Asus
-                          </Button>
-                        </Link>
-                      </li>
-                      <li key="Laptop-link-4" className="list-none relative">
-                        <Link to="/" className="link w-full">
-                          <Button
-                            className="w-full !text-[16px] !font-[500] !text-left !justify-start !h-10 !text-[rgba(0,0,0,0.8)] hover:!text-[var(--bg-primary)]"
-                            disableRipple
-                          >
-                            MacBook
-                          </Button>
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              </ul>
-            )}
-          </li>
-        </ul>
-      </div>
-    </>
-  )
-}
-
-export default CategoryCollapse
+export default CategoryCollapse;
