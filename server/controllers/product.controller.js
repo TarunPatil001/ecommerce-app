@@ -1370,6 +1370,24 @@ export async function updateProduct(request, response) {
 
 
 
+    // Define the correct order for sizes
+    const predefinedSizeOrder = ["S", "M", "L", "XL", "XXL", "XXXL"];
+
+    // Fetch valid sizes dynamically from the database
+    const validSizesFromDB = await ProductSizeModel.find({}); // Assuming sizes are stored in this collection
+
+    // Extract size names from the database records
+    const validSizeNames = validSizesFromDB.map(size => size.name);
+
+    // Filter sizes based on what's valid in the database
+    const filteredSizes = (request.body.size || []).filter(size => validSizeNames.includes(size));
+
+    // Sort the sizes according to the predefined order
+    const sortedSizes = filteredSizes.sort((a, b) => predefinedSizeOrder.indexOf(a) - predefinedSizeOrder.indexOf(b));
+
+    console.log("Sorted Sizes:", sortedSizes);
+
+
 
 
     // Update the product details in the database
@@ -1395,7 +1413,7 @@ export async function updateProduct(request, response) {
         discount: request.body.discount,
         productRam: filteredProductRams, // Save the sorted product RAMs
         productWeight: sortedWeights,
-        size: request.body.size, // Save the sorted sizes
+        size: sortedSizes, // Save the sorted sizes
       },
       { new: true } // Return the updated document
     );

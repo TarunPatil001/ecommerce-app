@@ -411,6 +411,8 @@ const AddProduct = () => {
 
 
 
+
+
     const handleChangeProductSize = (event) => {
         const selectedValues = event.target.value; // Get selected sizes as an array
         console.log("Selected Sizes:", selectedValues);
@@ -1053,12 +1055,15 @@ const AddProduct = () => {
                                 renderValue={(selected) => (selected.length === 0 ? <em>None</em> : selected.slice().sort((a, b) => ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(a) - ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].indexOf(b)).join(", "))}
                             >
 
-                                {productSizeData?.map((size) => (
-                                    <MenuItem key={size._id} value={size.name}>
-                                        <Checkbox checked={productSize.includes(size.name)} />
-                                        <ListItemText primary={size.name} />
-                                    </MenuItem> 
-                                ))}
+                                {productSizeData
+                                    ?.slice()
+                                    .sort((a, b) => ["S", "M", "L", "XL", "XXL", "XXXL"].indexOf(a.name) - ["S", "M", "L", "XL", "XXL", "XXXL"].indexOf(b.name)) // Ensure options are sorted in the dropdown
+                                    .map((size) => (
+                                        <MenuItem key={size._id} value={size.name}>
+                                            <Checkbox checked={productSize.includes(size.name)} />
+                                            <ListItemText primary={size.name} />
+                                        </MenuItem>
+                                    ))}
                             </Select>
                         </FormControl>
 
