@@ -1,11 +1,14 @@
 import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 import { MdOutlineEdit } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import { MyContext } from '../../App'
+import toast from 'react-hot-toast'
+import { deleteData, fetchDataFromApi } from '../../utils/api'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -21,6 +24,13 @@ const HomeSliderBanners = () => {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [isLoading, setIsLoading] = useState(false);
+
+
+    const handleChangeCategoryFilterValue = (event) => {
+        setCategoryFilterValue(event.target.value);
+        setPage(0); // Reset to first page on category change
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -31,13 +41,69 @@ const HomeSliderBanners = () => {
         setPage(0);
     };
 
+    useEffect(() => {
+        fetchDataFromApi("/api/homeSlides").then((res) => {
+            console.log(res?.data);
+            context?.setHomeSlideData(res?.data);
+        })
+    }, [context?.setHomeSlideData, context?.isReducer]);
+
+    const handleEditHomeSLide = (homeSlideId) => {
+        console.log("homeSlidePage - HomeSlide ID :", homeSlideId);
+
+        context.setIsOpenFullScreenPanel({
+            open: true,
+            model: "Home Banner Details",
+            homeSlideId: homeSlideId,
+        });
+    };
+
+    const handleDeleteHomeSlide = async (e, homeSlideId) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            const result = await toast.promise(
+                deleteData(`/api/homeSlides/${homeSlideId}`),
+                {
+                    loading: "Deleting homeSlide... Please wait.",
+                    success: (res) => {
+                        if (res?.success) {
+                            fetchDataFromApi("/api/homeSlides").then((updatedData) => {
+
+                                context?.setHomeSlideData(updatedData?.data);
+
+                            });
+                            return res.message || "HomeSlide deleted successfully!";
+                        } else {
+                            throw new Error(res?.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        return err?.response?.data?.message || err.message || "Failed to delete HomeSlide. Please try again.";
+                    },
+                }
+            );
+
+            console.log("Delete Result:", result);
+        } catch (err) {
+            console.error("Error in handleDeleteHomeSlide:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+
+
     return (
         <>
             <div className='flex items-center justify-between px-5 pt-3'>
                 <h2 className='text-[20px] font-bold'>Home Slider Banners <span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Add Home Banner'})}><GoPlus className='text-[20px]' />Add Home Banner</Button>
+                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Home Banner Details' })}><GoPlus className='text-[20px]' />Add Home Banner</Button>
                 </div>
             </div>
 
@@ -65,43 +131,63 @@ const HomeSliderBanners = () => {
 
                         <TableBody>
 
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox {...label} size='small' />
-                                </TableCell>
-                                <TableCell width={300}>
-                                    <div className="flex items-start gap-4 w-[300px]">
-                                        <div className='img w-full h-auto overflow-hidden rounded-md shadow-md group'>
-                                            <Link to="/product/458457">
-                                                <img src="https://api.spicezgold.com/download/file_1734524930884_NewProject(6).jpg" alt="product_img" className='w-full h-full object-cover rounded-md transition-all group-hover:scale-105' />
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </TableCell>
+                            {
+                                context?.homeSlideData?.length !== 0 && context?.homeSlideData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Checkbox {...label} size='small' />
+                                            </TableCell>
+                                            <TableCell width={300}>
+                                                <div className="flex items-start gap-4 w-[340px] h-[100px]">
+                                                    <Link to="/product/458457" className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
+                                                        <LazyLoadImage
+                                                            alt="homeSlide_img"
+                                                            effect="blur"
+                                                            src={item.images[0]}
+                                                            className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
+                                                        />
+                                                    </Link>
+                                                </div>
+                                            </TableCell>
 
-                                <TableCell width={100}>
-                                    <div className='flex items-center gap-2'>
-                                        <Tooltip title="Edit Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><MdOutlineEdit className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="View Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Product" arrow placement="top">
-                                            <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><RiDeleteBin6Line className='text-[35px]' /></Button>
-                                        </Tooltip>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                                            <TableCell width={100}>
+                                                <div className='flex items-center gap-2'>
+                                                    <Tooltip title="Edit Product" arrow placement="top">
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditHomeSLide(item?._id,); }}><MdOutlineEdit className='text-[35px]' /></Button>
+                                                    </Tooltip>
+                                                    <Tooltip title="View Product" arrow placement="top">
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
+                                                    </Tooltip>
+                                                    <Tooltip title="Delete Product" arrow placement="top">
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => { handleDeleteHomeSlide(e, item?._id,) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
+                                                    </Tooltip>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            }
+
+                            {
+                                context?.homeSlideData.length === 0 &&
+                                <TableRow>
+                                    <TableCell colSpan={8} align="center" style={{ height: 300 }}>
+                                        <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
+                                            &#128193; No Records Available
+                                        </span>
+                                    </TableCell>
+                                </TableRow>
+                            }
 
                         </TableBody>
                     </Table>
                 </TableContainer>
 
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={10}
+                    count={context?.catData?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

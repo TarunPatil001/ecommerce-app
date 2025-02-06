@@ -55,6 +55,7 @@ function App() {
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [categoryIdNo, setCategoryIdNo] = useState(null);
   const [catData, setCatData] = useState([]);
+  const [homeSlideData, setHomeSlideData] = useState([]);
   const [productIdNo, setProductIdNo] = useState(null);
 
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
@@ -410,6 +411,9 @@ function App() {
     catData,
     setCatData,
 
+    homeSlideData,
+    setHomeSlideData,
+
     productIdNo,
     setProductIdNo,
 
@@ -446,7 +450,7 @@ function App() {
 
             {isOpenFullScreenPanel?.model === "Product Details" && <AddProduct />}
 
-            {isOpenFullScreenPanel?.model === "Add Home Banner" && <AddHomeSlide />}
+            {isOpenFullScreenPanel?.model === "Home Banner Details" && <AddHomeSlide />}
 
             {isOpenFullScreenPanel?.model === "Category Details" && <AddCategory />}
 

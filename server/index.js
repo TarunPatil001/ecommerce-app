@@ -11,8 +11,8 @@ import categoryRouter from "./route/category.route.js";
 import productRouter from "./route/product.route.js";
 import cartProductRouter from "./route/cartProduct.route.js";
 import wishlistRouter from "./route/wishlist.route.js";
-import { addAddressController } from "./controllers/address.controller.js";
 import addressRouter from "./route/address.route.js";
+import homeSlideRouter from "./route/homeSlide.route.js";
 // import addressRouter from "./route/address.route.js";
 
 const app = express();
@@ -41,6 +41,7 @@ app.use('/api/product', productRouter);
 app.use('/api/cartProduct', cartProductRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/address', addressRouter);
+app.use('/api/homeSlides', homeSlideRouter);
 
 
 connectDB().then(() => {
