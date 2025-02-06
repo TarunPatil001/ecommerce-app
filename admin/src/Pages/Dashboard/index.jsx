@@ -625,7 +625,6 @@ const Dashboard = () => {
           </div>
 
           <div className='col w-[50%] flex items-center justify-end gap-3'>
-            <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
             <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={()=>context.setIsOpenFullScreenPanel({open:true,model:'Product Details'})}><GoPlus className='text-[20px]' />Add Product</Button>
           </div>
         </div>

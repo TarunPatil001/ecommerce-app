@@ -197,7 +197,6 @@ const isRowSelected = (image) => selectedRows.includes(image._id); // Correct co
             <div className='flex items-center justify-between px-5 pt-3'>
                 <h2 className='text-[20px] font-bold'>Home Slider Banners <span className="font-normal text-[12px]">Material UI</span></h2>
                 <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize'><RiDownloadCloud2Line className='text-[18px]' />Export</Button>
                     <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Home Banner Details' })}><GoPlus className='text-[20px]' />Add Home Banner</Button>
                 </div>
             </div>
