@@ -340,28 +340,53 @@ export async function deleteHomeSlide(request, response) {
 
 export async function deleteMultipleHomeSlides(request, response) {
     try {
-        const { slideIds } = request.body; // Expecting an array of IDs
+        // Read the slide IDs from the query parameter
+        const { ids } = request.query; // Query parameter should be 'ids'
 
-        if (!Array.isArray(slideIds) || slideIds.length === 0) {
-            return response.status(400).json({ message: "Invalid request. Provide slide IDs.", success: false });
+        // Validate the ids query parameter
+        if (!ids || !ids.trim()) {
+            return response.status(400).json({
+                message: "Invalid request. Provide slide IDs.",
+                success: false
+            });
         }
 
-        // Fetch the home slides that match the given IDs
+        // Split the comma-separated ids string into an array
+        const slideIds = ids.split(',');
+
+        // Fetch the slides that match the given IDs
         const slides = await HomeSliderModel.find({ _id: { $in: slideIds } });
 
         if (slides.length === 0) {
-            return response.status(404).json({ message: "No Home Slides found.", success: false });
+            return response.status(404).json({
+                message: "No Home Slides found.",
+                success: false
+            });
         }
 
+        console.log(`Found ${slides.length} slides for deletion.`); // Log number of slides found
+
         // Delete images from Cloudinary
-        await Promise.all(
-            slides.flatMap((slide) =>
-                slide.images.map(async (imgUrl) => {
+        const deletePromises = slides.flatMap((slide) => {
+            if (!slide.images || slide.images.length === 0) {
+                console.warn(`No images found for slide with ID: ${slide._id}`);
+                return [];
+            }
+
+            // For each image in the slide, delete it from Cloudinary
+            return slide.images.map(async (imgUrl) => {
+                try {
                     const publicId = imgUrl.split("/").pop().split(".")[0];
+                    console.log(`Deleting image with public ID: ${publicId}`);
                     await cloudinary.uploader.destroy(`ecommerceApp/uploads/${publicId}`);
-                })
-            )
-        );
+                } catch (err) {
+                    console.error("Error deleting image from Cloudinary:", err);
+                }
+            });
+        });
+
+        // Wait for all image deletion promises to complete
+        await Promise.all(deletePromises);
 
         // Delete slides from the database
         await HomeSliderModel.deleteMany({ _id: { $in: slideIds } });
@@ -373,7 +398,10 @@ export async function deleteMultipleHomeSlides(request, response) {
 
     } catch (error) {
         console.error("Error deleting Home Slides:", error);
-        return response.status(500).json({ message: "An error occurred.", success: false });
+        return response.status(500).json({
+            message: "An error occurred while deleting Home Slides.",
+            success: false
+        });
     }
 }
 

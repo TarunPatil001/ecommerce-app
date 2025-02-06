@@ -24,7 +24,7 @@ homeSlideRouter.delete("/delete-homeSlide-image", auth, removeHomeSlideImageFrom
 homeSlideRouter.delete("/:id", auth, deleteHomeSlide);
 
 // Delete multiple homeSlide 
-homeSlideRouter.delete("/:id", auth, deleteMultipleHomeSlides);
+homeSlideRouter.post("/:id", auth, deleteMultipleHomeSlides);
 
 // Update a homeSlide by ID
 homeSlideRouter.put("/:id", auth, updateHomeSlide);

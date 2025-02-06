@@ -7,7 +7,7 @@ import { MdOutlineEdit } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
 import { MyContext } from '../../App'
 import toast from 'react-hot-toast'
-import { deleteData, fetchDataFromApi } from '../../utils/api'
+import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 
@@ -25,6 +25,50 @@ const HomeSliderBanners = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [isLoading, setIsLoading] = useState(false);
+
+    // States to manage selected rows and select all functionality
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+
+// Handle Select All
+const handleSelectAll = () => {
+    if (!context?.homeSlideData || context?.homeSlideData.length === 0) {
+        console.warn("Home Slide data is empty or undefined.");
+        return;
+    }
+
+    if (selectAll) {
+        setSelectedRows([]); // Uncheck all
+    } else {
+        const allRows = context?.homeSlideData
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((image) => image._id); // Correct access to image._id
+        setSelectedRows(allRows);
+    }
+    setSelectAll(!selectAll); // Toggle selectAll state
+};
+
+// Handle Row Select or Deselect
+const handleRowCheckboxChange = (image) => {
+    const isBannerSelected = selectedRows.includes(image._id); // Correct comparison using image._id
+
+    const newSelectedRows = isBannerSelected
+        ? selectedRows.filter((id) => id !== image._id)
+        : [...selectedRows, image._id];
+
+    setSelectedRows(newSelectedRows);
+
+    // Check if all rows on the page are selected
+    const currentPageRows = context?.homeSlideData
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .map((image) => image._id); // Correct comparison with image._id
+
+    setSelectAll(newSelectedRows.length === currentPageRows.length);
+};
+
+// Check if a row is selected
+const isRowSelected = (image) => selectedRows.includes(image._id); // Correct comparison with image._id
+
 
 
     const handleChangeCategoryFilterValue = (event) => {
@@ -95,6 +139,57 @@ const HomeSliderBanners = () => {
     };
 
 
+    const handleDeleteSelectedRow = async (e, selectedRows) => {
+        e.preventDefault();
+        setIsLoading(true);
+    
+        try {
+            console.log("Selected Rows:", selectedRows);
+    
+            // Validate selectedRows
+            if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
+                throw new Error("Invalid Home Slide IDs.");
+            }
+    
+            // Convert array to comma-separated string
+            const idsQueryParam = selectedRows.join(',');
+    
+            // Send DELETE request with IDs as query parameters
+            const result = await toast.promise(
+                deleteMultipleData(`/api/homeSlides/delete-homeSlide-image?ids=${idsQueryParam}`, {
+                    method: 'DELETE',
+                }),
+                {
+                    loading: "Deleting Home Slide(s)... Please wait.",
+                    success: (response) => {
+                        if (response.success) {
+                            // Update UI to remove the deleted slides
+                            context?.setHomeSlideData((prevData) =>
+                                prevData.filter((slide) => !selectedRows.includes(slide._id))
+                            );
+                            setSelectedRows([]); // Clear selected rows after successful deletion
+                            setSelectAll(false); // Uncheck "Select All" checkbox
+                            return response.message || "Home Slide(s) deleted successfully!";
+                        } else {
+                            throw new Error(response.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        return err.message || "Failed to delete Home Slide(s). Please try again.";
+                    },
+                }
+            );
+    
+            console.log("Delete Result:", result);
+        } catch (err) {
+            console.error("Error in handleDeleteSelectedRow:", err);
+            toast.error(err.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+
 
 
     return (
@@ -115,7 +210,10 @@ const HomeSliderBanners = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className="px-6 py-2 text-left w-[60px]">
-                                    <Checkbox {...label} size='small' />
+                                    <Checkbox
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                    />
                                 </TableCell>
                                 {columns.map((column) => (
                                     <TableCell
@@ -132,11 +230,11 @@ const HomeSliderBanners = () => {
                         <TableBody>
 
                             {
-                                context?.homeSlideData?.length !== 0 && context?.homeSlideData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
+                                context?.homeSlideData?.length !== 0 && context?.homeSlideData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((image, index) => {
                                     return (
                                         <TableRow key={index}>
                                             <TableCell>
-                                                <Checkbox {...label} size='small' />
+                                            <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>
                                             <TableCell width={300}>
                                                 <div className="flex items-start gap-4 w-[340px] h-[100px]">
@@ -144,7 +242,7 @@ const HomeSliderBanners = () => {
                                                         <LazyLoadImage
                                                             alt="homeSlide_img"
                                                             effect="blur"
-                                                            src={item.images[0]}
+                                                            src={image.images[0]}
                                                             className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
                                                         />
                                                     </Link>
@@ -154,13 +252,13 @@ const HomeSliderBanners = () => {
                                             <TableCell width={100}>
                                                 <div className='flex items-center gap-2'>
                                                     <Tooltip title="Edit Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditHomeSLide(item?._id,); }}><MdOutlineEdit className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditHomeSLide(image?._id,); }}><MdOutlineEdit className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                     <Tooltip title="View Product" arrow placement="top">
                                                         <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                     <Tooltip title="Delete Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => { handleDeleteHomeSlide(e, item?._id,) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => { handleDeleteHomeSlide(e, image?._id,) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                 </div>
                                             </TableCell>
@@ -184,10 +282,30 @@ const HomeSliderBanners = () => {
                     </Table>
                 </TableContainer>
 
+                {
+                    selectedRows.length > 0 &&
+
+                    <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
+                        {selectedRows.length > 0 && (
+                            <span>
+                                <span className='font-bold'>{selectedRows.length}</span> banner{selectedRows.length > 1 ? 's' : ''} selected
+                            </span>
+                        )}
+                        <Button
+                            type="reset"
+                            onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
+                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                        >
+                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                        </Button>
+                    </div>
+
+                }
+
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={context?.catData?.length}
+                    count={context?.homeSlideData?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
