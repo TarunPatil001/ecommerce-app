@@ -463,6 +463,102 @@ export async function deleteCategory(request, response) {
 
 
 
+export async function deleteMultipleCategories(request, response) {
+  try {
+      // Read the category IDs from the query parameter
+      const { ids } = request.query; // Query parameter should be 'ids'
+
+      // Validate the ids query parameter
+      if (!ids || !ids.trim()) {
+          return response.status(400).json({
+              message: "Invalid request. Provide category IDs.",
+              success: false
+          });
+      }
+
+      // Split the comma-separated ids string into an array
+      const categoryIds = ids.split(',');
+
+      // Fetch the categories that match the given IDs
+      const categories = await CategoryModel.find({ _id: { $in: categoryIds } });
+
+      if (categories.length === 0) {
+          return response.status(404).json({
+              message: "No categories found.",
+              success: false
+          });
+      }
+
+      console.log(`Found ${categories.length} categories for deletion.`); // Log number of categories found
+
+      // Delete images from Cloudinary
+      const deletePromises = categories.flatMap((category) => {
+          if (!category.images || category.images.length === 0) {
+              console.warn(`No images found for category with ID: ${category._id}`);
+              return [];
+          }
+
+          // For each image in the category, delete it from Cloudinary
+          return category.images.map(async (imgUrl) => {
+              try {
+                  const publicId = extractPublicId(imgUrl); // Assume this function extracts the public ID
+                  console.log(`Deleting image with public ID: ${publicId}`);
+                  await cloudinary.uploader.destroy(publicId);
+              } catch (err) {
+                  console.error("Error deleting image from Cloudinary:", err);
+              }
+          });
+      });
+
+      // Wait for all image deletion promises to complete
+      await Promise.all(deletePromises);
+
+      // Function to delete subcategories recursively
+      const deleteSubcategories = async (parentCategoryId) => {
+          const subCategories = await CategoryModel.find({ parentCategoryId });
+
+          for (const subCategory of subCategories) {
+              await deleteSubcategories(subCategory._id); // Recursively delete subcategories
+
+              const subCategoryImages = Array.isArray(subCategory.images) ? subCategory.images : [];
+              for (const imgUrl of subCategoryImages) {
+                  const publicId = extractPublicId(imgUrl);
+                  if (publicId) {
+                      await cloudinary.uploader.destroy(publicId); // Delete images from Cloudinary
+                  }
+              }
+
+              // Delete the subcategory from the database
+              await CategoryModel.findByIdAndDelete(subCategory._id);
+          }
+      };
+
+      // Delete subcategories and categories from the database
+      const deletionPromises = categories.map(async (category) => {
+          await deleteSubcategories(category._id); // Delete subcategories
+          await CategoryModel.findByIdAndDelete(category._id); // Delete the main category
+      });
+
+      // Wait for all deletion promises to complete
+      await Promise.all(deletionPromises);
+
+      return response.status(200).json({
+          message: "Selected categories and associated data deleted successfully.",
+          success: true,
+      });
+
+  } catch (error) {
+      console.error("Error deleting categories:", error);
+      return response.status(500).json({
+          message: "An error occurred while deleting categories.",
+          success: false
+      });
+  }
+}
+
+
+
+
 
 // update Category
 export async function updateCategory(request, response) {

@@ -30,44 +30,44 @@ const HomeSliderBanners = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
 
-// Handle Select All
-const handleSelectAll = () => {
-    if (!context?.homeSlideData || context?.homeSlideData.length === 0) {
-        console.warn("Home Slide data is empty or undefined.");
-        return;
-    }
+    // Handle Select All
+    const handleSelectAll = () => {
+        if (!context?.homeSlideData || context?.homeSlideData.length === 0) {
+            console.warn("Home Slide data is empty or undefined.");
+            return;
+        }
 
-    if (selectAll) {
-        setSelectedRows([]); // Uncheck all
-    } else {
-        const allRows = context?.homeSlideData
+        if (selectAll) {
+            setSelectedRows([]); // Uncheck all
+        } else {
+            const allRows = context?.homeSlideData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((image) => image._id); // Correct access to image._id
+            setSelectedRows(allRows);
+        }
+        setSelectAll(!selectAll); // Toggle selectAll state
+    };
+
+    // Handle Row Select or Deselect
+    const handleRowCheckboxChange = (image) => {
+        const isBannerSelected = selectedRows.includes(image._id); // Correct comparison using image._id
+
+        const newSelectedRows = isBannerSelected
+            ? selectedRows.filter((id) => id !== image._id)
+            : [...selectedRows, image._id];
+
+        setSelectedRows(newSelectedRows);
+
+        // Check if all rows on the page are selected
+        const currentPageRows = context?.homeSlideData
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((image) => image._id); // Correct access to image._id
-        setSelectedRows(allRows);
-    }
-    setSelectAll(!selectAll); // Toggle selectAll state
-};
+            .map((image) => image._id); // Correct comparison with image._id
 
-// Handle Row Select or Deselect
-const handleRowCheckboxChange = (image) => {
-    const isBannerSelected = selectedRows.includes(image._id); // Correct comparison using image._id
+        setSelectAll(newSelectedRows.length === currentPageRows.length);
+    };
 
-    const newSelectedRows = isBannerSelected
-        ? selectedRows.filter((id) => id !== image._id)
-        : [...selectedRows, image._id];
-
-    setSelectedRows(newSelectedRows);
-
-    // Check if all rows on the page are selected
-    const currentPageRows = context?.homeSlideData
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((image) => image._id); // Correct comparison with image._id
-
-    setSelectAll(newSelectedRows.length === currentPageRows.length);
-};
-
-// Check if a row is selected
-const isRowSelected = (image) => selectedRows.includes(image._id); // Correct comparison with image._id
+    // Check if a row is selected
+    const isRowSelected = (image) => selectedRows.includes(image._id); // Correct comparison with image._id
 
 
 
@@ -142,23 +142,21 @@ const isRowSelected = (image) => selectedRows.includes(image._id); // Correct co
     const handleDeleteSelectedRow = async (e, selectedRows) => {
         e.preventDefault();
         setIsLoading(true);
-    
+
         try {
             console.log("Selected Rows:", selectedRows);
-    
+
             // Validate selectedRows
             if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
                 throw new Error("Invalid Home Slide IDs.");
             }
-    
+
             // Convert array to comma-separated string
             const idsQueryParam = selectedRows.join(',');
-    
+
             // Send DELETE request with IDs as query parameters
             const result = await toast.promise(
-                deleteMultipleData(`/api/homeSlides/delete-homeSlide-image?ids=${idsQueryParam}`, {
-                    method: 'DELETE',
-                }),
+                deleteMultipleData(`/api/homeSlides/delete-homeSlide-image?ids=${idsQueryParam}`),
                 {
                     loading: "Deleting Home Slide(s)... Please wait.",
                     success: (response) => {
@@ -179,7 +177,7 @@ const isRowSelected = (image) => selectedRows.includes(image._id); // Correct co
                     },
                 }
             );
-    
+
             console.log("Delete Result:", result);
         } catch (err) {
             console.error("Error in handleDeleteSelectedRow:", err);
@@ -188,7 +186,7 @@ const isRowSelected = (image) => selectedRows.includes(image._id); // Correct co
             setIsLoading(false);
         }
     };
-    
+
 
 
 
@@ -233,7 +231,7 @@ const isRowSelected = (image) => selectedRows.includes(image._id); // Correct co
                                     return (
                                         <TableRow key={index}>
                                             <TableCell>
-                                            <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
+                                                <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>
                                             <TableCell width={300}>
                                                 <div className="flex items-start gap-4 w-[340px] h-[100px]">

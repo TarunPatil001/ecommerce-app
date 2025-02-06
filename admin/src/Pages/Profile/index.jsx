@@ -75,39 +75,39 @@ const Profile = () => {
     useEffect(() => {
         // Only run the effect when user data is available
         if (context?.userData?._id) {
-    
+
             // Fetch addresses when the component mounts or userData changes
             fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
                 setAddress(res.data); // Store the fetched addresses in state
                 context?.setAddress(res.data); // Store the fetched addresses in context
             });
-    
+
             // Set user data in state
             setUserId(context?.userData?._id);
             setFormFields({
                 name: context?.userData?.name,
                 email: context?.userData?.email,
             });
-    
+
             setChangePassword({
                 email: context?.userData?.email,
             });
-            
+
             const validPhone = context?.userData?.mobile ? String(context?.userData?.mobile) : "";
             setPhone(validPhone);
             // setPhone(`${context?.userData?.mobile}`);  // Set initial phone value from user data
         }
     }, [context?.userData]);  // Only re-run when context?.userData changes
-    
+
 
 
 
     useEffect(() => {
         const safeAddress = address || [];  // Ensure address is an array (in case it's null or undefined)
-        
+
         // Find the address that is selected
         const selectedAddress = safeAddress.find(addr => addr.selected === true);
-    
+
         if (selectedAddress) {
             // Set the selected address ID
             setSelectedValue(selectedAddress._id);
@@ -116,11 +116,10 @@ const Profile = () => {
             setSelectedValue(null);  // Example: Set selectedValue to null if no address is selected
         }
     }, [address]); // This effect runs whenever the address list changes
-    
+
 
 
     const onChangeFile = async (e, apiEndPoint) => {
-
         try {
             const result = await toast.promise(
                 (async () => {
@@ -128,28 +127,31 @@ const Profile = () => {
                     if (!file) {
                         throw new Error("No file selected.");
                     }
-
+    
                     const validFormats = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
                     if (!validFormats.includes(file.type)) {
                         throw new Error("Please select a valid image (JPEG/JPG/PNG/WEBP).");
                     }
-
+    
                     const formData = new FormData();
                     formData.append("avatar", file);
-
+    
                     setUploading(true);
-
+    
                     const previewUrl = URL.createObjectURL(file);
                     setPreview(previewUrl); // Temporary preview
-
+    
                     // Call the API and validate the response
                     const response = await uploadImage(apiEndPoint, formData);
                     console.log("API Response Debug:", response); // Debug API response
-
+    
                     if (response?.avatar) {
                         setAvatar(response.avatar); // Update state with the final avatar URL
                         setPreview(response.avatar); // Update preview with the uploaded avatar
                         return "Avatar updated successfully!";
+                    } else if (response?.message) {
+                        console.error("Avatar removal issue:", response.message);
+                        throw new Error(response.message); // Display specific error message
                     } else {
                         console.error("Unexpected response format:", response);
                         throw new Error("Failed to update avatar.");
@@ -160,23 +162,21 @@ const Profile = () => {
                     success: (message) => message,
                     error: (err) => {
                         console.error("Toast error handler debug:", err);
-                        const errorMessage =
-                            err?.response?.data?.message || err.message || "An error occurred while uploading your image.";
+                        const errorMessage = err?.response?.data?.message || err.message || "An error occurred while uploading your image.";
                         return errorMessage;
                     },
                 }
             );
-
+    
             console.log("Result:", result); // Log success message
-            // context.openAlertBox("success", result); // Show success alert
         } catch (error) {
             console.error("Error while uploading file:", error);
             // context.openAlertBox("error", error?.message || "An unexpected error occurred.");
         } finally {
             setUploading(false); // Stop spinner
         }
-
     };
+    
 
 
     const onChangeInput = (e) => {
@@ -214,22 +214,22 @@ const Profile = () => {
         // Start a toast.promise for handling loading, success, and error states
         try {
             const result = await toast.promise(
-               editData(`/api/user/${userId}`, formFields, { withCredentials: true }), {
-                    loading: "Updating profile... Please wait.",
-                    success: (res) => {
-                        if (res?.success) {
-                            navigate("/"); // Redirect to the home page
-                            return res.message || "Profile updated successfully!";
-                        } else {
-                            throw new Error(res?.message || "An unexpected error occurred.");
-                        }
-                    },
-                    error: (err) => {
-                        // Check if err.response exists, else fallback to err.message
-                        const errorMessage = err?.response?.data?.message || err.message || "Failed to update profile. Please try again.";
-                        return errorMessage;
-                    },
-                }
+                editData(`/api/user/${userId}`, formFields, { withCredentials: true }), {
+                loading: "Updating profile... Please wait.",
+                success: (res) => {
+                    if (res?.success) {
+                        navigate("/"); // Redirect to the home page
+                        return res.message || "Profile updated successfully!";
+                    } else {
+                        throw new Error(res?.message || "An unexpected error occurred.");
+                    }
+                },
+                error: (err) => {
+                    // Check if err.response exists, else fallback to err.message
+                    const errorMessage = err?.response?.data?.message || err.message || "Failed to update profile. Please try again.";
+                    return errorMessage;
+                },
+            }
             );
             console.log("Result:", result);
         } catch (err) {
@@ -237,7 +237,7 @@ const Profile = () => {
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
             setIsLoading(false);
-        }  
+        }
     };
 
 
@@ -437,7 +437,15 @@ const Profile = () => {
                                 )}
                                 <div className="overlay w-full h-full absolute top-0 left-0 z-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center opacity-0 rounded-full group-hover:opacity-100 duration-300 transition-all">
                                     <FiUpload className="text-white text-[22px] group-hover:scale-125 duration-300 transition-all" />
-                                    <input type="file" id="" className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2 " name="avatar" accept='image/*' onChange={(e) => onChangeFile(e, "/api/user/user-avatar")} />
+                                    <input
+                                        type="file"
+                                        id="avatar-upload"
+                                        className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2"
+                                        name="avatar"
+                                        accept="image/jpeg, image/png, image/jpg, image/webp"
+                                        onChange={(e) => onChangeFile(e, "/api/user/user-avatar")}
+                                    />
+
                                 </div>
                             </div>
                         </div>
@@ -477,7 +485,7 @@ const Profile = () => {
 
                         </form>
                     </div>
-                    
+
                 </div>
             </div >
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createCategory, deleteCategory, getCategories, getCategoriesCount, getCategory, getSubCategoriesCount, removeCategoryImageFromCloudinary, updateCategory, uploadCategoryImages } from "../controllers/category.controller.js";
+import { createCategory, deleteCategory, deleteMultipleCategories, getCategories, getCategoriesCount, getCategory, getSubCategoriesCount, removeCategoryImageFromCloudinary, updateCategory, uploadCategoryImages } from "../controllers/category.controller.js";
 
 const categoryRouter = Router();
 
@@ -28,6 +28,9 @@ categoryRouter.delete("/delete-category-image", auth, removeCategoryImageFromClo
 
 // Delete a category by ID
 categoryRouter.delete("/:id", auth, deleteCategory);
+
+// delete multiple categories
+categoryRouter.post("/delete-multiple-categories", auth, deleteMultipleCategories);
 
 // Update a category by ID
 categoryRouter.put("/:id", auth, updateCategory);

@@ -91,7 +91,7 @@ const ProductDetails = () => {
                 <h1 className="text-[20px] font-bold">Products Details</h1>
             </div>
 
-            <div className={`productDetails flex gap-5 mt-2 ${context.isSidebarOpen === true ? 'max-h-[85%]' : 'max-h-[60%]'} `}>
+            <div className={`productDetails flex gap-5 mt-2 ${context.isSidebarOpen === true ? 'max-h-[58%]' : 'max-h-[60%]'} `}>
                 <div className="w-[40%]">
                     <div className="flex gap-3 h-[95%] max-w-[600px]">
                         {/* Small Image Slider */}
@@ -128,7 +128,7 @@ const ProductDetails = () => {
                         </div>
 
                         {/* Big Image Slider */}
-                        <div className="zoomContainer w-full h-full max-w-[85%] mx-auto relative shadow-lg rounded-md">
+                        <div className="zoomContainer w-full max-w-[85%] mx-auto relative shadow-lg rounded-md">
                             <Swiper
                                 ref={zoomSlideBig}
                                 slidesPerView={1}
