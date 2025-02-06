@@ -97,10 +97,17 @@ const AddCategory = () => {
   };
 
 
-  const setPreviewFun = (previeswArr) => {
-    setPreviews(previeswArr);
-    formFields.images = previeswArr;
-  }
+  // Handle image previews update properly
+const setPreviewFun = (previeswArr) => {
+  // Update the previews state, which will trigger re-render
+  setPreviews(previeswArr);
+
+  // Update formFields.images to reflect the preview updates
+  setFormFields((prev) => ({
+    ...prev,
+    images: previeswArr,
+  }));
+};
 
 
   const handleFormSubmit = async (e) => {
