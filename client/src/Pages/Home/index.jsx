@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { FaShippingFast } from "react-icons/fa";
 import HomeCatSlider from "../../components/HomeCatSlider";
@@ -17,9 +17,23 @@ import BlogItem from "../../components/BlogItem";
 import HomeBannerV2 from "../../components/HomeSliderV2";
 import BannerBoxV2 from "../../components/bannerBoxV2";
 import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2";
+import { useState } from "react";
+import { useEffect } from "react";
+import { fetchDataFromApi } from "../../utils/api";
+import { MyContext } from "../../App";
 
 const Home = () => {
-  const [value, setValue] = React.useState(0);
+
+  const context = useContext(MyContext);
+  const [value, setValue] = useState(0);
+  const [homeSlideData, setHomeSlideData] = useState([]);
+
+
+  useEffect(() => {
+    fetchDataFromApi('/api/homeSlides').then((res) => {
+      setHomeSlideData(res.data);
+    })
+  }, [])
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -27,8 +41,11 @@ const Home = () => {
 
   return (
     <>
-        <HomeSlider />
-      
+
+      {
+        homeSlideData.length !== 0 && <HomeSlider data={homeSlideData} />
+      }
+
 
       <section className="py-6">
         <div className="container flex">
@@ -42,7 +59,11 @@ const Home = () => {
         </div>
       </section>
 
-      <HomeCatSlider />
+      {
+        context?.catData?.length !== 0 &&
+        <HomeCatSlider data={context?.catData} />
+      }
+
 
       <section className="bg-white py-5">
         <div className="container">

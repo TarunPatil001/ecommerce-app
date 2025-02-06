@@ -1,5 +1,5 @@
 import "./style.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { RiMenu2Fill } from "react-icons/ri";
 import { LiaAngleDownSolid } from "react-icons/lia";
@@ -7,22 +7,19 @@ import { Link } from "react-router-dom";
 import { GoRocket } from "react-icons/go";
 import CategoryPanel from "./CategoryPanel";
 import { IoIosArrowForward } from "react-icons/io";
-import { fetchDataFromApi } from "../../../utils/api";
+import { MyContext } from "../../../App";
 
 const Navigation = () => {
+
+  const context = useContext(MyContext);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
   const [isSticky, setIsSticky] = useState(true); // Track sticky state
   const [lastScrollY, setLastScrollY] = useState(0); // Track last scroll position
   const [catData, setCatData] = useState([]);
 
   useEffect(() => {
-    fetchDataFromApi("/api/category").then((res) => {
-      if (res?.error === false) {
-        setCatData(res?.data);
-      }
-      console.log(res);
-    });
-  }, []);
+    setCatData(context?.catData);
+  }, [context?.catData]);
 
   const openCategoryPanel = (isOpenCatPanel) => {
     setIsOpenCatPanel(isOpenCatPanel);

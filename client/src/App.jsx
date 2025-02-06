@@ -39,6 +39,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
+  const [catData, setCatData] = useState([]);
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
@@ -88,42 +89,15 @@ function App() {
   }, [isLogin]);
   
 
-   // Sync login state with localStorage and other tabs using the storage event
-  //  useEffect(() => {
-  //   // Function to set the login state based on access token
-  //   const updateLoginState = () => {
-  //     const token = localStorage.getItem('accessToken');
-      
-  //     if (token !== undefined && token !== null && token !== '') {
-  //       setIsLogin(true);
-  //       fetchDataFromApi(`/api/user/user-details`).then((res) => {
-  //         setUserData(res.data);
-  //       });
-  //     } else {
-  //       setIsLogin(false);
-  //       setUserData(null);  // Optionally clear user data
-  //     }
-  //   };
+  useEffect(() => {
+    fetchDataFromApi("/api/category").then((res) => {
+      if (res?.error === false) {
+        setCatData(res?.data);
+      }
+      console.log(res);
+    });
+  }, [isReducer]);
 
-  //   // Call on initial render to sync the state
-  //   updateLoginState();
-
-  //   // Listen for changes in localStorage (across all tabs)
-  //   const handleStorageChange = (e) => {
-  //     if (e.key === 'accessToken') {
-  //       updateLoginState();  // Update login state when accessToken changes
-  //     }
-  //   };
-
-  //   // Add listener for localStorage changes (across all tabs)
-  //   window.addEventListener('storage', handleStorageChange);
-
-  //   // Cleanup event listener on component unmount
-  //   return () => {
-  //     window.removeEventListener('storage', handleStorageChange);
-  //   };
-  // }, [isLogin]); // Empty array to run only once when the component mounts
-  
 
   const openAlertBox = (status, msg) => {
     if (status === "success") {
@@ -164,6 +138,9 @@ function App() {
     // User details
     userData,
     setUserData,
+
+    catData,
+    setCatData,
 
     // Utility functions
     openAlertBox,
