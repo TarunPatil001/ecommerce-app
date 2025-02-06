@@ -210,299 +210,300 @@ const Dashboard = () => {
   }
 
 
-   // Handle Category Change
-   const handleChangeProductCategory = (event) => {
+  // Handle Category Change
+  const handleChangeProductCategory = (event) => {
     const selectedCategories = event.target.value;
     setProductCategory(selectedCategories);
 
     // If a category is removed, reset subcategories and third-level categories
     if (selectedCategories.length === 0) {
+      setProductCategory2([]);
+      setProductCategory3([]);
+      setSubCategories([]);
+      setThirdLevelCategories([]);
+    } else {
+      // Filter subcategories based on the selected categories
+      const newSubCategories = filterSubCategories(selectedCategories);
+      setSubCategories(newSubCategories);
+
+      // If no subcategories are found, reset subcategory and third-level category selections
+      if (newSubCategories.length === 0) {
         setProductCategory2([]);
         setProductCategory3([]);
-        setSubCategories([]);
         setThirdLevelCategories([]);
-    } else {
-        // Filter subcategories based on the selected categories
-        const newSubCategories = filterSubCategories(selectedCategories);
-        setSubCategories(newSubCategories);
+      } else {
+        // Reset third-level categories if the selected subcategories are no longer valid
+        const validSubCategories = productCategory2.filter((subCatId) =>
+          newSubCategories.some((subCat) => subCat._id === subCatId)
+        );
+        setProductCategory2(validSubCategories);
 
-        // If no subcategories are found, reset subcategory and third-level category selections
-        if (newSubCategories.length === 0) {
-            setProductCategory2([]);
-            setProductCategory3([]);
-            setThirdLevelCategories([]);
+        if (validSubCategories.length === 0) {
+          setProductCategory3([]);
+          setThirdLevelCategories([]);
         } else {
-            // Reset third-level categories if the selected subcategories are no longer valid
-            const validSubCategories = productCategory2.filter((subCatId) =>
-                newSubCategories.some((subCat) => subCat._id === subCatId)
+          // Filter third-level categories based on the valid subcategories
+          const newThirdLevelCategories = filterThirdLevelCategories(validSubCategories);
+          setThirdLevelCategories(newThirdLevelCategories);
+
+          // If no third-level categories are found, reset third-level category selections
+          if (newThirdLevelCategories.length === 0) {
+            setProductCategory3([]);
+          } else {
+            // Reset third-level categories if the selected third-level categories are no longer valid
+            const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
+              newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
             );
-            setProductCategory2(validSubCategories);
-
-            if (validSubCategories.length === 0) {
-                setProductCategory3([]);
-                setThirdLevelCategories([]);
-            } else {
-                // Filter third-level categories based on the valid subcategories
-                const newThirdLevelCategories = filterThirdLevelCategories(validSubCategories);
-                setThirdLevelCategories(newThirdLevelCategories);
-
-                // If no third-level categories are found, reset third-level category selections
-                if (newThirdLevelCategories.length === 0) {
-                    setProductCategory3([]);
-                } else {
-                    // Reset third-level categories if the selected third-level categories are no longer valid
-                    const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
-                        newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
-                    );
-                    setProductCategory3(validThirdLevelCategories);
-                }
-            }
+            setProductCategory3(validThirdLevelCategories);
+          }
         }
+      }
     }
-};
+  };
 
-// Handle Subcategory Change
-const handleChangeProductCategory2 = (event) => {
+  // Handle Subcategory Change
+  const handleChangeProductCategory2 = (event) => {
     const selectedSubCategories = event.target.value;
     setProductCategory2(selectedSubCategories);
 
     // If a subcategory is removed, reset third-level categories
     if (selectedSubCategories.length === 0) {
-        setProductCategory3([]);
-        setThirdLevelCategories([]);
+      setProductCategory3([]);
+      setThirdLevelCategories([]);
     } else {
-        // Filter third-level categories based on the selected subcategories
-        const newThirdLevelCategories = filterThirdLevelCategories(selectedSubCategories);
-        setThirdLevelCategories(newThirdLevelCategories);
+      // Filter third-level categories based on the selected subcategories
+      const newThirdLevelCategories = filterThirdLevelCategories(selectedSubCategories);
+      setThirdLevelCategories(newThirdLevelCategories);
 
-        // If no third-level categories are found, reset third-level category selections
-        if (newThirdLevelCategories.length === 0) {
-            setProductCategory3([]);
-        } else {
-            // Reset third-level categories if the selected third-level categories are no longer valid
-            const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
-                newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
-            );
-            setProductCategory3(validThirdLevelCategories);
-        }
+      // If no third-level categories are found, reset third-level category selections
+      if (newThirdLevelCategories.length === 0) {
+        setProductCategory3([]);
+      } else {
+        // Reset third-level categories if the selected third-level categories are no longer valid
+        const validThirdLevelCategories = productCategory3.filter((thirdCatId) =>
+          newThirdLevelCategories.some((thirdCat) => thirdCat._id === thirdCatId)
+        );
+        setProductCategory3(validThirdLevelCategories);
+      }
     }
-};
+  };
 
-// Handle Third-level Category Change
-const handleChangeProductCategory3 = (event) => {
+  // Handle Third-level Category Change
+  const handleChangeProductCategory3 = (event) => {
     const selectedThirdLevelCategories = event.target.value;
     setProductCategory3(selectedThirdLevelCategories);
-};
+  };
 
-// Filter Subcategories based on Category Selection
-const filterSubCategories = (categoryIds) => {
+  // Filter Subcategories based on Category Selection
+  const filterSubCategories = (categoryIds) => {
     if (!context?.catData) return [];
     return context.catData
-        .filter((cat) => categoryIds.includes(cat._id))
-        .flatMap((cat) => cat.children || []);
-};
+      .filter((cat) => categoryIds.includes(cat._id))
+      .flatMap((cat) => cat.children || []);
+  };
 
-// Filter Third-Level Categories based on Subcategory Selection
-const filterThirdLevelCategories = (subCategoryIds) => {
+  // Filter Third-Level Categories based on Subcategory Selection
+  const filterThirdLevelCategories = (subCategoryIds) => {
     if (!context?.catData) return [];
     return context.catData
-        .flatMap((cat) => cat.children || [])
-        .filter((subCat) => subCategoryIds.includes(subCat._id))
-        .flatMap((subCat) => subCat.children || []);
-};
+      .flatMap((cat) => cat.children || [])
+      .filter((subCat) => subCategoryIds.includes(subCat._id))
+      .flatMap((subCat) => subCat.children || []);
+  };
 
-// Reset filters function
-const resetFilters = () => {
+  // Reset filters function
+  const resetFilters = () => {
     setProductCategory([]); // Reset selected categories
     setProductCategory2([]); // Reset selected subcategories
     setProductCategory3([]); // Reset selected third-level categories
     setSubCategories([]); // Clear subcategories
     setThirdLevelCategories([]); // Clear third-level categories
-};
+  };
 
 
-// Handle Select All
-const handleSelectAll = () => {
+  // Handle Select All
+  const handleSelectAll = () => {
     console.log("Select All Clicked: ", selectAll);
     if (selectAll) {
-        setSelectedRows([]); // Uncheck all, clear selected rows array
-        console.log("Unchecking all rows");
+      setSelectedRows([]); // Uncheck all, clear selected rows array
+      console.log("Unchecking all rows");
     } else {
-        // Select all rows in the current page by storing only the _id
-        const allRows = productData
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map(product => product._id);
-        setSelectedRows(allRows); // Select all rows
-        console.log("Selecting all rows with IDs: ", allRows);
+      // Select all rows in the current page by storing only the _id
+      const allRows = productData
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .map(product => product._id);
+      setSelectedRows(allRows); // Select all rows
+      console.log("Selecting all rows with IDs: ", allRows);
     }
     setSelectAll(!selectAll); // Toggle selectAll state
-};
+  };
 
 
-// Handle Row Select or Deselect
-const handleRowCheckboxChange = (product) => {
+  // Handle Row Select or Deselect
+  const handleRowCheckboxChange = (product) => {
     console.log("Row Checkbox clicked for product: ", product);
     const isProductSelected = selectedRows.includes(product._id);
     console.log("Is Product Selected? ", isProductSelected);
 
     const newSelectedRows = isProductSelected
-        ? selectedRows.filter(id => id !== product._id) // Remove product _id from selection
-        : [...selectedRows, product._id]; // Add product _id to selection
+      ? selectedRows.filter(id => id !== product._id) // Remove product _id from selection
+      : [...selectedRows, product._id]; // Add product _id to selection
 
     setSelectedRows(newSelectedRows);
     console.log("Updated selected rows (IDs): ", newSelectedRows);
 
     // Check if all rows are selected manually
     if (newSelectedRows.length === productData.length) {
-        setSelectAll(true); // All rows are selected
-        console.log("All rows selected");
+      setSelectAll(true); // All rows are selected
+      console.log("All rows selected");
     } else {
-        setSelectAll(false); // Not all rows selected
-        console.log("Not all rows selected");
+      setSelectAll(false); // Not all rows selected
+      console.log("Not all rows selected");
     }
-};
+  };
 
 
-// Handle the rendering of individual row checkboxes
-const isRowSelected = (product) => selectedRows.includes(product._id);
+  // Handle the rendering of individual row checkboxes
+  const isRowSelected = (product) => selectedRows.includes(product._id);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("Selected rows (IDs) updated: ", selectedRows);
-}, [selectedRows]);
+  }, [selectedRows]);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("Select All status changed: ", selectAll);
-}, [selectAll]);
+  }, [selectAll]);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("Product Data: ", productData);
-}, [productData]);
+  }, [productData]);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("Page: ", page, "Rows Per Page: ", rowsPerPage);
-}, [page, rowsPerPage]);
+  }, [page, rowsPerPage]);
 
 
 
 
-const handleChangeCategoryFilterValue = (event) => {
+  const handleChangeCategoryFilterValue = (event) => {
     setCategoryFilterValue(event.target.value);
     setPage(0); // Reset to first page on category change
-};
+  };
 
-const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event, newPage) => {
     setPage(newPage);
-};
+  };
 
-const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-};
+  };
 
-const filteredProductData = categoryFilterValue
+  const filteredProductData = categoryFilterValue
     ? productData.filter((product) => product.categoryName === categoryFilterValue)
     : productData;
 
-const emptyRows =
+  const emptyRows =
     page > 0
-        ? Math.max(0, (1 + page) * rowsPerPage - filteredProductData.length)
-        : 0;
+      ? Math.max(0, (1 + page) * rowsPerPage - filteredProductData.length)
+      : 0;
 
 
-const handleEditCategory = (productId, productName) => {
+  const handleEditCategory = (productId, productName) => {
     console.log("ProductListPage - Product ID :", productId);
     console.log("ProductListPage - Product Name :", productName);
 
     context.setIsOpenFullScreenPanel({
-        open: true,
-        model: "Product Details",
-        productId: productId,
-        productName: productName,
+      open: true,
+      model: "Product Details",
+      productId: productId,
+      productName: productName,
     });
-};
+  };
 
 
 
-const handleDeleteProduct = async (e, productId) => {
+  const handleDeleteProduct = async (e, productId) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-        const result = await toast.promise(
-            deleteData(`/api/product/${productId}`),
-            {
-                loading: "Deleting category... Please wait.",
-                success: (res) => {
-                    if (res?.success) {
-                        setProductData((prevData) => prevData.filter(product => product._id !== productId));
-                        return res.message || "Product deleted successfully!";
-                    } else {
-                        throw new Error(res?.message || "An unexpected error occurred.");
-                    }
-                },
-                error: (err) => {
-                    return err?.response?.data?.message || err.message || "Failed to delete product. Please try again.";
-                },
+      const result = await toast.promise(
+        deleteData(`/api/product/${productId}`),
+        {
+          loading: "Deleting category... Please wait.",
+          success: (res) => {
+            if (res?.success) {
+              setProductData((prevData) => prevData.filter(product => product._id !== productId));
+              return res.message || "Product deleted successfully!";
+            } else {
+              throw new Error(res?.message || "An unexpected error occurred.");
             }
-        );
-
-        console.log("Delete Result:", result);
-    } catch (err) {
-        console.error("Error in handleDeleteProduct:", err);
-        toast.error(err?.message || "An unexpected error occurred.");
-    } finally {
-        setIsLoading(false);
-    }
-};
-
-
-
-const handleDeleteSelectedRow = async (e, selectedRows) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-        console.log("Selected Rows:", selectedRows);
-
-        // Validate selectedRows
-        if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
-            throw new Error("Invalid product IDs.");
+          },
+          error: (err) => {
+            return err?.response?.data?.message || err.message || "Failed to delete product. Please try again.";
+          },
         }
+      );
 
-        // Convert array to comma-separated string
-        const idsQueryParam = selectedRows.join(',');
-
-        // Make DELETE request with query parameters
-        const result = await toast.promise(
-            deleteMultipleData(`/api/product/delete-multiple-products?ids=${idsQueryParam}`),
-            {
-                loading: "Deleting product(s)... Please wait.",
-                success: (response) => {  // Removed async from here
-                    if (response.success) {
-                        // Update UI to remove the deleted products
-                        setProductData((prevData) =>
-                            prevData.filter((product) => !selectedRows.includes(product._id))
-                        );
-                        setSelectedRows([]);
-                        return response.message || "Product(s) deleted successfully!";
-                    } else {
-                        throw new Error(response.message || "An unexpected error occurred.");
-                    }
-                },
-                error: (err) => {
-                    return err.message || "Failed to delete product(s). Please try again.";
-                },
-            }
-        );
-
-        console.log("Delete Result:", result);
+      console.log("Delete Result:", result);
     } catch (err) {
-        console.error("Error in handleDeleteSelectedRow:", err);
-        toast.error(err.message || "An unexpected error occurred.");
+      console.error("Error in handleDeleteProduct:", err);
+      toast.error(err?.message || "An unexpected error occurred.");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
+
+
+
+  const handleDeleteSelectedRow = async (e, selectedRows) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      console.log("Selected Rows:", selectedRows);
+
+      // Validate selectedRows
+      if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
+        throw new Error("Invalid product IDs.");
+      }
+
+      // Convert array to comma-separated string
+      const idsQueryParam = selectedRows.join(',');
+
+      // Make DELETE request with query parameters
+      const result = await toast.promise(
+        deleteMultipleData(`/api/product/delete-multiple-products?ids=${idsQueryParam}`),
+        {
+          loading: "Deleting product(s)... Please wait.",
+          success: (response) => {  // Removed async from here
+            if (response.success) {
+              // Update UI to remove the deleted products
+              setProductData((prevData) =>
+                prevData.filter((product) => !selectedRows.includes(product._id))
+              );
+              setSelectedRows([]); // Clear selected rows after successful deletion
+              setSelectAll(false); // Uncheck "Select All" checkbox
+              return response.message || "Product(s) deleted successfully!";
+            } else {
+              throw new Error(response.message || "An unexpected error occurred.");
+            }
+          },
+          error: (err) => {
+            return err.message || "Failed to delete product(s). Please try again.";
+          },
+        }
+      );
+
+      console.log("Delete Result:", result);
+    } catch (err) {
+      console.error("Error in handleDeleteSelectedRow:", err);
+      toast.error(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
 

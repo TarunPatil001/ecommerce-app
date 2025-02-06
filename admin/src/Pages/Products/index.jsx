@@ -428,7 +428,8 @@ const Products = () => {
                             setProductData((prevData) =>
                                 prevData.filter((product) => !selectedRows.includes(product._id))
                             );
-                            setSelectedRows([]);
+                            setSelectedRows([]); // Clear selected rows after successful deletion
+                            setSelectAll(false); // Uncheck "Select All" checkbox
                             return response.message || "Product(s) deleted successfully!";
                         } else {
                             throw new Error(response.message || "An unexpected error occurred.");
@@ -787,10 +788,6 @@ const Products = () => {
 
                     </Table>
                 </TableContainer>
-
-
-
-
 
 
                 {

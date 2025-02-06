@@ -234,7 +234,8 @@ const AddRAMS = () => {
                             setData((prevData) =>
                                 prevData.filter((data) => !selectedRows.includes(data._id))
                             );
-                            setSelectedRows([]);
+                            setSelectedRows([]); // Clear selected rows after successful deletion
+                            setSelectAll(false); // Uncheck "Select All" checkbox
                             return response.message || "Product Ram(s) deleted successfully!";
                         } else {
                             throw new Error(response.message || "An unexpected error occurred.");
