@@ -235,27 +235,24 @@ const HomeSliderBanners = () => {
                                             </TableCell>
                                             <TableCell width={300}>
                                                 <div className="flex items-start gap-4 w-[340px] h-[100px]">
-                                                    <Link to="/product/458457" className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
+                                                    <div className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
                                                         <LazyLoadImage
                                                             alt="homeSlide_img"
                                                             effect="blur"
                                                             src={image.images[0]}
                                                             className='w-full h-full object-cover hover:scale-110 !transition-all !duration-300'
                                                         />
-                                                    </Link>
+                                                    </div>
                                                 </div>
                                             </TableCell>
 
                                             <TableCell width={100}>
                                                 <div className='flex items-center gap-2'>
                                                     <Tooltip title="Edit Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={() => { handleEditHomeSLide(image?._id,); }}><MdOutlineEdit className='text-[35px]' /></Button>
-                                                    </Tooltip>
-                                                    <Tooltip title="View Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow'><IoEyeOutline className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-blue-500 !text-white shadow' onClick={() => { handleEditHomeSLide(image?._id,); }}><MdOutlineEdit className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                     <Tooltip title="Delete Product" arrow placement="top">
-                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-[#f1f1f1] !text-[var(--text-light)] shadow' onClick={(e) => { handleDeleteHomeSlide(e, image?._id,) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
+                                                        <Button className='!h-[35px] !w-[35px] !min-w-[35px] !bg-red-500 !text-white shadow' onClick={(e) => { handleDeleteHomeSlide(e, image?._id,) }}><RiDeleteBin6Line className='text-[35px]' /></Button>
                                                     </Tooltip>
                                                 </div>
                                             </TableCell>
