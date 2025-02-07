@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
 import { Skeleton } from "@mui/material";
+import ProductLoading from "../../components/ProductLoading";
 
 const Home = () => {
 
@@ -64,7 +65,7 @@ const Home = () => {
 
     const fetchProducts = async () => {
       setLoading(true); // ✅ Show loader before API call starts
-
+      
       try {
         const res = await fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${context?.catData?._id}`);
 
@@ -93,6 +94,7 @@ const Home = () => {
 
   const filterByCatId = (id) => {
     setLoading(true); // Start loading before fetching
+    setPopularProductData([]); // Clear products if no data is found
     fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${id}`)
       .then((res) => {
         if (res?.error === false && Array.isArray(res?.data) && res.data.length > 0) {
@@ -166,21 +168,8 @@ const Home = () => {
             </div>
           </div>
 
-          {loading ? (
-            <div className="text-center text-gray-500 w-full h-[330px] flex justify-center gap-5 p-[15px]">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="flex flex-col items-start w-full sm:w-[45%] md:w-[30%] lg:w-[18%] h-[250px] sm:h-[280px] md:h-[310px] lg:h-[330px]">
-                  <Skeleton variant="rectangular" className="w-full h-[330px]" height={330} />
-                  <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="60%" />
-                  <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="80%" />
-                  <div className="flex items-center justify-between w-full">
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
-                  </div>
-                </div>
-              ))}
-            </div>
+          {popularProductData?.length === 0 && loading ? (
+            <ProductLoading size={6} />
           ) : popularProductData?.length > 0 ? (
             <ProductSlider items={6} data={popularProductData} />
           ) : (
@@ -188,6 +177,7 @@ const Home = () => {
               No products found
             </p>
           )}
+
 
         </div>
       </section>
@@ -219,9 +209,17 @@ const Home = () => {
         <div className="container">
           <h2 className="text-2xl font-semibold">Latest Products</h2>
           <p className="text-sm font-normal">New release for winter.</p>
-          {
-            allProductsData?.length !== 0 && <ProductSlider items={5} data={allProductsData} />
-          }
+
+          {allProductsData?.length === 0 && loading ? (
+            <ProductLoading size={6} />
+          ) : allProductsData?.length > 0 ? (
+            <ProductSlider items={6} data={allProductsData} />
+          ) : (
+            <p className="text-center text-gray-500 w-full h-[330px] flex items-center justify-center">
+              No products found
+            </p>
+          )}
+
           <AdsBannerSlider items={2} timedelay={5000} />
           <AdsBannerSliderV2 items={2} timedelay={3000} height={200} />
         </div>
@@ -233,8 +231,17 @@ const Home = () => {
           <p className="text-sm font-normal">
             Everything you need—on a budget.
           </p>
+
           {
-          allFeaturedProductsData?.length > 0 && <ProductSlider items={5} data={allFeaturedProductsData} />
+            allFeaturedProductsData?.length === 0 && loading ? (
+              <ProductLoading size={6} />
+            ) : allFeaturedProductsData?.length > 0 ? (
+              <ProductSlider items={6} data={allFeaturedProductsData} />
+            ) : (
+              <p className="text-center text-gray-500 w-full h-[330px] flex items-center justify-center">
+                No products found
+              </p>
+            )
           }
 
           <AdsBannerSlider items={3} timedelay={3000} />

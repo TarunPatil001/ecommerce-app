@@ -55,6 +55,7 @@ const Navigation = () => {
           }`}
       >
         <div className="container flex items-center justify-end gap-8">
+          
           <div className="col_1 w-[20%]">
             <Button
               className="!text-black !text-[14px] !font-[600] gap-2 w-full hover:!text-[rgba(0,0,0,0.9)]"
@@ -67,6 +68,8 @@ const Navigation = () => {
             </Button>
           </div>
           <span className="line !h-[20px]"></span>
+
+
           <div className="col_2 w-[60%]">
             <ul className="flex items-center gap-3 nav">
               <li className="list-none">
