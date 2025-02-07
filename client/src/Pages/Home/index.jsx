@@ -21,23 +21,92 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
+import { Skeleton } from "@mui/material";
 
 const Home = () => {
 
   const context = useContext(MyContext);
   const [value, setValue] = useState(0);
   const [homeSlideData, setHomeSlideData] = useState([]);
+  const [popularProductData, setPopularProductData] = useState([]);
+  const [allProductsData, setAllProductsData] = useState([]);
+  const [allFeaturedProductsData, setAllFeaturedProductsData] = useState([]);
+  const [loading, setLoading] = useState(false); // ✅ New state for tracking API request
+
 
 
   useEffect(() => {
     fetchDataFromApi('/api/homeSlides').then((res) => {
       setHomeSlideData(res.data);
     })
+
+    fetchDataFromApi('/api/product/get-all-products').then((res) => {
+      setAllProductsData(res.data);
+    })
+
+    fetchDataFromApi('/api/product/get-all-featuredProducts').then((res) => {
+      setAllFeaturedProductsData(res.data);
+    })
+
   }, [])
 
+  useEffect(() => {
+    if (context?.catData?.length > 0) {
+      setValue(0); // Set default tab
+      filterByCatId(context.catData[0]._id); // Fetch products for the first category
+    }
+  }, [context?.catData]);
+
+
+
+  useEffect(() => {
+    if (!context?.catData?._id) return;
+
+    const fetchProducts = async () => {
+      setLoading(true); // ✅ Show loader before API call starts
+
+      try {
+        const res = await fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${context?.catData?._id}`);
+
+        if (res?.error === false && Array.isArray(res?.data)) {
+          setPopularProductData(res.data.length > 0 ? res.data : []);
+        } else {
+          setPopularProductData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setPopularProductData([]);
+      } finally {
+        setLoading(false); // ✅ Hide loader after API response
+      }
+    };
+
+    fetchProducts();
+  }, [context?.catData?._id, context?.isReducer]);
+
+
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValue(newValue); // ✅ Set the active tab
+    filterByCatId(newValue); // ✅ Fetch products for the selected category
   };
+
+
+  const filterByCatId = (id) => {
+    setLoading(true); // Start loading before fetching
+    fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${id}`)
+      .then((res) => {
+        if (res?.error === false && Array.isArray(res?.data) && res.data.length > 0) {
+          setPopularProductData(res.data);
+        } else {
+          setPopularProductData([]); // Clear products if no data is found
+        }
+      })
+      .catch(() => setPopularProductData([])) // Handle API failure by clearing state
+      .finally(() => setLoading(false)); // Stop loading after API call
+  };
+
+
+
 
   return (
     <>
@@ -60,8 +129,7 @@ const Home = () => {
       </section>
 
       {
-        context?.catData?.length !== 0 &&
-        <HomeCatSlider data={context?.catData} />
+        context?.catData.length !== 0 && <HomeCatSlider data={context?.catData} />
       }
 
 
@@ -82,19 +150,45 @@ const Home = () => {
                 scrollButtons="auto"
                 aria-label="scrollable auto tabs example"
               >
-                <Tab label="Fashion" />
-                <Tab label="Electronics" />
-                <Tab label="Bags" />
-                <Tab label="Footwear" />
-                <Tab label="Groceries" />
-                <Tab label="Beauty" />
-                <Tab label="Wellness" />
-                <Tab label="Jewellery" />
+                {context?.catData.length > 0 &&
+                  context.catData.map((cat, index) => (
+                    <Tab
+                      label={cat?.name}
+                      key={index}
+                      onClick={() => {
+                        setValue(index); // Update selected tab
+                        filterByCatId(cat?._id); // Fetch products for the clicked category
+                      }}
+                    />
+                  ))}
               </Tabs>
+
             </div>
           </div>
 
-          <ProductSlider items={6} />
+          {loading ? (
+            <div className="text-center text-gray-500 w-full h-[330px] flex justify-center gap-5 p-[15px]">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="flex flex-col items-start w-full sm:w-[45%] md:w-[30%] lg:w-[18%] h-[250px] sm:h-[280px] md:h-[310px] lg:h-[330px]">
+                  <Skeleton variant="rectangular" className="w-full h-[330px]" height={330} />
+                  <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="60%" />
+                  <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="80%" />
+                  <div className="flex items-center justify-between w-full">
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="30%" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : popularProductData?.length > 0 ? (
+            <ProductSlider items={6} data={popularProductData} />
+          ) : (
+            <p className="text-center text-gray-500 w-full h-[330px] flex items-center justify-center">
+              No products found
+            </p>
+          )}
+
         </div>
       </section>
 
@@ -125,7 +219,9 @@ const Home = () => {
         <div className="container">
           <h2 className="text-2xl font-semibold">Latest Products</h2>
           <p className="text-sm font-normal">New release for winter.</p>
-          <ProductSlider items={5} />
+          {
+            allProductsData?.length !== 0 && <ProductSlider items={5} data={allProductsData} />
+          }
           <AdsBannerSlider items={2} timedelay={5000} />
           <AdsBannerSliderV2 items={2} timedelay={3000} height={200} />
         </div>
@@ -137,7 +233,10 @@ const Home = () => {
           <p className="text-sm font-normal">
             Everything you need—on a budget.
           </p>
-          <ProductSlider items={5} />
+          {
+          allFeaturedProductsData?.length > 0 && <ProductSlider items={5} data={allFeaturedProductsData} />
+          }
+
           <AdsBannerSlider items={3} timedelay={3000} />
           <AdsBannerSliderV2 items={3} timedelay={3000} />
         </div>

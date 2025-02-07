@@ -789,8 +789,8 @@ const AddProduct = () => {
                                         Select broad category
                                     </MenuItem>
                                     {
-                                        context?.catData?.map((item) => (
-                                            <MenuItem key={item._id} value={item._id} onClick={() => selectedCatFun(item._id, item.name)}>
+                                        context?.catData?.map((item, index) => (
+                                            <MenuItem key={index} value={item._id} onClick={() => selectedCatFun(item._id, item.name)}>
                                                 {item.name}
                                             </MenuItem>
                                         ))
@@ -814,8 +814,8 @@ const AddProduct = () => {
                                 <MenuItem value="" disabled>
                                     Select sub category
                                 </MenuItem>
-                                {filteredCategories.length > 0 && filteredCategories.map((item2) => (
-                                    <MenuItem key={item2._id} value={item2._id} onClick={() => selectedCatFun2(item2._id, item2.name)}>
+                                {filteredCategories.length > 0 && filteredCategories.map((item2, index_) => (
+                                    <MenuItem key={index_} value={item2._id} onClick={() => selectedCatFun2(item2._id, item2.name)}>
                                         {item2.name}
                                     </MenuItem>
                                 ))}
@@ -838,8 +838,8 @@ const AddProduct = () => {
                                     Select specific category
                                 </MenuItem>
                                 {/* Third-Level Child Category */}
-                                {filteredSubCategories.length > 0 && filteredSubCategories.map((item3) => (
-                                    <MenuItem key={item3._id} value={item3._id} onClick={() => selectedCatFun3(item3._id, item3.name)}>
+                                {filteredSubCategories.length > 0 && filteredSubCategories.map((item3, index__) => (
+                                    <MenuItem key={index__} value={item3._id} onClick={() => selectedCatFun3(item3._id, item3.name)}>
                                         {item3.name}
                                     </MenuItem>
                                 ))}

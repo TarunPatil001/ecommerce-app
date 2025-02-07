@@ -1,4 +1,4 @@
-// import React, { useRef, useState } from 'react';
+import React from 'react';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,7 +17,7 @@ const HomeCatSlider = (props) => {
     <div className="homeCatSlider pt-4 py-8">
       <div className="container">
         <Swiper
-          slidesPerView={7}
+          slidesPerView={`${props?.data?.length > 7 ? 8 : 7}`}
           spaceBetween={10}
           autoplay={{
             delay: 5000,
@@ -31,6 +31,7 @@ const HomeCatSlider = (props) => {
         >
           {
             props?.data?.map((item, index) => (
+
               <SwiperSlide key={index}>
                 <Link to="/">
                   <div className="item p-2 bg-white rounded-lg shadow-sm text-center flex items-center justify-center flex-col transition-all link">
@@ -41,14 +42,13 @@ const HomeCatSlider = (props) => {
                         className="scalable-image rounded-lg"
                       />
                     </div>
-                    <h3 className="text-[15px] font-[500] mt-3 truncate w-40">Tablets</h3>
+                    <h3 className="text-[15px] font-[500] mt-3 truncate w-40">{item?.name}</h3>
                   </div>
                 </Link>
               </SwiperSlide>
+
             ))
           }
-
-
         </Swiper>
       </div>
     </div>

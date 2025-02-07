@@ -34,12 +34,33 @@ const ProductItemListView = () => {
           </span>
 
           <span className=" px-1 flex items-center gap-1 absolute bottom-2 right-2 z-50 border rounded-sm text-[12px] bg-[rgba(255,255,255,0.8)]">
-            <span className="flex items-center gap-1 font-semibold">4.1<Rating name="" defaultValue={1} max={1} readOnly className="!text-sm !text-[var(--rating-star-color)]" /></span>
+            <span className="flex items-center gap-1 font-semibold">4.1<Rating defaultValue={1} max={1} readOnly className="!text-sm !text-[var(--rating-star-color)]" /></span>
             <span className="line !h-[10px] mx-0.5 !bg-[var(--text-light)]"></span>
             <span className="flex items-center gap-1 font-semibold">{new Intl.NumberFormat("en", { notation: "compact" }).format(500000).toLowerCase()}</span>
           </span>
 
           <div className="actions absolute top-[-200px] right-[0px] z-50 flex items-center gap-2 flex-col w-[80px] transition-all duration-500 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
+          <Tooltip
+              title="View Product details"
+              placement="right"
+              arrow
+            >
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group"  onClick={()=>context.handleOpeneProductDetailsModal(true)}>
+                <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
+              </Button>
+            </Tooltip>
+            
+            
+            <Tooltip
+              title="Add to Compare"
+              placement="right"
+              arrow
+            >
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
+                <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
+              </Button>
+            </Tooltip>
+            
             <Tooltip
               title="Add to Wishlist"
               placement="right"
@@ -50,27 +71,8 @@ const ProductItemListView = () => {
                 <Checkbox {...label} icon={<IoMdHeartEmpty className="text-[25px] !text-gray-700 group-hover:text-white" />} checkedIcon={<IoMdHeart className="text-[25px]" />} disableRipple />
               </Button>
             </Tooltip>
-            <Tooltip
-              title="Add to Compare"
-              placement="right"
-              arrow
-            >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
-                <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
-              </Button>
-            </Tooltip>
-            <Tooltip
-              title="View Product details"
-              placement="right"
-              arrow
-            >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group"  onClick={()=>context.setOpenProductDetailsModal(true)}>
-                <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
-              </Button>
-            </Tooltip>
-            <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group">
-              <LiaExternalLinkAltSolid className="text-[35px] !text-gray-700 group-hover:text-white " />
-            </Button>
+            
+
           </div>
         </div>
         <div className="info px-7 py-7 w-[75%] flex flex-col gap-2">

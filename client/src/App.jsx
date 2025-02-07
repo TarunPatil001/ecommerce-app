@@ -29,7 +29,10 @@ import Address from './Pages/MyAccount/address';
 const MyContext = createContext();
 
 function App() {
-  const [openProductDetailsModal, setOpenProductDetailsModal] = useState(false);
+  const [openProductDetailsModal, setOpenProductDetailsModal] = useState({
+    open: false,
+    product: {}
+  });
   const [maxWidth, setMaxWidth] = useState('lg');
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
@@ -58,23 +61,33 @@ function App() {
     setShippingFee(PlatformFeeRate); // Updates the cart quantity
   };
 
-  const handleCloseProductDetailsModal = () => {
-    setOpenProductDetailsModal(false);
+  const handleOpeneProductDetailsModal = (status, product) => {
+    setOpenProductDetailsModal({
+      open: status,
+      product: product,
+    });
+  };
+
+  const handleCloseProductDetailsModal = (status, product) => {
+    setOpenProductDetailsModal({
+      open: false,
+      product: {},
+    });
   };
 
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if(token!==undefined && token!==null && token!==''){
+    if (token !== undefined && token !== null && token !== '') {
       setIsLogin(true);
 
-      fetchDataFromApi(`/api/user/user-details`).then((res)=>{
+      fetchDataFromApi(`/api/user/user-details`).then((res) => {
         setUserData(res.data);
         // console.log(res?.response?.data?.error);
-        if(res?.response?.data?.error === true){
+        if (res?.response?.data?.error === true) {
           if (res?.response?.data?.message === "You have not login") {
             localStorage.clear();
             openAlertBox("error", "Your session has expired. Please login again.");
@@ -83,11 +96,11 @@ function App() {
         }
       })
 
-      }else{
-        setIsLogin(false);
-      }
+    } else {
+      setIsLogin(false);
+    }
   }, [isLogin]);
-  
+
 
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
@@ -125,6 +138,7 @@ function App() {
 
     // Modal-related state and handlers
     setOpenProductDetailsModal,
+    handleOpeneProductDetailsModal,
 
     // Cart panel visibility
     openCartPanel,
@@ -145,7 +159,7 @@ function App() {
     // Utility functions
     openAlertBox,
 
-    
+
     isReducer,
     forceUpdate,
 
@@ -180,43 +194,50 @@ function App() {
           </Routes>
           <Footer />
         </MyContext.Provider>
+
+        <Toaster />
+
+        <Dialog
+          open={openProductDetailsModal.open}
+          onClose={handleCloseProductDetailsModal}
+          fullWidth={fullWidth}
+          maxWidth={maxWidth}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          className="productDetailsModal"
+        >
+          <DialogContent>
+            <div className="flex items-start w-full productDetailsModalContainer relative gap-10 p-5">
+              {/* Close Button */}
+              <Button
+                className="!w-[40px] !h-[40px] !min-w-[40px] !bg-gray-100 !border-red-500 !text-red-500 !rounded-full !absolute top-[10px] right-[10px] z-10"
+                onClick={handleCloseProductDetailsModal}
+              >
+                <IoCloseOutline className="text-[30px]" />
+              </Button>
+
+
+              {
+                openProductDetailsModal?.product?.length !== 0 &&
+                <>
+                  {/* Left Column with Sticky */}
+                  <div className="col1 w-[50%] sticky top-5">
+                    <ProductZoom images={openProductDetailsModal?.product?.images} />
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="col2 w-[50%] overflow-y-auto p-2 productContent">
+                    <ProductDetailsContent product={openProductDetailsModal?.product} />
+                  </div>
+                </>
+              }
+
+            </div>
+
+          </DialogContent>
+        </Dialog>
+
       </BrowserRouter>
-
-      <Toaster />
-
-      <Dialog
-        open={openProductDetailsModal}
-        onClose={handleCloseProductDetailsModal}
-        fullWidth={fullWidth}
-        maxWidth={maxWidth}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        className="productDetailsModal"
-      >
-        <DialogContent>
-          <div className="flex items-start w-full productDetailsModalContainer relative gap-10 p-5">
-            {/* Close Button */}
-            <Button
-              className="!w-[40px] !h-[40px] !min-w-[40px] !bg-gray-100 !border-red-500 !text-red-500 !rounded-full !absolute top-[10px] right-[10px] z-10"
-              onClick={handleCloseProductDetailsModal}
-            >
-              <IoCloseOutline className="text-[30px]" />
-            </Button>
-
-            {/* Left Column with Sticky */}
-            <div className="col1 w-[50%] sticky top-5">
-              <ProductZoom />
-            </div>
-
-            {/* Right Column */}
-            <div className="col2 w-[50%] overflow-y-auto p-2 productContent">
-              <ProductDetailsContent />
-            </div>
-          </div>
-
-        </DialogContent>
-      </Dialog>
-
     </>
 
   );

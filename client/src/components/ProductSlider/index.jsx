@@ -21,30 +21,17 @@ const ProductSlider = (props) => {
         spaceBetween={10}
         navigation={true}
         modules={[Navigation]}
-        className="mySwiper"
+        className="mySwiper h-full"
       >
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
+        {props?.data?.map((product, index) => (
+          <SwiperSlide key={index} className="!h-full">
+            <div className="h-full flex">
+              <ProductItem product={product} />
+            </div>
+          </SwiperSlide>
+        ))}
       </Swiper>
+
       {/* </div> */}
     </section>
   );

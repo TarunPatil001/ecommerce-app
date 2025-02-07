@@ -13,7 +13,7 @@
   --off-color: rgb(255, 119, 0);
   --rating-star-color: rgb(0, 143, 100);
   --text-dark: #282c3f;
-  --text-light: #535665;
+  --text-light: rgb(163, 160, 156);
 }
 
 * {
@@ -654,7 +654,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .qtyBox button{
-  min-width: 40px !important;
+  /* min-width: 40px !important; */
   width: 20px !important;
   height: 20px !important;
   border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
