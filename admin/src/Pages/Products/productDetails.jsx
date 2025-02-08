@@ -43,6 +43,7 @@ const ProductDetails = () => {
     const [product, setProduct] = useState();
     const zoomSlideBig = useRef(null);
     const zoomSlideSml = useRef(null);
+    const [bgColor, setBgColor] = useState("#ffffff"); // Default background
 
     const { id } = useParams();
 
@@ -67,21 +68,62 @@ const ProductDetails = () => {
     }, [reviewDate]);
 
 
+
     // Function to manually set the slide index when clicking on thumbnails
     const goto = (index) => {
         setSlideIndex(index);
-        zoomSlideSml.current.swiper.slideTo(index);
-        zoomSlideBig.current.swiper.slideTo(index);
+        zoomSlideBig.current.swiper.slideTo(index); // Moves only the main swiper
     };
 
-    // Function to sync small slider when the big slider is manually moved
+
     const onSlideChange = () => {
-        if (zoomSlideBig.current && zoomSlideSml.current) {
-            const currentIndex = zoomSlideBig.current.swiper.realIndex;
-            setSlideIndex(currentIndex);
-            zoomSlideSml.current.swiper.slideTo(currentIndex);
-        }
+        if (!zoomSlideBig.current?.swiper) return;
+
+        const currentIndex = zoomSlideBig.current.swiper.realIndex;
+        setSlideIndex(currentIndex);
     };
+
+
+    // Function to extract the dominant color from the image
+    const extractDominantColor = (imageSrc) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous"; // Prevent CORS issues for external images
+        img.src = imageSrc;
+
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < pixels.length; i += 40) { // Sampling every 10th pixel for efficiency
+                r += pixels[i];
+                g += pixels[i + 1];
+                b += pixels[i + 2];
+                count++;
+            }
+
+            r = Math.floor(r / count);
+            g = Math.floor(g / count);
+            b = Math.floor(b / count);
+
+            setBgColor(`rgb(${r}, ${g}, ${b})`);
+        };
+    };
+
+    // Update background color when the slideIndex changes
+    useEffect(() => {
+        if (product?.images?.[slideIndex]) {
+            extractDominantColor(product.images[slideIndex]);
+        }
+    }, [slideIndex, product?.images]);
+
 
 
 
@@ -91,70 +133,81 @@ const ProductDetails = () => {
                 <h1 className="text-[20px] font-bold">Products Details</h1>
             </div>
 
-            <div className={`productDetails flex gap-5 mt-2 ${context.isSidebarOpen === true ? 'max-h-[58%]' : 'max-h-[60%]'} `}>
-                <div className="w-[40%]">
-                    <div className="flex gap-3 h-[95%] max-w-[600px]">
-                        {/* Small Image Slider */}
-                        <div className="slider w-[15%] productDetailImageOptions">
+            <div className={`productDetails flex gap-5 mt-2 `}>
+                <div className="w-[50%]">
+                    <div className="flex gap-3 max-h-[560px]">
+                        <div className="slider h-auto w-[10%] min-w-[40px] max-w-[80px] productDetailImageOptions flex flex-col items-center justify-center relative py-10">
                             {product?.images?.length !== 0 &&
                                 <Swiper
                                     ref={zoomSlideSml}
-                                    slidesPerView={`${context.isSidebarOpen === true ? 8 : 6}`}
-                                    centeredSlides={true} // Ensures the active slide is centered
+                                    centeredSlides={true}
                                     centeredSlidesBounds={true}
-                                    spaceBetween={0}
+                                    slidesPerView={"auto"}
+                                    spaceBetween={6}
                                     direction={"vertical"}
-                                    navigation={false}
+                                    navigation={{ nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" }}
                                     modules={[Navigation]}
-                                    className="zoomProductSliderThumbs h-full" // Make height responsive
+                                    className="zoomProductSliderThumbs absolute h-full overflow-hidden"
                                 >
+
                                     {product?.images?.map((image, index) => (
-                                        <SwiperSlide key={index}>
+                                        <SwiperSlide
+                                            key={index}
+                                            className="!w-[40px] !h-[40px] flex items-center justify-center"
+                                        >
                                             <div
-                                                className={`item rounded-md overflow-hidden cursor-pointer p-2 py-1 group ${slideIndex === index ? "opacity-1 border-2 border-blue-700" : "opacity-80"
-                                                    }`}
-                                                onClick={() => goto(index)} onMouseEnter={() => goto(index)}
+                                                className={`item w-[40px] h-[40px] p-0.5 border border-black rounded-md overflow-hidden cursor-pointer group ${slideIndex === index ? "opacity-1 border-4 !border-blue-700" : "opacity-50"}`}
+                                                onClick={() => goto(index)}
+                                                onMouseEnter={() => goto(index)}
                                             >
                                                 <img
                                                     src={image}
                                                     alt="img"
-                                                    className="w-full rounded-md transition-all object-cover"
+                                                    className="w-full h-full object-cover transition-all rounded-md"
                                                 />
                                             </div>
                                         </SwiperSlide>
+
                                     ))}
                                 </Swiper>
                             }
+
+                            <div className="swiper-button-prev"></div>
+                            <div className="swiper-button-next"></div>
                         </div>
 
-                        {/* Big Image Slider */}
-                        <div className="zoomContainer w-full max-w-[85%] mx-auto relative shadow-lg rounded-md">
-                            <Swiper
-                                ref={zoomSlideBig}
-                                slidesPerView={1}
-                                spaceBetween={0}
-                                className="productZoomSwiper w-full h-full rounded-md"
-                                onSlideChange={onSlideChange} // Sync small slider when big slider moves
-                            >
-                                {product?.images?.map((image, index) => (
-                                    <SwiperSlide key={index} className="!w-full !h-full">
-                                        <InnerImageZoom
-                                            zoomType="hover"
-                                            zoomPreload={true}
-                                            hideCloseButton={true}
-                                            fullscreenOnMobile={true}
-                                            zoomScale={1}
-                                            src={image}
-                                            className="!w-full !h-full rounded-md !object-cover" // Ensures image is contained within the div
-                                        />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
+                        {/* Main Image Viewer */}
+                        <div className="zoomContainer w-full h-auto max-w-[90%] max-h-[560px] mx-auto relative shadow rounded-md aspect-square">
+                            <div className="w-full h-full border-red-400">
+                                <Swiper
+                                    ref={zoomSlideBig}
+                                    slidesPerView={1}
+                                    spaceBetween={0}
+                                    onSlideChange={onSlideChange}
+                                    className="productZoomSwiper w-full h-full rounded-md"
+                                    style={{ backgroundColor: bgColor, transition: "background 0.5s ease" }}
+                                >
+                                    {product?.images?.map((image, index) => (
+                                        <SwiperSlide key={index}>
+                                            <InnerImageZoom
+                                                zoomType="hover"
+                                                zoomPreload={true}
+                                                hideCloseButton={true}
+                                                fullscreenOnMobile={false}
+                                                zoomScale={1}
+                                                src={image}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
-                <div className="w-[60%] bg-white p-5 rounded-md">
+                <div className={`bg-white p-5 rounded-md ${context.isSidebarOpen === true ? 'w-[w-[50%]%] z-50' : 'w-[80%]'}`}>
 
                     <span className="text-[16px] font-bold text-gray-500">{product?.brand}</span>
                     <h1 className="text-[20px]">{product?.name}</h1>
@@ -258,7 +311,7 @@ const ProductDetails = () => {
                             </div>
                         </div>
                     </div>
-                    
+
 
                 </div>
             </div>

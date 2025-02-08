@@ -95,15 +95,84 @@ body {
 
 /* --------- ProductDetails ----------- */
 
+.iiz {
+  border-radius: 6px;
+  height: 100%;
+  width: 100%;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+}
+
+
+.iiz div {
+  height: inherit !important;
+  /* background: white; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iiz div .iiz__img { /* Use the correct class */
+  height: inherit !important;
+  width: auto;
+  object-fit: contain !important;
+}
+
 .iiz__zoom-img--visible{
   cursor: crosshair !important;
 }
 
-.iiz__img {
+.productDetailImageOptions {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Fix buttons inside the container */
+.productDetailImageOptions .swiper-button-prev,
+.productDetailImageOptions .swiper-button-next {
+  position: absolute !important;
+  background: var(--bg-primary) !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  z-index: 10 !important;
+  border-radius: 0px !important;
+  -webkit-border-radius: 0px !important;
+  -moz-border-radius: 0px !important;
+  -ms-border-radius: 0px !important;
+  -o-border-radius: 0px !important;
+}
+
+/* Place the prev button at the top */
+.productDetailImageOptions .swiper-button-prev {
+  top: 0 !important;
+  bottom: inherit !important;
   width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-} 
+  height: 30px !important;
+  left: inherit !important;
+}
+
+/* Place the next button at the bottom */
+.productDetailImageOptions .swiper-button-next {
+  bottom: 0 !important;
+  top: inherit !important;
+  width: 100% !important;
+  height: 30px !important;
+  right: inherit !important;
+}
+
+.productDetailImageOptions .swiper-button-prev::after{
+  transform: rotate(90deg);
+  color: #fff !important;
+  font-size: 18px !important;
+}
+
+.productDetailImageOptions .swiper-button-next::after{
+  transform: rotate(90deg);
+  color: #fff !important;
+  font-size: 18px !important;
+}
 
 
 .MuiBadge-badge {
