@@ -1,4 +1,3 @@
-import 'react-international-phone/style.css';
 
 import {
   InputAdornment,
@@ -14,6 +13,7 @@ import {
   parseCountry,
   usePhoneInput,
 } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 export const MuiPhone = ({defaultCountry, value, onChange, ...restProps }) => {
   const { inputValue, handlePhoneValueChange, inputRef, country, setCountry } =
