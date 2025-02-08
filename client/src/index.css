@@ -565,18 +565,20 @@ button .MuiCircularProgress-root{
 
 .iiz div {
   height: inherit !important;
-  background: white;
+  /* background: white; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .iiz div .iiz__img { /* Use the correct class */
   height: inherit !important;
-  width: 100%;
-  object-fit: cover !important;
+  width: auto;
+  object-fit: contain !important;
 }
 
 .iiz__zoom-img--visible{
   cursor: crosshair !important;
-  object-fit: fill !important;
 }
 
 .productDetailImageOptions {
@@ -592,11 +594,11 @@ button .MuiCircularProgress-root{
   margin-top: 0px !important;
   margin-bottom: 0px !important;
   z-index: 10 !important;
-  border-radius: 6px !important;
-  -webkit-border-radius: 6px !important;
-  -moz-border-radius: 6px !important;
-  -ms-border-radius: 6px !important;
-  -o-border-radius: 6px !important;
+  border-radius: 0px !important;
+  -webkit-border-radius: 0px !important;
+  -moz-border-radius: 0px !important;
+  -ms-border-radius: 0px !important;
+  -o-border-radius: 0px !important;
 }
 
 /* Place the prev button at the top */

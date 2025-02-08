@@ -26,7 +26,7 @@ const ProductDetailsContent = (props) => {
             <h1 className="text-[20px] text-[var(--text-dark)] font-bold mb-1 productBrand">
                 <Link to="/">{props?.product?.brand}</Link>
             </h1>
-            <h1 className="text-[18px] mb-1 productTitle">
+            <h1 className="text-[18px] mb-1 productTitle pr-10">
                 <Link to="/">{props?.product?.name}</Link>
             </h1>
 
