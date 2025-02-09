@@ -84,17 +84,17 @@ const AddHomeSlide = () => {
   }, [context, context.isOpenFullScreenPanel, setHomeSlideIdNo]);
 
 
-// Handle image previews update properly
-const setPreviewFun = (previeswArr) => {
-  // Update the previews state, which will trigger re-render
-  setPreviews(previeswArr);
+  // Handle image previews update properly
+  const setPreviewFun = (previeswArr) => {
+    // Update the previews state, which will trigger re-render
+    setPreviews(previeswArr);
 
-  // Update formFields.images to reflect the preview updates
-  setFormFields((prev) => ({
-    ...prev,
-    images: previeswArr,
-  }));
-};
+    // Update formFields.images to reflect the preview updates
+    setFormFields((prev) => ({
+      ...prev,
+      images: previeswArr,
+    }));
+  };
 
 
   const handleFormSubmit = async (e) => {
@@ -186,52 +186,51 @@ const setPreviewFun = (previeswArr) => {
 
   const handleRemoveImage = async (image, index) => {
     try {
-        // Confirm image is valid before attempting to delete
-        if (!image) {
-            throw new Error("Invalid image.");
-        }
+      // Confirm image is valid before attempting to delete
+      if (!image) {
+        throw new Error("Invalid image.");
+      }
 
-        // Attempt to delete the image from Cloudinary or backend
-        const response = await deleteImages(`/api/homeSlides/delete-homeSlide-image?img=${image}`);
+      // Attempt to delete the image from Cloudinary or backend
+      const response = await deleteImages(`/api/homeSlides/delete-homeSlide-image?img=${image}`);
 
-        if (response.success) {
-            // If image is not found in Cloudinary, remove it from state
-            if (!response.imageFound) {
-                console.warn(`Image not found on Cloudinary: ${image}`);
-                
-                // Remove the image from the state
-                const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
-                setPreviews(updatedImages);
+      if (response.success) {
+        // If image is not found in Cloudinary, remove it from state
+        if (!response.imageFound) {
 
-                // Update formFields images as well (without mutating directly)
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    images: updatedImages,
-                }));
+          // Remove the image from the state
+          const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
+          setPreviews(updatedImages);
 
-                toast.warn("Image not found in Cloudinary, removed from state.");
-            } else {
-                // Image deleted successfully from Cloudinary, update state accordingly
-                const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
-                setPreviews(updatedImages);
+          // Update formFields images as well (without mutating directly)
+          setFormFields((prevFields) => ({
+            ...prevFields,
+            images: updatedImages,
+          }));
 
-                // Update formFields images as well
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    images: updatedImages,
-                }));
-
-                toast.success("Image removed successfully.");
-            }
+          context.openAlertBox("error", "Image not found in Cloudinary, removed from state.");
         } else {
-            throw new Error(response.message || "Failed to remove image.");
+          // Image deleted successfully from Cloudinary, update state accordingly
+          const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
+          setPreviews(updatedImages);
+
+          // Update formFields images as well
+          setFormFields((prevFields) => ({
+            ...prevFields,
+            images: updatedImages,
+          }));
+
+          context.openAlertBox("success", "Image removed successfully.");
         }
+      } else {
+        throw new Error(response.message || "Failed to remove image.");
+      }
     } catch (error) {
-        // Handle any errors during the removal
-        console.error("Error removing image:", error);
-        toast.error(error.message || "An unexpected error occurred.");
+      // Handle any errors during the removal
+      console.error("Error removing image:", error);
+      toast.error(error.message || "An unexpected error occurred.");
     }
-};
+  };
 
 
   // Refactored handleDiscard to ensure all images are removed properly

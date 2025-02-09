@@ -211,7 +211,7 @@ const extractPublicId = (imgUrl) => {
     try {
         const urlArr = imgUrl.split("/");
         const imageName = urlArr[urlArr.length - 1].split(".")[0];
-        return `ecommerceApp/uploads/${imageName}`;
+        return `ecommerceApp/uploads/${imageName}`; // Assuming this is the base format for your Cloudinary public ID
     } catch (error) {
         console.error("Error extracting public ID:", error);
         return null;
@@ -224,6 +224,7 @@ const checkImageExists = async (publicId) => {
         await cloudinary.api.resource(publicId);
         return true; // Image exists
     } catch (error) {
+        console.error("Error checking image existence:", error.message || error);
         return false; // Image not found
     }
 };
@@ -312,9 +313,16 @@ export async function deleteHomeSlide(request, response) {
             if (publicId) {
                 const exists = await checkImageExists(publicId);
                 if (exists) {
-                    await cloudinary.uploader.destroy(publicId);
+                    // Deleting the image from Cloudinary
+                    const cloudinaryResponse = await cloudinary.uploader.destroy(publicId);
+                    console.log("Cloudinary delete response:", cloudinaryResponse);
+                    if (cloudinaryResponse.result !== 'ok') {
+                        console.error(`Failed to delete image with public ID: ${publicId}`);
+                    } else {
+                        console.log(`Successfully deleted image with public ID: ${publicId}`);
+                    }
                 } else {
-                    console.warn(`Image ${publicId} not found in Cloudinary.`);
+                    console.warn(`Image with public ID ${publicId} not found in Cloudinary.`);
                 }
             }
         }));
@@ -336,6 +344,7 @@ export async function deleteHomeSlide(request, response) {
         });
     }
 }
+
 
 
 export async function deleteMultipleHomeSlides(request, response) {
