@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { Button, Checkbox, CircularProgress, FormControl, ListItemText, Rating } from '@mui/material';
+import { Button, Checkbox, CircularProgress, FormControl, FormControlLabel, ListItemText, Rating, styled, Switch } from '@mui/material';
 import UploadBox from '../../Components/UploadBox';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoClose } from "react-icons/io5";
@@ -23,6 +23,68 @@ const MenuProps = {
         },
     },
 };
+
+const IOSSwitch = styled((props) => (
+    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+    width: 42,
+    height: 26,
+    padding: 0,
+    '& .MuiSwitch-switchBase': {
+        padding: 0,
+        margin: 2,
+        transitionDuration: '300ms',
+        '&.Mui-checked': {
+            transform: 'translateX(16px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+                backgroundColor: '#65C466',
+                opacity: 1,
+                border: 0,
+                ...theme.applyStyles('dark', {
+                    backgroundColor: '#2ECA45',
+                }),
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+                opacity: 0.5,
+            },
+        },
+        '&.Mui-focusVisible .MuiSwitch-thumb': {
+            color: '#33cf4d',
+            border: '6px solid #fff',
+        },
+        '&.Mui-disabled .MuiSwitch-thumb': {
+            color: theme.palette.grey[100],
+            ...theme.applyStyles('dark', {
+                color: theme.palette.grey[600],
+            }),
+        },
+        '&.Mui-disabled + .MuiSwitch-track': {
+            opacity: 0.7,
+            ...theme.applyStyles('dark', {
+                opacity: 0.3,
+            }),
+        },
+    },
+    '& .MuiSwitch-thumb': {
+        boxSizing: 'border-box',
+        width: 22,
+        height: 22,
+    },
+    '& .MuiSwitch-track': {
+        borderRadius: 26 / 2,
+        backgroundColor: '#E9E9EA',
+        opacity: 1,
+        transition: theme.transitions.create(['background-color'], {
+            duration: 500,
+        }),
+        ...theme.applyStyles('dark', {
+            backgroundColor: '#39393D',
+        }),
+    },
+}));
+
+
 
 const AddProduct = () => {
 
@@ -54,10 +116,13 @@ const AddProduct = () => {
     const [bannerPreviews, setBannerPreviews] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
 
+    const [isBannerVisible, setIsBannerVisible] = useState(false);
+
     const [formFields, setFormFields] = useState({
         name: '',
         description: '',
         images: [],
+        isBannerVisible: false,
         bannerImages: [],
         bannerTitleName: '',
         brand: '',
@@ -81,7 +146,6 @@ const AddProduct = () => {
 
 
 
-
     useEffect(() => {
         setFormFields((prev) => ({
             ...prev,
@@ -99,6 +163,7 @@ const AddProduct = () => {
         if (!productId) {
             setProductIdNo(undefined);
             setPreviews([]);
+            setIsBannerVisible(false);
             setBannerPreviews([]);
             setProductRams([]);
             setProductSize([]);
@@ -110,6 +175,7 @@ const AddProduct = () => {
                 name: '',
                 description: '',
                 images: [],
+                isBannerVisible: false,
                 bannerImages: [],
                 bannerTitleName: '',
                 brand: '',
@@ -151,6 +217,7 @@ const AddProduct = () => {
                         // console.log("Response Data:", product);
 
                         setPreviews(product?.images || []);
+                        setIsBannerVisible(product?.isBannerVisible || false);
                         setBannerPreviews(product?.bannerImages || []);
                         setProductRams(product?.productRam || []);
                         setProductSize(product?.size || []);
@@ -163,6 +230,7 @@ const AddProduct = () => {
                             name: product?.name || "",
                             description: product?.description || "",
                             images: product?.images || [],
+                            isBannerVisible: product?.isBannerVisible || false,
                             bannerImages: product?.bannerImages || [],
                             bannerTitleName: product?.bannerTitleName || "",
                             brand: product?.brand || "",
@@ -208,7 +276,6 @@ const AddProduct = () => {
             fetchCategoryData();
         }
     }, [context, context.isOpenFullScreenPanel, setProductIdNo]);
-
 
 
     const onChangeInput = (e) => {
@@ -467,10 +534,18 @@ const AddProduct = () => {
     };
 
 
+    const handleToggle = async (event) => {
+        const newValue = event.target.checked; // Get the new toggle state
+        setIsBannerVisible(newValue);
+        setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
+    };
+    
+    
+
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (formFields.name === "") {
             context.openAlertBox("error", "Please enter product name");
             return;
@@ -515,9 +590,21 @@ const AddProduct = () => {
             context.openAlertBox("error", "Please upload images");
             return;
         }
-
+    
+        // ✅ Banner Validation
+        if (formFields.isBannerVisible) {
+            if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
+                context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+                return;
+            }
+            if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
+                context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
+                return;
+            }
+        }
+    
         setIsLoading(true);
-        // Start a toast.promise for handling loading, success, and error states
+        
         try {
             const result = await toast.promise(
                 postData(`/api/product/create-product`, formFields), {
@@ -531,12 +618,11 @@ const AddProduct = () => {
                     }
                 },
                 error: (err) => {
-                    // Check if err.response exists, else fallback to err.message
                     const errorMessage = err?.response?.data?.message || err.message || "Failed to add product. Please try again.";
                     return errorMessage;
                 },
-            }
-            );
+            });
+    
             console.log("Result:", result);
         } catch (err) {
             console.error("Error:", err);
@@ -548,16 +634,17 @@ const AddProduct = () => {
             }, 500);
         }
     };
+    
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-
+    
         if (formFields.name === "") {
             context.openAlertBox("error", "Please enter product name");
             return;
         }
         if (formFields.description === "") {
-            context.openAlertBox("error", "Please enter desciption");
+            context.openAlertBox("error", "Please enter description");
             return;
         }
         if (formFields.brand === "") {
@@ -596,7 +683,19 @@ const AddProduct = () => {
             context.openAlertBox("error", "Please upload images");
             return;
         }
-
+    
+        // ✅ Banner Validation
+        if (formFields.isBannerVisible) {
+            if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
+                context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+                return;
+            }
+            if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
+                context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
+                return;
+            }
+        }
+    
         try {
             const result = await toast.promise(
                 editData(`/api/product/updateProduct/${productIdNo}`, {
@@ -620,6 +719,7 @@ const AddProduct = () => {
                     },
                 }
             );
+    
             console.log("Update Result:", result);
         } catch (err) {
             console.error("Error in handleUpdate:", err);
@@ -631,6 +731,7 @@ const AddProduct = () => {
             }, 500);
         }
     };
+    
 
 
     // Image Deletion Handling
@@ -709,48 +810,47 @@ const AddProduct = () => {
     };
 
 
-
     const handleRemoveBannerImage = async (image) => {
         try {
             if (!image) throw new Error("Invalid image.");
-    
+
             console.log("Attempting to remove banner image:", image, "for productId:", productIdNo || "No productId");
-    
+
             // Check if the image is NEWLY uploaded but not saved in the backend
             const isNewImage = !formFields.bannerImages?.includes(image); // Image is not in backend
-    
+
             if (isNewImage) {
                 // Just remove it from the frontend state, no need to call the backend
                 console.log("Removing unsaved image from state:", image);
                 setBannerPreviews((prev) => prev.filter((img) => img !== image));
-    
+
                 // Also update formFields state
                 setFormFields((prevFields) => ({
                     ...prevFields,
                     bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
                 }));
-    
+
                 toast.success("Unsaved banner image removed.");
                 return;
             }
-    
+
             // If the image exists in the backend, delete it from the server
             let apiUrl = `/api/product/delete-banner-image?imgUrl=${encodeURIComponent(image)}`;
             if (productIdNo) {
                 apiUrl += `&productId=${productIdNo}`;
             }
-    
+
             const response = await deleteImages(apiUrl);
-    
+
             if (response?.success) {
                 // Update state after deletion
                 setBannerPreviews((prev) => prev.filter((img) => img !== image));
-    
+
                 setFormFields((prevFields) => ({
                     ...prevFields,
                     bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
                 }));
-    
+
                 toast.success("Banner image removed successfully.");
             } else {
                 throw new Error(response?.error || "Failed to remove banner image.");
@@ -760,9 +860,6 @@ const AddProduct = () => {
             toast.error(error.message || "An unexpected error occurred.");
         }
     };
-    
-    
-
 
 
 
@@ -1172,78 +1269,90 @@ const AddProduct = () => {
 
                 {/* BANNER IMAGES */}
                 <div className="col w-full px-0">
-                    <h3 className="text-[18px] font-bold mb-2">Banner Images</h3>
+                    <div className="flex items-center gap-4 mb-2">
+                        <h3 className="text-[18px] font-bold">Product Banner</h3>
+                        <FormControlLabel
+                            control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
+                            label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
+                        />
 
-                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                        <div className="col col-span-full mt-3">
-                            <h3 className="text-[14px] font-medium mb-1 text-gray-700">
-                                Banner Name
-                            </h3>
-                            <input
-                                type="text"
-                                className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
-                                placeholder="Banner title"
-                                name="bannerTitleName"
-                                value={formFields.bannerTitleName}
-                                onChange={onChangeInput}
-                            />
-                        </div>
                     </div>
 
-                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                        <span className="opacity-50 col-span-full text-[14px]">
-                            Choose a banner photo or simply drag and drop
-                        </span>
-
-                        {bannerPreviews?.length > 0 &&
-                            bannerPreviews.map((image, index) => (
-                                <div
-                                    className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
-                                    key={index}
-                                >
-                                    <span
-                                        className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                        onClick={() => handleRemoveBannerImage(image, index)}
-                                    >
-                                        <IoClose className="text-[15px] text-red-600 bg" />
-                                    </span>
-                                    <div className="w-full h-full">
-                                        {isLoading3 ? (
-                                            <CircularProgress color="inherit" />
-                                        ) : (
-                                            <img
-                                                src={
-                                                    productIdNo === undefined
-                                                        ? image
-                                                        : formFields.bannerImages[index]
-                                                }
-                                                alt="Banner Image"
-                                                className="w-full h-full object-cover rounded-md"
-                                            />
-                                        )}
-                                    </div>
+                    {
+                        isBannerVisible &&
+                        <div className="flex flex-col">
+                            <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
+                                <div className="col col-span-full mt-3">
+                                    <h3 className="text-[14px] font-medium mb-1 text-gray-700">
+                                        Banner Name
+                                    </h3>
+                                    <input
+                                        type="text"
+                                        className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
+                                        placeholder="Banner title"
+                                        name="bannerTitleName"
+                                        value={formFields.bannerTitleName}
+                                        onChange={onChangeInput}
+                                    />
                                 </div>
-                            ))}
+                            </div>
 
-                        {/* Upload Box */}
-                        <div className={bannerPreviews?.length > 0 ? "col-span-1" : "col-span-8"}>
-                            <UploadBox
-                                multiple={true}
-                                productId={productIdNo}
-                                existingImages={bannerPreviews}
-                                onDrop={(acceptedFiles) => {
-                                    const previewUrls = acceptedFiles.map((file) =>
-                                        URL.createObjectURL(file)
-                                    );
-                                    setBannerImagesFun([...bannerPreviews, ...previewUrls]); // ✅ Append new images
-                                }}
-                                name="bannerImages"
-                                url={"/api/product/upload-banner-images"}
-                                setPreviewFun={setBannerImagesFun}
-                                isBanner={true} // For product images
-                            />
+                            <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
+                                <span className="opacity-50 col-span-full text-[14px]">
+                                    Choose a banner photo or simply drag and drop
+                                </span>
+
+                                {bannerPreviews?.length > 0 &&
+                                    bannerPreviews.map((image, index) => (
+                                        <div
+                                            className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
+                                            key={index}
+                                        >
+                                            <span
+                                                className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                                onClick={() => handleRemoveBannerImage(image, index)}
+                                            >
+                                                <IoClose className="text-[15px] text-red-600 bg" />
+                                            </span>
+                                            <div className="w-full h-full">
+                                                {isLoading3 ? (
+                                                    <CircularProgress color="inherit" />
+                                                ) : (
+                                                    <img
+                                                        src={
+                                                            productIdNo === undefined
+                                                                ? image
+                                                                : formFields.bannerImages[index]
+                                                        }
+                                                        alt="Banner Image"
+                                                        className="w-full h-full object-cover rounded-md"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                {/* Upload Box */}
+                                <div className={bannerPreviews?.length > 0 ? "col-span-1" : "col-span-8"}>
+                                    <UploadBox
+                                        multiple={true}
+                                        productId={productIdNo}
+                                        existingImages={bannerPreviews}
+                                        onDrop={(acceptedFiles) => {
+                                            const previewUrls = acceptedFiles.map((file) =>
+                                                URL.createObjectURL(file)
+                                            );
+                                            setBannerImagesFun([...bannerPreviews, ...previewUrls]); // ✅ Append new images
+                                        }}
+                                        name="bannerImages"
+                                        url={"/api/product/upload-banner-images"}
+                                        setPreviewFun={setBannerImagesFun}
+                                        isBanner={true} // For product images
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
 
 
@@ -1273,7 +1382,7 @@ const AddProduct = () => {
                 </div>
 
             </form>
-        </section>
+        </section >
     )
 }
 
