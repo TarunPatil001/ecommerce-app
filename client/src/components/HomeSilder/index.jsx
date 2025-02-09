@@ -38,7 +38,7 @@ const HomeSlider = (props) => {
               return (
                 <SwiperSlide key={index}>
 
-                  <div className="w-full h-[450px] item rounded-2xl overflow-hidden">
+                  <div className="w-full h-[450px] item rounded-2xl overflow-hidden shadow-md">
 
                     <img
                       src={item?.images[0]}

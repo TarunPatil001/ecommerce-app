@@ -23,6 +23,7 @@ import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
 import { Skeleton } from "@mui/material";
 import ProductLoading from "../../components/ProductLoading";
+import { IoImagesSharp } from "react-icons/io5";
 
 const Home = () => {
 
@@ -37,75 +38,74 @@ const Home = () => {
 
 
   useEffect(() => {
-    fetchDataFromApi('/api/homeSlides').then((res) => {
-      setHomeSlideData(res.data);
-    })
+    const fetchHomeData = async () => {
+      try {
+        const homeSlides = await fetchDataFromApi('/api/homeSlides');
+        const allProducts = await fetchDataFromApi('/api/product/get-all-products');
+        const featuredProducts = await fetchDataFromApi('/api/product/get-all-featuredProducts');
 
-    fetchDataFromApi('/api/product/get-all-products').then((res) => {
-      setAllProductsData(res.data);
-    })
+        setHomeSlideData(homeSlides?.data?.length ? homeSlides.data : []);
+        setAllProductsData(allProducts?.data?.length ? allProducts.data : []);
+        setAllFeaturedProductsData(featuredProducts?.data?.length ? featuredProducts.data : []);
+      } catch (error) {
+        console.error("Error fetching home data:", error);
+        setHomeSlideData([]);
+        setAllProductsData([]);
+        setAllFeaturedProductsData([]);
+      }
+    };
 
-    fetchDataFromApi('/api/product/get-all-featuredProducts').then((res) => {
-      setAllFeaturedProductsData(res.data);
-    })
-
-  }, [])
+    fetchHomeData();
+  }, []);
 
   useEffect(() => {
     if (context?.catData?.length > 0) {
-      setValue(0); // Set default tab
-      filterByCatId(context.catData[0]._id); // Fetch products for the first category
+      setValue(0);
+      filterByCatId(context.catData[0]._id);
     }
   }, [context?.catData]);
-
-
 
   useEffect(() => {
     if (!context?.catData?._id) return;
 
     const fetchProducts = async () => {
-      setLoading(true); // ✅ Show loader before API call starts
-      
+      setLoading(true);
+
       try {
         const res = await fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${context?.catData?._id}`);
 
-        if (res?.error === false && Array.isArray(res?.data)) {
-          setPopularProductData(res.data.length > 0 ? res.data : []);
-        } else {
-          setPopularProductData([]);
-        }
+        setPopularProductData(res?.error === false && Array.isArray(res?.data) && res.data.length ? res.data : []);
       } catch (error) {
         console.error("Error fetching products:", error);
         setPopularProductData([]);
       } finally {
-        setLoading(false); // ✅ Hide loader after API response
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, [context?.catData?._id, context?.isReducer]);
 
-
   const handleChange = (event, newValue) => {
-    setValue(newValue); // ✅ Set the active tab
-    filterByCatId(newValue); // ✅ Fetch products for the selected category
+    setValue(newValue);
+    filterByCatId(newValue);
   };
 
+  const filterByCatId = async (id) => {
+    setLoading(true);
+    setPopularProductData([]);
 
-  const filterByCatId = (id) => {
-    setLoading(true); // Start loading before fetching
-    setPopularProductData([]); // Clear products if no data is found
-    fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${id}`)
-      .then((res) => {
-        if (res?.error === false && Array.isArray(res?.data) && res.data.length > 0) {
-          setPopularProductData(res.data);
-        } else {
-          setPopularProductData([]); // Clear products if no data is found
-        }
-      })
-      .catch(() => setPopularProductData([])) // Handle API failure by clearing state
-      .finally(() => setLoading(false)); // Stop loading after API call
+    try {
+      const res = await fetchDataFromApi(`/api/product/get-all-products-byCategoryId/${id}`);
+      setPopularProductData(res?.error === false && Array.isArray(res?.data) && res.data.length ? res.data : []);
+    } catch (error) {
+      console.error("Error fetching filtered products:", error);
+      setPopularProductData([]);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
 
 
@@ -121,7 +121,17 @@ const Home = () => {
       <section className="py-6">
         <div className="container flex">
           <div className="part1 w-[66%]">
-            <HomeBannerV2 />
+
+            {allProductsData.length > 0 ? (
+              <HomeBannerV2 data={allProductsData} />
+            ) : (
+              <div className="flex flex-col items-center justify-center font-bold italic w-full h-full border shadow rounded-md">
+                <IoImagesSharp className="text-[50px] opacity-50" />
+              <p className="text-gray-500">No banner image available.</p>
+              </div>
+            )}
+
+
           </div>
           <div className="part2 w-[34%] pl-10 flex items-center justify-between flex-col gap-5">
             <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"} price={7999} />
