@@ -95,6 +95,16 @@ const productSchema = mongoose.Schema(
         default: null,
       },
     ],
+    bannerImages: [
+      {
+        type: String,
+        required: true,
+      }
+    ],
+    bannerTitleName: {
+      type: String,
+      required: true,
+    },
     dateCreated: {
       type: Date,
       default: Date.now,

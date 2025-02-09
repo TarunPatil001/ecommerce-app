@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, createProductRams, createProductSize, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductSize, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductSize, deleteProductWeight, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductSize,  getAllProductWeight, getProduct, getProductRamById, getProductSizeById, getProductWeightById, removeImageProductFromCloudinary, updateProduct, updateProductRams, updateProductSize, updateProductWeight, uploadProductImages } from "../controllers/product.controller.js";
+import { createProduct, createProductRams, createProductSize, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductSize, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductSize, deleteProductWeight, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductSize,  getAllProductWeight, getProduct, getProductRamById, getProductSizeById, getProductWeightById, removeImageBannerFromCloudinary, removeImageProductFromCloudinary, updateProduct, updateProductRams, updateProductSize, updateProductWeight, uploadProductBannerImages, uploadProductImages } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -13,8 +13,14 @@ const productRouter = Router();
 // Upload product images
 productRouter.post("/upload-product-images", auth, upload.array("images"), uploadProductImages);
 
+// Upload banner images
+productRouter.post("/upload-banner-images", auth, upload.array("bannerImages"), uploadProductBannerImages);
+
 // remove image from cloudinary
 productRouter.delete("/delete-product-image", auth, removeImageProductFromCloudinary);
+
+// remove image from cloudinary
+productRouter.delete("/delete-banner-image", auth, removeImageBannerFromCloudinary);
 
 // Create a new product
 productRouter.post("/create-product", auth, createProduct);

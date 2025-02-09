@@ -125,8 +125,6 @@ const ProductDetails = () => {
     }, [slideIndex, product?.images]);
 
 
-
-
     return (
         <>
             <div className="flex items-center justify-between pt-3 ">
@@ -207,7 +205,7 @@ const ProductDetails = () => {
 
                 </div>
 
-                <div className={`bg-white p-5 rounded-md ${context.isSidebarOpen === true ? 'w-[w-[50%]%] z-50' : 'w-[80%]'}`}>
+                <div className={`bg-white p-5 rounded-md ${context.isSidebarOpen === true ? 'w-[50%] z-50' : 'w-[80%]'}`}>
 
                     <span className="text-[16px] font-bold text-gray-500">{product?.brand}</span>
                     <h1 className="text-[20px]">{product?.name}</h1>

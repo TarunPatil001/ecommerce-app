@@ -1,12 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, Rating } from '@mui/material';
+import { Button, Checkbox, CircularProgress, FormControl, ListItemText, Rating } from '@mui/material';
 import UploadBox from '../../Components/UploadBox';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoClose } from "react-icons/io5";
-import { FaCloudUploadAlt } from 'react-icons/fa';
 import { MyContext } from '../../App';
 import toast from 'react-hot-toast';
 import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/api';
@@ -47,17 +45,21 @@ const AddProduct = () => {
     const [productSize, setProductSize] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
+    const [isLoading3, setIsLoading3] = useState(false);
 
     const [productRating, setProductRating] = useState(0);
     const [productIdNo, setProductIdNo] = useState(undefined);
 
     const [previews, setPreviews] = useState([]);
+    const [bannerPreviews, setBannerPreviews] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
 
     const [formFields, setFormFields] = useState({
         name: '',
         description: '',
         images: [],
+        bannerImages: [],
+        bannerTitleName: '',
         brand: '',
         price: '',
         oldPrice: '',
@@ -97,6 +99,7 @@ const AddProduct = () => {
         if (!productId) {
             setProductIdNo(undefined);
             setPreviews([]);
+            setBannerPreviews([]);
             setProductRams([]);
             setProductSize([]);
             setProductWeight([]);
@@ -107,6 +110,8 @@ const AddProduct = () => {
                 name: '',
                 description: '',
                 images: [],
+                bannerImages: [],
+                bannerTitleName: '',
                 brand: '',
                 price: '',
                 oldPrice: '',
@@ -146,6 +151,7 @@ const AddProduct = () => {
                         // console.log("Response Data:", product);
 
                         setPreviews(product?.images || []);
+                        setBannerPreviews(product?.bannerImages || []);
                         setProductRams(product?.productRam || []);
                         setProductSize(product?.size || []);
                         setProductWeight(product?.productWeight || []);
@@ -157,6 +163,8 @@ const AddProduct = () => {
                             name: product?.name || "",
                             description: product?.description || "",
                             images: product?.images || [],
+                            bannerImages: product?.bannerImages || [],
+                            bannerTitleName: product?.bannerTitleName || "",
                             brand: product?.brand || "",
                             price: product?.price || "",
                             oldPrice: product?.oldPrice || "",
@@ -407,12 +415,6 @@ const AddProduct = () => {
 
 
 
-
-
-
-
-
-
     const handleChangeProductSize = (event) => {
         const selectedValues = event.target.value; // Get selected sizes as an array
         console.log("Selected Sizes:", selectedValues);
@@ -452,6 +454,19 @@ const AddProduct = () => {
             images: previewArr, // Assign the previewArr to images
         }));
     };
+
+    const setBannerImagesFun = (previewArr) => {
+        // Update the previews state to reflect the new image array
+        setBannerPreviews(previewArr);
+
+        // Update formFields.images state properly without direct mutation
+        setFormFields((prevFormFields) => ({
+            ...prevFormFields,
+            bannerImages: previewArr, // Assign the previewArr to images
+        }));
+    };
+
+
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -618,45 +633,8 @@ const AddProduct = () => {
     };
 
 
-    // const handleRemoveImage = async (image, index) => {
-    //     try {
-    //         if (!image) {
-    //             throw new Error("Invalid image.");
-    //         }
-
-    //         if (!productIdNo) {
-    //             throw new Error("Product ID is missing.");
-    //         }
-
-    //         console.log("Removing image:", image, "for product:", productIdNo);
-
-    //         // Corrected API request
-    //         const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}&productId=${productIdNo}`);
-
-    //         if (response?.success) {
-    //             // Remove the image from previews and update the state
-    //             const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
-    //             setPreviews(updatedImages);
-
-    //             // Update formFields state for images
-    //             setFormFields((prevFields) => ({
-    //                 ...prevFields,
-    //                 images: updatedImages,
-    //             }));
-
-    //             toast.success("Image removed successfully.");
-    //         } else {
-    //             throw new Error(response?.message || "Failed to remove image.");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error removing image:", error);
-    //         toast.error(error?.message || "An unexpected error occurred.");
-    //     }
-    // };
-
-
     // Image Deletion Handling
-    const handleRemoveImage = async (image, index) => {
+    const handleRemoveImage = async (image) => {
         try {
             if (!image) {
                 throw new Error("Invalid image.");
@@ -732,15 +710,70 @@ const AddProduct = () => {
 
 
 
+    const handleRemoveBannerImage = async (image) => {
+        try {
+            if (!image) throw new Error("Invalid image.");
+    
+            console.log("Attempting to remove banner image:", image, "for productId:", productIdNo || "No productId");
+    
+            // Check if the image is NEWLY uploaded but not saved in the backend
+            const isNewImage = !formFields.bannerImages?.includes(image); // Image is not in backend
+    
+            if (isNewImage) {
+                // Just remove it from the frontend state, no need to call the backend
+                console.log("Removing unsaved image from state:", image);
+                setBannerPreviews((prev) => prev.filter((img) => img !== image));
+    
+                // Also update formFields state
+                setFormFields((prevFields) => ({
+                    ...prevFields,
+                    bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
+                }));
+    
+                toast.success("Unsaved banner image removed.");
+                return;
+            }
+    
+            // If the image exists in the backend, delete it from the server
+            let apiUrl = `/api/product/delete-banner-image?imgUrl=${encodeURIComponent(image)}`;
+            if (productIdNo) {
+                apiUrl += `&productId=${productIdNo}`;
+            }
+    
+            const response = await deleteImages(apiUrl);
+    
+            if (response?.success) {
+                // Update state after deletion
+                setBannerPreviews((prev) => prev.filter((img) => img !== image));
+    
+                setFormFields((prevFields) => ({
+                    ...prevFields,
+                    bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
+                }));
+    
+                toast.success("Banner image removed successfully.");
+            } else {
+                throw new Error(response?.error || "Failed to remove banner image.");
+            }
+        } catch (error) {
+            console.error("Error removing banner image:", error);
+            toast.error(error.message || "An unexpected error occurred.");
+        }
+    };
+    
+    
+
 
 
 
     const handleDiscard = async () => {
         await Promise.all(previews.map((image, index) => handleRemoveImage(image, index)));
+        await Promise.all(bannerPreviews.map((image, index) => handleRemoveBannerImage(image, index)));
 
         // Reset the form and previews after deletions complete
-        setFormFields({ name: '', images: [] });
+        setFormFields({ name: '', images: [], bannerImages: [], });
         setPreviews([]);
+        setBannerPreviews([]);
         console.log("Discard action, file cleared.");
     };
 
@@ -1086,58 +1119,133 @@ const AddProduct = () => {
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
 
                     <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                        <span className='opacity-50 col-span-full text-[14px]'>Choose a product photo or simply drag and drop</span>
+                        <span className="opacity-50 col-span-full text-[14px]">
+                            Choose a product photo or simply drag and drop
+                        </span>
 
-
-                        {
-                            previews?.length !== 0 && previews.map((image, index) => {
-                                return (
-                                    <div className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative" key={index}>
-                                        <span
-                                            className='absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all'
-                                            onClick={() => handleRemoveImage(image, index)}
-                                        >
-                                            <IoClose className='text-[15px] text-red-600 bg' />
-                                        </span>
-                                        <div className='w-full h-full'>
-                                            {
-                                                isLoading2 ? (
-                                                    <CircularProgress color="inherit" />
-                                                ) : (
-                                                    productIdNo === undefined ? (
-                                                        <img src={image} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                                                    ) : (
-                                                        <img src={formFields.images[index]} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                                                    )
-                                                )
-                                            }
-                                        </div>
+                        {previews?.length > 0 &&
+                            previews.map((image, index) => (
+                                <div
+                                    className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
+                                    key={index}
+                                >
+                                    <span
+                                        className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                        onClick={() => handleRemoveImage(image, index)}
+                                    >
+                                        <IoClose className="text-[15px] text-red-600 bg" />
+                                    </span>
+                                    <div className="w-full h-full">
+                                        {isLoading2 ? (
+                                            <CircularProgress color="inherit" />
+                                        ) : (
+                                            <img
+                                                src={productIdNo === undefined ? image : formFields.images[index]}
+                                                alt="Product Image"
+                                                className="w-full h-full object-cover rounded-md"
+                                            />
+                                        )}
                                     </div>
-                                )
-                            }
-                            )}
+                                </div>
+                            ))}
 
-
-                        {/* Only show UploadBox if no file is uploaded */}
-
+                        {/* Upload Box */}
                         <div className={previews?.length > 0 ? "col-span-1" : "col-span-8"}>
                             <UploadBox
                                 multiple={true}
                                 productId={productIdNo}
-                                images={previews}
+                                existingImages={previews}
                                 onDrop={(acceptedFiles) => {
-                                    const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-                                    setPreviewFun(previewUrls);
+                                    const previewUrls = acceptedFiles.map((file) =>
+                                        URL.createObjectURL(file)
+                                    );
+                                    setPreviewFun([...previews, ...previewUrls]); // ✅ Append new images
                                 }}
                                 name="images"
                                 url={"/api/product/upload-product-images"}
-                                setPreviewFun={setPreviewFun} // Pass function to handle preview in the parent
+                                setPreviewFun={setPreviewFun}
+                                isBanner={false} // For product images
                             />
                         </div>
-
-
                     </div>
                 </div>
+
+                {/* BANNER IMAGES */}
+                <div className="col w-full px-0">
+                    <h3 className="text-[18px] font-bold mb-2">Banner Images</h3>
+
+                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
+                        <div className="col col-span-full mt-3">
+                            <h3 className="text-[14px] font-medium mb-1 text-gray-700">
+                                Banner Name
+                            </h3>
+                            <input
+                                type="text"
+                                className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
+                                placeholder="Banner title"
+                                name="bannerTitleName"
+                                value={formFields.bannerTitleName}
+                                onChange={onChangeInput}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
+                        <span className="opacity-50 col-span-full text-[14px]">
+                            Choose a banner photo or simply drag and drop
+                        </span>
+
+                        {bannerPreviews?.length > 0 &&
+                            bannerPreviews.map((image, index) => (
+                                <div
+                                    className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
+                                    key={index}
+                                >
+                                    <span
+                                        className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                        onClick={() => handleRemoveBannerImage(image, index)}
+                                    >
+                                        <IoClose className="text-[15px] text-red-600 bg" />
+                                    </span>
+                                    <div className="w-full h-full">
+                                        {isLoading3 ? (
+                                            <CircularProgress color="inherit" />
+                                        ) : (
+                                            <img
+                                                src={
+                                                    productIdNo === undefined
+                                                        ? image
+                                                        : formFields.bannerImages[index]
+                                                }
+                                                alt="Banner Image"
+                                                className="w-full h-full object-cover rounded-md"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                        {/* Upload Box */}
+                        <div className={bannerPreviews?.length > 0 ? "col-span-1" : "col-span-8"}>
+                            <UploadBox
+                                multiple={true}
+                                productId={productIdNo}
+                                existingImages={bannerPreviews}
+                                onDrop={(acceptedFiles) => {
+                                    const previewUrls = acceptedFiles.map((file) =>
+                                        URL.createObjectURL(file)
+                                    );
+                                    setBannerImagesFun([...bannerPreviews, ...previewUrls]); // ✅ Append new images
+                                }}
+                                name="bannerImages"
+                                url={"/api/product/upload-banner-images"}
+                                setPreviewFun={setBannerImagesFun}
+                                isBanner={true} // For product images
+                            />
+                        </div>
+                    </div>
+                </div>
+
 
                 <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
                     <Button
@@ -1163,6 +1271,7 @@ const AddProduct = () => {
                         )
                     }
                 </div>
+
             </form>
         </section>
     )
