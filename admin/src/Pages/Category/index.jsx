@@ -62,7 +62,7 @@ const CategoryList = () => {
         setSelectedRows(newSelectedRows);
 
         // Check if all rows on the page are selected
-        const currentPageRows = context?.homeSlideData
+        const currentPageRows = context?.catData
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((item) => item._id); // Correct comparison with item._id
 
