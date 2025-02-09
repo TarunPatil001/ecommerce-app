@@ -104,7 +104,7 @@ export async function uploadProductImages(request, response) {
 
 var bannerImagesArr = {}; // Ensure structure consistency
 
-// Upload product bannerImages
+// Upload product banner images
 export async function uploadProductBannerImages(request, response) {
   try {
     const { productId } = request.body;
@@ -114,14 +114,14 @@ export async function uploadProductBannerImages(request, response) {
     console.log("Uploaded files:", bannerImages);
 
     if (!bannerImages || bannerImages.length === 0) {
-      return response.status(400).json({ error: "No bannerImages provided" });
+      return response.status(400).json({ error: "No banner images provided" });
     }
 
-    // Ensure bannerImagesArr is properly initialized
+    // Ensure bannerImagesArr is properly initialized as an object containing arrays
     if (!productId) {
-      bannerImagesArr["new"] = bannerImagesArr["new"] || [];
+      if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = []; 
     } else {
-      bannerImagesArr[productId] = bannerImagesArr[productId] || [];
+      if (!Array.isArray(bannerImagesArr[productId])) bannerImagesArr[productId] = [];
     }
 
     // Upload banner images and update bannerImagesArr after successful upload
@@ -137,7 +137,7 @@ export async function uploadProductBannerImages(request, response) {
 
           console.log("Uploaded image URL:", result.secure_url);
 
-          fs.unlinkSync(file.path); // Remove uploaded file from local storage
+          fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
           return result.secure_url; // Return uploaded image URL
         } catch (error) {
           console.log("Cloudinary upload error:", error);
@@ -148,7 +148,7 @@ export async function uploadProductBannerImages(request, response) {
 
     // Filter out null values (failed uploads)
     const validImages = uploadedImages.filter(Boolean);
-    console.log("Valid uploaded bannerImages:", validImages);
+    console.log("Valid uploaded banner images:", validImages);
 
     // Append images to array
     if (productId) {
@@ -157,14 +157,11 @@ export async function uploadProductBannerImages(request, response) {
       bannerImagesArr["new"].push(...validImages);
     }
 
-    // Ensure proper format before saving to DB
-    const bannerImagesArray = productId ? [...bannerImagesArr[productId]] : [...bannerImagesArr["new"]];
-
     // Debugging: Check bannerImagesArr before returning response
     console.log("Updated bannerImagesArr:", bannerImagesArr);
 
     return response.status(200).json({
-      bannerImages: bannerImagesArray, // Send properly formatted array
+      bannerImages: productId ? bannerImagesArr[productId] : bannerImagesArr["new"],
     });
 
   } catch (error) {
@@ -180,7 +177,142 @@ export async function uploadProductBannerImages(request, response) {
 
 
 
+
+
 // ----------------------------------------------------------------------------------------------------------------------
+
+// Create Product  
+// export async function createProduct(request, response) {
+//   try {
+//     const {
+//       name,
+//       description,
+//       isBannerVisible,
+//       bannerTitleName,
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//     } = request.body;
+
+//     // Check if required fields are present
+//     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Missing required fields. Please provide all necessary product details.",
+//       });
+//     }
+
+//     // Validate banner fields if isBannerVisible is true
+//     if (isBannerVisible) {
+//       if (!bannerTitleName || !Array.isArray(request.body.bannerImages) || request.body.bannerImages.length === 0) {
+//         return response.status(400).json({
+//           error: true,
+//           success: false,
+//           message: "Banner is enabled, but bannerTitleName or bannerImages are missing.",
+//         });
+//       }
+//     }
+
+//     // Validate and fetch product images
+//     const productId = request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
+//       ? new mongoose.Types.ObjectId(request.body.productId)
+//       : null;
+    
+//     const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
+//     const bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
+
+//     if (!Array.isArray(imagesForProduct) || imagesForProduct.length === 0) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Images array is missing or empty.",
+//       });
+//     }
+
+//     if (!Array.isArray(bannerImagesForProduct)) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Banner images must be an array.",
+//       });
+//     }
+
+//     // Create new product object
+//     let product = new ProductModel({
+//       name,
+//       description,
+//       images: [...imagesForProduct],
+//       isBannerVisible,
+//       bannerImages: [...bannerImagesForProduct],
+//       bannerTitleName,
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//     });
+
+//     // Save the product to the database
+//     product = await product.save();
+
+//     if (!product) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Product creation failed",
+//       });
+//     }
+
+//     // Clear images array after product creation to avoid conflicts with subsequent uploads
+//     if (productId) {
+//       imagesArr[productId] = new Set();
+//       bannerImagesArr[productId] = new Set();
+//     } else {
+//       imagesArr["new"] = new Set();
+//       bannerImagesArr["new"] = new Set();
+//     }
+
+//     return response.status(200).json({
+//       message: "Product created successfully.",
+//       success: true,
+//       error: false,
+//       data: product,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || "Internal Server Error",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
 
 // Create Product  
 export async function createProduct(request, response) {
@@ -188,6 +320,7 @@ export async function createProduct(request, response) {
     const {
       name,
       description,
+      isBannerVisible,
       bannerTitleName,
       brand,
       price,
@@ -217,13 +350,13 @@ export async function createProduct(request, response) {
       });
     }
 
-    const imagesForProduct = request.body.productId
-      ? imagesArr[request.body.productId] || []
-      : imagesArr["new"] || [];
+    // Validate and fetch product images
+    const productId =
+      request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
+        ? new mongoose.Types.ObjectId(request.body.productId)
+        : null;
 
-    const bannerImagesForProduct = request.body.productId
-      ? bannerImagesArr[request.body.productId] || []
-      : bannerImagesArr["new"] || [];
+    const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
 
     if (!Array.isArray(imagesForProduct) || imagesForProduct.length === 0) {
       return response.status(400).json({
@@ -233,25 +366,27 @@ export async function createProduct(request, response) {
       });
     }
 
-    if (!Array.isArray(bannerImagesForProduct)) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "Banner images must be an array.",
-      });
-    }
+    let bannerImagesForProduct = [];
 
-    // Ensure bannerImages is a simple array of URLs
-    const imagesArray = [...imagesForProduct];
-    const bannerImagesArray = [...bannerImagesForProduct];
+    if (isBannerVisible) {
+      if (!bannerTitleName || !Array.isArray(request.body.bannerImages) || request.body.bannerImages.length === 0) {
+        return response.status(400).json({
+          error: true,
+          success: false,
+          message: "Banner is enabled, but bannerTitleName or bannerImages are missing.",
+        });
+      }
+      bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
+    }
 
     // Create new product object
     let product = new ProductModel({
       name,
       description,
-      images: imagesArray, // Use array of images
-      bannerImages: bannerImagesArray, // Use array of banner images
-      bannerTitleName,
+      images: [...imagesForProduct],
+      isBannerVisible,
+      bannerImages: [...bannerImagesForProduct],
+      bannerTitleName: isBannerVisible ? bannerTitleName : "",
       brand,
       price,
       oldPrice,
@@ -274,7 +409,6 @@ export async function createProduct(request, response) {
     // Save the product to the database
     product = await product.save();
 
-
     if (!product) {
       return response.status(400).json({
         error: true,
@@ -284,12 +418,12 @@ export async function createProduct(request, response) {
     }
 
     // Clear images array after product creation to avoid conflicts with subsequent uploads
-    if (request.body.productId) {
-      imagesArr[request.body.productId] = new Set(); // Reset the images for the specific product
-      bannerImagesArr[request.body.productId] = new Set(); // Reset the images for the specific bannerImages
+    if (productId) {
+      imagesArr[productId] = new Set();
+      bannerImagesArr[productId] = new Set();
     } else {
-      imagesArr["new"] = new Set(); // Reset global "new" set
-      bannerImagesArr["new"] = new Set(); // Reset global "new" set
+      imagesArr["new"] = new Set();
+      bannerImagesArr["new"] = new Set();
     }
 
     return response.status(200).json({
@@ -1007,219 +1141,7 @@ export async function getAllFeaturedProducts(request, response) {
 
 
 
-// ----------------------------------------------------------------------------------------------------------------------
-
-function extractPublicId(imageUrl) {
-  // Regex to match the Cloudinary URL and extract public ID
-  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
-  const match = imageUrl.match(regex);
-
-  if (match && match[1]) {
-    // Return the full public ID (including folder path)
-    return match[1];
-  }
-
-  return null;
-}
-
-
-
-export async function deleteProduct(request, response) {
-  try {
-    const productId = request.params.id;
-    const product = await ProductModel.findById(productId);
-
-    if (!product) {
-      return response.status(404).json({
-        message: "Product not found.",
-        success: false,
-        error: true,
-      });
-    }
-
-    let cloudinaryMessages = [];
-
-    for (let i = 0; i < product.images.length; i++) {
-      const imageUrl = product.images[i];
-      const publicId = extractPublicId(imageUrl);
-
-      if (!publicId) {
-        cloudinaryMessages.push(`Failed to extract public ID for image ${i + 1}.`);
-        continue;
-      }
-
-      // Add the folder path for Cloudinary deletion
-      const fullPublicId = `ecommerceApp/uploads/${publicId}`;
-      console.log(`Attempting to delete image with full public ID: ${fullPublicId}`);
-
-      // Delete image from Cloudinary and check the response
-      const result = await cloudinary.uploader.destroy(fullPublicId);
-
-      console.log('Cloudinary delete result:', result);  // Log the entire result
-
-      if (result.result === 'ok') {
-        cloudinaryMessages.push(`Image ${i + 1} deleted successfully from Cloudinary.`);
-      } else {
-        cloudinaryMessages.push(`Failed to delete image ${i + 1} from Cloudinary. Error: ${result.error ? result.error.message : 'Unknown error'}`);
-      }
-    }
-
-    let cloudinaryMessagesForBanner = [];
-
-    for (let i = 0; i < product.bannerImages.length; i++) {
-      const imageUrl = product.bannerImages[i];
-      const publicId = extractPublicId(imageUrl);
-
-      if (!publicId) {
-        cloudinaryMessages.push(`Failed to extract public ID for image ${i + 1}.`);
-        continue;
-      }
-
-      // Add the folder path for Cloudinary deletion
-      const fullPublicId = `ecommerceApp/uploads/${publicId}`;
-      console.log(`Attempting to delete image with full public ID: ${fullPublicId}`);
-
-      // Delete image from Cloudinary and check the response
-      const result = await cloudinary.uploader.destroy(fullPublicId);
-
-      console.log('Cloudinary delete result:', result);  // Log the entire result
-
-      if (result.result === 'ok') {
-        cloudinaryMessagesForBanner.push(`Image ${i + 1} deleted successfully from Cloudinary.`);
-      } else {
-        cloudinaryMessagesForBanner.push(`Failed to delete image ${i + 1} from Cloudinary. Error: ${result.error ? result.error.message : 'Unknown error'}`);
-      }
-    }
-
-    const deletedProduct = await ProductModel.findByIdAndDelete(productId);
-
-    if (!deletedProduct) {
-      return response.status(400).json({
-        message: "Product deletion failed.",
-        success: false,
-        error: true,
-      });
-    }
-
-    return response.status(200).json({
-      message: "Product and associated images deleted successfully.",
-      success: true,
-      error: false,
-      cloudinaryMessages: cloudinaryMessages,
-      cloudinaryMessagesForBanner: cloudinaryMessagesForBanner,
-    });
-
-  } catch (error) {
-    return response.status(500).json({
-      message: error.message || error,
-      error: true,
-      status: false,
-    });
-  }
-}
-
-
-
-// ----------------------------------------------------------------------------------------------------------------------
-
-// delete multiple products
-export async function deleteMultipleProduct(req, res) {
-  try {
-    const { ids } = req.query;
-
-    // Check if ids exist and are valid
-    if (!ids) {
-      return res.status(400).json({
-        message: "No product IDs provided.",
-        success: false,
-        error: true,
-      });
-    }
-
-    console.log("Received IDs:", ids);
-
-    // Convert comma-separated string to an array and trim spaces
-    const idArray = ids.split(',').map(id => id.trim());
-
-    // Validate the IDs
-    if (idArray.length === 0 || idArray.some(id => !mongoose.Types.ObjectId.isValid(id))) {
-      return res.status(400).json({
-        message: "Invalid product IDs.",
-        success: false,
-        error: true,
-      });
-    }
-
-    // Fetch products before deletion
-    const products = await ProductModel.find({ _id: { $in: idArray } });
-
-    if (products.length === 0) {
-      return res.status(404).json({
-        message: "No products found with the given IDs.",
-        success: false,
-        error: true,
-      });
-    }
-
-    console.log(`Found ${products.length} products for deletion.`);
-
-    // Delete images from Cloudinary, handling individual image deletion errors
-    const imageDeletePromises = products.flatMap((product) =>
-      product.images.map(async (imgUrl) => {
-        try {
-          const imageName = imgUrl.split("/").pop().split(".")[0];
-          await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
-          console.log(`Deleted image: ${imageName}`);
-        } catch (err) {
-          console.error(`Error deleting image ${imgUrl}:`, err);
-        }
-      })
-    );
-
-    // Delete images from Cloudinary, handling individual image deletion errors
-    const bannerImageDeletePromises = products.flatMap((product) =>
-      product.bannerImages.map(async (imgUrl) => {
-        try {
-          const imageName = imgUrl.split("/").pop().split(".")[0];
-          await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
-          console.log(`Deleted banner image: ${imageName}`);
-        } catch (err) {
-          console.error(`Error deleting banner image ${imgUrl}:`, err);
-        }
-      })
-    );
-
-    // Wait for all image deletions to complete, continue even if some fail
-    await Promise.allSettled(imageDeletePromises);
-    // Wait for all image deletions to complete, continue even if some fail
-    await Promise.allSettled(bannerImageDeletePromises);
-
-    // Delete products from the database
-    await ProductModel.deleteMany({ _id: { $in: idArray } });
-
-    console.log("Products deleted successfully.");
-
-    return res.status(200).json({
-      message: "Product(s) deleted successfully.",
-      success: true,
-      error: false,
-    });
-
-  } catch (error) {
-    console.error("Error deleting products:", error);
-    return res.status(500).json({
-      message: "Internal Server Error.",
-      success: false,
-      error: true,
-    });
-  }
-}
-
-
-
-
-
-// ----------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------
 
 // get single products
 export async function getProduct(request, response) {
@@ -1251,6 +1173,378 @@ export async function getProduct(request, response) {
   }
 }
 
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+function extractPublicId(imageUrl) {
+  // Regex to match the Cloudinary URL and extract public ID
+  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
+  const match = imageUrl.match(regex);
+
+  if (match && match[1]) {
+    // Return the full public ID (including folder path)
+    return match[1];
+  }
+
+  return null;
+}
+
+
+
+// export async function deleteProduct(request, response) {
+//   try {
+//     const productId = request.params.id;
+//     const product = await ProductModel.findById(productId);
+
+//     if (!product) {
+//       return response.status(404).json({
+//         message: "Product not found.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     let cloudinaryMessages = [];
+
+//     for (let i = 0; i < product.images.length; i++) {
+//       const imageUrl = product.images[i];
+//       const publicId = extractPublicId(imageUrl);
+
+//       if (!publicId) {
+//         cloudinaryMessages.push(`Failed to extract public ID for image ${i + 1}.`);
+//         continue;
+//       }
+
+//       // Add the folder path for Cloudinary deletion
+//       const fullPublicId = `ecommerceApp/uploads/${publicId}`;
+//       console.log(`Attempting to delete image with full public ID: ${fullPublicId}`);
+
+//       // Delete image from Cloudinary and check the response
+//       const result = await cloudinary.uploader.destroy(fullPublicId);
+
+//       console.log('Cloudinary delete result:', result);  // Log the entire result
+
+//       if (result.result === 'ok') {
+//         cloudinaryMessages.push(`Image ${i + 1} deleted successfully from Cloudinary.`);
+//       } else {
+//         cloudinaryMessages.push(`Failed to delete image ${i + 1} from Cloudinary. Error: ${result.error ? result.error.message : 'Unknown error'}`);
+//       }
+//     }
+
+//     let cloudinaryMessagesForBanner = [];
+
+//     for (let i = 0; i < product.bannerImages.length; i++) {
+//       const imageUrl = product.bannerImages[i];
+//       const publicId = extractPublicId(imageUrl);
+
+//       if (!publicId) {
+//         cloudinaryMessages.push(`Failed to extract public ID for image ${i + 1}.`);
+//         continue;
+//       }
+
+//       // Add the folder path for Cloudinary deletion
+//       const fullPublicId = `ecommerceApp/uploads/${publicId}`;
+//       console.log(`Attempting to delete image with full public ID: ${fullPublicId}`);
+
+//       // Delete image from Cloudinary and check the response
+//       const result = await cloudinary.uploader.destroy(fullPublicId);
+
+//       console.log('Cloudinary delete result:', result);  // Log the entire result
+
+//       if (result.result === 'ok') {
+//         cloudinaryMessagesForBanner.push(`Image ${i + 1} deleted successfully from Cloudinary.`);
+//       } else {
+//         cloudinaryMessagesForBanner.push(`Failed to delete image ${i + 1} from Cloudinary. Error: ${result.error ? result.error.message : 'Unknown error'}`);
+//       }
+//     }
+
+//     const deletedProduct = await ProductModel.findByIdAndDelete(productId);
+
+//     if (!deletedProduct) {
+//       return response.status(400).json({
+//         message: "Product deletion failed.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     return response.status(200).json({
+//       message: "Product and associated images deleted successfully.",
+//       success: true,
+//       error: false,
+//       cloudinaryMessages: cloudinaryMessages,
+//       cloudinaryMessagesForBanner: cloudinaryMessagesForBanner,
+//     });
+
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       status: false,
+//     });
+//   }
+// }
+
+
+
+// // ----------------------------------------------------------------------------------------------------------------------
+
+// // delete multiple products
+// export async function deleteMultipleProduct(req, res) {
+//   try {
+//     const { ids } = req.query;
+
+//     // Check if ids exist and are valid
+//     if (!ids) {
+//       return res.status(400).json({
+//         message: "No product IDs provided.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log("Received IDs:", ids);
+
+//     // Convert comma-separated string to an array and trim spaces
+//     const idArray = ids.split(',').map(id => id.trim());
+
+//     // Validate the IDs
+//     if (idArray.length === 0 || idArray.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+//       return res.status(400).json({
+//         message: "Invalid product IDs.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     // Fetch products before deletion
+//     const products = await ProductModel.find({ _id: { $in: idArray } });
+
+//     if (products.length === 0) {
+//       return res.status(404).json({
+//         message: "No products found with the given IDs.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log(`Found ${products.length} products for deletion.`);
+
+//     // Delete images from Cloudinary, handling individual image deletion errors
+//     const imageDeletePromises = products.flatMap((product) =>
+//       product.images.map(async (imgUrl) => {
+//         try {
+//           const imageName = imgUrl.split("/").pop().split(".")[0];
+//           await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
+//           console.log(`Deleted image: ${imageName}`);
+//         } catch (err) {
+//           console.error(`Error deleting image ${imgUrl}:`, err);
+//         }
+//       })
+//     );
+
+//     // Delete images from Cloudinary, handling individual image deletion errors
+//     const bannerImageDeletePromises = products.flatMap((product) =>
+//       product.bannerImages.map(async (imgUrl) => {
+//         try {
+//           const imageName = imgUrl.split("/").pop().split(".")[0];
+//           await cloudinary.uploader.destroy(`ecommerceApp/uploads/${imageName}`);
+//           console.log(`Deleted banner image: ${imageName}`);
+//         } catch (err) {
+//           console.error(`Error deleting banner image ${imgUrl}:`, err);
+//         }
+//       })
+//     );
+
+//     // Wait for all image deletions to complete, continue even if some fail
+//     await Promise.allSettled(imageDeletePromises);
+//     // Wait for all image deletions to complete, continue even if some fail
+//     await Promise.allSettled(bannerImageDeletePromises);
+
+//     // Delete products from the database
+//     await ProductModel.deleteMany({ _id: { $in: idArray } });
+
+//     console.log("Products deleted successfully.");
+
+//     return res.status(200).json({
+//       message: "Product(s) deleted successfully.",
+//       success: true,
+//       error: false,
+//     });
+
+//   } catch (error) {
+//     console.error("Error deleting products:", error);
+//     return res.status(500).json({
+//       message: "Internal Server Error.",
+//       success: false,
+//       error: true,
+//     });
+//   }
+// }
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+export async function deleteProduct(request, response) {
+  try {
+    const productId = request.params.id;
+    const product = await ProductModel.findById(productId);
+
+    if (!product) {
+      return response.status(404).json({
+        message: "Product not found.",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Function to delete images from Cloudinary
+    async function deleteImages(images, type) {
+      if (!images || images.length === 0) return [];
+      
+      return Promise.allSettled(
+        images.map(async (imageUrl, index) => {
+          const publicId = extractPublicId(imageUrl);
+          if (!publicId) return `Failed to extract public ID for ${type} image ${index + 1}.`;
+
+          console.log(`Deleting ${type} image: ${publicId}`);
+          try {
+            const result = await cloudinary.uploader.destroy(publicId);
+            return result.result === "ok"
+              ? `${type} Image ${index + 1} deleted successfully.`
+              : `Failed to delete ${type} image ${index + 1}: ${result.error?.message || "Unknown error"}`;
+          } catch (error) {
+            return `Error deleting ${type} image ${index + 1}: ${error.message}`;
+          }
+        })
+      );
+    }
+
+    // Delete product images and banner images
+    const [productImageResults, bannerImageResults] = await Promise.all([
+      deleteImages(product.images, "Product"),
+      deleteImages(product.bannerImages, "Banner"),
+    ]);
+
+    // Delete the product from the database
+    await ProductModel.findByIdAndDelete(productId);
+
+    console.log(`Product ${productId} and its images deleted successfully.`);
+    return response.status(200).json({
+      message: "Product and associated images deleted successfully.",
+      success: true,
+      error: false,
+      productImageResults,
+      bannerImageResults,
+    });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return response.status(500).json({
+      message: error.message || "Internal Server Error",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+export async function deleteMultipleProduct(req, res) {
+  try {
+    const { ids } = req.query;
+
+    if (!ids || ids.length === 0) {
+      return res.status(400).json({
+        message: "No product IDs provided.",
+        success: false,
+        error: true,
+      });
+    }
+
+    const idArray = Array.isArray(ids) ? ids : ids.split(",").map((id) => id.trim());
+
+    if (idArray.some((id) => !mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({
+        message: "Invalid product IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    const products = await ProductModel.find({ _id: { $in: idArray } });
+
+    if (!products.length) {
+      return res.status(404).json({
+        message: "No products found with the given IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log(`Found ${products.length} products for deletion.`);
+
+    // Extract and delete images
+    async function deleteImages(images, type) {
+      if (!images || images.length === 0) return [];
+
+      return Promise.allSettled(
+        images.map(async (imageUrl, index) => {
+          const publicId = extractPublicId(imageUrl);
+          if (!publicId) return `Failed to extract public ID for ${type} image ${index + 1}.`;
+
+          console.log(`Deleting ${type} image: ${publicId}`);
+
+          try {
+            const result = await cloudinary.uploader.destroy(publicId);
+            return result.result === "ok"
+              ? `${type} Image ${index + 1} deleted successfully.`
+              : `Failed to delete ${type} image ${index + 1}: ${result.error?.message || "Unknown error"}`;
+          } catch (error) {
+            return `Error deleting ${type} image ${index + 1}: ${error.message}`;
+          }
+        })
+      );
+    }
+
+    const deletionPromises = products.map(async (product) => {
+      const [productImageMessages, bannerImageMessages] = await Promise.all([
+        deleteImages(product.images, "Product"),
+        deleteImages(product.bannerImages, "Banner"),
+      ]);
+      return [...productImageMessages, ...bannerImageMessages];
+    });
+
+    const cloudinaryMessages = (await Promise.all(deletionPromises)).flat();
+
+    // Delete products from DB
+    await ProductModel.deleteMany({ _id: { $in: idArray } });
+
+    console.log("Products deleted successfully.");
+
+    return res.status(200).json({
+      message: "Products and associated images deleted successfully.",
+      success: true,
+      error: false,
+      cloudinaryMessages,
+    });
+
+  } catch (error) {
+    console.error("Error deleting products:", error);
+    return res.status(500).json({
+      message: "Internal Server Error.",
+      success: false,
+      error: true,
+    });
+  }
+}
 
 
 
@@ -1342,78 +1636,252 @@ export async function removeImageProductFromCloudinary(request, response) {
   }
 }
 
+// export async function removeImageProductFromCloudinary(request, response) {
+//   try {
+//     const { imgUrl, productId } = request.query;
+//     console.log("Request received for product image deletion:", request.query);
+
+//     if (!imgUrl) {
+//       return response.status(400).json({ error: "Image URL is required" });
+//     }
+
+//     let imageRemoved = false;
+
+//     if (productId) {
+//       const product = await ProductModel.findById(productId);
+//       if (!product) {
+//         console.log(`Product with ID ${productId} not found.`);
+//         return response.status(404).json({ error: "Product not found" });
+//       }
+
+//       // Remove image from product's image array
+//       const updatedImages = product.images.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
+//       if (updatedImages.length !== product.images.length) {
+//         product.images = updatedImages;
+//         await product.save();
+//         imageRemoved = true;
+//         console.log(`Image removed from product: ${productId}`);
+//       }
+//     }
+
+//     if (imagesArr["new"] && imagesArr["new"].includes(imgUrl)) {
+//       imagesArr["new"] = imagesArr["new"].filter(url => url.trim() !== imgUrl.trim());
+//       console.log("Image removed from temporary storage.");
+//       imageRemoved = true;
+//     }
+
+//     if (productId && imagesArr[productId]) {
+//       if (imagesArr[productId].includes(imgUrl)) {
+//         imagesArr[productId] = imagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
+//         console.log(`Image removed from in-memory storage for product: ${productId}`);
+//         imageRemoved = true;
+//       }
+//     }
+
+//     if (!imageRemoved) {
+//       console.log("Image not found in database or temporary storage.");
+//       return response.status(404).json({ error: "Image not found in database or memory" });
+//     }
+
+//     const publicId = extractPublicId(imgUrl);
+//     if (!publicId) {
+//       console.log("Invalid image URL format for Cloudinary deletion.");
+//       return response.status(400).json({ error: "Invalid image URL format" });
+//     }
+
+//     console.log(`Deleting image from Cloudinary with public ID: ${publicId}`);
+//     const result = await cloudinary.uploader.destroy(publicId);
+
+//     if (result.result === "ok") {
+//       console.log("Image successfully deleted from Cloudinary:", imgUrl);
+//       return response.status(200).json({ message: "Image removed successfully from Cloudinary and product", success: true });
+//     } else {
+//       console.log("Cloudinary deletion failed:", result);
+//       return response.status(500).json({ error: "Failed to delete image from Cloudinary" });
+//     }
+//   } catch (error) {
+//     console.error("Error in removeImageProductFromCloudinary:", error);
+//     return response.status(500).json({ message: "Failed to remove image", success: false, error: true });
+//   }
+// }
+
 
 // ----------------------------------------------------------------------------------------------------------------------
 
-// Backend: Remove Banner Image from Cloudinary and Product
 export async function removeImageBannerFromCloudinary(request, response) {
   try {
-    const { imgUrl, productId } = request.query;
-    console.log("Request Query:", request.query);
+    const { imgUrl, productId } = request.query;  // Expecting both imgUrl and productId in query
+    console.log("Request Query:", request.query);  // Log the incoming request query
 
+    // Validate input
     if (!imgUrl) {
       return response.status(400).json({ error: "Banner image URL is required" });
     }
 
-    let imageRemoved = false; // Track if the image was removed from DB or temporary storage
-
+    // Handle image removal logic for both new and existing products
     if (productId) {
-      // Handle deletion from MongoDB (Product model)
+      // If productId is provided, handle for editing an existing product
       const product = await ProductModel.findById(productId);
+
       if (!product) {
         return response.status(404).json({ error: "Product not found" });
       }
 
-      // Remove image from the product's bannerImages array
+      // Remove the image from the product's bannerImages array
       const updatedBannerImages = product.bannerImages.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
-      if (updatedBannerImages.length !== product.bannerImages.length) {
-        product.bannerImages = updatedBannerImages;
-        await product.save();
-        imageRemoved = true;
-        console.log("Banner image removed from product:", productId);
+      if (updatedBannerImages.length === product.bannerImages.length) {
+        return response.status(404).json({ error: "Banner image not found in product images" });
       }
-    }
 
-    // Handle deletion from temporary storage (bannerImagesArr)
-    if (bannerImagesArr["new"] && bannerImagesArr["new"].includes(imgUrl)) {
-      bannerImagesArr["new"] = bannerImagesArr["new"].filter(url => url.trim() !== imgUrl.trim());
-      console.log("Banner image removed from temporary storage");
-      imageRemoved = true;
-    }
+      // Update the product in the database
+      product.bannerImages = updatedBannerImages;
+      await product.save();
 
-    // Handle deletion from specific product's bannerImagesArr
-    if (productId && bannerImagesArr[productId]) {
-      if (bannerImagesArr[productId].includes(imgUrl)) {
+      // Also update the bannerImagesArr in-memory (or your state management) to reflect the changes
+      if (bannerImagesArr[productId]) {
         bannerImagesArr[productId] = bannerImagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
-        console.log("Banner image removed from in-memory storage for product:", productId);
-        imageRemoved = true;
-      }
-    }
-
-    // If image was found in either database or memory, proceed with Cloudinary deletion
-    if (imageRemoved) {
-      const publicId = extractPublicId(imgUrl);
-      if (!publicId) {
-        return response.status(400).json({ error: "Invalid banner image URL format" });
       }
 
-      console.log("Deleting banner image with public ID:", publicId);
-      const result = await cloudinary.uploader.destroy(publicId);
-
-      if (result.result === "ok") {
-        console.log("Banner image successfully deleted from Cloudinary:", imgUrl);
-        return response.status(200).json({ message: "Banner image removed successfully", success: true });
+      console.log("Banner image removed from product", productId);
+    } else {
+      // If no productId is provided, handle as new product
+      if (bannerImagesArr["new"] && bannerImagesArr["new"].includes(imgUrl)) {
+        const index = bannerImagesArr["new"].indexOf(imgUrl);
+        bannerImagesArr["new"].splice(index, 1);  // Remove from the global new set
+        console.log("Banner image removed from global set");
       } else {
-        return response.status(404).json({ error: "Banner image not found in Cloudinary" });
+        return response.status(404).json({ error: "Banner image URL not found in global images" });
       }
     }
 
-    return response.status(404).json({ error: "Banner image not found in database or temporary storage" });
+    // Extract the public ID from the imgUrl for Cloudinary deletion
+    const publicId = extractPublicId(imgUrl);
+    if (!publicId) {
+      return response.status(400).json({
+        message: "Invalid banner image URL format",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log("Deleting banner image with public ID:", publicId);
+
+    // Attempt to delete the image from Cloudinary
+    const result = await cloudinary.uploader.destroy(publicId);
+
+    if (result.result === "ok") {
+      console.log("Banner image successfully deleted from Cloudinary:", imgUrl);
+      return response.status(200).json({
+        message: "Banner image removed successfully from Cloudinary and product",
+        success: true,
+      });
+    }
+
+    // If the Cloudinary deletion result is not 'ok'
+    return response.status(404).json({
+      message: "Banner image not found in Cloudinary",
+      success: false,
+      error: true,
+    });
   } catch (error) {
     console.error("Error in removeImageBannerFromCloudinary:", error);
-    return response.status(500).json({ error: "Failed to remove banner image" });
+    return response.status(500).json({
+      message: "Failed to remove banner image",
+      success: false,
+      error: true,
+    });
   }
 }
+
+
+// export async function removeImageBannerFromCloudinary(request, response) {
+//   try {
+//     const { imgUrl, productId } = request.query;
+//     console.log("Received request to remove banner image:", request.query);
+
+//     if (!imgUrl) {
+//       return response.status(400).json({ error: "Banner image URL is required" });
+//     }
+
+//     let imageRemoved = false;
+
+//     // If productId is provided, remove from existing product
+//     if (productId) {
+//       const product = await ProductModel.findById(productId);
+//       if (!product) {
+//         console.log(`Product with ID ${productId} not found.`);
+//         return response.status(404).json({ error: "Product not found" });
+//       }
+
+//       // Remove from product's bannerImages array
+//       const updatedBannerImages = product.bannerImages.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
+//       if (updatedBannerImages.length !== product.bannerImages.length) {
+//         product.bannerImages = updatedBannerImages;
+//         await product.save();
+//         imageRemoved = true;
+//         console.log(`Banner image removed from product in DB: ${productId}`);
+//       }
+//     }
+
+//     // Remove from in-memory storage
+//     if (bannerImagesArr["new"] && bannerImagesArr["new"].includes(imgUrl)) {
+//       bannerImagesArr["new"] = bannerImagesArr["new"].filter(url => url.trim() !== imgUrl.trim());
+//       console.log("Banner image removed from temporary storage.");
+//       imageRemoved = true;
+//     }
+
+//     if (productId && bannerImagesArr[productId]) {
+//       if (bannerImagesArr[productId].includes(imgUrl)) {
+//         bannerImagesArr[productId] = bannerImagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
+//         console.log(`Banner image removed from in-memory storage for product: ${productId}`);
+//         imageRemoved = true;
+//       }
+//     }
+
+//     if (!imageRemoved) {
+//       console.log("Banner image not found in DB or memory.");
+//       return response.status(404).json({ error: "Banner image not found in database or memory" });
+//     }
+
+//     // Extract Public ID from Cloudinary URL
+//     const publicId = extractPublicId(imgUrl);
+//     if (!publicId) {
+//       console.log("Invalid banner image URL format.");
+//       return response.status(400).json({
+//         message: "Invalid banner image URL format",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log(`Deleting banner image from Cloudinary. Public ID: ${publicId}`);
+    
+//     // Delete from Cloudinary
+//     const result = await cloudinary.uploader.destroy(publicId);
+//     console.log("Cloudinary Response:", result);
+
+//     if (result.result === "ok" || result.result === "deleted") {
+//       console.log("Banner image successfully deleted from Cloudinary:", imgUrl);
+//       return response.status(200).json({
+//         message: "Banner image removed successfully from Cloudinary and product",
+//         success: true,
+//       });
+//     }
+
+//     return response.status(500).json({
+//       message: "Failed to remove banner image from Cloudinary",
+//       success: false,
+//       error: true,
+//     });
+//   } catch (error) {
+//     console.error("Error in removeImageBannerFromCloudinary:", error);
+//     return response.status(500).json({
+//       message: "Failed to remove banner image",
+//       success: false,
+//       error: true,
+//     });
+//   }
+// }
 
 
 
@@ -1482,7 +1950,7 @@ export async function updateProduct(request, response) {
     let validNewImages = [];
     let validNewBannerImages = [];
 
-    // Validate new images exist in Cloudinary
+    // ✅ Validate new images exist in Cloudinary
     for (let newImageUrl of newImages) {
       const publicId = extractPublicId(newImageUrl);
       if (publicId) {
@@ -1496,7 +1964,7 @@ export async function updateProduct(request, response) {
       }
     }
 
-    // Validate new banner images exist in Cloudinary
+    // ✅ Validate new banner images exist in Cloudinary
     for (let newBannerUrl of newBannerImages) {
       const publicId = extractPublicId(newBannerUrl);
       if (publicId) {
@@ -1510,33 +1978,46 @@ export async function updateProduct(request, response) {
       }
     }
 
-    // Identify and remove old images that are not in the new list
-    const imagesToDelete = product.images.filter(image => !validNewImages.includes(image));
-    const bannersToDelete = product.bannerImages.filter(image => !validNewBannerImages.includes(image));
+    // ✅ Preserve existing images if new images are not provided
+    product.images = validNewImages.length > 0 ? validNewImages : product.images;
 
-    for (let oldImageUrl of [...imagesToDelete, ...bannersToDelete]) {
-      const publicId = extractPublicId(oldImageUrl);
-      if (publicId) {
-        try {
-          const result = await cloudinary.uploader.destroy(publicId);
-          if (result.result === "ok") cloudinaryMessages.push(`Deleted image: ${publicId}`);
-        } catch (error) {
-          cloudinaryMessages.push(`Error deleting image: ${error.message}`);
-        }
-      }
+    // ✅ Handle `isBannerVisible` toggle without deleting banner data
+    if (request.body.isBannerVisible !== undefined) {
+      product.isBannerVisible = request.body.isBannerVisible;
     }
 
-    // Assign updated valid images
-    product.images = validNewImages.length > 0 ? validNewImages : product.images;
-    product.bannerImages = validNewBannerImages.length > 0 ? validNewBannerImages : product.bannerImages;
+    // ✅ Only update banner title & images if new values are provided
+    if (request.body.isBannerVisible) {
+      if (!request.body.bannerTitleName || request.body.bannerTitleName.trim() === "") {
+        return response.status(400).json({
+          error: true,
+          success: false,
+          message: "Banner is enabled but missing title.",
+        });
+      }
+      if (!Array.isArray(validNewBannerImages) || validNewBannerImages.length === 0) {
+        // If banner images are missing, but existing ones are present, keep them
+        if (product.bannerImages.length > 0) {
+          validNewBannerImages = product.bannerImages;
+        } else {
+          return response.status(400).json({
+            error: true,
+            success: false,
+            message: "Banner is enabled but no valid banner images provided.",
+          });
+        }
+      }
+      product.bannerTitleName = request.body.bannerTitleName;
+      product.bannerImages = validNewBannerImages;
+    }
 
-    // Fetch valid RAMs dynamically
+    // ✅ Fetch valid RAMs dynamically
     const validProductRams = await getValidProductRams();
     const filteredProductRams = (request.body.productRam || [])
       .filter(ram => validProductRams.includes(ram))
       .sort((a, b) => parseRamSize(a) - parseRamSize(b));
 
-    // Fetch and sort valid weights dynamically
+    // ✅ Fetch and sort valid weights dynamically
     const validWeights = await ProductWeightModel.find({});
     const weightOrder = validWeights.reduce((acc, weight, index) => {
       acc[weight.name] = index + 1;
@@ -1548,14 +2029,14 @@ export async function updateProduct(request, response) {
       .filter(weight => weightOrder[weight])
       .sort((a, b) => parseWeightToGrams(a) - parseWeightToGrams(b));
 
-    // Fetch and sort valid sizes dynamically
+    // ✅ Fetch and sort valid sizes dynamically
     const predefinedSizeOrder = ["S", "M", "L", "XL", "XXL", "XXXL"];
     const validSizesFromDB = await ProductSizeModel.find({});
     const validSizeNames = validSizesFromDB.map(size => size.name);
     const filteredSizes = (request.body.size || []).filter(size => validSizeNames.includes(size));
     const sortedSizes = filteredSizes.sort((a, b) => predefinedSizeOrder.indexOf(a) - predefinedSizeOrder.indexOf(b));
 
-    // Update the product details in the database
+    // ✅ Update product in the database
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
       {
@@ -1565,6 +2046,8 @@ export async function updateProduct(request, response) {
         productRam: filteredProductRams,
         productWeight: sortedWeights,
         size: sortedSizes,
+        isBannerVisible: product.isBannerVisible,
+        bannerTitleName: product.bannerTitleName,
       },
       { new: true }
     );
@@ -1591,7 +2074,6 @@ export async function updateProduct(request, response) {
     });
   }
 }
-
 
 
 

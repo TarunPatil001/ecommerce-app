@@ -101,9 +101,13 @@ const productSchema = mongoose.Schema(
         required: true,
       }
     ],
-    bannerTitleName: {
-      type: String,
-      required: true,
+    bannerTitleName: { 
+      type: String, 
+      required: function() { return this.isBannerVisible; } // Conditionally required
+    },
+    isBannerVisible: {
+      type: Boolean,
+      default: false,
     },
     dateCreated: {
       type: Date,
