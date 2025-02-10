@@ -56,9 +56,9 @@ const HomeBannerV2 = (props) => {
 
                                 {/* Banner Info with Animation - Only Visible on Active Slide */}
                                 <div className="info absolute top-0 -right-[100%] opacity-0 w-[50%] h-[100%] z-50 p-8 flex flex-col items-start justify-center gap-4 transition-all duration-700 bg-[rgba(0,0,0,0.2)]">
-                                    <h4 className="text-[20px] font-medium w-full relative -right-[100%] opacity-0">Big Saving Days Sale</h4>
-                                    <h2 className="text-[35px] font-bold w-full relative -right-[100%] opacity-0 line-clamp-4">{item?.bannerTitleName}</h2>
-                                    <h3 className="text-[20px] font-medium w-full flex items-center gap-2 relative -right-[100%] opacity-0">Starting At Only <span className="!text-[var(--bg-primary)] text-[30px] font-bold"><span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(`${item?.price}`)}</span></h3>
+                                    <h4 className="text-[20px] font-medium w-full relative -right-[100%] opacity-0 text-white">Big Saving Days Sale</h4>
+                                    <h2 className="text-[35px] font-bold w-full relative -right-[100%] opacity-0 line-clamp-4 text-white">{item?.bannerTitleName}</h2>
+                                    <h3 className="text-[20px] font-medium w-full flex items-center gap-2 relative -right-[100%] opacity-0 text-white">Starting At Only <span className="!text-[var(--bg-primary)] text-[30px] font-extrabold"><span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(`${item?.price}`)}</span></h3>
                                     <div className="w-full relative -right-[100%] opacity-0 btn_">
                                         <Link to="/">
                                             <Button className="!text-white !bg-[var(--bg-primary)] hover:!bg-[#000] !text-lg !px-5 !py-3 top-5" size="large">Shop Now</Button>
