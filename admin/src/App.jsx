@@ -37,6 +37,8 @@ import ProductDetails from './Pages/Products/productDetails';
 import AddRAMS from './Pages/Products/addRAMS';
 import AddWeight from './Pages/Products/addWeight';
 import AddSize from './Pages/Products/addSize';
+import AddBannersV1 from './Pages/Banners/addBannersV1';
+import BannersV1List from './Pages/Banners';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -54,8 +56,10 @@ function App() {
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [categoryIdNo, setCategoryIdNo] = useState(null);
+  const [bannerIdNo, setBannerIdNo] = useState(null);
   const [catData, setCatData] = useState([]);
   const [homeSlideData, setHomeSlideData] = useState([]);
+  const [bannerV1Data, setBannerV1Data] = useState([]);
   const [productIdNo, setProductIdNo] = useState(null);
 
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
@@ -339,6 +343,25 @@ function App() {
         </>
       ),
     },
+    {
+      path: "/bannersV1/list",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className='contentMain flex'>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+                <Sidebar />
+              </div>
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+                <BannersV1List />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
   ]);
 
   useEffect(() => {
@@ -408,11 +431,18 @@ function App() {
     categoryIdNo,
     setCategoryIdNo,
 
+    bannerIdNo,
+    setBannerIdNo,
+
     catData,
     setCatData,
 
     homeSlideData,
     setHomeSlideData,
+
+    bannerV1Data,
+    setBannerV1Data,
+
 
     productIdNo,
     setProductIdNo,
@@ -457,6 +487,8 @@ function App() {
             {isOpenFullScreenPanel?.model === "Sub-Category Details" && <AddSubCategory />}
 
             {isOpenFullScreenPanel?.model === "Address Details" && <AddAddress />}
+
+            {isOpenFullScreenPanel?.model === "BannerV1 Details" && <AddBannersV1 />}
 
 
           </div>

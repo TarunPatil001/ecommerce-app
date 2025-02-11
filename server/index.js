@@ -13,7 +13,7 @@ import cartProductRouter from "./route/cartProduct.route.js";
 import wishlistRouter from "./route/wishlist.route.js";
 import addressRouter from "./route/address.route.js";
 import homeSlideRouter from "./route/homeSlide.route.js";
-// import addressRouter from "./route/address.route.js";
+import bannerV1Router from "./route/bannerV1.route.js";
 
 const app = express();
 
@@ -42,6 +42,7 @@ app.use('/api/cartProduct', cartProductRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/homeSlides', homeSlideRouter);
+app.use('/api/bannersV1', bannerV1Router);
 
 
 connectDB().then(() => {
