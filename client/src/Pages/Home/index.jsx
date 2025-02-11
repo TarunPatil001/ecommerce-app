@@ -21,7 +21,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
-import { Skeleton } from "@mui/material";
 import ProductLoading from "../../components/ProductLoading";
 import { IoImagesSharp } from "react-icons/io5";
 
@@ -33,6 +32,7 @@ const Home = () => {
   const [popularProductData, setPopularProductData] = useState([]);
   const [allProductsData, setAllProductsData] = useState([]);
   const [allFeaturedProductsData, setAllFeaturedProductsData] = useState([]);
+  const [bannerV1Data, setBannerV1Data] = useState([]);
   const [loading, setLoading] = useState(false); // ✅ New state for tracking API request
 
 
@@ -43,15 +43,18 @@ const Home = () => {
         const homeSlides = await fetchDataFromApi('/api/homeSlides');
         const allProducts = await fetchDataFromApi('/api/product/get-all-products');
         const featuredProducts = await fetchDataFromApi('/api/product/get-all-featuredProducts');
+        const bannerV1 = await fetchDataFromApi('/api/bannersV1');
 
         setHomeSlideData(homeSlides?.data?.length ? homeSlides.data : []);
         setAllProductsData(allProducts?.data?.length ? allProducts.data : []);
         setAllFeaturedProductsData(featuredProducts?.data?.length ? featuredProducts.data : []);
+        setBannerV1Data(bannerV1?.data?.length ? bannerV1.data : []);  
       } catch (error) {
         console.error("Error fetching home data:", error);
         setHomeSlideData([]);
         setAllProductsData([]);
         setAllFeaturedProductsData([]);
+        setBannerV1Data([]);
       }
     };
 
@@ -210,8 +213,11 @@ const Home = () => {
             <span className="line"></span>
             <p className="font-bold text-2xl">- Only ₹500*</p>
           </div>
-          <AdsBannerSlider items={4} timedelay={7000} />
-          <AdsBannerSliderV2 items={4} timedelay={3000} height={200} />
+
+          {/* <AdsBannerSlider items={4} timedelay={7000} /> */}
+          {
+            bannerV1Data?.length !== 0 && <AdsBannerSliderV2 items={4} timedelay={3000} height={200} data={bannerV1Data} />
+          }
         </div>
       </section>
 

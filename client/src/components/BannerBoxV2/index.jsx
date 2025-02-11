@@ -9,8 +9,8 @@ const BannerBoxV2 = (props) => {
       <img src={props.image} alt="side banner"  className="scalable-image"/>
 
       <div className={`info absolute top-0 ${props.info==="left"?'left-0 pl-8 pr-2':'right-0 pl-4 p-4'} ${props.items <= 2 ? "!pl-14" : "!pl-8"} w-[50%] h-[100%] z-50 flex flex-col justify-center`}>
-      <h2 className={`${props.items >= 4 ? "text-[17px]" : "text-[24px]"} font-medium line-clamp-2`}>{props.heading}</h2>
-        <span className={`!text-[var(--bg-primary)] font-bold ${props.items <= 3 ? "text-[22px]" : "text-[20px]"}`}><span className="rupee">₹</span>{new Intl.NumberFormat('en-IN').format(props.price)}</span>
+      <h2 className={`${props.items >= 4 ? "text-[17px]" : "text-[17px]"} font-bold line-clamp-2`}>{props.heading}</h2>
+        <span className={`!text-[var(--bg-primary)] font-bold ${props.items <= 3 ? "text-[22px]" : "text-[20px]"}`}><span className="rupee">&#8377;</span>{new Intl.NumberFormat('en-IN').format(props.price)}</span>
         <Link to="/" className={`underline hover:no-underline font-medium ${props.items <= 3 ? "text-[18px]" : "text-[16px]"}`}>
             Shop Now
         </Link>

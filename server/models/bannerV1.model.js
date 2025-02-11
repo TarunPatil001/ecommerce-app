@@ -7,6 +7,11 @@ const bannerV1Schema = mongoose.Schema(
             default: '',
             required: true,
         },
+        alignInfo: {
+            type: String,
+            default: '',
+            required: true,
+        },
         images: [
             {
                 type: String,
@@ -27,7 +32,7 @@ const bannerV1Schema = mongoose.Schema(
             default: '',
             required: true,
         },
-        
+
         // parentCategoryId: {
         //     type: mongoose.Schema.Types.ObjectId,
         //     ref: "Category",
@@ -43,7 +48,7 @@ const bannerV1Schema = mongoose.Schema(
         //     ref: "Category",
         //     required: true,
         // },
-        
+
         price: {
             type: Number,
             default: '',

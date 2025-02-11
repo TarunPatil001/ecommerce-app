@@ -22,37 +22,14 @@ const AdsBannerSliderV2 = (props) => {
         modules={[Autoplay, Navigation]}
         className="smallBtn"
       >
-        <SwiperSlide>
-            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"} price={7999} height={props.height} items={props.items} link={'/'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-3.jpg"} heading={"Noise Wireless Headphones"} price={1499} height={props.height} items={props.items} link={'/'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-4.jpg"} heading={"Armchair Mad By shopstic"} price={5499} height={props.height} items={props.items} link={'/b1'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-1.jpg"} heading={"S22 Samsung Smartphone"} price={2499} height={props.height} items={props.items} link={'/b2'}/>
-        </SwiperSlide>
 
-        <SwiperSlide>
-            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/sub-banner-1.jpg"} heading={"Samsung Gear VR Camera"} price={7999} height={props.height} items={props.items} link={'/'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-3.jpg"} heading={"Noise Wireless Headphones"} price={1499} height={props.height} items={props.items} link={'/'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="left" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-4.jpg"} heading={"Armchair Mad By shopstic"} price={5499} height={props.height} items={props.items} link={'/b1'}/>
-        </SwiperSlide>
-        
-        <SwiperSlide>
-            <BannerBoxV2 info="right" image={"https://demos.codezeel.com/prestashop/PRS21/PRS210502/img/cms/cms-banner-1.jpg"} heading={"S22 Samsung Smartphone"} price={2499} height={props.height} items={props.items} link={'/b2'}/>
-        </SwiperSlide>
+        {
+          props?.data?.map((item, index) => (
+            <SwiperSlide key={index}>
+              <BannerBoxV2 info={item.alignInfo} image={item?.images[0]} heading={item?.bannerTitle} price={item.price} height={props.height} items={item} link={'/'} />
+            </SwiperSlide>
+          ))
+        }
 
       </Swiper>
     </div>
@@ -60,9 +37,9 @@ const AdsBannerSliderV2 = (props) => {
 };
 
 AdsBannerSliderV2.propTypes = {
-    items: PropTypes.number.isRequired,
-    timedelay: PropTypes.number.isRequired,
-    height: PropTypes.number
+  items: PropTypes.number.isRequired,
+  timedelay: PropTypes.number.isRequired,
+  height: PropTypes.number
 }
 
 export default AdsBannerSliderV2;

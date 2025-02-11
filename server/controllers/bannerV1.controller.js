@@ -74,6 +74,7 @@ export async function addBanner(request, response) {
         // Step 3: Create a new category document
         let banner = new BannerV1Model({
             bannerTitle: request.body.bannerTitle,
+            alignInfo: request.body.alignInfo,
             images: imagesArr,
             parentCategoryId: request.body.parentCategoryId,
             subCategoryId: request.body.subCategoryId,

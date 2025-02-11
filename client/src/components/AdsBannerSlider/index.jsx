@@ -7,18 +7,18 @@ import { Autoplay, Navigation } from "swiper/modules";
 import BannerBox from "../BannerBox";
 import PropTypes from "prop-types";
 
-const AdsBannerSlider = (props) => {
+const AdsBannerSlider = ({ items, timedelay, images, showNavigation = false }) => {
   return (
     <div className="py-5 w-full">
       <Swiper
-        slidesPerView={props.items}
+        slidesPerView={items}
         spaceBetween={10}
         autoplay={{
-          delay: props.timedelay,
-          // disableOnInteraction: false,
+          delay: timedelay,
+          disableOnInteraction: false,
         }}
         loop={true}
-        // navigation={true}
+        navigation={showNavigation}
         modules={[Autoplay, Navigation]}
         className="smallBtn"
       >
@@ -60,8 +60,10 @@ const AdsBannerSlider = (props) => {
 };
 
 AdsBannerSlider.propTypes = {
-    items: PropTypes.number.isRequired,
-    timedelay: PropTypes.number.isRequired
-}
+  items: PropTypes.number.isRequired,
+  timedelay: PropTypes.number.isRequired,
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  showNavigation: PropTypes.bool,
+};
 
 export default AdsBannerSlider;

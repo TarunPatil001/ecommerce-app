@@ -26,6 +26,7 @@ const AddBannersV1 = () => {
     const [productCategory, setProductCategory] = useState('');
     const [productCategory2, setProductCategory2] = useState('');
     const [productCategory3, setProductCategory3] = useState('');
+    const [alignInfo, setAlignInfo] = useState('');
     const [isLoadingReset1, setIsLoadingReset1] = useState(false);
     const [isLoadingSave1, setIsLoadingSave1] = useState(false);
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -38,6 +39,7 @@ const AddBannersV1 = () => {
         subCategoryId: '',
         thirdSubCategoryId: '',
         price: '',
+        alignInfo: '',
     });
 
 
@@ -66,12 +68,14 @@ const AddBannersV1 = () => {
                     subCategoryId: '',
                     thirdSubCategoryId: '',
                     price: '',
+                    alignInfo: '',
                 });
                 setProductCategory('');
                 setProductCategory2('');
                 setProductCategory3('');
                 setFilteredCategories([]);
                 setFilteredSubCategories([]);
+                setAlignInfo('');
                 return;
             }
 
@@ -86,6 +90,8 @@ const AddBannersV1 = () => {
                     console.log("Banner Data:", banner);
 
                     setPreviews(banner.images || []);
+                    setAlignInfo(banner.alignInfo || []);
+
                     setFormFields((prev) => ({
                         ...prev,
                         bannerTitle: banner.bannerTitle || "",
@@ -94,6 +100,7 @@ const AddBannersV1 = () => {
                         subCategoryId: banner.subCategoryId || "",
                         thirdSubCategoryId: banner.thirdSubCategoryId || "",
                         price: banner.price || "",
+                        alignInfo: banner.alignInfo || "",
                     }));
 
                     // Automatically populate categories
@@ -244,6 +251,16 @@ const AddBannersV1 = () => {
         setFormFields((prevFormFields) => ({
             ...prevFormFields,
             images: previewArr, // Assign the previewArr to images
+        }));
+    };
+
+
+    const handleAlignInfoChange = (event) => {
+        const value = event.target.value;
+        setAlignInfo(value); // Update status in local state
+        setFormFields((prevState) => ({
+            ...prevState,
+            alignInfo: value, // Update the form fields
         }));
     };
 
@@ -400,10 +417,10 @@ const AddBannersV1 = () => {
             if (!bannerImage) {
                 throw new Error("Invalid banner image.");
             }
-    
+
             const bannerId = context.bannerIdNo; // Get banner ID properly
             let url = `/api/bannersV1/deleteImage?imgUrl=${encodeURIComponent(bannerImage)}`;
-    
+
             if (bannerId) {
                 // If updating, include bannerId in the API request
                 url += `&bannerId=${bannerId}`;
@@ -411,22 +428,22 @@ const AddBannersV1 = () => {
             } else {
                 console.log("Removing banner image without bannerId:", bannerImage);
             }
-    
+
             const response = await deleteImages(url);
-    
+
             if (response?.success) {
                 // Remove the deleted image from the previews array
                 setPreviews((prevPreviews) => {
                     const updatedPreviews = prevPreviews?.filter((_, i) => i !== index) || [];
                     return updatedPreviews;
                 });
-    
+
                 // Update formFields state for banner image
                 setFormFields((prevFields) => ({
                     ...prevFields,
                     bannerImage: null,
                 }));
-    
+
                 console.log("Updated formFields after banner deletion:", formFields);
                 toast.success("Banner image removed successfully.");
             } else {
@@ -437,7 +454,7 @@ const AddBannersV1 = () => {
             toast.error(error?.message || "An unexpected error occurred.");
         }
     };
-    
+
 
 
     const handleDiscard = () => { }
@@ -454,10 +471,30 @@ const AddBannersV1 = () => {
 
                     <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
                     <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-                        <div className='col col-span-2'>
+                        <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Banner Title</h3>
                             <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Content to display on banner...' name="bannerTitle" ref={nameInputRef} value={formFields?.bannerTitle || ''} onChange={onChangeInput} />
                         </div>
+
+                        <div className='col'>
+                            <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Align Info</h3>
+                            <Select
+                                size="small"
+                                value={alignInfo}
+                                onChange={handleAlignInfoChange}
+                                className="w-full !text-[14px]"
+                                displayEmpty
+                                inputProps={{ 'aria-label': 'Without label' }}
+                            >
+                                <MenuItem value="" disabled>
+                                    Where to align info?
+                                </MenuItem>
+                                <MenuItem value="right">Right</MenuItem>
+                                <MenuItem value="left">Left</MenuItem>
+                                {/* <MenuItem value="center">Center</MenuItem> */}
+                            </Select>
+                        </div>
+
 
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Price</h3>
