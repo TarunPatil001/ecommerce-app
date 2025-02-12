@@ -117,35 +117,49 @@ export async function addBlog(request, response) {
 // Get all blogs  
 export async function getBlogs(request, response) {
     try {
-        // Fetch all blog from the database
-        const blog = await BlogModel.find();
+        const page = parseInt(request.query.page) || 1;
+        const perPage = parseInt(request.query.perPage) || 10000; // Default perPage limit
 
-        // Check if there are no blog
-        if (blog.length === 0) {  // ✅ FIXED: Check if array is empty
+        // Calculate total blogs count
+        const totalBlogs = await BlogModel.countDocuments();
+        const totalPages = Math.ceil(totalBlogs / perPage);
+
+        // Fetch paginated blogs from the database
+        const blogs = await BlogModel.find()
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        if (blogs.length === 0) {
             return response.status(404).json({
-                message: "No blog found",
-                error: true,   // ✅ FIXED: If no blog, this should be `true`
-                success: false, // ✅ FIXED: `false` because no data is found
+                message: "No blogs found",
+                error: true,
+                success: false,
             });
         }
 
-        // Return blog
         return response.status(200).json({
-            message: "Blog retrieved successfully",
+            message: "Blogs retrieved successfully",
             error: false,
             success: true,
-            data: blog,
+            data: blogs,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                perPage: perPage,
+                totalBlogs: totalBlogs,
+            },
         });
 
     } catch (error) {
-        console.error("Error getting blog:", error.message || error);
+        console.error("Error fetching blogs:", error.message || error);
         return response.status(500).json({
-            message: error.message || "An error occurred while retrieving blog.",
+            message: error.message || "An error occurred while retrieving blogs.",
             error: true,
             success: false,
         });
     }
 }
+
 
 
 // get single bannerV1

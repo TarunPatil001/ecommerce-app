@@ -195,7 +195,7 @@ const BlogList = () => {
 
             <div className="card my-4 bg-white border rounded-md px-1 pt-1">
 
-                <TableContainer className='max-h-[440px] customScroll'>
+                <TableContainer className=''>
                     <Table stickyHeader aria-label="sticky table">
 
                         <TableHead>
@@ -302,7 +302,7 @@ const BlogList = () => {
                     </div>
 
                 }
-
+    
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
