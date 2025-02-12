@@ -245,7 +245,10 @@ const BlogList = () => {
                                             </TableCell>
 
                                             <TableCell width={200}>
-                                                <span className='text-[15px] font-medium'>{item?.description}</span>
+                                                <span className='text-[15px] font-medium line-clamp-4'>
+                                                    {item?.description?.substr(0, 150)}{item?.description?.length > 150 ? "..." : ""}
+                                                </span>
+
                                             </TableCell>
 
                                             <TableCell width={100}>

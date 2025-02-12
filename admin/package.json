@@ -26,6 +26,7 @@
     "react-international-phone": "^4.5.0",
     "react-lazy-load-image-component": "^1.6.3",
     "react-router-dom": "^7.1.1",
+    "react-simple-wysiwyg": "^3.2.0",
     "recharts": "^2.15.0",
     "swiper": "^11.2.0"
   },

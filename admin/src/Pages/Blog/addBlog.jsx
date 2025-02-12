@@ -8,6 +8,7 @@ import { IoClose } from 'react-icons/io5';
 import { MyContext } from '../../App';
 import toast from 'react-hot-toast';
 import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/api';
+import Editor from 'react-simple-wysiwyg';
 
 const AddBlog = () => {
 
@@ -18,6 +19,7 @@ const AddBlog = () => {
 
     const titleInputRef = useRef(null);
     const descriptionInputRef = useRef(null);
+    const [description, setDescription] = useState('');
 
     const [formFields, setFormFields] = useState({
         title: '',
@@ -49,6 +51,7 @@ const AddBlog = () => {
                     images: [],
                     description: '',
                 });
+                setDescription('');
                 return;
             }
 
@@ -63,6 +66,7 @@ const AddBlog = () => {
                     console.log("Blog Data:", blog);
 
                     setPreviews(blog.images || []);
+                    setDescription(blog.description || "");
 
                     setFormFields((prev) => ({
                         ...prev,
@@ -89,19 +93,30 @@ const AddBlog = () => {
                 images: [],
                 description: '',
             });
+            setDescription('');
         };
 
     }, [context.isOpenFullScreenPanel?.blogId]); // Depend only on `blogId`
 
 
 
+    // Ensure both input and editor update state properly
     const onChangeInput = (e) => {
         const { name, value } = e.target;
-        setFormFields((formFields) => ({
-            ...formFields,
+        setFormFields((prev) => ({
+            ...prev,
             [name]: value,
         }));
+        if (name === "description") setDescription(value); // Sync description state
     };
+
+    function onChangeDescription(e) {
+        setDescription(e.target.value);
+        setFormFields((prev) => ({
+            ...prev,
+            description: e.target.value,
+        }));
+    }
 
 
     const setPreviewFun = (previewArr) => {
@@ -296,7 +311,19 @@ const AddBlog = () => {
 
                         <div className='col col-span-full'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Blog Description</h3>
-                            <textarea type="text" rows={4} className='w-full border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Blog description' name="description" ref={descriptionInputRef} value={formFields?.description || ''} onChange={onChangeInput} />
+                            <Editor
+                                containerProps={{
+                                    style: {
+                                        resize: 'vertical',
+                                        minHeight: '150px', // Adjust as needed
+                                    }
+                                }}
+                                value={description}
+                                placeholder='Blog description'
+                                name="description"
+                                ref={descriptionInputRef}
+                                onChange={onChangeDescription}
+                            />
                         </div>
 
 
