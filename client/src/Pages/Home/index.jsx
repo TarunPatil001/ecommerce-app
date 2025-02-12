@@ -34,6 +34,7 @@ const Home = () => {
   const [allFeaturedProductsData, setAllFeaturedProductsData] = useState([]);
   const [bannerV1Data, setBannerV1Data] = useState([]);
   const [loading, setLoading] = useState(false); // ✅ New state for tracking API request
+  const [blogData, setBlogData] = useState([]);
 
 
 
@@ -44,17 +45,20 @@ const Home = () => {
         const allProducts = await fetchDataFromApi('/api/product/get-all-products');
         const featuredProducts = await fetchDataFromApi('/api/product/get-all-featuredProducts');
         const bannerV1 = await fetchDataFromApi('/api/bannersV1');
+        const blogData = await fetchDataFromApi('/api/blog');
 
         setHomeSlideData(homeSlides?.data?.length ? homeSlides.data : []);
         setAllProductsData(allProducts?.data?.length ? allProducts.data : []);
         setAllFeaturedProductsData(featuredProducts?.data?.length ? featuredProducts.data : []);
-        setBannerV1Data(bannerV1?.data?.length ? bannerV1.data : []);  
+        setBannerV1Data(bannerV1?.data?.length ? bannerV1.data : []);
+        setBlogData(blogData?.data?.length ? blogData.data : []);
       } catch (error) {
         console.error("Error fetching home data:", error);
         setHomeSlideData([]);
         setAllProductsData([]);
         setAllFeaturedProductsData([]);
         setBannerV1Data([]);
+        setBlogData([]);
       }
     };
 
@@ -130,7 +134,7 @@ const Home = () => {
             ) : (
               <div className="flex flex-col items-center justify-center font-bold italic w-full h-full border shadow rounded-md">
                 <IoImagesSharp className="text-[50px] opacity-50" />
-              <p className="text-gray-500">No banner image available.</p>
+                <p className="text-gray-500">No banner image available.</p>
               </div>
             )}
 
@@ -265,63 +269,37 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-5 pb-8 pt-0 bg-white blogSection">
-        <div className="container py-5">
-          <h2 className="text-2xl font-semibold mb-4">From The Blog</h2>
-          <Swiper
-            slidesPerView={4}
-            spaceBetween={30}
-            autoplay={{
-              delay: 1500, // Continuous autoplay
-              disableOnInteraction: false, // Continue autoplay even after interaction
-              pauseOnMouseEnter: true,
-            }}
-            // speed={5000} // Smooth continuous scrolling
-            loop={true} // Infinite loop
-            navigation={true} // Enable navigation
-            allowTouchMove={true} // Allow swiping
-            modules={[Autoplay, Navigation]}
-            className="blogSlider"
-          >
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-          </Swiper>
-        </div>
-      </section>
+      {
+        blogData?.length !== 0 &&
+
+        <section className="py-5 pb-8 pt-0 bg-white blogSection">
+          <div className="container py-5">
+            <h2 className="text-2xl font-semibold mb-4">From The Blog</h2>
+            <Swiper
+              slidesPerView={4}
+              spaceBetween={30}
+              autoplay={{
+                delay: 1500, // Continuous autoplay
+                disableOnInteraction: false, // Continue autoplay even after interaction
+                pauseOnMouseEnter: true,
+              }}
+              // speed={5000} // Smooth continuous scrolling
+              loop={true} // Infinite loop
+              navigation={true} // Enable navigation
+              allowTouchMove={true} // Allow swiping
+              modules={[Autoplay, Navigation]}
+              className="blogSlider"
+            >
+              {blogData.map((item, index) => (
+                <SwiperSlide key={index}>
+                  <BlogItem item={item} />
+                </SwiperSlide>
+              ))}
+
+            </Swiper>
+          </div>
+        </section>
+      }
 
     </>
   );

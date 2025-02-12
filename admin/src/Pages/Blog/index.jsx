@@ -7,6 +7,7 @@ import { MyContext } from '../../App'
 import toast from 'react-hot-toast'
 import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import DOMPurify from 'dompurify';
 
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -227,7 +228,7 @@ const BlogList = () => {
                                             <TableCell>
                                                 <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
                                             </TableCell>
-                                            <TableCell width={300}>
+                                            <TableCell width={100}>
                                                 <div className="flex items-start gap-4 w-[250px] h-[132px]">
                                                     <div className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
                                                         <LazyLoadImage
@@ -240,16 +241,16 @@ const BlogList = () => {
                                                 </div>
                                             </TableCell>
 
-                                            <TableCell width={200}>
+                                            <TableCell width={300}>
                                                 <span className='text-[15px] font-medium'>{item?.title}</span>
                                             </TableCell>
 
-                                            <TableCell width={200}>
-                                                <span className='text-[15px] font-medium line-clamp-4'>
-                                                    {item?.description?.substr(0, 150)}{item?.description?.length > 150 ? "..." : ""}
+                                            <TableCell width={400}>
+                                                <span className='text-[15px] font-medium text-justify'>
+                                                    {item?.description?.replace(/<[^>]+>/g, '').substr(0, 150) + (item?.description?.length > 150 ? "..." : "")}
                                                 </span>
-
                                             </TableCell>
+
 
                                             <TableCell width={100}>
                                                 <div className='flex items-center gap-2'>
@@ -302,7 +303,7 @@ const BlogList = () => {
                     </div>
 
                 }
-    
+
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
