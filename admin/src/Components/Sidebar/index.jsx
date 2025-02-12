@@ -4,7 +4,7 @@ import { MdDashboard, MdOutlineLogout } from 'react-icons/md'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { TbSlideshow } from "react-icons/tb";
 import { LuUsers } from "react-icons/lu";
-import { RiProductHuntLine } from "react-icons/ri";
+import { RiBloggerLine, RiProductHuntLine } from "react-icons/ri";
 import { TbCategory } from "react-icons/tb";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { FaAngleDown } from "react-icons/fa6";
@@ -26,6 +26,7 @@ const Sidebar = () => {
   const [subMenuIndex2, setSubMenuIndex2] = useState(false);
   const [subMenuIndex3, setSubMenuIndex3] = useState(false);
   const [subMenuIndex4, setSubMenuIndex4] = useState(false);
+  const [subMenuIndex5, setSubMenuIndex5] = useState(false);
 
   const { id } = useParams();
 
@@ -41,8 +42,9 @@ const Sidebar = () => {
     "/products/addProductSize": "Add Product Size",
     "/category/list": "Categories List",
     "/subCategory/list": "Sub-Categories List",
-    "/bannersV1/list": "BannerV1 List",
     "/orders": "Orders",
+    "/bannersV1/list": "BannerV1 List",
+    "/blog/list": "Blog List",
     "/logout": "Logout",
   };
 
@@ -57,6 +59,7 @@ const Sidebar = () => {
     if (currentMenu.includes("Product")) setSubMenuIndex2(true);
     if (currentMenu.includes("Categories")) setSubMenuIndex3(true);
     if (currentMenu.includes("Banners")) setSubMenuIndex4(true);
+    if (currentMenu.includes("Blogs")) setSubMenuIndex4(true);
   }, [menuMapping]);
 
 
@@ -74,7 +77,7 @@ const Sidebar = () => {
   return (
     <>
       <div className={`sidebar fixed overflow-y-scroll customScroll top-0 left-0 bg-[#fff] ${context.isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%]'} h-full border-r p-2`}>
-        <div className="py-2 w-full px-4">
+        <div className="py-2 w-full px-5">
           <Link to="/">
             <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="logo" className='w-[200px]' />
           </Link>
@@ -239,8 +242,6 @@ const Sidebar = () => {
           </li>
 
 
-
-
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'BannerV1 List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex4(!subMenuIndex4) }}><PiSlideshowLight className='text-[25px]' />
               <span>Banners</span>
@@ -280,6 +281,38 @@ const Sidebar = () => {
                     <span>Add Banner V3</span>
                   </Button>
                 </li> */}
+
+              </ul>
+            </Collapse>
+
+          </li>
+          
+          
+          
+          <li>
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex5(!subMenuIndex5) }}><RiBloggerLine className='text-[25px]' />
+              <span>Blogs</span>
+              <span className={`ml-auto w-[30px] h-[30px] flex !items-center !justify-center transform transition-transform duration-300 ${subMenuIndex5 ? "-rotate-180" : "rotate-0"}`}><FaAngleDown /></span>
+            </Button>
+
+            <Collapse isOpened={subMenuIndex5}>
+              <ul className='w-full'>
+                
+                <li className='w-full'>
+                  <Link to="/blog/list">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Blog List')}>
+                      <GoDotFill className={`${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Blog List</span>
+                    </Button>
+                  </Link>
+                </li>
+
+                <li className='w-full'>
+                  <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Blog Details" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add Blog</span>
+                  </Button>
+                </li>
 
               </ul>
             </Collapse>
