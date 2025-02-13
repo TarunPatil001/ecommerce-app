@@ -121,7 +121,8 @@ const Header = () => {
 
             <div className="relative">
               <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer" onClick={handleClickMyAcc}>
-              <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
+              {/* <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" /> */}
+              <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
               </div>
 
               <Menu
@@ -164,7 +165,7 @@ const Header = () => {
                 <MenuItem onClick={handleCloseMyAcc}>
                   <div className="flex items-center justify-center gap-3 h-[40px]">
                     <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer">
-                    <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
+                    <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
                     </div>
                     <div className="info">
                       <h3 className='text-[14px] font-bold leading-5'>{loginData?.name}</h3>

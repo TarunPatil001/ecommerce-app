@@ -15,6 +15,10 @@ import { useNavigate } from 'react-router-dom';
 import { postData } from '../../utils/api.js';
 import toast from 'react-hot-toast';
 
+import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { firebaseApp } from '../../firebase.jsx';
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -141,6 +145,57 @@ const SignUp = () => {
         }
     };
 
+
+    const authWithGoogle = () => {
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+                // The signed-in user info.
+                const user = result.user;
+                // IdP data available using getAdditionalUserInfo(result)
+
+                const fields = {
+                    name: user.providerData[0].displayName,
+                    email: user.providerData[0].email,
+                    password: null,
+                    avatar: user.providerData[0].photoURL,
+                    mobile: user.providerData[0].phoneNumber,
+                    role: "ADMIN",
+                }
+
+                postData(`/api/user/authWithGoogle`, fields).then((res) => {
+                    if (res?.error !== true) {
+                        setIsLoading(false);
+                        context.openAlertBox("success", res?.message);
+                        localStorage.setItem("User email", fields.email);
+                        localStorage.setItem("accessToken", res?.data?.accessToken);
+                        localStorage.setItem("refreshToken", res?.data?.refreshToken);
+                        context.setIsLogin(true);
+                        navigate('/');
+                    } else {
+                        context.openAlertBox("error", res?.message);
+                        setIsLoading(false);
+                    }
+                })
+
+                console.log(user);
+                // ...
+            }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.customData.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                // ...
+            });
+    }
+
+
+
     return (
 
         <section className='bg-white w-full h-full'>
@@ -170,7 +225,7 @@ const SignUp = () => {
                 <div className='flex items-center justify-center w-full mt-10 gap-6'>
                     <LoadingButton
                         size="small"
-                        onClick={handleClickGoogle}
+                        onClick={()=> {handleClickGoogle(); authWithGoogle();}}
                         startIcon={<FcGoogle />}
                         loading={loadingGoogle}
                         loadingPosition="start"

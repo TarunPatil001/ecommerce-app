@@ -127,24 +127,24 @@ const Profile = () => {
                     if (!file) {
                         throw new Error("No file selected.");
                     }
-    
+
                     const validFormats = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
                     if (!validFormats.includes(file.type)) {
                         throw new Error("Please select a valid image (JPEG/JPG/PNG/WEBP).");
                     }
-    
+
                     const formData = new FormData();
                     formData.append("avatar", file);
-    
+
                     setUploading(true);
-    
+
                     const previewUrl = URL.createObjectURL(file);
                     setPreview(previewUrl); // Temporary preview
-    
+
                     // Call the API and validate the response
                     const response = await uploadImage(apiEndPoint, formData);
                     console.log("API Response Debug:", response); // Debug API response
-    
+
                     if (response?.avatar) {
                         setAvatar(response.avatar); // Update state with the final avatar URL
                         setPreview(response.avatar); // Update preview with the uploaded avatar
@@ -167,7 +167,7 @@ const Profile = () => {
                     },
                 }
             );
-    
+
             console.log("Result:", result); // Log success message
         } catch (error) {
             console.error("Error while uploading file:", error);
@@ -176,7 +176,7 @@ const Profile = () => {
             setUploading(false); // Stop spinner
         }
     };
-    
+
 
 
     const onChangeInput = (e) => {
@@ -248,7 +248,7 @@ const Profile = () => {
         const missingFields = [];
 
         // Validate form fields
-        if (!changePassword.oldPassword) missingFields.push("Old Password");
+        if (context?.userData?.signUpWithGoogle === false && !changePassword.oldPassword) missingFields.push("Old Password");
         if (!changePassword.newPassword) missingFields.push("New Password");
         if (!changePassword.confirmPassword) missingFields.push("Confirm Password");
         if (changePassword.confirmPassword !== changePassword.newPassword) missingFields.push("New & Confirm Passwords correctly. They don't match.");
@@ -593,18 +593,22 @@ const Profile = () => {
                             <form action="" onSubmit={handleSubmitChangePassword}>
 
                                 <div className="grid grid-cols-2 mb-3 gap-4">
-                                    <div className='col relative'>
-                                        <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Old Password</h3>
-                                        <input type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Old Password' ref={oldPasswordRef} name="oldPassword" value={changePassword?.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
-                                        <Button className="!absolute bottom-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
-                                            {
-                                                isShowPassword1 === false ?
-                                                    <FaRegEyeSlash className="text-[20px]" />
-                                                    :
-                                                    <FaRegEye className="text-[20px]" />
-                                            }
-                                        </Button>
-                                    </div>
+                                    {
+                                        context?.userData?.signUpWithGoogle === false &&
+
+                                        <div className='col relative'>
+                                            <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Old Password</h3>
+                                            <input type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Old Password' ref={oldPasswordRef} name="oldPassword" value={changePassword?.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
+                                            <Button className="!absolute bottom-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
+                                                {
+                                                    isShowPassword1 === false ?
+                                                        <FaRegEyeSlash className="text-[20px]" />
+                                                        :
+                                                        <FaRegEye className="text-[20px]" />
+                                                }
+                                            </Button>
+                                        </div>
+                                    }
 
                                     <div className="col relative">
                                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>New Password</h3>
