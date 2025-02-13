@@ -94,6 +94,67 @@ export async function registerUserController(request, response) {
   }
 }
 
+export async function authWithGoogle(request, response) {
+  const { name, email, password, avatar, mobile, role } = request.body;
+
+  try {
+    let user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      // If user doesn't exist, create a new one
+      user = await UserModel.create({
+        name: name,
+        mobile: mobile,
+        email: email,
+        password: "null",
+        avatar: avatar,
+        role: role,
+        verify_email: true,
+        signUpWithGoogle: true,
+      });
+    }
+
+    // Generate access and refresh tokens
+    const accessToken = await generatedAccessToken(user._id);
+    const refreshToken = await generatedRefreshToken(user._id);
+
+    // Update the user's last login date
+    await UserModel.findByIdAndUpdate(user._id, {
+      last_login_date: new Date(),
+    });
+
+    // Cookie options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+    // Set cookies for access and refresh tokens
+    response.cookie("accessToken", accessToken, cookieOptions);
+    response.cookie("refreshToken", refreshToken, cookieOptions);
+
+    // Send the success response
+    return response.json({
+      message: "Login Successfully",
+      error: false,
+      success: true,
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
+
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
 export async function resendOtpController(request, response) {
   try {
     const { email } = request.body;
@@ -806,27 +867,29 @@ export async function resetPassword(request, response) {
       });
     }
 
-    // If the user is logged in (authToken exists), verify the old password
-    if (user.refresh_token && user.refresh_token.trim() !== "") {
-      if (!oldPassword) {
-        return response.status(400).json({
-          message: "Please enter the old password.",
-          error: true,
-          success: false,
-        });
-      }
+    if (user?.signUpWithGoogle === false) {
+      // If the user is logged in (authToken exists), verify the old password
+      if (user.refresh_token && user.refresh_token.trim() !== "") {
+        if (!oldPassword) {
+          return response.status(400).json({
+            message: "Please enter the old password.",
+            error: true,
+            success: false,
+          });
+        }
 
-      // Verify the password
-      const isPasswordValid = await bcryptjs.compare(
-        oldPassword,
-        user.password
-      );
-      if (!isPasswordValid) {
-        return response.status(400).json({
-          message: "Invalid old password.",
-          error: true,
-          success: false,
-        });
+        // Verify the password
+        const isPasswordValid = await bcryptjs.compare(
+          oldPassword,
+          user.password
+        );
+        if (!isPasswordValid) {
+          return response.status(400).json({
+            message: "Invalid old password.",
+            error: true,
+            success: false,
+          });
+        }
       }
     }
 
@@ -855,6 +918,7 @@ export async function resetPassword(request, response) {
     const hashedPassword = await bcryptjs.hash(confirmPassword, salt);
 
     user.password = hashedPassword;
+    user.signUpWithGoogle = false;
     await user.save();
 
     return response.status(200).json({

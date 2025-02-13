@@ -9,10 +9,7 @@ import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import { postData } from './../../utils/api';
 import { Collapse } from 'react-collapse'
 import { MuiPhone } from '../../components/MuiPhone'
-import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
-
-
 
 
 const MyAccount = () => {
@@ -144,7 +141,7 @@ const MyAccount = () => {
         const missingFields = [];
 
         // Validate form fields
-        if (!changePassword.oldPassword) missingFields.push("Old Password");
+        if (context?.userData?.signUpWithGoogle === false && !changePassword.oldPassword) missingFields.push("Old Password");
         if (!changePassword.newPassword) missingFields.push("New Password");
         if (!changePassword.confirmPassword) missingFields.push("Confirm Password");
         if (changePassword.confirmPassword !== changePassword.newPassword) missingFields.push("New & Confirm Passwords correctly. They don't match.");
@@ -246,19 +243,23 @@ const MyAccount = () => {
                             </div>
                             <Divider />
                             <form action="" className="mt-6" onSubmit={handleSubmitChangePassword}>
-                                <div className="flex items-center gap-5">
-                                    <div className="w-[50%] relative">
-                                        <TextField type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} label="Old Password" variant="outlined" size="small" className="custom-textfield w-full" name="oldPassword" value={changePassword.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
-                                        <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
-                                            {
-                                                isShowPassword1 === false ?
-                                                    <FaRegEyeSlash className="text-[20px]" />
-                                                    :
-                                                    <FaRegEye className="text-[20px]" />
-                                            }
-                                        </Button>
-                                    </div>
-                                    <div className="w-[50%] relative">
+                                <div className="grid grid-cols-2 gap-5">
+                                    {
+                                        context?.userData?.signUpWithGoogle === false &&
+                                        <div className="col relative">
+                                            <TextField type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} label="Old Password" variant="outlined" size="small" className="custom-textfield w-full" name="oldPassword" value={changePassword.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
+                                            <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
+                                                {
+                                                    isShowPassword1 === false ?
+                                                        <FaRegEyeSlash className="text-[20px]" />
+                                                        :
+                                                        <FaRegEye className="text-[20px]" />
+                                                }
+                                            </Button>
+                                        </div>
+                                    }
+
+                                    <div className="col relative">
                                         <TextField type={isLoading2 ? 'password' : (isShowPassword2 ? 'text' : 'password')} label="New Password" variant="outlined" size="small" className="custom-textfield w-full" name="newPassword" value={changePassword.newPassword} disabled={isLoading2} onChange={onChangeInput} />
                                         <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword2(!isShowPassword2)} disabled={isLoading} >
                                             {
@@ -269,9 +270,7 @@ const MyAccount = () => {
                                             }
                                         </Button>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-5 mt-4">
-                                    <div className="w-[50%] relative">
+                                    <div className="col relative">
                                         <TextField type={isLoading2 ? 'password' : (isShowPassword3 ? 'text' : 'password')} label="Confirm Password" variant="outlined" size="small" className="custom-textfield w-full" name="confirmPassword" value={changePassword.confirmPassword} disabled={isLoading2} onChange={onChangeInput} />
                                         <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword3(!isShowPassword3)} disabled={isLoading} >
                                             {
@@ -282,10 +281,10 @@ const MyAccount = () => {
                                             }
                                         </Button>
                                     </div>
-                                    <div className="w-[50%]"></div>
+                                    <div className="col"></div>
                                 </div>
-                                <div className="flex items-center gap-5 mt-5">
-                                    <div className="flex gap-5 w-[50%]">
+                                <div className="grid grid-cols-2 gap-5 mt-5">
+                                    <div className="flex gap-5 col">
                                         <Button type='submit' className={`${isLoading2 === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full`} disabled={isLoading2}>
                                             {
                                                 isLoading2 ? <CircularProgress color="inherit" /> : "Change Password"

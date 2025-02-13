@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, CircularProgress } from '@mui/material'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { FiUpload } from 'react-icons/fi'
 import { FaMapMarkerAlt, FaUserCircle } from 'react-icons/fa'
 import { IoMdHeart } from 'react-icons/io'
 import { IoBagCheck } from 'react-icons/io5'
 import { TbLogout } from 'react-icons/tb'
 import { MyContext } from '../../App'
-import { uploadImage } from '../../utils/api'
+import { fetchDataFromApi, uploadImage } from '../../utils/api'
 import toast from 'react-hot-toast'
 
 const AccountSidebar = () => {
 
     const context = useContext(MyContext);
+    const navigate = useNavigate();
     const [preview, setPreview] = useState(null);  // Preview for image before uploading
     const [avatar, setAvatar] = useState(null);  // Actual avatar URL fetched from the server
     const [uploading, setUploading] = useState(false);
@@ -85,6 +86,17 @@ const AccountSidebar = () => {
 
     };
 
+    const logout = () => {
+    
+        fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+          if (res?.error === false) {
+            context.setIsLogin(false);
+            localStorage.clear();
+            navigate("/");
+          }
+        })
+      }
+
 
     return (
         <>
@@ -134,7 +146,7 @@ const AccountSidebar = () => {
                             </NavLink>
                         </li>
                         <li className="w-full">
-                            <Button className="!py-2 flex items-center !text-left !justify-start gap-2 w-full !rounded-none !capitalize !text-[rgba(0,0,0,0.8)] !text-[16px]"><TbLogout className="text-[20px]" />Logout</Button>
+                            <Button className="!py-2 flex items-center !text-left !justify-start gap-2 w-full !rounded-none !capitalize !text-[rgba(0,0,0,0.8)] !text-[16px]" onClick={logout}><TbLogout className="text-[20px]" />Logout</Button>
                         </li>
 
                     </ul>

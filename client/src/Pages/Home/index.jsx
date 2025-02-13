@@ -39,6 +39,9 @@ const Home = () => {
 
 
   useEffect(() => {
+
+    window.scrollTo(0,0);
+    
     const fetchHomeData = async () => {
       try {
         const homeSlides = await fetchDataFromApi('/api/homeSlides');

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {forgotPasswordController, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resendOtpController, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
+import {authWithGoogle, forgotPasswordController, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resendOtpController, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
 import auth from '../middlewares/auth.js';
 import upload from '../middlewares/multer.js';
 
@@ -8,6 +8,7 @@ userRouter.post('/register', registerUserController);
 userRouter.post('/resend-otp', resendOtpController);
 userRouter.post('/verifyEmail', verifyEmailController);
 userRouter.post('/login', loginUserController);
+userRouter.post('/authWithGoogle', authWithGoogle);
 userRouter.get('/logout', auth, logoutController);
 userRouter.put('/user-avatar', auth, upload.array('avatar'), userAvatarController);
 userRouter.delete('/deleteImage', auth, removeImageFromCloudinary);

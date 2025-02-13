@@ -9,7 +9,10 @@ import { MyContext } from '../../App';
 import { postData } from '../../utils/api';
 import { CircularProgress } from '@mui/material';
 
-
+import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { firebaseApp } from '../../firebase';
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 const Login = () => {
 
@@ -214,6 +217,55 @@ const Login = () => {
     };
 
 
+     const authWithGoogle = () => {
+            signInWithPopup(auth, googleProvider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    // IdP data available using getAdditionalUserInfo(result)
+    
+                    const fields = {
+                        name: user.providerData[0].displayName,
+                        email: user.providerData[0].email,
+                        password: null,
+                        avatar: user.providerData[0].photoURL,
+                        mobile: user.providerData[0].phoneNumber,
+                        role: "USER",
+                    }
+    
+                    postData(`/api/user/authWithGoogle`, fields).then((res) => {
+                        if (res?.error !== true) {
+                            setIsLoading(false);
+                            context.openAlertBox("success", res?.message);
+                            localStorage.setItem("User email", fields.email);
+                            localStorage.setItem("accessToken", res?.data?.accessToken);
+                            localStorage.setItem("refreshToken", res?.data?.refreshToken);
+                            context.setIsLogin(true);
+                            navigate('/');
+                        } else {
+                            context.openAlertBox("error", res?.message);
+                            setIsLoading(false);
+                        }
+                    })
+    
+                    console.log(user);
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                });
+        }
+
+
     return (
         <div>
             <section className="section py-10">
@@ -249,7 +301,7 @@ const Login = () => {
 
                             <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-1">Or continue with social account</p>
 
-                            <Button className="w-full !bg-[#f1f1f1] hover:!bg-[#ffe6db] hover:!text-gray-700 flex items-center gap-2 !text-[15px] !font-semibold !mt-2" disabled={isLoading} ><FcGoogle className="text-[18px]" />Login with google</Button>
+                            <Button className="w-full !bg-[#f1f1f1] hover:!bg-[#ffe6db] hover:!text-gray-700 flex items-center gap-2 !text-[15px] !font-semibold !mt-2" disabled={isLoading} onClick={authWithGoogle}><FcGoogle className="text-[18px]" />Login with google</Button>
 
                         </form>
                     </div>

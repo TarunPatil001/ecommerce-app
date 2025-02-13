@@ -32,7 +32,7 @@ const Header = () => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
 
-  const [loginData, setLoginData] = useState({ avatar:'', name: '', email: '' });
+  const [loginData, setLoginData] = useState({ avatar: '', name: '', email: '' });
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -138,7 +138,7 @@ const Header = () => {
                         <div className="myAccountWrap px-1 flex items-center justify-end gap-2 rounded-md hover:bg-slate-100 cursor-pointer transition-all duration-300" onClick={handleClick}>
                           <div className="w-[35px] p-1">
                             <div className="w-[35px] h-[35px] rounded-full overflow-hidden border flex items-center justify-center border-[rgb(180,180,180)]">
-                              <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" />
+                              <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
                             </div>
                           </div>
                           <div className="flex items-start flex-col  p-1">
