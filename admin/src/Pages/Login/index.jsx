@@ -230,11 +230,11 @@ const Login = () => {
                         loading={loadingGoogle}
                         loadingPosition="start"
                         variant="outlined"
-                        className="!normal-case w-[200px] h-[44px] !rounded-md !shadow-none !text-[rgba(0,0,0,0.8)] custom-credential-btn !text-[14px] hover:!border-black"
+                        className="!normal-case w-[220px] h-[44px] !rounded-md shadow !text-[rgba(0,0,0,0.8)] custom-credential-btn !text-[14px] hover:!border-black"
                     >
                         Sign In with Google
                     </LoadingButton>
-                    <LoadingButton
+                    {/* <LoadingButton
                         size="small"
                         onClick={handleClickFb}
                         startIcon={<FaFacebook className='text-blue-600' />}
@@ -244,7 +244,7 @@ const Login = () => {
                         className="!normal-case w-[200px] h-[44px] !rounded-md !shadow-none !text-[rgba(0,0,0,0.8)] custom-credential-btn !text-[14px] hover:!border-black"
                     >
                         Sign In with Facebook
-                    </LoadingButton>
+                    </LoadingButton> */}
                 </div>
 
                 <div className='flex items-center justify-center w-full mt-10 gap-3 text-center'>

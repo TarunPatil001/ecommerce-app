@@ -235,7 +235,7 @@ const SignUp = () => {
                     >
                         Sign Up with Google
                     </LoadingButton>
-                    <LoadingButton
+                    {/* <LoadingButton
                         size="small"
                         onClick={handleClickFb}
                         startIcon={<FaFacebook className='text-blue-600' />}
@@ -246,7 +246,7 @@ const SignUp = () => {
                         className="!normal-case w-[220px] h-[44px] !rounded-md !shadow-none !text-[rgba(0,0,0,0.8)] custom-credential-btn !text-[14px] hover:!border-black"
                     >
                         Sign Up with Facebook
-                    </LoadingButton>
+                    </LoadingButton> */}
                 </div>
 
                 <div className='flex items-center justify-center w-full mt-10 gap-3 text-center'>
@@ -288,11 +288,8 @@ const SignUp = () => {
                                 </>}
                             disabled={isLoading}
                         />
-                        {/* <Link to="/forgot-password">
-                            <h4 className='underline hover:no-underline font-semibold'>Forgot Password?</h4>
-                        </Link> */}
+                       
                     </div>
-                    {/* <Button className='w-full custom-btn !capitalize !text-[16px]'>Create Account</Button> */}
                     <Button
                         type="submit"
                         className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} w-full !capitalize !text-[15px]`}
