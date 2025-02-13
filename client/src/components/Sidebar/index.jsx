@@ -35,7 +35,7 @@ const Sidebar = (props) => {
         size: '',
         rating: '',
         page: 1,
-        limit: 5,
+        limit: 25,
     })
 
     const [price, setPrice] = useState([100, 400000]);

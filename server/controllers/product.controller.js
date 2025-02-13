@@ -118,7 +118,7 @@ export async function uploadProductBannerImages(request, response) {
 
     // Ensure bannerImagesArr is properly initialized as an object containing arrays
     if (!productId) {
-      if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = []; 
+      if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = [];
     } else {
       if (!Array.isArray(bannerImagesArr[productId])) bannerImagesArr[productId] = [];
     }
@@ -231,7 +231,7 @@ export async function uploadProductBannerImages(request, response) {
 //     const productId = request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
 //       ? new mongoose.Types.ObjectId(request.body.productId)
 //       : null;
-    
+
 //     const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
 //     const bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
 
@@ -1405,7 +1405,7 @@ export async function deleteProduct(request, response) {
     // Function to delete images from Cloudinary
     async function deleteImages(images, type) {
       if (!images || images.length === 0) return [];
-      
+
       return Promise.allSettled(
         images.map(async (imageUrl, index) => {
           const publicId = extractPublicId(imageUrl);
@@ -1854,7 +1854,7 @@ export async function removeImageBannerFromCloudinary(request, response) {
 //     }
 
 //     console.log(`Deleting banner image from Cloudinary. Public ID: ${publicId}`);
-    
+
 //     // Delete from Cloudinary
 //     const result = await cloudinary.uploader.destroy(publicId);
 //     console.log("Cloudinary Response:", result);
@@ -3032,36 +3032,33 @@ export async function updateProductSize(request, response) {
 // ----------------------------------------------------------------------------------------------------------------------
 
 export async function filters(request, response) {
-  const {categoryId, subCategoryId, thirdSubCategoryId, minPrice, maxPrice, size, rating, page, limit} = request.body;
+  const { categoryId, subCategoryId, thirdSubCategoryId, minPrice, maxPrice, size, rating, page, limit } = request.body;
 
   const filters = {}
 
-  if(categoryId?.length){
-    filters.categoryId = {$in: categoryId};
+  if (categoryId?.length) {
+    filters.categoryId = { $in: categoryId };
   }
-  if(subCategoryId?.length){
-    filters.subCategoryId = {$in: subCategoryId};
+  if (subCategoryId?.length) {
+    filters.subCategoryId = { $in: subCategoryId };
   }
-  if(thirdSubCategoryId?.length){
-    filters.thirdSubCategoryId = {$in: thirdSubCategoryId};
+  if (thirdSubCategoryId?.length) {
+    filters.thirdSubCategoryId = { $in: thirdSubCategoryId };
   }
 
-  if(minPrice || maxPrice){
-    filters.price = {$gte: +minPrice || 0, $lte: +maxPrice || Infinity};
+  if (minPrice || maxPrice) {
+    filters.price = { $gte: +minPrice || 0, $lte: +maxPrice || Infinity };
   }
-  
+
   if (rating?.length) {
     filters.rating = { $gte: Math.min(...rating) }; // Use lowest selected rating
-}
+  }
 
-  
-
-
-  try{
+  try {
 
     const products = await ProductModel.find(filters).populate("category").skip((page - 1) * limit).limit(parseInt(limit));
     const total = await ProductModel.countDocuments(filters);
-    
+
     return response.status(200).json({
       message: "Products filtered successfully!",
       error: false,
@@ -3070,9 +3067,9 @@ export async function filters(request, response) {
       total: total,
       page: parseInt(page),
       totalPages: Math.ceil(total / limit),
-      });
+    });
 
-  }catch(error){
+  } catch (error) {
     return response.status(500).json({
       message: error.message || "An error occurred during product filtering.",
       error: true,
@@ -3081,3 +3078,88 @@ export async function filters(request, response) {
   }
 }
 
+// const sortItems = (products, sortBy, order) => {
+//   return products.sort((a, b) => {
+//     if (sortBy === "name") {
+//       return order === "asc" ? a.name.localCompare(b.name) : b.name.localCompare(a.name);
+//     }
+
+//     if (sortBy === "price") {
+//       return order === "asc" ? a.price - b.price : b.price - a.price;
+//     }
+    
+//     if (sortBy === "rating") {
+//       return order === "asc" ? a.rating - b.rating : b.rating - a.rating;
+//     }
+//   })
+// }
+
+// export async function sortBy(request, response) {
+//   const { products, sortBy, order } = request.body;
+//   const sortedItems = sortItems([...products?.products], sortBy, order);
+
+//   return response.status(200).json({
+//     message: "Products sorted successfully!",
+//     error: false,
+//     success: true,
+//     data: sortedItems,
+//     page: 0,
+//     totalPages: 0,
+//     });
+
+// }
+
+// Utility function to sort products
+const sortItems = ({ data: products }, sortBy = "name", order = "asc") => {
+  // Create a copy of the array to avoid mutating the original
+  return products.slice().sort((a, b) => {
+    if (sortBy === "name") {
+      return order === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    }
+
+    if (sortBy === "price") {
+      return order === "asc" ? a.price - b.price : b.price - a.price;
+    }
+
+    if (sortBy === "rating") {
+      return order === "asc" ? a.rating - b.rating : b.rating - a.rating;
+    }
+
+    return 0; // Default case: no sorting
+  });
+};
+
+// API endpoint to handle sorting
+export async function sortBy(request, response) {
+  try {
+    const { data: products, sortBy, order } = request.body;
+
+    if (!Array.isArray(products)) {
+      return response.status(400).json({
+        message: "Invalid input: 'data' must be an array of products.",
+        error: true,
+        success: false,
+      });
+    }
+
+    const sortedItems = sortItems({ data: products }, sortBy, order);
+
+    return response.status(200).json({
+      message: "Products sorted successfully!",
+      error: false,
+      success: true,
+      data: sortedItems,
+      page: 0,
+      totalPages: 0,
+    });
+  } catch (error) {
+    console.error("Error sorting products:", error);
+    return response.status(500).json({
+      message: "An error occurred while sorting products.",
+      error: true,
+      success: false,
+    });
+  }
+}

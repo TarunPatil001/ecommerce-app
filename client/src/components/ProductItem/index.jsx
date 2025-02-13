@@ -11,6 +11,7 @@ import { Checkbox, Tooltip } from "@mui/material";
 import ProductImageFlipChange from "./ImageChanger/ProductImageFlip";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MyContext } from "../../App";
+import { MdOutlineShoppingCart } from "react-icons/md";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -21,7 +22,7 @@ const ProductItem = (props) => {
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
       <div className="productItem rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)]">
-        <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative">
+        <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative bg-gray-100">
 
           <Link to={props?.product?._id ? `/product/${props.product._id}` : '#'}>
 
@@ -101,6 +102,9 @@ const ProductItem = (props) => {
             </span>
             <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">({props?.product?.discount}% OFF)</span>
           </div>
+        </div>
+        <div className="w-full h-[40px] px-3 mb-3">
+          <Button className="buttonPrimaryWhite w-full flex items-center justify-center shadow-md"><MdOutlineShoppingCart className="text-[16px]" />Add To Cart</Button>
         </div>
       </div>
     </div>

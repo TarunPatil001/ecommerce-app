@@ -22,7 +22,7 @@ const ProductItemListView = (props) => {
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
       <div className="productItemListView rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)] flex items-center h-[230px]">
-        <div className="group imgWrapper w-[25%] h-[230px] overflow-hidden relative">
+        <div className="group imgWrapper w-[25%] h-[230px] bg-gray-100 overflow-hidden relative">
           <Link to={props?.product?._id ? `/product/${props.product._id}` : '#'}>
 
             {/* <ProductImageFlipChange firstImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/320-large_default/hummingbird-printed-t-shirt.jpg"} SecondImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/318-large_default/hummingbird-printed-t-shirt.jpg"} /> */}

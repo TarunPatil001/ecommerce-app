@@ -16,7 +16,7 @@ import { HiBarsArrowDown } from 'react-icons/hi2';
 import ProductItemListView from '../../components/ProductItemListview';
 import Pagination from '@mui/material/Pagination';
 import ProductLoadingGrid from './productLoadingGrid';
-import { fetchDataFromApi } from '../../utils/api';
+import { fetchDataFromApi, postData } from '../../utils/api';
 
 
 function handleClick(event) {
@@ -26,7 +26,6 @@ function handleClick(event) {
 
 const ProductListing = () => {
 
-  const [selectedOption, setSelectedOption] = useState("Sales: highest to lowest");
   const [itemView, setItemView] = useState('grid');
 
   const [productsData, setProductsData] = useState([]);
@@ -35,6 +34,8 @@ const ProductListing = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [selectedName, setSelectedName] = useState('');
+  const [selectedSortValue, setSelectedSortValue] = useState('Name: A to Z');
+
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -45,12 +46,38 @@ const ProductListing = () => {
     setAnchorEl(null);
   };
 
-  const handleMenuItemClick = (option) => {
-    setSelectedOption(option); // Update the selected option
+  const handleMenuItemClick = (value) => {
+    setSelectedSortValue(value); // Update the selected value
     handleDropdownClose(); // Close the menu
   };
 
- 
+  const handleSortBy = (name, order, products, value) => {
+    if (!Array.isArray(products)) {
+      console.error("Invalid products data:", products);
+      return;
+    }
+
+    setSelectedSortValue(value);
+
+    postData(`/api/product/sortBy`, {
+      data: products,
+      sortBy: name,
+      order: order,
+    })
+      .then((res) => {
+        if (res.success) {
+          setProductsData(res);
+          setAnchorEl(null);
+        } else {
+          console.error("Failed to sort products:", res.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error sorting products:", error);
+      });
+  };
+
+
 
   return (
     <section className="py-0 pb-0">
@@ -128,7 +155,7 @@ const ProductListing = () => {
                 <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'list' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}
                 ><TfiLayoutListThumbAlt className={`text-[20px] ${itemView === 'list' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} /></Button>
 
-                <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]"><span className='font-bold'>{selectedName}</span> - {total || 0} item{total > 2 ? 's' : ''}</span>
+                <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]"><span className='font-bold'>{'Total'}</span> - {total || 0} Product{total > 2 ? 's' : ''}</span>
               </div>
 
               <div className="col2 ml-auto flex items-center justify-end gap-2">
@@ -142,7 +169,7 @@ const ProductListing = () => {
                     onClick={handleDropdownClick}
                     className="!bg-[var(--bg-primary)] !text-white !capitalize !h-8 !text-[14px] !w-[200px] flex !justify-start"
                   >
-                    {selectedOption}
+                    {selectedSortValue}
                   </Button>
                   <Menu
                     id="basic-menu"
@@ -153,12 +180,14 @@ const ProductListing = () => {
                       'aria-labelledby': 'basic-button',
                     }}
                   >
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Sales: highest to lowest"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><HiBarsArrowDown />Sales: highest to lowest</MenuItem>
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Relevance"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><PiTargetLight />Relevance</MenuItem>
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Name: A to Z"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BsSortAlphaDown />Name: A to Z</MenuItem>
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Name: Z to A"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BsSortAlphaUp />Name: Z to A</MenuItem>
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Price: low to high"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingUp />Price: low to high</MenuItem>
-                    <MenuItem onClick={() => { handleDropdownClose(); handleMenuItemClick("Price: high to low"); }} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingDown />Price: high to low</MenuItem>
+
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("name", "asc", productsData.data, "Name: A to Z") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BsSortAlphaDown />Name: A to Z</MenuItem>
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("name", "desc", productsData.data, "Name: Z to A") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BsSortAlphaUp />Name: Z to A</MenuItem>
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("price", "asc", productsData.data, "Price: low to high") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingUp />Price: low to high</MenuItem>
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("price", "desc", productsData.data, "Price: high to low") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingDown />Price: high to low</MenuItem>
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("rating", "asc", productsData.data, "Rating: low to high") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingDown />Rating: low to high</MenuItem>
+                    <MenuItem onClick={() => Array.isArray(productsData.data) ? handleSortBy("rating", "desc", productsData.data, "Rating: high to low") : console.error("productsData.data is not an array:", productsData.data)} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1"><BiTrendingDown />Rating: high to low</MenuItem>
+
                   </Menu>
                 </span>
               </div>
