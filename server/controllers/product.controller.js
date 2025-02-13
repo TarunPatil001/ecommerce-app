@@ -1,7 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import ProductModel from "../models/product.model.js";
-import CategoryModel from './../models/category.model.js';
 import { mongoose } from 'mongoose';
 import ProductRamsModel from "../models/productRams.model.js";
 import ProductWeightModel from "../models/productWeight.model.js";
@@ -3028,3 +3027,57 @@ export async function updateProductSize(request, response) {
     });
   }
 }
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+export async function filters(request, response) {
+  const {categoryId, subCategoryId, thirdSubCategoryId, minPrice, maxPrice, size, rating, page, limit} = request.body;
+
+  const filters = {}
+
+  if(categoryId?.length){
+    filters.categoryId = {$in: categoryId};
+  }
+  if(subCategoryId?.length){
+    filters.subCategoryId = {$in: subCategoryId};
+  }
+  if(thirdSubCategoryId?.length){
+    filters.thirdSubCategoryId = {$in: thirdSubCategoryId};
+  }
+
+  if(minPrice || maxPrice){
+    filters.price = {$gte: +minPrice || 0, $lte: +maxPrice || Infinity};
+  }
+  
+  if (rating?.length) {
+    filters.rating = { $gte: Math.min(...rating) }; // Use lowest selected rating
+}
+
+  
+
+
+  try{
+
+    const products = await ProductModel.find(filters).populate("category").skip((page - 1) * limit).limit(parseInt(limit));
+    const total = await ProductModel.countDocuments(filters);
+    
+    return response.status(200).json({
+      message: "Products filtered successfully!",
+      error: false,
+      success: true,
+      data: products,
+      total: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      });
+
+  }catch(error){
+    return response.status(500).json({
+      message: error.message || "An error occurred during product filtering.",
+      error: true,
+      success: false,
+    })
+  }
+}
+

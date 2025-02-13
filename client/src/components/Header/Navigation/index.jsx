@@ -85,7 +85,7 @@ const Navigation = () => {
                   return (
                     <li className="list-none relative" key={index}>
                       <Link
-                        to="/productListing"
+                        to={`/products?categoryId=${cat?._id}`}
                         className="link transition  font-[500]"
                       >
                         <Button className="link transition !text-[14px] !font-[600] !text-[rgba(0,0,0,0.9)] !py-4">
@@ -102,7 +102,7 @@ const Navigation = () => {
                                   className="list-none w-full relative"
                                   key={index_}
                                 >
-                                  <Link to="/" className="w-full">
+                                  <Link to={`/products?subCategoryId=${subCat?._id}`} className="w-full">
                                     <Button className="!text-[rgba(0,0,0,0.9)] !pl-4 w-full !text-left !justify-between !rounded-none">
                                       {subCat?.name}
                                       {
@@ -122,7 +122,7 @@ const Navigation = () => {
                                                 className="list-none w-full"
                                                 key={index__}
                                               >
-                                                <Link to="/" className="w-full">
+                                                <Link to={`/products?thirdSubCategoryId=${childSubCat?._id}`} className="w-full">
                                                   <Button className="!text-[rgba(0,0,0,0.9)] !pl-4 w-full !text-left !justify-start !rounded-none">
                                                     {childSubCat?.name}
                                                   </Button>

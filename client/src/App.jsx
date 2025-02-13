@@ -61,7 +61,7 @@ function App() {
     setShippingFee(PlatformFeeRate); // Updates the cart quantity
   };
 
-  const handleOpeneProductDetailsModal = (status, product) => {
+  const handleOpenProductDetailsModal = (status, product) => {
     setOpenProductDetailsModal({
       open: status,
       product: product,
@@ -138,7 +138,7 @@ function App() {
 
     // Modal-related state and handlers
     setOpenProductDetailsModal,
-    handleOpeneProductDetailsModal,
+    handleOpenProductDetailsModal,
 
     // Cart panel visibility
     openCartPanel,
@@ -179,7 +179,7 @@ function App() {
           <Navigation />
           <Routes>
             <Route path={"/"} exact={true} element={<Home />} />
-            <Route path={"/productListing"} exact={true} element={<ProductListing />} />
+            <Route path={"/products"} exact={true} element={<ProductListing />} />
             <Route path={"/productDetails/:id"} exact={true} element={<ProductDetails />} />
             <Route path={"/login"} exact={true} element={<Login />} />
             <Route path={"/register"} exact={true} element={<Register />} />

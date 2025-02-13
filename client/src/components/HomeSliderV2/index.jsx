@@ -7,6 +7,7 @@ import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
 import Button from "@mui/material/Button";
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types'; // Import PropTypes for prop validation
+import { IoImagesSharp } from "react-icons/io5";
 
 const HomeBannerV2 = (props) => {
     // Filter the products that have the banner visible

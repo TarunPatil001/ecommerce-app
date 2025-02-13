@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Sidebar from "../../components/Sidebar"
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -15,6 +15,8 @@ import { PiTargetLight } from 'react-icons/pi';
 import { HiBarsArrowDown } from 'react-icons/hi2';
 import ProductItemListView from '../../components/ProductItemListview';
 import Pagination from '@mui/material/Pagination';
+import ProductLoadingGrid from './productLoadingGrid';
+import { fetchDataFromApi } from '../../utils/api';
 
 
 function handleClick(event) {
@@ -26,6 +28,13 @@ const ProductListing = () => {
 
   const [selectedOption, setSelectedOption] = useState("Sales: highest to lowest");
   const [itemView, setItemView] = useState('grid');
+
+  const [productsData, setProductsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [selectedName, setSelectedName] = useState('');
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -40,6 +49,8 @@ const ProductListing = () => {
     setSelectedOption(option); // Update the selected option
     handleDropdownClose(); // Close the menu
   };
+
+ 
 
   return (
     <section className="py-0 pb-0">
@@ -93,7 +104,16 @@ const ProductListing = () => {
       <div className="bg-white p-3">
         <div className="container flex gap-3">
           <div className="sidebarWrapper w-[20%] h-full bg-white p-3 sticky top-20">
-            <Sidebar />
+            <Sidebar
+              productsData={productsData}
+              setProductsData={setProductsData}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              page={page}
+              setTotalPages={setTotalPages}
+              setTotal={setTotal}
+              setSelectedName={setSelectedName}
+            />
           </div>
 
 
@@ -108,7 +128,7 @@ const ProductListing = () => {
                 <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'list' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}
                 ><TfiLayoutListThumbAlt className={`text-[20px] ${itemView === 'list' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} /></Button>
 
-                <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]">There are 27 products.</span>
+                <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]"><span className='font-bold'>{selectedName}</span> - {total || 0} item{total > 2 ? 's' : ''}</span>
               </div>
 
               <div className="col2 ml-auto flex items-center justify-end gap-2">
@@ -120,7 +140,7 @@ const ProductListing = () => {
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleDropdownClick}
-                    className="!bg-[var(--bg-primary)] !text-white !capitalize !h-8 !text-[14px] !w-[190px] flex !justify-start"
+                    className="!bg-[var(--bg-primary)] !text-white !capitalize !h-8 !text-[14px] !w-[200px] flex !justify-start"
                   >
                     {selectedOption}
                   </Button>
@@ -144,46 +164,76 @@ const ProductListing = () => {
               </div>
             </div>
 
-            <div className={`grid ${itemView === 'grid' ? "grid-cols-5 md:grid-cols-5" : "grid-cols-1 md:grid-cols-1"} gap-5`}>
-
+            <div className={`grid ${itemView === 'grid' ? "grid-cols-4 md:grid-cols-4" : "grid-cols-1 md:grid-cols-1"} gap-3`}>
               {
-                itemView === 'grid' ?
+                itemView === 'grid' ? (
                   <>
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
-                    <ProductItem />
+                    {
+                      isLoading === true ?
+                        <ProductLoadingGrid view={itemView} size={8} /> :
+                        productsData?.data?.length !== 0 && productsData?.data?.map((item, index) => {
+                          return (
+                            <ProductItem product={item} key={index} />
+                          )
+                        })
+                    }
                   </>
-
-                  :
-
+                ) : (
                   <>
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
-                    <ProductItemListView />
+                    {
+                      isLoading === true ?
+                        <>
+                          <ProductLoadingGrid view={itemView} size={8} />
+                        </>
+                        :
+                        productsData?.data?.length !== 0 && productsData?.data?.map((item, index) => {
+                          return (
+                            <ProductItemListView product={item} key={index} />
+                          )
+                        })
+                    }
                   </>
+                )
               }
+
+
+              {/* {
+                itemView === 'grid' ? (
+                  <>
+                    {isLoading ? (
+                      <ProductLoadingGrid view={itemView} />
+                    ) : (
+                      Array.isArray(productsData) && productsData.length > 0 ? (
+                        productsData.map((item, index) => <ProductItem product={item} key={index} />)
+                      ) : (
+                        <p>No products found.</p> // Handle empty state
+                      )
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isLoading ? (
+                      <ProductLoadingGrid view={itemView} />
+                    ) : (
+                      Array.isArray(productsData) && productsData.length > 0 ? (
+                        productsData.map((item, index) => <ProductItemListView product={item} key={index} />)
+                      ) : (
+                        <p>No products found.</p> // Handle empty state
+                      )
+                    )}
+                  </>
+                )
+              } */}
             </div>
 
-            <div className="bottomPagination py-10 flex items-center justify-center">
-              <Pagination defaultPage={1} count={10} showFirstButton showLastButton />
-            </div>
+            {
+              totalPages > 0 &&
+              <div className="bottomPagination py-10 flex items-center justify-center">
+                <Pagination count={totalPages} page={page} onChange={(e, value) => setPage(value)} showFirstButton showLastButton />
+              </div>
+            }
           </div>
+
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import "./styles.css"
@@ -8,14 +8,139 @@ import Button from '@mui/material/Button';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Rating from '@mui/material/Rating';
+import { MyContext } from '../../App';
+import { useLocation } from 'react-router-dom';
+import { postData } from '../../utils/api';
 
-const Sidebar = () => {
+const Sidebar = (props) => {
+
+    const context = useContext(MyContext);
     const [isOpenCategoryFilter1, setIsOpenCategoryFilter1] = useState(true);
-    const [isOpenInnerCategoryFilter1, setIsOpenInnerCategoryFilter1] = useState(false);
-    const [isOpenCategoryFilter2, setIsOpenCategoryFilter2] = useState(true);
-    const [isOpenCategoryFilter3, setIsOpenCategoryFilter3] = useState(true);
+    // const [isOpenInnerCategoryFilter1, setIsOpenInnerCategoryFilter1] = useState(false);
+    // const [isOpenCategoryFilter2, setIsOpenCategoryFilter2] = useState(true);
+    // const [isOpenCategoryFilter3, setIsOpenCategoryFilter3] = useState(true);
     const [isOpenCategoryFilter4, setIsOpenCategoryFilter4] = useState(true);
     const [isOpenCategoryFilter5, setIsOpenCategoryFilter5] = useState(true);
+    const ratings = [5, 4, 3, 2, 1];
+
+
+
+
+    const [filters, setFilters] = useState({
+        categoryId: [],
+        subCategoryId: [],
+        thirdSubCategoryId: [],
+        minPrice: '',
+        maxPrice: '',
+        size: '',
+        rating: '',
+        page: 1,
+        limit: 5,
+    })
+
+    const [price, setPrice] = useState([100, 400000]);
+    const location = useLocation();
+
+
+    const handleCheckBoxChange = (field, value) => {
+        setFilters((prev) => {
+            let updatedValues = prev[field] || [];
+
+            if (updatedValues.includes(value)) {
+                // Remove if already selected
+                updatedValues = updatedValues.filter((item) => item !== value);
+            } else {
+                // Add and sort in descending order (highest rating first)
+                updatedValues = [...updatedValues, value].sort((a, b) => b - a);
+            }
+
+            return {
+                ...prev,
+                [field]: updatedValues,
+                ...(field === "categoryId" && { subCategoryId: [], thirdSubCategoryId: [] }), // Reset subcategories if category is changed
+            };
+        });
+    };
+
+
+
+    useEffect(() => {
+        const queryParameters = new URLSearchParams(window.location.search);
+
+        const categoryId = queryParameters.get('categoryId');
+        const subCategoryId = queryParameters.get('subCategoryId');
+        const thirdSubCategoryId = queryParameters.get('thirdSubCategoryId');
+
+        // ✅ Update filters state properly
+        setFilters({
+            categoryId: categoryId ? [categoryId] : [],
+            subCategoryId: subCategoryId ? [subCategoryId] : [],
+            thirdSubCategoryId: thirdSubCategoryId ? [thirdSubCategoryId] : [],
+            rating: [],
+            page: 1
+        });
+
+    }, [location.search]); // Runs when URL search params change
+
+
+    useEffect(() => {
+        let selectedName = "All Categories"; // Default name
+
+        if (context?.catData?.length > 0) {
+            // Search for thirdSubCategory first
+            context.catData.forEach(category => {
+                category?.children?.forEach(subCat => {
+                    subCat?.children?.forEach(thirdSubCat => {
+                        if (thirdSubCat._id === filters.thirdSubCategoryId[0]) {
+                            selectedName = thirdSubCat.name; // ✅ Set thirdSubCategoryName if found
+                        }
+                    });
+
+                    if (subCat._id === filters.subCategoryId[0] && filters.thirdSubCategoryId.length === 0) {
+                        selectedName = subCat.name; // ✅ Set subCategoryName if no thirdSubCategoryId
+                    }
+                });
+
+                if (category._id === filters.categoryId[0] && filters.subCategoryId.length === 0 && filters.thirdSubCategoryId.length === 0) {
+                    selectedName = category.name; // ✅ Set categoryName only if subCategoryId & thirdSubCategoryId are empty
+                }
+            });
+        }
+
+        props?.setSelectedName(selectedName);
+    }, [filters.categoryId, filters.subCategoryId, filters.thirdSubCategoryId, context?.catData]); // Runs when filters/context data changes
+
+
+    const filtersData = () => {
+        props?.setIsLoading(true);
+        postData(`/api/product/filters`, filters).then((res) => {
+            props?.setProductsData(res);  // ✅ Correct function to update state
+            props?.setIsLoading(false);
+            props?.setTotalPages(res?.totalPages);
+            props?.setTotal(res?.total);
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 300);
+        })
+    }
+
+
+    useEffect(() => {
+        filters.page = props.page;
+        filtersData();
+    }, [filters, props.page]);
+
+    useEffect(() => {
+        setFilters((prev) => ({
+            ...prev,
+            minPrice: price[0],
+            maxPrice: price[1]
+        }))
+    }, [price])
+
+
+
+
 
     return (
         <aside className="sidebar">
@@ -30,28 +155,28 @@ const Sidebar = () => {
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter1}>
                     <div className="relative flex flex-col w-full mb-1">
-
                         <div className="px-4 flex flex-col w-full mb-2 capitalize">
-                            <FormControlLabel control={<Checkbox size="small" />} label="Fashion" className="link w-full" />
-                            <FormControlLabel control={<Checkbox size="small" />} label="Electronics" className="link w-full" />
-                            <FormControlLabel control={<Checkbox size="small" />} label="Bags" className="link w-full" />
-                            <FormControlLabel control={<Checkbox size="small" />} label="Footwear" className="link w-full" />
-                            <FormControlLabel control={<Checkbox size="small" />} label="Groceries" className="link w-full" />
-                            <Collapse isOpened={isOpenInnerCategoryFilter1}>
-                                <div className="flex flex-col w-full">
-                                    <FormControlLabel control={<Checkbox size="small" />} label="Beauty" className="link w-full" />
-                                    <FormControlLabel control={<Checkbox size="small" />} label="Wellness" className="link w-full" />
-                                    <FormControlLabel control={<Checkbox size="small" />} label="Jewellery" className="link w-full" />
-                                </div>
-                            </Collapse>
-                            <button className="flex items-center justify-center link blink-button mt-2" onClick={() => { setIsOpenInnerCategoryFilter1(!isOpenInnerCategoryFilter1) }}> {isOpenInnerCategoryFilter1 ? (<><IoIosArrowUp />Show Less</>) : (<><IoIosArrowDown />Show More</>)}</button>
+                            {context?.catData?.length !== 0 &&
+                                context?.catData.map((item, index) => (
+                                    <FormControlLabel
+                                        key={index}
+                                        value={item?._id}
+                                        control={<Checkbox size="small" />}
+                                        checked={filters?.categoryId?.includes(item?._id)} // ✅ Ensures correct checked state
+                                        label={item?.name}
+                                        onChange={() => handleCheckBoxChange("categoryId", item?._id)}
+                                        className="link w-full"
+                                    />
+                                ))}
                         </div>
+
                     </div>
                 </Collapse>
 
+
             </div>
 
-            <div className="box border-x border-b">
+            {/* <div className="box border-x border-b">
                 <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
                     Availability
                     <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter2(!isOpenCategoryFilter2) }}> {isOpenCategoryFilter2 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
@@ -60,25 +185,26 @@ const Sidebar = () => {
                     <div className="relative flex flex-col mb-1">
 
                         <div className="px-5  flex flex-col w-full mb-2 capitalize">
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="Available" className="link w-full" />
-                                (17)
+
+                            <div className="flex items-center">
+                                <FormControlLabel control={<Checkbox size="small" />} label="Available" className="link" />
+                                <span className='text-gray-400 text-[10px]'>(1700)</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="In Stock" className="link w-full" />
-                                (19)
+                            <div className="flex items-center">
+                                <FormControlLabel control={<Checkbox size="small" />} label="In Stock" className="link" />
+                                <span className='text-gray-400 text-[10px]'>(1700)</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="Not Available" className="link w-full" />
-                                (1)
+                            <div className="flex items-center">
+                                <FormControlLabel control={<Checkbox size="small" />} label="Not Available" className="link" />
+                                <span className='text-gray-400 text-[10px]'>(1700)</span>
                             </div>
 
                         </div>
                     </div>
                 </Collapse>
-            </div>
+            </div> */}
 
-            <div className="box border-x border-b">
+            {/* <div className="box border-x border-b">
                 <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
                     Size
                     <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter3(!isOpenCategoryFilter3) }}> {isOpenCategoryFilter3 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
@@ -87,31 +213,18 @@ const Sidebar = () => {
                     <div className="relative flex flex-col mb-1">
 
                         <div className="px-5  flex flex-col w-full mb-2 capitalize">
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="Small" className="link w-full" />
-                                (17)
+                            <div className="flex items-center">
+                                <FormControlLabel control={<Checkbox size="small" />} label={"S"} className="link" />
+                                <span className='text-gray-400 text-[10px]'>(1700)</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="Medium" className="link w-full" />
-                                (19)
+                            <div className="flex items-center">
+                                <FormControlLabel control={<Checkbox size="small" />} label={"M"} className="link" />
+                                <span className='text-gray-400 text-[10px]'>(2607)</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="Large" className="link w-full" />
-                                (1)
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="XL" className="link w-full" />
-                                (1)
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <FormControlLabel control={<Checkbox size="small" />} label="XXL" className="link w-full" />
-                                (1)
-                            </div>
-
                         </div>
                     </div>
                 </Collapse>
-            </div>
+            </div> */}
 
             <div className="box border-x border-b">
                 <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
@@ -120,10 +233,17 @@ const Sidebar = () => {
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter4}>
                     <div className="p-5  flex flex-col w-full capitalize">
-                        <RangeSlider />
+                        <RangeSlider
+                            value={price}
+                            onInput={setPrice}
+                            min={100}
+                            max={400000}
+                            step={10}
+                        />
+
                         <div className="py-4 px-0 text-[12px] flex items-center justify-between priceRange">
-                            <span>low: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(500)}</span></span>
-                            <span>high: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(1000)}</span></span>
+                            <span>low: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(`${price[0]}`)}</span></span>
+                            <span>high: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(`${price[1]}`)}</span></span>
                         </div>
                     </div>
                 </Collapse>
@@ -136,21 +256,32 @@ const Sidebar = () => {
                 </h3>
                 <Collapse isOpened={isOpenCategoryFilter5}>
                     <div className="p-5 pt-0  flex flex-col w-full lowercase">
-                        <div className="flex items-center">
-                            <FormControlLabel control={<><Checkbox size="small" /><Rating name="half-rating" defaultValue={5} precision={0.5} size="small" readOnly /></>} label="&nbsp;& above" className="link w-full " />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <FormControlLabel control={<><Checkbox size="small" /><Rating name="half-rating" defaultValue={4} precision={0.5} size="small" readOnly /></>} label="&nbsp;& above" className="link w-full" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <FormControlLabel control={<><Checkbox size="small" /><Rating name="half-rating" defaultValue={3} precision={0.5} size="small" readOnly /></>} label="&nbsp;& above" className="link w-full" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <FormControlLabel control={<><Checkbox size="small" /><Rating name="half-rating" defaultValue={2} precision={0.5} size="small" readOnly /></>} label="&nbsp;& above" className="link w-full" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <FormControlLabel control={<><Checkbox size="small" /><Rating name="half-rating" defaultValue={1} precision={0.5} size="small" readOnly /></>} label="&nbsp;& above" className="link w-full" />
-                        </div>
+                        {ratings.map((rating) => (
+                            <FormControlLabel
+                                key={rating}
+                                className="link w-full"
+                                control={
+                                    <Checkbox
+                                        size="small"
+                                        checked={filters?.rating?.includes(rating)}
+                                        onChange={() => handleCheckBoxChange("rating", rating)}
+                                    />
+                                }
+                                label={
+                                    <div className="flex items-center gap-2">
+                                        <Rating
+                                            name={`rating-${rating}`}
+                                            defaultValue={rating}
+                                            precision={0.5}
+                                            size="small"
+                                            readOnly
+                                        />
+                                        <span>& above</span>
+                                    </div>
+                                }
+                            />
+                        ))}
+
                     </div>
                 </Collapse>
             </div>
