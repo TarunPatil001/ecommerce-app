@@ -7,6 +7,7 @@ import generatedRefreshToken from "../utils/generatedRefreshToken.js";
 import UserModel from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
+import ReviewModel from "../models/reviews.model.js";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -1025,6 +1026,94 @@ export async function userDetails(request, response) {
       error: true,
       success: false,
       details: error.message, // Include error details for better debugging
+    });
+  }
+}
+
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+// Add Review Details
+export async function addReview(request, response) {
+  try {
+    const { image, userName, review, rating, userId, productId } = request.body;
+
+    // Validate required fields
+    if (!userId || !productId || !review || !rating) {
+      return response.status(400).json({
+        message: "All fields are required.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Ensure rating is at least 1
+    const validRating = Math.max(1, rating);
+
+    const userReview = new ReviewModel({
+      image,
+      userName,
+      review,
+      rating: validRating, // Ensures rating is at least 1
+      userId,
+      productId,
+    });
+
+    await userReview.save();
+
+    return response.status(201).json({
+      message: "Review added successfully.",
+      error: false,
+      success: true,
+    });
+
+  } catch (error) {
+    console.error("Error adding review:", error);
+    return response.status(500).json({
+      message: "An error occurred while adding the review.",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+// get review details
+export async function getReview(request, response) {
+  try {
+    const { productId } = request.query; // Extract productId from query params
+    if (!productId) {
+      return response.status(400).json({
+        message: "Product ID is required.",
+        error: true,
+        success: false,
+      });
+    }
+
+    const reviews = await ReviewModel.find({ productId }); // Fetch all reviews for the product
+    console.log(reviews);
+
+    if (!reviews.length) {
+      return response.status(404).json({
+        message: "Be the first to review this product.",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Reviews retrieved successfully.",
+      error: false,
+      success: true,
+      data: reviews,
+    });
+
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return response.status(500).json({
+      message: "An error occurred while fetching reviews.",
+      error: true,
+      success: false,
     });
   }
 }

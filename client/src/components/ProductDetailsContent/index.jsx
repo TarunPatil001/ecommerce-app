@@ -31,7 +31,7 @@ const ProductDetailsContent = (props) => {
             </h1>
 
             <div className="flex items-center justify-start gap-3 text-[14px] py-1">
-                <Link to="/">
+                <Link to="#">
                     <span className="flex items-center gap-1 border px-2 hover:border-[var(--text-dark)]">
                         <span className="flex items-center gap-1 font-semibold">
                             {props?.product?.rating}
@@ -45,7 +45,7 @@ const ProductDetailsContent = (props) => {
                     </span>
                 </Link>
                 <span className="line !h-[15px] mx-1"></span>
-                <span className="cursor-pointer link">Review (5)</span>
+                <span className="cursor-pointer link" onClick={props?.gotoReviews}>Review{props?.reviewsCount>=2 ? "s":""} ({props?.reviewsCount})</span>
             </div>
 
             <hr className="my-2" />
