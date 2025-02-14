@@ -180,7 +180,7 @@ function App() {
           <Routes>
             <Route path={"/"} exact={true} element={<Home />} />
             <Route path={"/products"} exact={true} element={<ProductListing />} />
-            <Route path={"/productDetails/:id"} exact={true} element={<ProductDetails />} />
+            <Route path={"/product/:id"} exact={true} element={<ProductDetails />} />
             <Route path={"/login"} exact={true} element={<Login />} />
             <Route path={"/register"} exact={true} element={<Register />} />
             <Route path={"/cart"} exact={true} element={<CartPage />} />

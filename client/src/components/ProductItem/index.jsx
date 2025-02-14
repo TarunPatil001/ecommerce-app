@@ -5,13 +5,12 @@ import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { BsArrowsFullscreen } from "react-icons/bs";
-import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { Checkbox, Tooltip } from "@mui/material";
-import ProductImageFlipChange from "./ImageChanger/ProductImageFlip";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MyContext } from "../../App";
 import { MdOutlineShoppingCart } from "react-icons/md";
+import PropTypes from "prop-types";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -49,7 +48,7 @@ const ProductItem = (props) => {
               placement="right"
               arrow
             >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpeneProductDetailsModal(true, props?.product)}>
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.product)}>
                 <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
               </Button>
             </Tooltip>
@@ -109,6 +108,19 @@ const ProductItem = (props) => {
       </div>
     </div>
   );
+};
+
+ProductItem.propTypes = {
+  product: PropTypes.shape({
+    _id: PropTypes.string,
+    brand: PropTypes.string,
+    name: PropTypes.string,
+    price: PropTypes.number,
+    oldPrice: PropTypes.number,
+    discount: PropTypes.number,
+    rating: PropTypes.number,
+    images: PropTypes.arrayOf(PropTypes.string),
+  }),
 };
 
 export default ProductItem;

@@ -48,7 +48,7 @@ const CartItems = (props) => {
             <div className="cartItem w-full p-3 flex items-start gap-4 border rounded-md">
                 <div className="cartItemImg w-[15%] flex items-center justify-center">
                     <div className="w-full h-[150px] rounded-md overflow-hidden">
-                        <Link to="/productDetails/47856" onClick={context.toggleCartPanel(false)}>
+                        <Link to="/product/47856222442424" onClick={context.toggleCartPanel(false)}>
                             <img src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/z3UAG5L0_e6cd3d86e0ec4ecfbd0d275b4651a52d.jpg" alt="ProductImg" className="w-full h-full object-cover rounded-md hover:scale-105 transition-all" />
                         </Link>
                     </div>
