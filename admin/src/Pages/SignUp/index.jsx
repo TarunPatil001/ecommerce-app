@@ -225,7 +225,7 @@ const SignUp = () => {
                 <div className='flex items-center justify-center w-full mt-10 gap-6'>
                     <LoadingButton
                         size="small"
-                        onClick={()=> {handleClickGoogle(); authWithGoogle();}}
+                        onClick={() => { handleClickGoogle(); authWithGoogle(); }}
                         startIcon={<FcGoogle />}
                         loading={loadingGoogle}
                         loadingPosition="start"
@@ -249,11 +249,14 @@ const SignUp = () => {
                     </LoadingButton> */}
                 </div>
 
-                <div className='flex items-center justify-center w-full mt-10 gap-3 text-center'>
-                    <span className='w-full'><hr /></span>
-                    <span className='w-full text-[16px] text-[rgba(0,0,0,0.7)] font-medium'>Or, Sign Up with your email</span>
-                    <span className='w-full'><hr /></span>
+                <div className="flex items-center justify-center w-full mt-10 gap-3 text-center">
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <span className="text-[16px] text-[rgba(0,0,0,0.7)] font-medium whitespace-nowrap">
+                        Or, Sign Up with your email
+                    </span>
+                    <div className="flex-1 border-t border-gray-300"></div>
                 </div>
+
 
                 <form action='' className='w-full px-8 mt-3' onSubmit={handleSubmit}>
                     <div className='form-group mb-4 w-full'>
@@ -288,7 +291,7 @@ const SignUp = () => {
                                 </>}
                             disabled={isLoading}
                         />
-                       
+
                     </div>
                     <Button
                         type="submit"
