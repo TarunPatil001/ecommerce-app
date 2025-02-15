@@ -88,10 +88,10 @@ const ProductZoom = (props) => {
                         {props?.images?.map((image, index) => (
                             <SwiperSlide
                                 key={index}
-                                className="!w-[40px] !h-[40px] flex items-center justify-center"
+                                className="!w-[40px] !h-[40px] flex items-center justify-center border"
                             >
                                 <div
-                                    className={`item w-[40px] h-[40px] p-0.5 border border-black rounded-md overflow-hidden cursor-pointer group 
+                                    className={`item w-[40px] h-[40px] overflow-hidden cursor-pointer group  flex items-center justify-center
                                 ${slideIndex === index ? "opacity-1 border-4 !border-blue-700" : "opacity-50"}`}
                                     onClick={() => goto(index)}
                                     onMouseEnter={() => goto(index)}
@@ -99,7 +99,7 @@ const ProductZoom = (props) => {
                                     <img
                                         src={image}
                                         alt="img"
-                                        className="w-full h-full object-cover transition-all rounded-md"
+                                        className="w-full h-full object-cover transition-all "
                                     />
                                 </div>
                             </SwiperSlide>
