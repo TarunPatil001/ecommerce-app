@@ -45,6 +45,7 @@ function App() {
   const [catData, setCatData] = useState([]);
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
+  const [reviewsCount, setReviewsCount] = useState(0);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
@@ -112,6 +113,19 @@ function App() {
   }, [isReducer]);
 
 
+  useEffect(()=>{
+    fetchDataFromApi(`/api/user/getReviews?productId=${openProductDetailsModal?.product?._id}`).then((res) => {
+      if (res?.error === false && res?.data) {
+          setReviewsCount(res.data.length);
+      } else {
+          setReviewsCount(0); // Ensuring reviewsCount is always a number
+      }
+  });
+  },[openProductDetailsModal?.product?._id])
+
+  
+
+
   const openAlertBox = (status, msg) => {
     if (status === "success") {
       toast.success(msg);
@@ -168,6 +182,9 @@ function App() {
 
     addressIdNo,
     setAddressIdNo,
+
+    reviewsCount,
+    setReviewsCount,
 
   };
 
@@ -227,7 +244,7 @@ function App() {
 
                   {/* Right Column */}
                   <div className="col2 w-[50%] overflow-y-auto p-2 productContent">
-                    <ProductDetailsContent product={openProductDetailsModal?.product} />
+                    <ProductDetailsContent product={openProductDetailsModal?.product} reviewsCount={reviewsCount} />
                   </div>
                 </>
               }
