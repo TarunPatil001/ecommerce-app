@@ -22,6 +22,11 @@ const userSchema = mongoose.Schema({
     type: Number,
     default: "",
   },
+  sellerName: {
+    type: String,
+    default: "",
+    required: [true, "Provide seller name"],
+  },
   verify_email: {
     type: Boolean,
     default: false,

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -9,14 +9,118 @@ import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { Checkbox, Tooltip } from "@mui/material";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MyContext } from "../../App";
-import { MdOutlineShoppingCart } from "react-icons/md";
 import PropTypes from "prop-types";
+import { FiMinus, FiPlus } from "react-icons/fi";
+import { MdOutlineShoppingCart } from "react-icons/md";
+import { deleteData, editData } from "../../utils/api";
+import toast from "react-hot-toast";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const ProductItem = (props) => {
 
   const context = useContext(MyContext);
+  const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+  const [cartItem, setCartItem] = useState(null);
+
+  const addToCart = (product, userId, quantity) => {
+    if (quantity <= 0) return; // ✅ Prevent adding 0 quantity
+
+    context?.addToCart(product, userId, quantity);
+    setIsAdded(true);
+  };
+
+  useEffect(() => {
+    if (!context?.cartData || !props?.product?._id) return;
+
+    const item = context.cartData.find(
+      (cartItem) => cartItem.productId === props.product._id
+    );
+
+    if (item) {
+      setCartItem(item);
+      setQuantity(item.quantity); // ✅ Sync quantity from cart
+      setIsAdded(true);
+    } else {
+      setCartItem(null);
+      setIsAdded(false);
+      setQuantity(1); // ✅ Reset quantity after removal
+    }
+  }, [context?.cartData, props?.product?._id]);
+
+  const removeQty = async () => {
+    if (!cartItem?._id) {
+      console.error("Error: Missing cart item ID");
+      return;
+    }
+  
+    if (quantity > 1) {
+      const updatedQty = quantity - 1;
+      setQuantity(updatedQty);
+  
+      try {
+        const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
+  
+        await toast.promise(
+          editData(`/api/cart/update-product-qty-in-cart`, obj),
+          {
+            loading: "Updating quantity...",
+            success: "Quantity decreased!",
+            error: "Error updating quantity. Please try again.",
+          }
+        );
+        context?.getCartItems();
+      } catch (error) {
+        console.error("Error updating quantity:", error);
+      }
+    } else if (quantity === 1) {
+      try {
+        await toast.promise(
+          deleteData(`/api/cart/delete-cart-item/${cartItem._id}`),
+          {
+            loading: "Removing item...",
+            success: "Item removed from cart!",
+            error: "Error deleting item. Please try again.",
+          }
+        );
+  
+        setCartItem(null);
+        setIsAdded(false);
+        setQuantity(1);
+        context?.getCartItems();
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
+    }
+  };
+  
+  const addQty = async () => {
+    if (!cartItem?._id) {
+      console.error("Error: Missing cart item ID");
+      return;
+    }
+  
+    const updatedQty = quantity + 1;
+    setQuantity(updatedQty);
+  
+    const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
+  
+    try {
+      await toast.promise(
+        editData(`/api/cart/update-product-qty-in-cart`, obj),
+        {
+          loading: "Updating quantity...",
+          success: "Quantity increased!",
+          error: "Error updating quantity. Please try again.",
+        }
+      );
+      context?.getCartItems();
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+  
 
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
@@ -78,7 +182,6 @@ const ProductItem = (props) => {
         </div>
 
 
-
         <div className="info px-3 py-1 border-t h-[100px]">
           <h6 className="text-[16px] font-bold text-[var(--text-dark)]">
             <Link to="/" className="link transition-all line-clamp-1">
@@ -103,8 +206,18 @@ const ProductItem = (props) => {
           </div>
         </div>
         <div className="w-full h-[40px] px-3 mb-3">
-          <Button className="buttonPrimaryWhite w-full flex items-center justify-center shadow-md"><MdOutlineShoppingCart className="text-[16px]" />Add To Cart</Button>
+          {
+            isAdded === false ?
+              <Button className="buttonPrimaryWhite w-full flex items-center justify-center shadow-md" onClick={() => addToCart(props?.product, context?.userData?._id, quantity)}><MdOutlineShoppingCart className="text-[16px]" />Add To Cart</Button>
+              :
+              <div className="flex items-center justify-between w-full h-full border border-red-400 rounded-md">
+                <Button className="buttonPrimaryBlack !rounded-r-none !w-[40px] !min-w-[50px] !h-full flex items-center justify-center shadow-md" onClick={removeQty}><FiMinus className="text-[16px]" /></Button>
+                <span className="w-full h-full flex items-center justify-center font-medium">{quantity}</span>
+                <Button className="buttonPrimaryBlack !rounded-l-none !w-[40px] !min-w-[50px] !h-full flex items-center justify-center shadow-md" onClick={addQty}><FiPlus className="text-[16px]" /></Button>
+              </div>
+          }
         </div>
+
       </div>
     </div>
   );

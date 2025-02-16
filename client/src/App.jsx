@@ -21,7 +21,7 @@ import Checkout from './Pages/Checkout';
 import MyAccount from './Pages/MyAccount';
 import Wishlist from './Pages/Wishlist';
 import Orders from './Pages/Orders';
-import { fetchDataFromApi } from './utils/api';
+import { fetchDataFromApi, postData } from './utils/api';
 import Address from './Pages/MyAccount/address';
 
 
@@ -36,9 +36,6 @@ function App() {
   const [maxWidth, setMaxWidth] = useState('lg');
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
-  const [cartItemsQty, setCartItemsQty] = useState(0);
-  const [platformFee, setPlatformFee] = useState(0);
-  const [shippingFee, setShippingFee] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
@@ -46,21 +43,11 @@ function App() {
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [reviewsCount, setReviewsCount] = useState(0);
+  const [cartData, setCartData] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [cartItem, setCartItem] = useState(null);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
-
-  // callback from cartPanel
-  const handleCartItemQtyChange = (newQty) => {
-    setCartItemsQty(newQty); // Updates the cart quantity
-  };
-  // callback from cartPanel
-  const handlePlatformFeeChange = (PlatformFeeRate) => {
-    setPlatformFee(PlatformFeeRate); // Updates the cart quantity
-  };
-  // callback from cartPanel
-  const handleShippingFeeChange = (PlatformFeeRate) => {
-    setShippingFee(PlatformFeeRate); // Updates the cart quantity
-  };
 
   const handleOpenProductDetailsModal = (status, product) => {
     setOpenProductDetailsModal({
@@ -97,6 +84,8 @@ function App() {
         }
       })
 
+      getCartItems();
+
     } else {
       setIsLogin(false);
     }
@@ -108,22 +97,20 @@ function App() {
       if (res?.error === false) {
         setCatData(res?.data);
       }
-      console.log(res);
+      // console.log(res);
     });
   }, [isReducer]);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchDataFromApi(`/api/user/getReviews?productId=${openProductDetailsModal?.product?._id}`).then((res) => {
       if (res?.error === false && res?.data) {
-          setReviewsCount(res.data.length);
+        setReviewsCount(res.data.length);
       } else {
-          setReviewsCount(0); // Ensuring reviewsCount is always a number
+        setReviewsCount(0); // Ensuring reviewsCount is always a number
       }
-  });
-  },[openProductDetailsModal?.product?._id])
-
-  
+    });
+  }, [openProductDetailsModal?.product?._id])
 
 
   const openAlertBox = (status, msg) => {
@@ -137,19 +124,79 @@ function App() {
   };
 
 
+  const getCartItems = () => {
+    fetchDataFromApi('/api/cart/get-product-from-cart').then((res) => {
+      if (res.error === false && res.data) {
+        setCartData(res?.data);
+      }
+    })
+  };
+  
+  const addToCart = async (product, userId, quantity) => {
+    if (!userId) {
+      openAlertBox("error", "Please login to continue.");
+      return false;
+    }
+  
+    if (!product || !product?._id || !product?.name || !product?.price) {
+      openAlertBox("error", "Invalid product details.");
+      return false;
+    }
+  
+    const data = {
+      productTitle: product?.name,
+      image: product?.images?.[0],
+      sellerDetails: {
+        sellerId: product?.seller?.sellerId,  // Ensure the correct path for seller's ID
+        sellerName: product?.seller?.sellerName,  // Ensure the correct path for seller's name
+      },
+      rating: product?.rating,
+      price: product?.price,
+      oldPrice: product?.oldPrice,
+      quantity: quantity,
+      discount: product?.discount,
+      subTotal: Number(product?.price) * Number(quantity),  // Ensure subTotal is a valid number
+      subTotalOldPrice: Number(product?.oldPrice) * Number(quantity),
+      productId: product?._id,
+      countInStock: product?.countInStock,
+      userId: userId,
+    };
+  
+    try {
+      // Show a loading toast and handle API response
+      await toast.promise(
+        postData("/api/cart/add-product-to-cart", data),
+        {
+          loading: "Adding to cart... Please wait.",
+          success: (res) => {
+            if (res.error === false) {
+              console.log(res?.data);
+  
+              getCartItems();
+              return res?.message || "Item added to cart!";
+            } else {
+              throw new Error(res?.message || "Failed to add item.");
+            }
+          },
+          error: (err) => {
+            console.error("Error Response:", err);
+  
+            // Extract error message safely
+            const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
+            openAlertBox("error", errorMessage);
+            return errorMessage;
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      openAlertBox("error", "Unexpected error occurred. Please try again.");
+    }
+  };
+
+
   // Consolidated values for context/provider
   const values = {
-    // Cart-related states and handlers
-    cartItemsQty,
-    platformFee,
-    shippingFee,
-    handleCartItemQtyChange,
-    handlePlatformFeeChange,
-    handleShippingFeeChange,
-    setCartItemsQty,
-    setPlatformFee,
-    setShippingFee,
-
     // Modal-related state and handlers
     setOpenProductDetailsModal,
     handleOpenProductDetailsModal,
@@ -186,6 +233,19 @@ function App() {
     reviewsCount,
     setReviewsCount,
 
+    addToCart,
+    
+    cartData,
+    setCartData,
+
+    quantity,
+    setQuantity,
+
+    cartItem,
+    setCartItem,
+
+    getCartItems,
+
   };
 
   return (
@@ -193,7 +253,7 @@ function App() {
       <BrowserRouter>
         <MyContext.Provider value={values}>
           <Header />
-          <Navigation />
+          {/* <Navigation /> */}
           <Routes>
             <Route path={"/"} exact={true} element={<Home />} />
             <Route path={"/products"} exact={true} element={<ProductListing />} />

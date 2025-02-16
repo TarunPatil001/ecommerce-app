@@ -142,6 +142,8 @@ const AddProduct = () => {
         productRam: [],
         size: [],
         productWeight: [],
+        sellerId: context?.userData?._id,  // ✅ Ensure sellerId is set
+        sellerName: context?.userData?.sellerName,
     });
 
 
@@ -157,8 +159,8 @@ const AddProduct = () => {
 
     useEffect(() => {
         const { productId, productName } = context.isOpenFullScreenPanel || {};
-        // console.log("AddNewProductPage - Product ID:", productId);
-        // console.log("AddNewProductPage - Product Name:", productName);
+        console.log("AddNewProductPage - Seller ID:", context?.userData?._id);
+        console.log("AddNewProductPage - Seller Name:", context?.userData?.sellerName);
 
         if (!productId) {
             setProductIdNo(undefined);
@@ -195,6 +197,11 @@ const AddProduct = () => {
                 productRam: [],
                 size: [],
                 productWeight: [],
+                seller: {
+                    sellerId: context?.userData?._id, // Ensure seller ID exists
+                    sellerName: context?.userData?.sellerName, // Ensure sellerName is available
+                },
+
             });
 
             setProductCategory("");
@@ -208,7 +215,7 @@ const AddProduct = () => {
         if (productId && productName) {
             setProductIdNo(productId);
 
-            const fetchCategoryData = async () => {
+            const fetchProductData = async () => {
                 try {
                     const response = await fetchDataFromApi(`/api/product/${productId}`, { withCredentials: true });
 
@@ -250,6 +257,10 @@ const AddProduct = () => {
                             productRam: product?.productRam || [],
                             size: product?.size || [],
                             productWeight: product?.productWeight || [],
+                            seller: {
+                                sellerId: product?.seller?._id || context?.userData?._id || null,
+                                sellerName: product?.seller?.sellerName || context?.userData?.sellerName || "Unknown Seller",
+                            },
                         }));
 
                         // Automatically populate categories
@@ -273,17 +284,38 @@ const AddProduct = () => {
                 }
             };
 
-            fetchCategoryData();
+            fetchProductData();
         }
     }, [context, context.isOpenFullScreenPanel, setProductIdNo]);
 
 
+    // const onChangeInput = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormFields((formFields) => ({
+    //         ...formFields,
+    //         [name]: value,
+    //     }));
+    // };
+
     const onChangeInput = (e) => {
         const { name, value } = e.target;
-        setFormFields((formFields) => ({
-            ...formFields,
-            [name]: value,
-        }));
+        const keys = name.split("."); // Splitting name like "seller.sellerName"
+
+        setFormFields((prevFields) => {
+            if (keys.length === 2) {
+                return {
+                    ...prevFields,
+                    [keys[0]]: {
+                        ...prevFields[keys[0]],
+                        [keys[1]]: value,
+                    },
+                };
+            }
+            return {
+                ...prevFields,
+                [name]: value,
+            };
+        });
     };
 
 
@@ -539,13 +571,13 @@ const AddProduct = () => {
         setIsBannerVisible(newValue);
         setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
     };
-    
-    
+
+
 
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (formFields.name === "") {
             context.openAlertBox("error", "Please enter product name");
             return;
@@ -590,7 +622,11 @@ const AddProduct = () => {
             context.openAlertBox("error", "Please upload images");
             return;
         }
-    
+        if (!formFields.seller || !formFields.seller.sellerId) {
+            context.openAlertBox("error", "Seller information is missing.");
+            return;
+        }
+
         // ✅ Banner Validation
         if (formFields.isBannerVisible) {
             if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
@@ -602,12 +638,18 @@ const AddProduct = () => {
                 return;
             }
         }
-    
+
         setIsLoading(true);
-        
+
         try {
+            // Ensure sellerId is correctly included in the request payload
+            const requestBody = {
+                ...formFields,
+                seller: formFields.seller.sellerId, // ✅ Send only sellerId, not the whole object
+            };
+
             const result = await toast.promise(
-                postData(`/api/product/create-product`, formFields), {
+                postData(`/api/product/create-product`, requestBody), {
                 loading: "Adding product... Please wait.",
                 success: (res) => {
                     if (res?.success) {
@@ -622,7 +664,7 @@ const AddProduct = () => {
                     return errorMessage;
                 },
             });
-    
+
             console.log("Result:", result);
         } catch (err) {
             console.error("Error:", err);
@@ -634,11 +676,11 @@ const AddProduct = () => {
             }, 500);
         }
     };
-    
+
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-    
+
         if (formFields.name === "") {
             context.openAlertBox("error", "Please enter product name");
             return;
@@ -683,7 +725,7 @@ const AddProduct = () => {
             context.openAlertBox("error", "Please upload images");
             return;
         }
-    
+
         // ✅ Banner Validation
         if (formFields.isBannerVisible) {
             if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
@@ -695,7 +737,7 @@ const AddProduct = () => {
                 return;
             }
         }
-    
+
         try {
             const result = await toast.promise(
                 editData(`/api/product/updateProduct/${productIdNo}`, {
@@ -719,7 +761,7 @@ const AddProduct = () => {
                     },
                 }
             );
-    
+
             console.log("Update Result:", result);
         } catch (err) {
             console.error("Error in handleUpdate:", err);
@@ -731,7 +773,7 @@ const AddProduct = () => {
             }, 500);
         }
     };
-    
+
 
 
     // Image Deletion Handling
@@ -1002,6 +1044,10 @@ const AddProduct = () => {
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Brand</h3>
                             <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Product brand' name="brand" value={formFields.brand} onChange={onChangeInput} />
+                        </div>
+                        <div className='col'>
+                            <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Seller Name</h3>
+                            <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Seller name' name="seller.sellerName" value={formFields.seller?.sellerName} onChange={onChangeInput} />
                         </div>
                     </div>
                 </div>

@@ -1,131 +1,160 @@
-import { Button, Divider, Menu, MenuItem } from '@mui/material';
-import React, { useContext, useState } from 'react'
-import { FaCaretDown } from 'react-icons/fa';
-import { RiCloseLargeLine } from 'react-icons/ri';
+import { Button, Divider } from '@mui/material';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { MyContext } from '../../App';
-import { GiReturnArrow } from 'react-icons/gi';
 import { MdDeleteOutline } from 'react-icons/md';
+import { FiMinus, FiPlus } from 'react-icons/fi';
+import { TbTruckDelivery } from 'react-icons/tb';
+import toast from 'react-hot-toast';
+import { deleteData, editData } from '../../utils/api';
+import { PropTypes } from 'prop-types';
 
 const CartPanelItems = (props) => {
+  const context = useContext(MyContext);
 
-    const context = useContext(MyContext);
+  // Remove Quantity Handler
+  const removeQty = async () => {
+    if (!props?.item?._id) {
+      console.error("Error: Missing cart item ID");
+      return;
+    }
 
-    const [anchorEl1, setAnchorEl1] = useState(null);
-    const [anchorEl2, setAnchorEl2] = useState(null);
-    const [selectedSize, setSelectedSize] = useState(props.size);
-    const [selectedQty, setSelectedQty] = useState(props.quantity);
+    if (props?.item?.quantity > 1) {
+      const updatedQty = props?.item?.quantity - 1;
+      try {
+        const obj = { id: props?.item?._id, qty: updatedQty, subTotal: props?.item?.price * updatedQty, subTotalOldPrice: props?.item?.oldPrice * updatedQty };
+        await toast.promise(
+          editData(`/api/cart/update-product-qty-in-cart`, obj),
+          {
+            loading: "Updating quantity...",
+            success: "Quantity decreased!",
+            error: "Error updating quantity. Please try again.",
+          }
+        );
+        context?.getCartItems(); // Fetch updated cart
+      } catch (error) {
+        console.error("Error updating quantity:", error);
+      }
+    } else if (props?.item?.quantity === 1) {
+      try {
+        await toast.promise(
+          deleteData(`/api/cart/delete-cart-item/${props?.item?._id}`),
+          {
+            loading: "Removing item...",
+            success: "Item removed from cart!",
+            error: "Error deleting item. Please try again.",
+          }
+        );
+        context?.getCartItems(); // Fetch updated cart
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
+    }
+  };
 
+  // Add Quantity Handler
+  const addQty = async () => {
+    if (!props?.item?._id) {
+      console.error("Error: Missing cart item ID");
+      return;
+    }
 
-    const openSize = Boolean(anchorEl1);
-    const handleSizeClick = (event) => {
-        setAnchorEl1(event.currentTarget);
-    };
-    const handleSizeClose = (valueSize) => {
-        setAnchorEl1(null);
-        if (valueSize !== null) {
-            setSelectedSize(valueSize);
-        } else {
-            setSelectedSize(null);
+    const updatedQty = props?.item?.quantity + 1;
+    try {
+      const obj = { id: props?.item?._id, qty: updatedQty, subTotal: props?.item?.price * updatedQty, subTotalOldPrice: props?.item?.oldPrice * updatedQty };
+      await toast.promise(
+        editData(`/api/cart/update-product-qty-in-cart`, obj),
+        {
+          loading: "Updating quantity...",
+          success: "Quantity increased!",
+          error: "Error updating quantity. Please try again.",
         }
-    };
-    const openQty = Boolean(anchorEl2);
-    const handleQtyClick = (event) => {
-        setAnchorEl2(event.currentTarget);
-    };
-    const handleQtyClose = (valueQty) => {
-        setAnchorEl2(null);
-        if (valueQty !== null) {
-            setSelectedQty(valueQty);
-        } else {
-            setSelectedQty(null);
+      );
+      context?.getCartItems(); // Fetch updated cart
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  // Remove Item Handler
+  const removeItem = async (id) => {
+    try {
+      await toast.promise(
+        deleteData(`/api/cart/delete-cart-item/${id}`),
+        {
+          loading: "Removing item...",
+          success: "Item removed from cart!",
+          error: "Error deleting item. Please try again.",
         }
-    };
+      );
+      context?.getCartItems(); // Fetch updated cart
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
 
-
-
-    return (
-        <>
-            <div className="cartItem w-full flex items-start gap-3 p-2">
-                <div className="cartItemImg w-[30%]">
-                    <div className="w-full h-[120px] rounded-md border overflow-hidden">
-                        <Link to="/productDetails/47856" onClick={context.toggleCartPanel(false)}>
-                            <img src="https://assets.myntassets.com/h_1440,q_90,w_1080/v1/assets/images/2024/JULY/29/z3UAG5L0_e6cd3d86e0ec4ecfbd0d275b4651a52d.jpg" alt="ProductImg" className="w-full h-full object-cover rounded-md hover:scale-105 transition-all" />
-                        </Link>
-                    </div>
-                </div>
-                <div className="cartInfo w-[80%] pr-5 relative">
-                    <h5 className="text-[13px] font-bold line-clamp-1">T-Shirt</h5>
-                    <h4 className="text-[14px] line-clamp-1 leading-6"><Link to="/product/784585" className="link transition-all" onClick={context.toggleCartPanel(false)}>Nike Air Max Invigor Black Nike Air Max Invigor Black</Link></h4>
-                    <h6 className="text-[12px] line-clamp-1 text-[rgba(0,0,0,0.4)]">Sold by: <span className="capitalize">BEST UNITED INDIA COMFORTS PVT LTD</span></h6>
-                    <div className="flex items-center gap-2 mt-1">
-                        <div className="relative">
-                            <span className="bg-gray-100 px-2 border hover:border-black rounded-sm font-bold text-[13px] flex items-center gap-1 cursor-pointer" onClick={handleSizeClick}>Size: <span>{selectedSize}</span><FaCaretDown /></span>
-                            <Menu
-                                id="basic-menu"
-                                anchorEl={anchorEl1}
-                                open={openSize}
-                                onClose={() => handleSizeClose(null)}
-                                MenuListProps={{
-                                    'aria-labelledby': 'basic-button',
-                                }}
-                            >
-                                <MenuItem onClick={() => handleSizeClose('S')}>S</MenuItem>
-                                <MenuItem onClick={() => handleSizeClose('M')}>M</MenuItem>
-                                <MenuItem onClick={() => handleSizeClose('L')}>L</MenuItem>
-                                <MenuItem onClick={() => handleSizeClose('XL')}>XL</MenuItem>
-                                <MenuItem onClick={() => handleSizeClose('2XL')}>2XL</MenuItem>
-                                <MenuItem onClick={() => handleSizeClose('3XL')}>3XL</MenuItem>
-                            </Menu>
-                        </div>
-                        <div className="relative">
-                            <span className="bg-gray-100 px-2 border hover:border-black rounded-sm font-bold text-[13px] flex items-center gap-1 cursor-pointer" onClick={handleQtyClick}>Qty: <span>{selectedQty}</span><FaCaretDown /></span>
-                            <Menu
-                                id="basic-menu"
-                                anchorEl={anchorEl2}
-                                open={openQty}
-                                onClose={() => handleQtyClose(null)}
-                                MenuListProps={{
-                                    'aria-labelledby': 'basic-button',
-                                }}
-                            >
-                                <MenuItem onClick={() => handleQtyClose(1)}>1</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(2)}>2</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(3)}>3</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(4)}>4</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(5)}>5</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(6)}>6</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(7)}>7</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(8)}>8</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(9)}>9</MenuItem>
-                                <MenuItem onClick={() => handleQtyClose(10)}>10</MenuItem>
-                            </Menu>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="price text-black text-[14px] font-bold flex items-center">
-                            ₹{new Intl.NumberFormat('en-IN').format(1499)}
-                        </span>
-                        <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-normal flex items-center">
-                            ₹{new Intl.NumberFormat('en-IN').format(2599)}
-                        </span>
-                        <span className="uppercase text-[14px] text-[var(--off-color)] font-normal">17% OFF</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="flex flex-row items-center gap-1 text-[12px]"><span className="w-[15px] h-[15px] rounded-full border !border-[rgba(0,0,0,0.4)] flex items-center justify-center p-0.5"><GiReturnArrow className="text-[10px]" /></span><span className="font-bold !text-[#000]">10 days</span> return available</span>
-                    </div>
-                    <Button
-                        className="!w-[30px] !h-[30px] !min-w-[30px] !absolute top-0 right-0 !shadow-md !text-gray-800 hover:!bg-gray-500 hover:!text-white !rounded-full flex items-center justify-center"
-                        onClick={""}
-                    >
-                        <MdDeleteOutline className="!text-[40px]" />
-                    </Button>
-                </div>
+  return (
+    <>
+      <div className="cartItem w-full flex items-start gap-3 p-2">
+        <div className="cartItemImg w-[30%]">
+          <div className="w-full h-[120px] rounded-md border overflow-hidden">
+            <Link to={`/product/${props?.item?._id}`} onClick={() => context?.toggleCartPanel(false)}>
+              <img src={props?.item?.image} className="w-full h-full object-cover rounded-md hover:scale-105 transition-all" />
+            </Link>
+          </div>
+        </div>
+        <div className="cartInfo w-[80%] pr-5 relative">
+          <h4 className="text-[14px] line-clamp-1 leading-6">
+            <Link to={`/product/${props?.item?._id}`} className="link transition-all" onClick={() => context?.toggleCartPanel(false)}>
+              {props?.item?.productTitle}
+            </Link>
+          </h4>
+          <h6 className="text-[12px] line-clamp-1 text-[rgba(0,0,0,0.4)]">Seller: <span className="capitalize">{props?.item?.sellerDetails?.sellerName}</span></h6>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="w-[90px] h-[22px] px-2 border rounded-full flex items-center justify-center">
+              <span className='text-[13px]'>
+                Size: {`L`}
+              </span>
             </div>
-            <Divider />
+            <div className="w-auto">
+              <span className='w-full border flex items-center rounded-full'>
+                <Button className='!w-[30px] !min-w-[30px] !h-[20px] !rounded-l-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black' onClick={removeQty}>
+                  <FiMinus className='!text-[20px] !font-bold' />
+                </Button>
+                <span className='w-[40px] text-center text-[13px]'>{props?.item?.quantity}</span>
+                <Button className='!w-[30px] !min-w-[30px] !h-[20px] !rounded-r-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black' onClick={addQty}>
+                  <FiPlus className='!text-[20px] !font-bold' />
+                </Button>
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="price text-black text-[16px] font-bold flex items-center">
+              ₹{new Intl.NumberFormat('en-IN').format(`${props?.item?.subTotal}`)}
+            </span>
+            <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-normal flex items-center">
+              ₹{new Intl.NumberFormat('en-IN').format(`${props?.item?.subTotalOldPrice}`)}
+            </span>
+            <span className="uppercase text-[14px] text-[var(--off-color)] font-normal">{props?.item?.discount}% OFF</span>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="flex flex-row items-center justify-center gap-1 text-[12px]"><TbTruckDelivery className="text-[18px]" />Delivery by Sat Feb 22</span>
+          </div>
+          <Button
+            className="!w-[30px] !h-[30px] !min-w-[30px] !absolute top-0 right-0 !shadow-md !text-gray-800 hover:!bg-gray-500 hover:!text-white !rounded-full flex items-center justify-center"
+            onClick={() => removeItem(props?.item?._id)}
+          >
+            <MdDeleteOutline className="!text-[40px]" />
+          </Button>
+        </div>
+      </div>
+      <Divider />
+    </>
+  );
+};
 
-        </>
-    )
-}
+CartPanelItems.propTypes = {
+  item: PropTypes.object.isRequired,
+};
 
-export default CartPanelItems
+export default CartPanelItems;

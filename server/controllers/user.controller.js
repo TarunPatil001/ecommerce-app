@@ -608,7 +608,7 @@ export async function removeImageFromCloudinary(request, response) {
 export async function updateUserDetails(request, response) {
   try {
     // Extract details from the request body
-    const { name, email, password, mobile } = request.body;
+    const { name, email, password, mobile, sellerName } = request.body;
 
     const userId = request.userId; // Assuming this is passed in the request
 
@@ -653,6 +653,7 @@ export async function updateUserDetails(request, response) {
         email: email || userExist.email,
         password: hashedPassword,
         mobile: mobile || userExist.mobile,
+        sellerName: sellerName || userExist.sellerName,
         verify_email:
           email && email !== userExist.email ? false : userExist.verify_email,
         otp: verifyCode || null,
@@ -680,6 +681,7 @@ export async function updateUserDetails(request, response) {
         _id: updatedUser._id,
         email: updatedUser.email,
         mobile: updatedUser.mobile,
+        sellerName: updatedUser.sellerName,
         avatar: updatedUser.avatar,
       },
     });

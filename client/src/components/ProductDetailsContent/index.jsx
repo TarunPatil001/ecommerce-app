@@ -45,7 +45,7 @@ const ProductDetailsContent = (props) => {
                     </span>
                 </Link>
                 <span className="line !h-[15px] mx-1"></span>
-                <span className="cursor-pointer link" onClick={props?.gotoReviews}>Review{props?.reviewsCount>=2 ? "s":""} ({props?.reviewsCount})</span>
+                <span className="cursor-pointer link" onClick={props?.gotoReviews}>Review{props?.reviewsCount >= 2 ? "s" : ""} ({props?.reviewsCount})</span>
             </div>
 
             <hr className="my-2" />
@@ -63,24 +63,46 @@ const ProductDetailsContent = (props) => {
                         ({`${props?.product?.discount}`}% OFF)
                     </span>
                 </div>
-                <div className="flex items-center">
-                    <span className="text-[16px] font-normal flex items-center gap-2">
-                        Available in stocks:
+
+                <div className='flex items-center gap-5'>
+                    <div className="flex items-center">
+                        <span className="text-[16px] font-normal flex items-center gap-2">
+                            Available in stocks:
+                            {
+                                availableStock > 0 ? (
+                                    <span className="font-bold text-[var(--rating-star-color)]">{`${availableStock} Items`}</span>
+                                ) : (
+                                    <span className="p-1 text-[12px] bg-red-50 font-bold text-red-500 border border-red-500 capitalize">
+                                        Out of Stock
+                                    </span>
+                                )
+                            }
+                        </span>
+                    </div>
+
+                    <div className="flex items-start flex-col gap-2">
                         {
-                            availableStock > 0 ? (
-                                <span className="font-bold text-[var(--rating-star-color)]">{`${availableStock} Items`}</span>
+                            availableStock === 0 ? (
+                                <span className="normal-case border bg-[#fff2e5] p-1 px-2 border-orange-500 text-orange-500 text-[16px] font-medium">
+                                    There are not enough products in stock
+                                </span>
                             ) : (
-                                <span className="p-1 text-[12px] bg-red-50 font-bold text-red-500 border border-red-500 capitalize">
-                                    Out of Stock
+                                <span className="capitalize border bg-[#e5ffe8] p-1 px-2 border-green-500 text-green-500 text-[16px] font-medium">
+                                    In stock
                                 </span>
                             )
                         }
-                    </span>
+                    </div>
                 </div>
             </div>
 
-            <div className="description py-1 mb-5 mt-3">
-                <p className="pr-10 text-[14px] text-justify">{props?.product?.description}</p>
+
+            {/* Product Details */}
+            <div className="shadow-sm w-full px-8 border rounded-md mb-5 description py-5 mt-3">
+                <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Description:</h2>
+                <p className="text-[16px] text-justify">
+                    {props?.product?.description || "No description available."}
+                </p>
             </div>
 
             {props?.product?.size?.length > 0 && (
@@ -130,19 +152,6 @@ const ProductDetailsContent = (props) => {
                 </span>
             </div>
 
-            <div className="flex items-start flex-col gap-2">
-                {
-                    availableStock === 0 ? (
-                        <span className="normal-case border bg-[#fff2e5] p-1 px-2 border-orange-500 text-orange-500 text-[16px] font-medium">
-                            There are not enough products in stock
-                        </span>
-                    ) : (
-                        <span className="capitalize border bg-[#e5ffe8] p-1 px-2 border-green-500 text-green-500 text-[16px] font-medium">
-                            In stock
-                        </span>
-                    )
-                }
-            </div>
         </>
     );
 };

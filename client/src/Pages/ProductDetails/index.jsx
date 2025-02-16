@@ -141,12 +141,12 @@ const ProductDetails = (props) => {
                                 <div className="productContent w-[60%] p-3">
                                     <ProductDetailsContent product={productData} reviewsCount={reviewsCount} gotoReviews={gotoReviews} />
                                     <div className="tabPanel pt-6">
-
-                                        {/* Product Details */}
+                                        
+                                        {/* Seller Details */}
                                         <div className="shadow-sm w-full px-8 py-5 border rounded-md mb-5">
-                                            <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Description</h2>
+                                            <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Seller Details</h2>
                                             <p className="text-[16px]">
-                                                {productData?.description || "No description available."}
+                                                Seller: {productData?.seller?.sellerName || "No description available."}
                                             </p>
                                         </div>
 

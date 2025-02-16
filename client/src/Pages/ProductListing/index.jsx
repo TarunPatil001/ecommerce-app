@@ -130,7 +130,7 @@ const ProductListing = () => {
 
       <div className="bg-white p-3">
         <div className="container flex gap-3">
-          <div className="sidebarWrapper w-[20%] h-full bg-white p-3 sticky top-20">
+          <div className="sidebarWrapper w-[20%] h-full bg-white p-3">
             <Sidebar
               productsData={productsData}
               setProductsData={setProductsData}

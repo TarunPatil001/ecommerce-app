@@ -26,6 +26,10 @@ const Login = () => {
     const context = useContext(MyContext);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const onChangeInput = (e) => {
         const { name, value } = e.target;
         setFormFields((formFields) => ({
@@ -217,53 +221,53 @@ const Login = () => {
     };
 
 
-     const authWithGoogle = () => {
-            signInWithPopup(auth, googleProvider)
-                .then((result) => {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    // The signed-in user info.
-                    const user = result.user;
-                    // IdP data available using getAdditionalUserInfo(result)
-    
-                    const fields = {
-                        name: user.providerData[0].displayName,
-                        email: user.providerData[0].email,
-                        password: null,
-                        avatar: user.providerData[0].photoURL,
-                        mobile: user.providerData[0].phoneNumber,
-                        role: "USER",
+    const authWithGoogle = () => {
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+                // The signed-in user info.
+                const user = result.user;
+                // IdP data available using getAdditionalUserInfo(result)
+
+                const fields = {
+                    name: user.providerData[0].displayName,
+                    email: user.providerData[0].email,
+                    password: null,
+                    avatar: user.providerData[0].photoURL,
+                    mobile: user.providerData[0].phoneNumber,
+                    role: "USER",
+                }
+
+                postData(`/api/user/authWithGoogle`, fields).then((res) => {
+                    if (res?.error !== true) {
+                        setIsLoading(false);
+                        context.openAlertBox("success", res?.message);
+                        localStorage.setItem("User email", fields.email);
+                        localStorage.setItem("accessToken", res?.data?.accessToken);
+                        localStorage.setItem("refreshToken", res?.data?.refreshToken);
+                        context.setIsLogin(true);
+                        navigate('/');
+                    } else {
+                        context.openAlertBox("error", res?.message);
+                        setIsLoading(false);
                     }
-    
-                    postData(`/api/user/authWithGoogle`, fields).then((res) => {
-                        if (res?.error !== true) {
-                            setIsLoading(false);
-                            context.openAlertBox("success", res?.message);
-                            localStorage.setItem("User email", fields.email);
-                            localStorage.setItem("accessToken", res?.data?.accessToken);
-                            localStorage.setItem("refreshToken", res?.data?.refreshToken);
-                            context.setIsLogin(true);
-                            navigate('/');
-                        } else {
-                            context.openAlertBox("error", res?.message);
-                            setIsLoading(false);
-                        }
-                    })
-    
-                    console.log(user);
-                    // ...
-                }).catch((error) => {
-                    // Handle Errors here.
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    // The email of the user's account used.
-                    const email = error.customData.email;
-                    // The AuthCredential type that was used.
-                    const credential = GoogleAuthProvider.credentialFromError(error);
-                    // ...
-                });
-        }
+                })
+
+                console.log(user);
+                // ...
+            }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.customData.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                // ...
+            });
+    }
 
 
     return (

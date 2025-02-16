@@ -39,7 +39,7 @@ app.get("/", (request, response) => {
 app.use('/api/user', userRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/product', productRouter);
-app.use('/api/cartProduct', cartProductRouter);
+app.use('/api/cart', cartProductRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/homeSlides', homeSlideRouter);

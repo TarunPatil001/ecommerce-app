@@ -21,6 +21,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const nameRef = useRef(null);
     const emailRef = useRef(null);
+    const sellerNameRef = useRef(null);
     const oldPasswordRef = useRef(null);
     const newPasswordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
@@ -43,6 +44,7 @@ const Profile = () => {
         name: '',
         email: '',
         mobile: '',
+        sellerName: '',
     })
     const [changePassword, setChangePassword] = useState({
         email: '',
@@ -87,6 +89,7 @@ const Profile = () => {
             setFormFields({
                 name: context?.userData?.name,
                 email: context?.userData?.email,
+                sellerName: context?.userData?.sellerName,
             });
 
             setChangePassword({
@@ -98,7 +101,6 @@ const Profile = () => {
             // setPhone(`${context?.userData?.mobile}`);  // Set initial phone value from user data
         }
     }, [context?.userData]);  // Only re-run when context?.userData changes
-
 
 
 
@@ -208,6 +210,11 @@ const Profile = () => {
 
         if (formFields.mobile === "") {
             context.openAlertBox("error", "Please enter your mobile number.");
+            return;
+        }
+
+        if (formFields.sellerName === "") {
+            context.openAlertBox("error", "Please enter seller name.");
             return;
         }
 
@@ -466,6 +473,10 @@ const Profile = () => {
                                 <div className='col'>
                                     <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Mobile No.</h3>
                                     <PhoneInput defaultCountry="in" preferredCountries={["in"]} name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevState) => ({ ...prevState, mobile: phone })); }} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "!cursor-not-allowed" : ""}`} disabled={isLoading} />
+                                </div>
+                                <div className='col'>
+                                    <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Seller Name</h3>
+                                    <input type="text" className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Seller Name' ref={sellerNameRef} name="sellerName" value={formFields?.sellerName} disabled={isLoading} onChange={onChangeInput} />
                                 </div>
 
                             </div>

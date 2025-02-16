@@ -22,7 +22,7 @@ import CartPanel from "../CartPanel";
 import { MyContext } from "../../App";
 
 const Footer = () => {
-  
+
   const context = useContext(MyContext);
 
   const [isChecked, setIsChecked] = useState(false);
@@ -292,7 +292,7 @@ const Footer = () => {
       {/* Cart Panel */}
       <Drawer open={context.openCartPanel} onClose={context.toggleCartPanel(false)} anchor="right">
         <div className="flex items-center justify-between px-4 py-1 !w-[400px] !max-w-[400px]">
-          <h3 className="text-[18px] !font-semibold text-[var(--text-dark)]">Shopping Cart ({context.cartItemsQty})</h3>
+          <h3 className="text-[18px] !font-semibold text-[var(--text-dark)]">Shopping Cart ({context.cartData.length})</h3>
           <Button
             className="!w-[40px] !h-[40px] !min-w-[40px] !shadow-sm !text-red-500 !rounded-full flex items-center justify-center"
             onClick={context.toggleCartPanel(false)}
@@ -302,7 +302,14 @@ const Footer = () => {
         </div>
         <Divider />
         {/* <CartPanel  /> */}
-        <CartPanel onCartItemQtyChange={context.handleCartItemQtyChange} onPlatformFeeChange={context.handlePlatformFeeChange} onShippingFeeChange={context.handleShippingFeeChange} />
+        {
+          context?.cartData?.length !== 0 ?
+            <CartPanel data={context?.cartData} />
+            :
+            <div className="flex items-center justify-center h-full">
+              <span>Your Cart is Empty</span>
+            </div>
+        }
 
       </Drawer>
 

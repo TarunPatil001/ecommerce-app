@@ -5,6 +5,7 @@ import { mongoose } from 'mongoose';
 import ProductRamsModel from "../models/productRams.model.js";
 import ProductWeightModel from "../models/productWeight.model.js";
 import ProductSizeModel from "../models/productSize.model.js";
+import UserModel from "../models/user.model.js";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -316,6 +317,7 @@ export async function uploadProductBannerImages(request, response) {
 // Create Product  
 export async function createProduct(request, response) {
   try {
+
     const {
       name,
       description,
@@ -338,6 +340,7 @@ export async function createProduct(request, response) {
       productRam,
       size,
       productWeight,
+      seller,
     } = request.body;
 
     // Check if required fields are present
@@ -348,6 +351,30 @@ export async function createProduct(request, response) {
         message: "Missing required fields. Please provide all necessary product details.",
       });
     }
+
+    console.log("Received sellerId:", seller); // 🔍 Debugging Log
+
+    // ✅ Validate sellerId
+    if (!seller || !mongoose.Types.ObjectId.isValid(seller)) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Invalid or missing seller ID.",
+      });
+    }
+
+    // ✅ Fetch seller details from DB
+    const sellerData = await UserModel.findById(seller).select("sellerName").lean();
+
+    if (!sellerData) {
+      return response.status(404).json({
+        error: true,
+        success: false,
+        message: "Seller not found.",
+      });
+    }
+
+    console.log("Seller found:", sellerData.sellerName);
 
     // Validate and fetch product images
     const productId =
@@ -403,6 +430,10 @@ export async function createProduct(request, response) {
       productRam,
       size,
       productWeight,
+      seller: {
+        sellerId: seller, // ✅ Store sellerId inside object
+        sellerName: sellerData.sellerName, // ✅ Store sellerName from DB
+      },
     });
 
     // Save the product to the database
@@ -429,7 +460,10 @@ export async function createProduct(request, response) {
       message: "Product created successfully.",
       success: true,
       error: false,
-      data: product,
+      data: {
+        ...product._doc,
+        sellerName: seller.sellerName || "Unknown Seller",  // Ensure sellerName is included in response
+      },
     });
   } catch (error) {
     return response.status(500).json({
@@ -470,10 +504,10 @@ export async function getAllProducts(request, response) {
     }
 
     const products = await ProductModel.find()
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
+    .populate("category") // Populating category details
+    .skip((page - 1) * perPage)
+    .limit(perPage)
+    .exec();
 
     return response.status(200).json({
       message: "Products retrieved successfully",
@@ -1933,13 +1967,22 @@ const getValidProductRams = async () => {
 export async function updateProduct(request, response) {
   try {
     const productId = request.params.id;
-    const product = await ProductModel.findById(productId);
+    const product = await ProductModel.findById(productId).populate("seller").lean(); // Fetch seller details
 
     if (!product) {
       return response.status(404).json({
         error: true,
         success: false,
         message: "Product not found!",
+      });
+    }
+
+    // ✅ Check if seller exists
+    if (!product.seller) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Seller details not found!",
       });
     }
 
@@ -2010,6 +2053,8 @@ export async function updateProduct(request, response) {
       product.bannerImages = validNewBannerImages;
     }
 
+
+
     // ✅ Fetch valid RAMs dynamically
     const validProductRams = await getValidProductRams();
     const filteredProductRams = (request.body.productRam || [])
@@ -2049,7 +2094,7 @@ export async function updateProduct(request, response) {
         bannerTitleName: product.bannerTitleName,
       },
       { new: true }
-    );
+    ).populate("seller", "sellerName contact"); // Ensure seller remains populated
 
     if (!updatedProduct) {
       return response.status(400).json({
@@ -2064,6 +2109,7 @@ export async function updateProduct(request, response) {
       success: true,
       cloudinaryMessages,
       product: updatedProduct,
+      seller: updatedProduct.seller, // ✅ Include seller details in response
     });
   } catch (error) {
     return response.status(500).json({

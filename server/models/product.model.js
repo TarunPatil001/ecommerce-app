@@ -20,6 +20,18 @@ const productSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    seller: {
+      sellerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      sellerName: {
+        type: String,
+        required: true,
+      }
+    },
+
     price: {
       type: Number,
       default: 0,
@@ -101,9 +113,9 @@ const productSchema = mongoose.Schema(
         required: true,
       }
     ],
-    bannerTitleName: { 
-      type: String, 
-      required: function() { return this.isBannerVisible; } // Conditionally required
+    bannerTitleName: {
+      type: String,
+      required: function () { return this.isBannerVisible; } // Conditionally required
     },
     isBannerVisible: {
       type: Boolean,
