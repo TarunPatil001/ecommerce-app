@@ -51,8 +51,7 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`bg-white border-b shadow-md w-full z-[999] transition-all duration-500 ${isSticky ? "sticky top-0" : "-top-[100px]"
-          }`}
+        className={`bg-white border-b shadow-md w-full transition-all duration-500 sticky top-[82px] left-0 z-[999]`}
       >
         <div className="container flex items-center justify-end gap-8">
           

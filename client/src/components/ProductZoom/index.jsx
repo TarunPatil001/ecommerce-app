@@ -71,7 +71,7 @@ const ProductZoom = (props) => {
 
     return (
         <>
-            <div className="flex gap-3 sticky top-20 z-[99] stickyZoom max-h-[495px] max-w-[550px]">
+            <div className="flex gap-3 sticky top-[170px] z-[99] stickyZoom max-h-[495px] max-w-[550px]">
                 {/* Thumbnail Slider */}
                 <div className="slider h-auto w-[10%] min-w-[40px] max-w-[80px] productDetailImageOptions flex flex-col items-center justify-center relative py-10">
                     <Swiper
