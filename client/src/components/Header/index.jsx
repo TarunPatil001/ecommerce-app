@@ -63,6 +63,7 @@ const Header = () => {
         context.setIsLogin(false);
         localStorage.clear();
         context.setUserData(null)
+        context?.setCartData(0);
         navigate("/");
       }
     })

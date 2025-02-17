@@ -20,6 +20,7 @@ import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import CartPanel from "../CartPanel";
 import { MyContext } from "../../App";
+import { MdOutlineRemoveShoppingCart } from "react-icons/md";
 
 const Footer = () => {
 
@@ -306,8 +307,13 @@ const Footer = () => {
           context?.cartData?.length !== 0 ?
             <CartPanel data={context?.cartData} />
             :
-            <div className="flex items-center justify-center h-full">
-              <span>Your Cart is Empty</span>
+            <div className='w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400'>
+              <MdOutlineRemoveShoppingCart className='text-[40px]' />
+              <span className="text-[18px]">Your cart is empty!</span>
+              <span className="text-[12px]">Add items to it now.</span>
+              <Link to="/" className="w-[50%] min-w-[30%] !mt-2 !flex !items-center !justify-center">
+                <Button className="buttonPrimaryBlack !normal-case w-[100%] min-w-[30%] !mt-2" onClick={context.toggleCartPanel(false)}>Shop now</Button>
+              </Link>
             </div>
         }
 

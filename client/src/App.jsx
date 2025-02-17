@@ -44,7 +44,8 @@ function App() {
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [reviewsCount, setReviewsCount] = useState(0);
   const [cartData, setCartData] = useState([]);
-  const [quantity, setQuantity] = useState(1);
+  // const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState({});
   const [cartItem, setCartItem] = useState(null);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -131,39 +132,59 @@ function App() {
       }
     })
   };
-  
-  const addToCart = async (product, userId, quantity) => {
+
+  const addToCart = async (product, userId, quantity, selectedSize, selectedWeight, selectedRam) => {
     if (!userId) {
       openAlertBox("error", "Please login to continue.");
       return false;
     }
   
-    if (!product || !product?._id || !product?.name || !product?.price) {
+    if (!product || !product._id || !product.name || !product.price) {
       openAlertBox("error", "Invalid product details.");
       return false;
     }
   
+    // Send empty string if not selected
+    const selectedOptions = {
+      size: selectedSize || "",  // Send empty string if not selected
+      productWeight: selectedWeight || "",  // Send empty string if not selected
+      productRam: selectedRam || "",  // Send empty string if not selected
+    };
+  
+    // // Check if at least one option is selected (size, weight, or RAM)
+    // if (!selectedOptions.size && !selectedOptions.productWeight && !selectedOptions.productRam) {
+    //   openAlertBox("error", "Please select at least one option (size, weight, or RAM).");
+    //   return false;
+    // }
+  
+    // Create the data object to send to the backend
     const data = {
-      productTitle: product?.name,
-      image: product?.images?.[0],
+      productTitle: product.name,
+      image: product.images?.[0] || "",
       sellerDetails: {
-        sellerId: product?.seller?.sellerId,  // Ensure the correct path for seller's ID
-        sellerName: product?.seller?.sellerName,  // Ensure the correct path for seller's name
+        sellerId: product.seller?.sellerId || "",
+        sellerName: product.seller?.sellerName || "",
       },
-      rating: product?.rating,
-      price: product?.price,
-      oldPrice: product?.oldPrice,
-      quantity: quantity,
-      discount: product?.discount,
-      subTotal: Number(product?.price) * Number(quantity),  // Ensure subTotal is a valid number
-      subTotalOldPrice: Number(product?.oldPrice) * Number(quantity),
-      productId: product?._id,
-      countInStock: product?.countInStock,
+      rating: product.rating || 0,
+      brand: product.brand || "Unknown",
+      availableOptions: {
+        size: Array.isArray(product.size) ? product.size : [],
+        productWeight: Array.isArray(product.productWeight) ? product.productWeight : [],
+        productRam: Array.isArray(product.productRam) ? product.productRam : [],
+      },
+      selectedOptions,  // Send the selectedOptions with empty strings if not selected
+      price: Number(product.price) || 0,
+      oldPrice: Number(product.oldPrice) || 0,
+      quantity: Number(quantity) || 1,
+      discount: Number(product.discount) || 0,
+      subTotal: (Number(product.price) || 0) * (Number(quantity) || 1),
+      subTotalOldPrice: (Number(product.oldPrice) || 0) * (Number(quantity) || 1),
+      productId: product._id,
+      countInStock: Number(product.countInStock) || 0,
       userId: userId,
     };
   
     try {
-      // Show a loading toast and handle API response
       await toast.promise(
         postData("/api/cart/add-product-to-cart", data),
         {
@@ -171,7 +192,6 @@ function App() {
           success: (res) => {
             if (res.error === false) {
               console.log(res?.data);
-  
               getCartItems();
               return res?.message || "Item added to cart!";
             } else {
@@ -180,8 +200,6 @@ function App() {
           },
           error: (err) => {
             console.error("Error Response:", err);
-  
-            // Extract error message safely
             const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
             openAlertBox("error", errorMessage);
             return errorMessage;
@@ -193,6 +211,11 @@ function App() {
       openAlertBox("error", "Unexpected error occurred. Please try again.");
     }
   };
+  
+  
+  
+
+
 
 
   // Consolidated values for context/provider
@@ -234,17 +257,17 @@ function App() {
     setReviewsCount,
 
     addToCart,
-    
+
     cartData,
     setCartData,
-
-    quantity,
-    setQuantity,
 
     cartItem,
     setCartItem,
 
     getCartItems,
+
+    selectedSize,
+    setSelectedSize,
 
   };
 

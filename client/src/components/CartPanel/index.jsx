@@ -12,7 +12,7 @@ const CartPanel = (props) => {
     const calculateTotal = () => {
         let totalMRP = 0;
         let discount = 0;
-        let couponDiscount = 0;
+        // let couponDiscount = 0;
         // let platformFee = 49; // If applicable
         // let shippingFee = 79; // If applicable
 
@@ -21,10 +21,10 @@ const CartPanel = (props) => {
             discount += item?.subTotalOldPrice - item?.subTotal || 0;
         });
 
-        return { totalMRP, discount, couponDiscount }; // Returning values separately
+        return { totalMRP, discount }; // Returning values separately
     };
 
-    const { totalMRP, discount, couponDiscount } = calculateTotal(); // Destructuring values
+    const { totalMRP, discount } = calculateTotal(); // Destructuring values
 
     return (
         <>
@@ -49,45 +49,43 @@ const CartPanel = (props) => {
                     <span className="text-[14px]">Discount on MRP</span>
                     <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(discount)}</span>
                 </div>
-                <div className="flex items-center justify-between px-4 py-1">
+                {/* <div className="flex items-center justify-between px-4 py-1">
                     <span className="text-[14px]">Coupon Discount</span>
                     <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(couponDiscount)}</span>
                 </div>
                 <div className="flex items-center justify-between px-4 py-1">
                     <span className="text-[14px]">Platform Fee</span>
-                    {/* If platformFee is needed, display it here */}
-                    {/* {
+                    {
                         platformFee === 0 ? (
                             <span className="price text-green-600 text-[14px] flex items-center">Free</span>
                         ) : (
                             <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(49)}</span>
                         )
-                    } */}
+                    }
                 </div>
                 <div className="flex items-center justify-between px-4">
                     <span className="text-[14px]">Shipping Fee</span>
-                    {/* If shippingFee is needed, display it here */}
-                    {/* {
+                    If shippingFee is needed, display it here
+                    {
                         shippingFee === 0 ? (
                             <span className="price text-green-600 text-[14px] flex items-center gap-1"><span className="line-through !text-[var(--text-dark)]"> ₹{new Intl.NumberFormat('en-IN').format(79)}</span>Free</span>
                         ) : (
                             <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(79)}</span>
                         )
-                    } */}
+                    }
                 </div>
                 <div className="flex items-center justify-between px-4 py-0 pb-5">
-                    {/* {
+                    {
                         shippingFee === 0 ? (
                             <span className="text-[12px]">Free Shipping for you</span>
                         ) : (""
                         )
-                    } */}
-
-                </div>
+                    }
+                </div> */}
                 <Divider />
                 <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                     <span>Total Amount:</span>
-                    <span>₹{new Intl.NumberFormat('en-IN').format(totalMRP - discount - couponDiscount)}</span> {/* Displaying the total amount after all discounts */}
+                    <span>₹{new Intl.NumberFormat('en-IN').format(totalMRP - discount)}</span> {/* Displaying the total amount after all discounts */}
                 </div>
                 <Divider />
                 <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4">

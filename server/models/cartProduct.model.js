@@ -23,6 +23,19 @@ const cartProductSchema = mongoose.Schema({
         type: Number,
         required: true,
     },
+    brand: {
+        type: String,
+    },
+    availableOptions: {
+        size: [{ type: String, default: null }], // Available sizes
+        productWeight: [{ type: String, default: null }], // Available weights
+        productRam: [{ type: String, default: null }], // Available RAMs
+    },
+    selectedOptions: {
+        size: { type: String },
+        productWeight: { type: String },
+        productRam: { type: String },
+    },
     price: {
         type: Number,
         required: true,
