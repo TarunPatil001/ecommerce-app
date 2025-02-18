@@ -27,9 +27,9 @@ const cartProductSchema = mongoose.Schema({
         type: String,
     },
     availableOptions: {
-        size: [{ type: String, default: null }], // Available sizes
-        productWeight: [{ type: String, default: null }], // Available weights
-        productRam: [{ type: String, default: null }], // Available RAMs
+        size: [{ type: String, }], // Available sizes
+        productWeight: [{ type: String, }], // Available weights
+        productRam: [{ type: String, }], // Available RAMs
     },
     selectedOptions: {
         size: { type: String },

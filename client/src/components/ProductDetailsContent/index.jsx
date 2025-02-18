@@ -1,33 +1,142 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import QtyBox from '../../components/QtyBox';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
 import { IoGitCompareOutline } from 'react-icons/io5';
 import { Button, Rating } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { MyContext } from '../../App';
+import toast from 'react-hot-toast';
+import { deleteData, editData } from '../../utils/api';
+import { PropTypes } from 'prop-types';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const ProductDetailsContent = (props) => {
-    const [productActionIndex, setProductActionIndex] = useState(null);
-    const [checked, setChecked] = useState(false);
-    const [quantity, setQuantity] = useState(props?.product?.countInStock === 0 ? 0 : 1); // Default quantity
 
-    // Calculate available stock dynamically
+    const [checked, setChecked] = useState(false);
+    const context = useContext(MyContext);
+    const [productActionIndex, setProductActionIndex] = useState(null);
+    const [quantity, setQuantity] = useState(1); // Default quantity
+    const [selectedSize, setSelectedSize] = useState(null);
+    const [selectedWeight, setSelectedWeight] = useState(null);
+    const [selectedRam, setSelectedRam] = useState(null);
+    const [isAdded, setIsAdded] = useState(false);
+    const [cartItem, setCartItem] = useState(null);
+
+    const navigate = useNavigate(); // React Router's navigate hook for redirection
+
     const availableStock = props?.product?.countInStock - props?.product?.sale;
 
-    // Ensure quantity does not exceed available stock
-    const handleQuantityChange = (newQuantity) => {
-        if (newQuantity <= availableStock) {
-            setQuantity(newQuantity);
+    const addToCart = async (product, userId, quantity, selectedSize, selectedWeight, selectedRam) => {
+    if (!context.cartData) {
+        console.error("Cart data is undefined or context is not initialized.");
+        context?.openAlertBox("error", "Cart is not available. Please try again later.");
+        return;
+    }
+
+    if (quantity <= 0) return; // Prevent adding 0 quantity
+
+    // Check which options are required but not selected
+    const missingOptions = [];
+
+    if (props?.product?.size?.length > 0 && !selectedSize?.trim()) missingOptions.push("Size");
+    if (props?.product?.productWeight?.length > 0 && !selectedWeight?.trim()) missingOptions.push("Weight");
+    if (props?.product?.productRam?.length > 0 && !selectedRam?.trim()) missingOptions.push("RAM");
+
+    if (missingOptions.length > 0) {
+        const errorMessage = `Please select ${missingOptions.join(", ")} before adding to cart.`;
+        context?.openAlertBox("error", errorMessage);
+        return;
+    }
+
+    // Filter out empty available options
+    const availableOptions = {};
+    if (Array.isArray(product.size) && product.size.length > 0) availableOptions.size = product.size;
+    if (Array.isArray(product.productWeight) && product.productWeight.length > 0) availableOptions.productWeight = product.productWeight;
+    if (Array.isArray(product.productRam) && product.productRam.length > 0) availableOptions.productRam = product.productRam;
+
+    // Filter out empty selected options
+    const selectedOptions = {};
+    if (selectedSize?.trim()) selectedOptions.size = selectedSize;
+    if (selectedWeight?.trim()) selectedOptions.productWeight = selectedWeight;
+    if (selectedRam?.trim()) selectedOptions.productRam = selectedRam;
+
+    // Create a unique identifier for the combination of product and selected options
+    const uniqueIdentifier = `${product._id}-${selectedSize}-${selectedWeight}-${selectedRam}`;
+
+    // Check if the item is already in the cart
+    const itemInCart = context.cartData?.find(
+        (cartItem) =>
+            cartItem.productId === product._id &&
+            cartItem.selectedOptions?.size === selectedSize &&
+            cartItem.selectedOptions?.weight === selectedWeight &&
+            cartItem.selectedOptions?.ram === selectedRam
+    );
+
+    if (itemInCart) {
+        // If the item is already in the cart, show "Go to Cart"
+        setIsAdded(true);
+        setQuantity(itemInCart.quantity); // Sync quantity from cart item
+    } else {
+        // Add the item to the cart
+        await context.addToCart(product, userId, quantity, selectedSize, selectedWeight, selectedRam, uniqueIdentifier);
+        setIsAdded(true); // Update button to show "Go to Cart"
+    }
+};
+
+// Updating `useEffect` and `handleOptionSelection` remains unchanged
+
+
+
+    useEffect(() => {
+        if (!context?.cartData || !props?.product?._id) return;
+
+        // Check if the item with selected options is already in the cart
+        const item = context.cartData.find(
+            (cartItem) =>
+                cartItem.productId === props.product._id &&
+                cartItem.selectedOptions?.size === selectedSize &&
+                cartItem.selectedOptions?.weight === selectedWeight &&
+                cartItem.selectedOptions?.ram === selectedRam
+        );
+
+        if (item) {
+            setCartItem(item);
+            setQuantity(item.quantity); // Sync quantity from context
+        } else {
+            setCartItem(null);
+            setQuantity(1); // Reset quantity
+        }
+    }, [context?.cartData, props?.product?._id, selectedSize, selectedWeight, selectedRam]);
+
+    useEffect(() => {
+        setIsAdded(false);
+    }, [selectedSize, selectedWeight, selectedRam])
+
+    const handleOptionSelection = (type, value) => {
+        // Handle size, weight, and RAM selection
+        switch (type) {
+            case 'size':
+                setSelectedSize(value);
+                break;
+            case 'weight':
+                setSelectedWeight(value);
+                break;
+            case 'ram':
+                setSelectedRam(value);
+                break;
+            default:
+                break;
         }
     };
 
     return (
         <>
             <h1 className="text-[20px] text-[var(--text-dark)] font-bold mb-1 productBrand">
-                <Link to="/">{props?.product?.brand}</Link>
+                <Link to="#">{props?.product?.brand}</Link>
             </h1>
             <h1 className="text-[18px] mb-1 productTitle pr-10">
-                <Link to="/">{props?.product?.name}</Link>
+                <Link to="#">{props?.product?.name}</Link>
             </h1>
 
             <div className="flex items-center justify-start gap-3 text-[14px] py-1">
@@ -105,6 +214,7 @@ const ProductDetailsContent = (props) => {
                 </p>
             </div>
 
+            {/* Product Options */}
             {props?.product?.size?.length > 0 && (
                 <div className="flex items-center gap-3 mb-4">
                     <span className="text-[16px] font-bold">Size:</span>
@@ -112,8 +222,8 @@ const ProductDetailsContent = (props) => {
                         {props?.product?.size?.map((size, index) => (
                             <Button
                                 key={index}
-                                className={`${productActionIndex === index ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
-                                onClick={() => { availableStock !== 0 && setProductActionIndex(index) }}
+                                className={`${selectedSize === size ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("size", size); }}
                                 disableRipple={availableStock === 0}>
                                 {size}
                             </Button>
@@ -122,17 +232,63 @@ const ProductDetailsContent = (props) => {
                 </div>
             )}
 
-            <p className="text-[14px] text-[rgba(0,0,0,0.5)]">Free Shipping (Est. Delivery Time 2-3 Days)</p>
+            {/* Product Weight Options */}
+            {props?.product?.productWeight?.length > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="text-[16px] font-bold">Weight:</span>
+                    <div className="flex items-center gap-1 actions">
+                        {props?.product?.productWeight?.map((weight, index) => (
+                            <Button
+                                key={index}
+                                className={`${selectedWeight === weight ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("weight", weight); }}
+                                disableRipple={availableStock === 0}>
+                                {weight}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Product RAM Options */}
+            {props?.product?.productRam?.length > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="text-[16px] font-bold">RAM:</span>
+                    <div className="flex items-center gap-1 actions">
+                        {props?.product?.productRam?.map((ram, index) => (
+                            <Button
+                                key={index}
+                                className={`${selectedRam === ram ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("ram", ram); }}
+                                disableRipple={availableStock === 0}>
+                                {ram}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <p className="text-[14px] text-[rgba(0,0,0,0.5)]">Free Shipping (Est. Delivery Time 7 Days)</p>
 
             <div className="flex items-center my-4 gap-5 rounded-md">
-                <div className="qtyBoxWrapper w-[95px] rounded-md">
-                    <QtyBox totalStocks={availableStock} onQuantityChange={handleQuantityChange} />
-                </div>
                 <Button
                     className={`!h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1 ${availableStock === 0 ? "!cursor-not-allowed !bg-gray-300 !text-white" : "buttonPrimaryBlack"}`}
-                    onClick={() => { availableStock !== 0 && null }} disableRipple={availableStock === 0}>
+                    onClick={async () => {
+                        if (isAdded) {
+                            // Navigate to cart if "Go to Cart" is displayed
+                            context?.handleCloseProductDetailsModal();
+                            navigate('/cart');
+                        } else {
+                            // Add to cart if "Add to Cart" is displayed
+                            if (availableStock !== 0) {
+                                await addToCart(props?.product, context?.userData?._id, quantity, selectedSize, selectedWeight, selectedRam);
+                            }
+                        }
+                    }}
+                    disableRipple={availableStock === 0}
+                >
                     <MdOutlineShoppingCart className="text-[16px]" />
-                    Add To Cart
+                    {isAdded ? 'Go to Cart' : 'Add to Cart'}
                 </Button>
             </div>
 
@@ -155,5 +311,9 @@ const ProductDetailsContent = (props) => {
         </>
     );
 };
+
+ProductDetailsContent.PropTypes = {
+
+}
 
 export default ProductDetailsContent;

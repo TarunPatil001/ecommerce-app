@@ -61,50 +61,71 @@ const CartItems = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Log to ensure both ids are available
+        // console.log("Item ID:", props?.item?._id);
+        // console.log("Product ID:", props?.item?.productId);
+
         if (!props?.item?._id) {
             console.error("Error: Missing cart item ID");
-            toast.error("Unable to update cart: Missing item information."); // User-friendly error
+            toast.error("Unable to update cart: Missing item information.");
+            return;
+        }
+
+        if (!props?.item?.productId) {
+            console.error("Error: Missing cart product ID");
+            toast.error("Unable to update cart: Missing item information.");
             return;
         }
 
         try {
+            // Construct the selected options object dynamically, only including non-empty values
+            const selectedOptions = {};
+
+            if (selectedSize) selectedOptions.size = selectedSize;
+            if (selectedWeight) selectedOptions.productWeight = selectedWeight;
+            if (selectedRam) selectedOptions.productRam = selectedRam;
+
+            // Prepare the request object with selectedOptions and other necessary details
             const obj = {
-                id: props?.item?._id, // Send empty string if not selected
-                selectedOptions: {
-                    size: selectedSize || "",  // Send empty string if not selected
-                    productWeight: selectedWeight || "",  // Send empty string if not selected
-                    productRam: selectedRam || "",  // Send empty string if not selected
-                },
+                id: props?.item?._id, // Send cart item ID
+                productId: props?.item?.productId, // Include productId from props
+                selectedOptions,  // Only non-empty selected options will be included
+                qty: props?.item?.qty, // Send the current quantity as it is
+                subTotal: props?.item?.subTotal, // Send the subtotal if applicable
+                subTotalOldPrice: props?.item?.subTotalOldPrice // Send the old price subtotal if applicable
             };
 
+            // Call the API to update the cart item
             await toast.promise(
                 editData(`/api/cart/update-product-qty-in-cart`, obj),
                 {
-                    loading: "Updating your cart...", // More user-friendly loading message
+                    loading: "Updating your cart...",
                     success: (res) => {
                         if (res?.success) {
                             context?.getCartItems(); // Fetch updated cart
                             setIsOpenModel(false);
-                            return res?.message || "Cart updated successfully!"; // Success message
+                            return res?.message || "Cart updated successfully!";
                         } else {
-                            throw new Error(res?.message || "Failed to update cart. Please try again."); // Fallback error message
+                            throw new Error(res?.message || "Failed to update cart. Please try again.");
                         }
                     },
                     error: (err) => {
-                        return err?.message || "Something went wrong. Please try again later."; // Generic error message
+                        return err?.message || "Something went wrong. Please try again later.";
                     }
                 }
             );
         } catch (error) {
             console.error("Error updating quantity:", error);
-            toast.error("An unexpected error occurred. Please try again."); // Fallback error for unexpected issues
+            toast.error("An unexpected error occurred. Please try again.");
         }
     };
 
 
 
+
     // Remove Quantity Handler
     const removeQty = async () => {
+
         if (!props?.item?._id) {
             console.error("Error: Missing cart item ID");
             return;
@@ -153,6 +174,7 @@ const CartItems = (props) => {
 
     // Add Quantity Handler
     const addQty = async () => {
+
         if (!props?.item?._id) {
             console.error("Error: Missing cart item ID");
             return;
@@ -218,17 +240,21 @@ const CartItems = (props) => {
             <div className="cartItem w-full p-3 flex items-start gap-4 border rounded-md">
                 <div className="cartItemImg w-[15%] flex items-center justify-center">
                     <div className="w-full h-[150px] rounded-md overflow-hidden">
-                        <Link to={`/product/${props?.item?._id}`} onClick={context.toggleCartPanel(false)}>
+                        <Link to={`/product/${props?.item?.productId}`} onClick={context.toggleCartPanel(false)}>
                             <img src={props?.item?.image} alt="ProductImg" className="w-full h-full object-cover rounded-md hover:scale-105 transition-all" />
                         </Link>
                     </div>
                 </div>
                 <div className="cartInfo w-[85%] pr-5 relative">
-                    <h4 className="text-[14px] line-clamp-1 leading-6 flex items-center gap-1">
-                        <span className="font-semibold flex items-center justify-center gap-0.5">{props?.item?.rating}
-                            <Rating defaultValue={1} max={1} readOnly className="!text-sm !text-[var(--rating-star-color)]" />
+                    <div className='flex items-center text-[12px] gap-1'>
+                        <span className="font-semibold flex items-center justify-center gap-0.5 bg-[var(--rating-star-color)] !text-white rounded-sm px-1">
+                            {props?.item?.rating}
+                            <Rating defaultValue={1} max={1} label={props?.item?.rating} readOnly className="!text-[14px] !text-white mb-0.5" />
                         </span>
-                        <Link to={`/product/${props?.item?._id}`} className="link transition-all" onClick={context.toggleCartPanel(false)}>
+                        <span className="font-bold text-[14px]">{props?.item?.brand?.length > 40 ? `${props?.item?.brand?.substr(0, 40)}...` : props?.item?.brand}</span>
+                    </div>
+                    <h4 className="text-[14px] line-clamp-1 leading-6 flex items-center gap-1">
+                        <Link to={`/product/${props?.item?.productId}`} className="link transition-all" onClick={context.toggleCartPanel(false)}>
                             {props?.item?.productTitle?.length > 50 ? `${props?.item?.productTitle?.substr(0, 50)}...` : props?.item?.productTitle}
                         </Link>
                     </h4>
@@ -264,16 +290,15 @@ const CartItems = (props) => {
                                 </Button>
                                 <span className='w-[40px] text-center text-[13px]'>{props?.item?.quantity}</span>
                                 <Button
-                                    className={`!w-[30px] !min-w-[30px] !h-[20px] !rounded-r-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black ${props?.item?.quantity >= props?.item?.countInStock ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                    className={`!w-[30px] !min-w-[30px] !h-[20px] !rounded-r-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black `}
                                     onClick={addQty}
-                                    disabled={props?.item?.quantity >= props?.item?.countInStock} // Disable plus button if quantity reaches stock limit
                                 >
                                     <FiPlus className='!text-[20px] !font-bold' />
                                 </Button>
                             </span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-4">
+                    <div className="flex items-center gap-2 mt-2">
                         <span className="price text-black text-[16px] font-bold flex items-center">
                             ₹{new Intl.NumberFormat('en-IN').format(`${props?.item?.subTotal}`)}
                         </span>

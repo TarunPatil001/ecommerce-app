@@ -83,45 +83,44 @@
 // };
 
 // export default QtyBox;
-
-
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
-const QtyBox = ({ totalStocks, onQuantityChange }) => {
-    const [quantity, setQuantity] = useState(totalStocks > 0 ? 1 : 0); // Default: 1 if stock exists, else 0
+const QtyBox = ({ totalStocks, onQuantityChange, addQty, removeQty, quantity }) => {
+    const [localQuantity, setLocalQuantity] = useState(quantity); // Use the passed quantity as the initial state
 
-    // Update quantity when totalStocks changes
     useEffect(() => {
-        setQuantity(totalStocks > 0 ? 1 : 0);
-    }, [totalStocks]);
-
-    // Notify parent when quantity changes
-    useEffect(() => {
-        onQuantityChange(quantity);
-    }, [quantity, onQuantityChange]);
+        setLocalQuantity(quantity); // Sync with parent `quantity` when it changes
+    }, [quantity]); // Whenever `quantity` from parent changes, update the local state
 
     const handleIncrement = () => {
-        if (quantity < totalStocks) {
-            setQuantity(prev => prev + 1);
+        if (localQuantity < totalStocks) {
+            setLocalQuantity(prev => prev + 1);
+            if (addQty) addQty();  // Notify parent about the increment
         }
     };
 
     const handleDecrement = () => {
-        if (quantity > 1) {
-            setQuantity(prev => prev - 1);
+        if (localQuantity > 1) {
+            setLocalQuantity(prev => prev - 1);
+            if (removeQty) removeQty();  // Notify parent about the decrement
         }
     };
 
     const handleInputChange = (e) => {
         const value = Number(e.target.value);
         if (!isNaN(value) && value >= 1 && value <= totalStocks) {
-            setQuantity(value);
+            setLocalQuantity(value);
         } else if (value < 1) {
-            setQuantity(1);
+            setLocalQuantity(1);
         }
     };
+
+    // Notify parent when quantity changes
+    useEffect(() => {
+        onQuantityChange(localQuantity);
+    }, [localQuantity, onQuantityChange]);
 
     return (
         <div className="qtyBox flex items-center border border-gray-200 rounded-md">
@@ -130,21 +129,17 @@ const QtyBox = ({ totalStocks, onQuantityChange }) => {
                 type="number"
                 min="1"
                 max={totalStocks}
-                value={quantity}
+                value={localQuantity}
                 onChange={handleInputChange}
                 disabled={totalStocks === 0}
-                className={`w-[60px] h-[40px] p-2 text-[15px] text-center rounded-l-md focus:outline-none ${
-                    totalStocks === 0 ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                }`}
+                className={`w-[60px] h-[40px] p-2 text-[15px] text-center rounded-l-md focus:outline-none ${totalStocks === 0 ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
             />
             <span className="flex flex-col w-full">
                 {/* Increment Button */}
                 <button
                     onClick={handleIncrement}
-                    disabled={quantity >= totalStocks}
-                    className={`flex items-center justify-center bg-gray-200 hover:bg-gray-300 h-[20px] min-w-full shadow rounded-tr-md ${
-                        quantity >= totalStocks ? 'cursor-not-allowed opacity-50' : ''
-                    }`}
+                    disabled={localQuantity >= totalStocks}
+                    className={`flex items-center justify-center bg-gray-200 hover:bg-gray-300 h-[20px] min-w-full shadow rounded-tr-md ${localQuantity >= totalStocks ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
                     <FiChevronUp />
                 </button>
@@ -152,10 +147,8 @@ const QtyBox = ({ totalStocks, onQuantityChange }) => {
                 {/* Decrement Button */}
                 <button
                     onClick={handleDecrement}
-                    disabled={quantity <= 1 || totalStocks === 0}
-                    className={`flex items-center justify-center bg-gray-200 hover:bg-gray-300 h-[20px] min-w-full shadow rounded-br-md ${
-                        quantity <= 1 || totalStocks === 0 ? 'cursor-not-allowed opacity-50' : ''
-                    }`}
+                    disabled={localQuantity <= 1 || totalStocks === 0}
+                    className={`flex items-center justify-center bg-gray-200 hover:bg-gray-300 h-[20px] min-w-full shadow rounded-br-md ${localQuantity <= 1 || totalStocks === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
                     <FiChevronDown />
                 </button>
@@ -167,6 +160,9 @@ const QtyBox = ({ totalStocks, onQuantityChange }) => {
 QtyBox.propTypes = {
     totalStocks: PropTypes.number.isRequired,
     onQuantityChange: PropTypes.func.isRequired,
+    addQty: PropTypes.func,  // Optional prop for increment action
+    removeQty: PropTypes.func,  // Optional prop for decrement action
+    quantity: PropTypes.number.isRequired, // The quantity passed from parent
 };
 
 export default QtyBox;

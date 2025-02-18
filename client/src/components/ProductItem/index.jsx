@@ -20,106 +20,106 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ProductItem = (props) => {
 
   const context = useContext(MyContext);
-  const [quantity, setQuantity] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
-  const [cartItem, setCartItem] = useState(null);
+  // const [quantity, setQuantity] = useState(1);
+  // const [isAdded, setIsAdded] = useState(false);
+  // const [cartItem, setCartItem] = useState(null);
 
-  const addToCart = (product, userId, quantity) => {
-    if (quantity <= 0) return; // ✅ Prevent adding 0 quantity
+  // const addToCart = (product, userId, quantity) => {
+  //   if (quantity <= 0) return; // ✅ Prevent adding 0 quantity
 
-    context?.addToCart(product, userId, quantity);
-    setIsAdded(true);
-  };
+  //   context?.addToCart(product, userId, quantity);
+  //   setIsAdded(true);
+  // };
 
-  useEffect(() => {
-    if (!context?.cartData || !props?.product?._id) return;
+  // useEffect(() => {
+  //   if (!context?.cartData || !props?.product?._id) return;
 
-    const item = context.cartData.find(
-      (cartItem) => cartItem.productId === props.product._id
-    );
+  //   const item = context.cartData.find(
+  //     (cartItem) => cartItem.productId === props.product._id
+  //   );
 
-    if (item) {
-      setCartItem(item);
-      setQuantity(item.quantity); // ✅ Sync quantity from cart
-      setIsAdded(true);
-    } else {
-      setCartItem(null);
-      setIsAdded(false);
-      setQuantity(1); // ✅ Reset quantity after removal
-    }
-  }, [context?.cartData, props?.product?._id]);
+  //   if (item) {
+  //     setCartItem(item);
+  //     setQuantity(item.quantity); // ✅ Sync quantity from cart
+  //     setIsAdded(true);
+  //   } else {
+  //     setCartItem(null);
+  //     setIsAdded(false);
+  //     setQuantity(1); // ✅ Reset quantity after removal
+  //   }
+  // }, [context?.cartData, props?.product?._id]);
 
-  const removeQty = async () => {
-    if (!cartItem?._id) {
-      console.error("Error: Missing cart item ID");
-      return;
-    }
+  // const removeQty = async () => {
+  //   if (!cartItem?._id) {
+  //     console.error("Error: Missing cart item ID");
+  //     return;
+  //   }
   
-    if (quantity > 1) {
-      const updatedQty = quantity - 1;
-      setQuantity(updatedQty);
+  //   if (quantity > 1) {
+  //     const updatedQty = quantity - 1;
+  //     setQuantity(updatedQty);
   
-      try {
-        const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
+  //     try {
+  //       const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
   
-        await toast.promise(
-          editData(`/api/cart/update-product-qty-in-cart`, obj),
-          {
-            loading: "Updating quantity...",
-            success: "Quantity decreased!",
-            error: "Error updating quantity. Please try again.",
-          }
-        );
-        context?.getCartItems();
-      } catch (error) {
-        console.error("Error updating quantity:", error);
-      }
-    } else if (quantity === 1) {
-      try {
-        await toast.promise(
-          deleteData(`/api/cart/delete-cart-item/${cartItem._id}`),
-          {
-            loading: "Removing item...",
-            success: "Item removed from cart!",
-            error: "Error deleting item. Please try again.",
-          }
-        );
+  //       await toast.promise(
+  //         editData(`/api/cart/update-product-qty-in-cart`, obj),
+  //         {
+  //           loading: "Updating quantity...",
+  //           success: "Quantity decreased!",
+  //           error: "Error updating quantity. Please try again.",
+  //         }
+  //       );
+  //       context?.getCartItems();
+  //     } catch (error) {
+  //       console.error("Error updating quantity:", error);
+  //     }
+  //   } else if (quantity === 1) {
+  //     try {
+  //       await toast.promise(
+  //         deleteData(`/api/cart/delete-cart-item/${cartItem._id}`),
+  //         {
+  //           loading: "Removing item...",
+  //           success: "Item removed from cart!",
+  //           error: "Error deleting item. Please try again.",
+  //         }
+  //       );
   
-        setCartItem(null);
-        setIsAdded(false);
-        setQuantity(1);
-        context?.getCartItems();
-      } catch (error) {
-        console.error("Error deleting item:", error);
-      }
-    }
-  };
+  //       setCartItem(null);
+  //       setIsAdded(false);
+  //       setQuantity(1);
+  //       context?.getCartItems();
+  //     } catch (error) {
+  //       console.error("Error deleting item:", error);
+  //     }
+  //   }
+  // };
   
-  const addQty = async () => {
-    if (!cartItem?._id) {
-      console.error("Error: Missing cart item ID");
-      return;
-    }
+  // const addQty = async () => {
+  //   if (!cartItem?._id) {
+  //     console.error("Error: Missing cart item ID");
+  //     return;
+  //   }
   
-    const updatedQty = quantity + 1;
-    setQuantity(updatedQty);
+  //   const updatedQty = quantity + 1;
+  //   setQuantity(updatedQty);
   
-    const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
+  //   const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
   
-    try {
-      await toast.promise(
-        editData(`/api/cart/update-product-qty-in-cart`, obj),
-        {
-          loading: "Updating quantity...",
-          success: "Quantity increased!",
-          error: "Error updating quantity. Please try again.",
-        }
-      );
-      context?.getCartItems();
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-    }
-  };
+  //   try {
+  //     await toast.promise(
+  //       editData(`/api/cart/update-product-qty-in-cart`, obj),
+  //       {
+  //         loading: "Updating quantity...",
+  //         success: "Quantity increased!",
+  //         error: "Error updating quantity. Please try again.",
+  //       }
+  //     );
+  //     context?.getCartItems();
+  //   } catch (error) {
+  //     console.error("Error updating quantity:", error);
+  //   }
+  // };
   
 
   return (
@@ -205,7 +205,7 @@ const ProductItem = (props) => {
             <span className="uppercase text-[12px] text-[var(--off-color)] font-normal">({props?.product?.discount}% OFF)</span>
           </div>
         </div>
-        <div className="w-full h-[40px] px-3 mb-3">
+        {/* <div className="w-full h-[40px] px-3 mb-3">
           {
             isAdded === false ?
               <Button className="buttonPrimaryWhite w-full flex items-center justify-center shadow-md" onClick={() => addToCart(props?.product, context?.userData?._id, quantity)}><MdOutlineShoppingCart className="text-[16px]" />Add To Cart</Button>
@@ -216,7 +216,7 @@ const ProductItem = (props) => {
                 <Button className="buttonPrimaryBlack !rounded-l-none !w-[40px] !min-w-[50px] !h-full flex items-center justify-center shadow-md" onClick={addQty}><FiPlus className="text-[16px]" /></Button>
               </div>
           }
-        </div>
+        </div> */}
 
       </div>
     </div>

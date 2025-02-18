@@ -48,7 +48,9 @@ const CartPage = () => {
                             {
                                 context?.cartData?.length === 0 ?
                                     <div className='w-full h-[50vh] flex flex-col items-center justify-center gap-2 text-gray-400'>
-                                        <MdOutlineRemoveShoppingCart className='text-[40px]' />
+                                        <span className="flex items-center justify-center">
+                                            <img src="../empty-cart.png" alt="empty-cart-img" className="w-[128px] h-[128px]" />
+                                        </span>
                                         <span className="text-[18px]">Your cart is empty!</span>
                                         <span className="text-[12px]">Add items to it now.</span>
                                         <Link to="/" className="w-[30%] min-w-[30%] !flex !items-center !justify-center mt-4">

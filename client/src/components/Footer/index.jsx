@@ -3,6 +3,8 @@ import {
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogContent,
   Divider,
   Drawer,
   FormControlLabel,
@@ -21,6 +23,8 @@ import { Link } from "react-router-dom";
 import CartPanel from "../CartPanel";
 import { MyContext } from "../../App";
 import { MdOutlineRemoveShoppingCart } from "react-icons/md";
+import ProductZoom from "../ProductZoom";
+import ProductDetailsContent from "../ProductDetailsContent";
 
 const Footer = () => {
 
@@ -308,7 +312,10 @@ const Footer = () => {
             <CartPanel data={context?.cartData} />
             :
             <div className='w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400'>
-              <MdOutlineRemoveShoppingCart className='text-[40px]' />
+              {/* <MdOutlineRemoveShoppingCart className='text-[40px]' /> */}
+              <span className="flex items-center justify-center">
+                <img src="../empty-cart.png" alt="empty-cart-img" className="w-[128px] h-[128px]"/>
+              </span>
               <span className="text-[18px]">Your cart is empty!</span>
               <span className="text-[12px]">Add items to it now.</span>
               <Link to="/" className="w-[50%] min-w-[30%] !mt-2 !flex !items-center !justify-center">
@@ -318,6 +325,48 @@ const Footer = () => {
         }
 
       </Drawer>
+
+
+      <Dialog
+          open={context?.openProductDetailsModal.open}
+          onClose={context?.handleCloseProductDetailsModal}
+          fullWidth={context?.fullWidth}
+          maxWidth={context?.maxWidth}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          className="productDetailsModal"
+          classes={"relative"}
+        >
+          <DialogContent>
+            <div className="flex items-start w-full productDetailsModalContainer gap-10 p-5">
+              {/* Close Button */}
+              <Button
+                className="!w-[40px] !h-[40px] !min-w-[40px] !bg-red-50 shadow !text-red-500 !rounded-full !absolute top-[20px] right-[30px] z-10"
+                onClick={context?.handleCloseProductDetailsModal}
+              >
+                <IoCloseOutline className="text-[30px]" />
+              </Button>
+
+              {
+                context?.openProductDetailsModal?.product?.length !== 0 &&
+                 ( // Ensure cartData exists before rendering
+                  <>
+                    {/* Left Column with Sticky */}
+                    <div className="col1 w-[50%] sticky top-5">
+                      <ProductZoom images={context?.openProductDetailsModal?.product?.images} />
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="col2 w-[50%] h-full  p-2 productContent">
+                      <ProductDetailsContent product={context?.openProductDetailsModal?.product} reviewsCount={context?.reviewsCount} />
+                    </div>
+                  </>
+                )
+              }
+            </div>
+
+          </DialogContent>
+        </Dialog>
 
 
     </>

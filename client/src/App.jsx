@@ -134,95 +134,96 @@ function App() {
   };
 
   const addToCart = async (product, userId, quantity, selectedSize, selectedWeight, selectedRam) => {
+    // Validate user
     if (!userId) {
-      openAlertBox("error", "Please login to continue.");
-      return false;
+        openAlertBox("error", "Please login to continue.");
+        return false;
     }
-  
+
+    // Validate product
     if (!product || !product._id || !product.name || !product.price) {
-      openAlertBox("error", "Invalid product details.");
-      return false;
+        openAlertBox("error", "Invalid product details.");
+        return false;
     }
-  
-    // Send empty string if not selected
-    const selectedOptions = {
-      size: selectedSize || "",  // Send empty string if not selected
-      productWeight: selectedWeight || "",  // Send empty string if not selected
-      productRam: selectedRam || "",  // Send empty string if not selected
-    };
-  
-    // // Check if at least one option is selected (size, weight, or RAM)
-    // if (!selectedOptions.size && !selectedOptions.productWeight && !selectedOptions.productRam) {
-    //   openAlertBox("error", "Please select at least one option (size, weight, or RAM).");
-    //   return false;
-    // }
-  
+
+    // Create selectedOptions object, excluding empty fields
+    const selectedOptions = {};
+    if (selectedSize?.trim()) selectedOptions.size = selectedSize;
+    if (selectedWeight?.trim()) selectedOptions.productWeight = selectedWeight;
+    if (selectedRam?.trim()) selectedOptions.productRam = selectedRam;
+
+    // Create availableOptions object, excluding empty arrays
+    const availableOptions = {};
+    if (Array.isArray(product.size) && product.size.length > 0) availableOptions.size = product.size;
+    if (Array.isArray(product.productWeight) && product.productWeight.length > 0) availableOptions.productWeight = product.productWeight;
+    if (Array.isArray(product.productRam) && product.productRam.length > 0) availableOptions.productRam = product.productRam;
+
     // Create the data object to send to the backend
     const data = {
-      productTitle: product.name,
-      image: product.images?.[0] || "",
-      sellerDetails: {
-        sellerId: product.seller?.sellerId || "",
-        sellerName: product.seller?.sellerName || "",
-      },
-      rating: product.rating || 0,
-      brand: product.brand || "Unknown",
-      availableOptions: {
-        size: Array.isArray(product.size) ? product.size : [],
-        productWeight: Array.isArray(product.productWeight) ? product.productWeight : [],
-        productRam: Array.isArray(product.productRam) ? product.productRam : [],
-      },
-      selectedOptions,  // Send the selectedOptions with empty strings if not selected
-      price: Number(product.price) || 0,
-      oldPrice: Number(product.oldPrice) || 0,
-      quantity: Number(quantity) || 1,
-      discount: Number(product.discount) || 0,
-      subTotal: (Number(product.price) || 0) * (Number(quantity) || 1),
-      subTotalOldPrice: (Number(product.oldPrice) || 0) * (Number(quantity) || 1),
-      productId: product._id,
-      countInStock: Number(product.countInStock) || 0,
-      userId: userId,
+        productTitle: product.name,
+        image: product.images?.[0] || "", // Use the first image or an empty string
+        sellerDetails: {
+            sellerId: product.seller?.sellerId || "",
+            sellerName: product.seller?.sellerName || "",
+        },
+        rating: product.rating || 0,
+        brand: product.brand || "Unknown",
+        price: Number(product.price) || 0,
+        oldPrice: Number(product.oldPrice) || 0,
+        quantity: Number(quantity) || 1,
+        discount: Number(product.discount) || 0,
+        subTotal: (Number(product.price) || 0) * (Number(quantity) || 1),
+        subTotalOldPrice: (Number(product.oldPrice) || 0) * (Number(quantity) || 1),
+        productId: product._id,
+        countInStock: Number(product.countInStock) || 0,
+        userId: userId,
     };
-  
-    try {
-      await toast.promise(
-        postData("/api/cart/add-product-to-cart", data),
-        {
-          loading: "Adding to cart... Please wait.",
-          success: (res) => {
-            if (res.error === false) {
-              console.log(res?.data);
-              getCartItems();
-              return res?.message || "Item added to cart!";
-            } else {
-              throw new Error(res?.message || "Failed to add item.");
-            }
-          },
-          error: (err) => {
-            console.error("Error Response:", err);
-            const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
-            openAlertBox("error", errorMessage);
-            return errorMessage;
-          },
-        }
-      );
-    } catch (error) {
-      console.error(error);
-      openAlertBox("error", "Unexpected error occurred. Please try again.");
-    }
-  };
-  
-  
-  
 
+    // Add availableOptions and selectedOptions only if they are not empty
+    if (Object.keys(availableOptions).length > 0) data.availableOptions = availableOptions;
+    if (Object.keys(selectedOptions).length > 0) data.selectedOptions = selectedOptions;
+
+    try {
+        await toast.promise(
+            postData("/api/cart/add-product-to-cart", data),
+            {
+                loading: "Adding to cart... Please wait.",
+                success: (res) => {
+                    if (res.error === false) {
+                        console.log(res?.data);
+                        getCartItems(); // Refresh cart items
+                        return res?.message || "Item added to cart!";
+                    } else {
+                        throw new Error(res?.message || "Failed to add item.");
+                    }
+                },
+                error: (err) => {
+                    console.error("Error Response:", err);
+                    const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
+                    return errorMessage;
+                },
+            }
+        );
+    } catch (error) {
+        console.error(error);
+        openAlertBox("error", "Unexpected error occurred. Please try again.");
+    }
+};
 
 
 
   // Consolidated values for context/provider
   const values = {
     // Modal-related state and handlers
+    openProductDetailsModal,
     setOpenProductDetailsModal,
     handleOpenProductDetailsModal,
+    handleCloseProductDetailsModal,
+
+    fullWidth,
+    setFullWidth,
+    maxWidth,
+    setMaxWidth,
 
     // Cart panel visibility
     openCartPanel,
@@ -296,46 +297,6 @@ function App() {
         </MyContext.Provider>
 
         <Toaster />
-
-        <Dialog
-          open={openProductDetailsModal.open}
-          onClose={handleCloseProductDetailsModal}
-          fullWidth={fullWidth}
-          maxWidth={maxWidth}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          className="productDetailsModal"
-        >
-          <DialogContent>
-            <div className="flex items-start w-full productDetailsModalContainer relative gap-10 p-5">
-              {/* Close Button */}
-              <Button
-                className="!w-[40px] !h-[40px] !min-w-[40px] !bg-gray-100 !border-red-500 !text-red-500 !rounded-full !absolute top-[10px] right-[10px] z-10"
-                onClick={handleCloseProductDetailsModal}
-              >
-                <IoCloseOutline className="text-[30px]" />
-              </Button>
-
-
-              {
-                openProductDetailsModal?.product?.length !== 0 &&
-                <>
-                  {/* Left Column with Sticky */}
-                  <div className="col1 w-[50%] sticky top-5">
-                    <ProductZoom images={openProductDetailsModal?.product?.images} />
-                  </div>
-
-                  {/* Right Column */}
-                  <div className="col2 w-[50%] overflow-y-auto p-2 productContent">
-                    <ProductDetailsContent product={openProductDetailsModal?.product} reviewsCount={reviewsCount} />
-                  </div>
-                </>
-              }
-
-            </div>
-
-          </DialogContent>
-        </Dialog>
 
       </BrowserRouter>
     </>

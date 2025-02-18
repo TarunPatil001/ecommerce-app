@@ -8,9 +8,10 @@ import ProductSlider from '../../components/ProductSlider';
 import ProductDetailsContent from '../../components/ProductDetailsContent';
 import { CircularProgress, Rating } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { fetchDataFromApi } from '../../utils/api';
+import { deleteData, editData, fetchDataFromApi } from '../../utils/api';
 import Reviews from './reviews';
 import { MyContext } from '../../App';
+import toast from 'react-hot-toast';
 
 
 function handleClick(event) {
@@ -18,7 +19,7 @@ function handleClick(event) {
     console.info('You clicked a breadcrumb.');
 }
 
-const ProductDetails = (props) => {
+const ProductDetails = () => {
 
     const context = useContext(MyContext);
     const [activeTab, setActiveTab] = useState(0);
@@ -26,6 +27,7 @@ const ProductDetails = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [reviewsCount, setReviewsCount] = useState(0);
     const [relatedProductData, setRelatedProductData] = useState([]);
+
 
     // Ref for scrolling to reviews
     const reviewsRef = useRef(null);
