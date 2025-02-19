@@ -12,7 +12,7 @@ import { MyContext } from "../../App";
 import PropTypes from "prop-types";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { MdOutlineShoppingCart } from "react-icons/md";
-import { deleteData, editData } from "../../utils/api";
+import { deleteData, editData, fetchDataFromApi, postData } from "../../utils/api";
 import toast from "react-hot-toast";
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -20,122 +20,134 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 const ProductItem = (props) => {
 
   const context = useContext(MyContext);
-  // const [quantity, setQuantity] = useState(1);
-  // const [isAdded, setIsAdded] = useState(false);
-  // const [cartItem, setCartItem] = useState(null);
+  const [isAddedWishlist, setIsAddedWishlist] = useState(false);
 
-  // const addToCart = (product, userId, quantity) => {
-  //   if (quantity <= 0) return; // ✅ Prevent adding 0 quantity
 
-  //   context?.addToCart(product, userId, quantity);
-  //   setIsAdded(true);
-  // };
+  useEffect(() => {
+    if (context?.userData !== null) {
+      const isWishlistItem = context?.wishlistData?.filter((item) => item?.productId.includes(props?.product._id));
+      setIsAddedWishlist(isWishlistItem.length > 0); // Set to true if the item exists in the wishlist
+    }else{
+      setIsAddedWishlist(false); 
+    }
+      
+  }, [context?.wishlistData, props.product._id, context?.userData]);
 
-  // useEffect(() => {
-  //   if (!context?.cartData || !props?.product?._id) return;
 
-  //   const item = context.cartData.find(
-  //     (cartItem) => cartItem.productId === props.product._id
-  //   );
+  const handleAddToMyList = async (item) => {
+    if (!context?.userData) {
+      context?.openAlertBox("error", "You are not logged in.");
+      return;
+    }
 
-  //   if (item) {
-  //     setCartItem(item);
-  //     setQuantity(item.quantity); // ✅ Sync quantity from cart
-  //     setIsAdded(true);
-  //   } else {
-  //     setCartItem(null);
-  //     setIsAdded(false);
-  //     setQuantity(1); // ✅ Reset quantity after removal
-  //   }
-  // }, [context?.cartData, props?.product?._id]);
+    // Find the wishlist item ID if it exists
+    const wishlistItem = context?.wishlistData?.find((w) => w.productId === item._id);
+    const wishlistItemId = wishlistItem?._id; // Correct wishlist item ID
 
-  // const removeQty = async () => {
-  //   if (!cartItem?._id) {
-  //     console.error("Error: Missing cart item ID");
-  //     return;
-  //   }
-  
-  //   if (quantity > 1) {
-  //     const updatedQty = quantity - 1;
-  //     setQuantity(updatedQty);
-  
-  //     try {
-  //       const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
-  
-  //       await toast.promise(
-  //         editData(`/api/cart/update-product-qty-in-cart`, obj),
-  //         {
-  //           loading: "Updating quantity...",
-  //           success: "Quantity decreased!",
-  //           error: "Error updating quantity. Please try again.",
-  //         }
-  //       );
-  //       context?.getCartItems();
-  //     } catch (error) {
-  //       console.error("Error updating quantity:", error);
-  //     }
-  //   } else if (quantity === 1) {
-  //     try {
-  //       await toast.promise(
-  //         deleteData(`/api/cart/delete-cart-item/${cartItem._id}`),
-  //         {
-  //           loading: "Removing item...",
-  //           success: "Item removed from cart!",
-  //           error: "Error deleting item. Please try again.",
-  //         }
-  //       );
-  
-  //       setCartItem(null);
-  //       setIsAdded(false);
-  //       setQuantity(1);
-  //       context?.getCartItems();
-  //     } catch (error) {
-  //       console.error("Error deleting item:", error);
-  //     }
-  //   }
-  // };
-  
-  // const addQty = async () => {
-  //   if (!cartItem?._id) {
-  //     console.error("Error: Missing cart item ID");
-  //     return;
-  //   }
-  
-  //   const updatedQty = quantity + 1;
-  //   setQuantity(updatedQty);
-  
-  //   const obj = { id: cartItem._id, qty: updatedQty, subTotal: props?.product?.price * updatedQty, subTotalOldPrice: props?.product?.oldPrice * updatedQty };
-  
-  //   try {
-  //     await toast.promise(
-  //       editData(`/api/cart/update-product-qty-in-cart`, obj),
-  //       {
-  //         loading: "Updating quantity...",
-  //         success: "Quantity increased!",
-  //         error: "Error updating quantity. Please try again.",
-  //       }
-  //     );
-  //     context?.getCartItems();
-  //   } catch (error) {
-  //     console.error("Error updating quantity:", error);
-  //   }
-  // };
-  
+    const obj = {
+      productId: item._id,
+      userId: context?.userData?._id,
+      productTitle: item.name,
+      image: item.images[0],
+      rating: item.rating,
+      price: item.price,
+      oldPrice: item.oldPrice,
+      brand: item.brand,
+      discount: item.discount,
+    };
+
+    console.log("Item ID:", item?._id);
+    console.log("Wishlist Item ID:", wishlistItemId);
+
+    try {
+      if (wishlistItemId) {
+        // Item exists in wishlist, so remove it
+        const endpoint = `/api/wishlist/remove-from-wishlist/${wishlistItemId}`;
+        await toast.promise(deleteData(endpoint), {
+          loading: "Removing from wishlist...",
+          success: (res) => {
+            if (!res.error) {
+              setIsAddedWishlist(false); // Set state to removed
+              context?.getWishlistData(); // Refresh wishlist
+              return res?.message || "Item removed from wishlist!";
+            } else {
+              throw new Error(res?.message || "Failed to remove from wishlist.");
+            }
+          },
+          error: (err) => {
+            console.error("Error Response:", err);
+            return err?.response?.data?.message || err?.message || "Something went wrong!";
+          },
+        });
+      } else {
+        // Item not in wishlist, so add it
+        const endpoint = "/api/wishlist/add-to-wishlist";
+        await toast.promise(postData(endpoint, obj), {
+          loading: "Adding to wishlist...",
+          success: (res) => {
+            if (!res.error) {
+              setIsAddedWishlist(true); // Set state to added
+              context?.getWishlistData(); // Refresh wishlist
+              return res?.message || "Item added to wishlist!";
+            } else {
+              throw new Error(res?.message || "Failed to add to wishlist.");
+            }
+          },
+          error: (err) => {
+            console.error("Error Response:", err);
+            return err?.response?.data?.message || err?.message || "Something went wrong!";
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      context?.openAlertBox("error", "Unexpected error occurred. Please try again.");
+    }
+  };
+
+
+
 
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
       <div className="productItem rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)]">
         <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative bg-gray-100">
 
-          <Link to={props?.product?._id ? `/product/${props.product._id}` : '#'}>
+          <Link to={props?.product?._id ? `/product/${props.product._id}` : '#'} className="cursor-default">
 
 
             {/* <ProductImageFlipChange firstImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/320-large_default/hummingbird-printed-t-shirt.jpg"} SecondImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/318-large_default/hummingbird-printed-t-shirt.jpg"} /> */}
             <ProductImageOpacityChange firstImg={props?.product?.images?.[0]} SecondImg={props?.product?.images?.[1]} />
 
           </Link>
-          <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-[var(--bg-primary)] text-white rounded-md p-1 text-[12px] font-medium">
-            -{props?.product?.discount}%
+          {/* -{props?.product?.discount}% */}
+
+          <span className="flex items-center absolute top-[0px] left-[0px] z-50 rounded-md">
+            {/* <Tooltip
+              title="Add to Wishlist"
+              placement="right"
+              arrow
+            > */}
+              <Checkbox
+                icon={
+                  <div className="relative">
+                    <IoMdHeart className="text-[35px] text-[rgba(0,0,0,0.3)]" />
+                    <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
+                  </div>
+                }
+                checkedIcon={
+                  <div className="relative">
+                    <IoMdHeart className="text-[35px] text-red-500" />
+                    <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
+                  </div>
+                }
+                checked={isAddedWishlist}
+                onChange={() => handleAddToMyList(props?.product)}
+                disableRipple
+              />
+
+            {/* </Tooltip> */}
+
           </span>
 
           <span className=" px-1 flex items-center gap-1 absolute bottom-2 right-2 z-50 border rounded-sm text-[12px] bg-[rgba(255,255,255,0.8)]">
@@ -144,7 +156,7 @@ const ProductItem = (props) => {
             <span className="flex items-center gap-1 font-semibold">{new Intl.NumberFormat("en", { notation: "compact" }).format(500000).toLowerCase()}</span>
           </span>
 
-
+          {!props?.fromWishlist && (
           <div className="actions absolute top-[-200px] right-[0px] z-50 flex items-center gap-2 flex-col w-[80px] transition-all duration-500 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
 
             <Tooltip
@@ -152,7 +164,7 @@ const ProductItem = (props) => {
               placement="right"
               arrow
             >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.product)}>
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.product)}>
                 <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
               </Button>
             </Tooltip>
@@ -162,29 +174,18 @@ const ProductItem = (props) => {
               placement="right"
               arrow
             >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" >
+              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" >
                 <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
               </Button>
             </Tooltip>
-
-            <Tooltip
-              title="Add to Wishlist"
-              placement="right"
-              arrow
-            >
-              <Button className="heartBtn !w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.7)] text-gray-700 hover:!bg-[var(--bg-primary)] group">
-                {/* <IoMdHeartEmpty className="text-[35px] !text-gray-700 group-hover:text-white  " /> */}
-                <Checkbox {...label} icon={<IoMdHeartEmpty className="text-[25px] !text-gray-700 group-hover:text-white" />} checkedIcon={<IoMdHeart className="text-[25px]" />} disableRipple />
-              </Button>
-            </Tooltip>
-
           </div>
+          )}
         </div>
 
 
         <div className="info px-3 py-1 border-t h-[100px]">
           <h6 className="text-[16px] font-bold text-[var(--text-dark)]">
-            <Link to="/" className="link transition-all line-clamp-1">
+            <Link to="#" className="link transition-all line-clamp-1">
               {props?.product?.brand}
             </Link>
           </h6>

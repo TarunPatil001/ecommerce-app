@@ -64,6 +64,7 @@ const Header = () => {
         localStorage.clear();
         context.setUserData(null)
         context?.setCartData(0);
+        context?.setWishlistData([]);
         navigate("/");
       }
     })
@@ -245,13 +246,15 @@ const Header = () => {
                   </Tooltip>
                 </li>
                 <li>
+                  <Link to="/my-wishlist">
                   <Tooltip title="Wishlist" placement="top" arrow>
                     <IconButton aria-label="wishlist" className="link transition">
-                      <StyledBadge badgeContent={4} color="secondary">
+                      <StyledBadge badgeContent={context?.wishlistData?.length || 0} color="secondary">
                         <FaRegHeart />
                       </StyledBadge>
                     </IconButton>
                   </Tooltip>
+                  </Link>
                 </li>
                 <li>
                   <Tooltip title="Cart" placement="top" arrow>

@@ -40,6 +40,7 @@ function App() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
   const [catData, setCatData] = useState([]);
+  const [productData, setProductData] = useState([]);
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);
   const [reviewsCount, setReviewsCount] = useState(0);
@@ -47,6 +48,8 @@ function App() {
   // const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState({});
   const [cartItem, setCartItem] = useState(null);
+  const [wishlistData, setWishlistData] = useState([]);
+  // const [isWishlist, setIsWishlist] = useState(false);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
@@ -86,13 +89,14 @@ function App() {
       })
 
       getCartItems();
-
+      getWishlistData();
+      
     } else {
       setIsLogin(false);
     }
   }, [isLogin]);
-
-
+  
+  
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
       if (res?.error === false) {
@@ -101,6 +105,18 @@ function App() {
       // console.log(res);
     });
   }, [isReducer]);
+  
+  useEffect(()=>{
+    getProductData();
+  },[]);
+
+  const getProductData = () => {
+    fetchDataFromApi('/api/product/get-all-products').then((res) => {
+      if (res.error === false && res.data) {
+        setProductData(res?.data);
+      }
+    })
+  };
 
 
   useEffect(() => {
@@ -136,14 +152,14 @@ function App() {
   const addToCart = async (product, userId, quantity, selectedSize, selectedWeight, selectedRam) => {
     // Validate user
     if (!userId) {
-        openAlertBox("error", "Please login to continue.");
-        return false;
+      openAlertBox("error", "Please login to continue.");
+      return false;
     }
 
     // Validate product
     if (!product || !product._id || !product.name || !product.price) {
-        openAlertBox("error", "Invalid product details.");
-        return false;
+      openAlertBox("error", "Invalid product details.");
+      return false;
     }
 
     // Create selectedOptions object, excluding empty fields
@@ -160,23 +176,23 @@ function App() {
 
     // Create the data object to send to the backend
     const data = {
-        productTitle: product.name,
-        image: product.images?.[0] || "", // Use the first image or an empty string
-        sellerDetails: {
-            sellerId: product.seller?.sellerId || "",
-            sellerName: product.seller?.sellerName || "",
-        },
-        rating: product.rating || 0,
-        brand: product.brand || "Unknown",
-        price: Number(product.price) || 0,
-        oldPrice: Number(product.oldPrice) || 0,
-        quantity: Number(quantity) || 1,
-        discount: Number(product.discount) || 0,
-        subTotal: (Number(product.price) || 0) * (Number(quantity) || 1),
-        subTotalOldPrice: (Number(product.oldPrice) || 0) * (Number(quantity) || 1),
-        productId: product._id,
-        countInStock: Number(product.countInStock) || 0,
-        userId: userId,
+      productTitle: product.name,
+      image: product.images?.[0] || "", // Use the first image or an empty string
+      sellerDetails: {
+        sellerId: product.seller?.sellerId || "",
+        sellerName: product.seller?.sellerName || "",
+      },
+      rating: product.rating || 0,
+      brand: product.brand || "Unknown",
+      price: Number(product.price) || 0,
+      oldPrice: Number(product.oldPrice) || 0,
+      quantity: Number(quantity) || 1,
+      discount: Number(product.discount) || 0,
+      subTotal: (Number(product.price) || 0) * (Number(quantity) || 1),
+      subTotalOldPrice: (Number(product.oldPrice) || 0) * (Number(quantity) || 1),
+      productId: product._id,
+      countInStock: Number(product.countInStock) || 0,
+      userId: userId,
     };
 
     // Add availableOptions and selectedOptions only if they are not empty
@@ -184,31 +200,38 @@ function App() {
     if (Object.keys(selectedOptions).length > 0) data.selectedOptions = selectedOptions;
 
     try {
-        await toast.promise(
-            postData("/api/cart/add-product-to-cart", data),
-            {
-                loading: "Adding to cart... Please wait.",
-                success: (res) => {
-                    if (res.error === false) {
-                        console.log(res?.data);
-                        getCartItems(); // Refresh cart items
-                        return res?.message || "Item added to cart!";
-                    } else {
-                        throw new Error(res?.message || "Failed to add item.");
-                    }
-                },
-                error: (err) => {
-                    console.error("Error Response:", err);
-                    const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
-                    return errorMessage;
-                },
+      await toast.promise(
+        postData("/api/cart/add-product-to-cart", data),
+        {
+          loading: "Adding to cart... Please wait.",
+          success: (res) => {
+            if (res.error === false) {
+              console.log(res?.data);
+              getCartItems(); // Refresh cart items
+              return res?.message || "Item added to cart!";
+            } else {
+              throw new Error(res?.message || "Failed to add item.");
             }
-        );
+          },
+          error: (err) => {
+            console.error("Error Response:", err);
+            const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong!";
+            return errorMessage;
+          },
+        }
+      );
     } catch (error) {
-        console.error(error);
-        openAlertBox("error", "Unexpected error occurred. Please try again.");
+      console.error(error);
+      openAlertBox("error", "Unexpected error occurred. Please try again.");
     }
-};
+  };
+
+  const getWishlistData = () => {
+    fetchDataFromApi('/api/wishlist/get-wishlist').then((res) => {
+      console.log(res.data);
+      setWishlistData(res.data);
+    })
+  }
 
 
 
@@ -241,6 +264,11 @@ function App() {
     catData,
     setCatData,
 
+    productData,
+    setProductData,
+
+    getProductData,
+
     // Utility functions
     openAlertBox,
 
@@ -269,6 +297,12 @@ function App() {
 
     selectedSize,
     setSelectedSize,
+
+    getWishlistData,
+    wishlistData,
+    setWishlistData,
+    // isWishlist,
+    // setIsWishlist,
 
   };
 

@@ -37,7 +37,7 @@ const CartPage = () => {
         <section className="section py-5 pb-10">
             <div className={`container w-[80%] max-w-[80%] ${context?.cartData?.length === 0 ? "flex items-center justify-center" : ""} flex gap-4`}>
 
-                <div className={`leftPart w-[70%]`}>
+                <div className={`rightPart w-[70%]`}>
                     <div className="h-[100%] shadow-md rounded-md bg-white flex flex-col gap-2">
                         <div className="py-2 px-3">
                             <h2 className="font-bold">Your Cart</h2>
@@ -47,11 +47,11 @@ const CartPage = () => {
                         <div className="flex items-center flex-col p-3 gap-4 w-full h-auto min-h-[50vh]">
                             {
                                 context?.cartData?.length === 0 ?
-                                    <div className='w-full h-[50vh] flex flex-col items-center justify-center gap-2 text-gray-400'>
+                                    <div className='w-full h-[50vh] flex flex-col items-center justify-center gap-2'>
                                         <span className="flex items-center justify-center">
-                                            <img src="../empty-cart.png" alt="empty-cart-img" className="w-[128px] h-[128px]" />
+                                            <img src="../empty-cart.png" alt="empty-cart-img" className="w-[200px]" />
                                         </span>
-                                        <span className="text-[18px]">Your cart is empty!</span>
+                                        <span className="text-[18px] mt-4">Your cart is empty!</span>
                                         <span className="text-[12px]">Add items to it now.</span>
                                         <Link to="/" className="w-[30%] min-w-[30%] !flex !items-center !justify-center mt-4">
                                             <Button className="buttonPrimaryBlack !normal-case w-[100%] min-w-[30%]" onClick={context.toggleCartPanel(false)}>Shop now</Button>

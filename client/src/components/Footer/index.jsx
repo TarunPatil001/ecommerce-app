@@ -311,12 +311,12 @@ const Footer = () => {
           context?.cartData?.length !== 0 ?
             <CartPanel data={context?.cartData} />
             :
-            <div className='w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400'>
+            <div className='w-full h-full flex flex-col items-center justify-center gap-2'>
               {/* <MdOutlineRemoveShoppingCart className='text-[40px]' /> */}
               <span className="flex items-center justify-center">
-                <img src="../empty-cart.png" alt="empty-cart-img" className="w-[128px] h-[128px]"/>
+                <img src="../empty-cart.png" alt="empty-cart-img" className="w-[200px]"/>
               </span>
-              <span className="text-[18px]">Your cart is empty!</span>
+              <span className="text-[18px] mt-4">Your cart is empty!</span>
               <span className="text-[12px]">Add items to it now.</span>
               <Link to="/" className="w-[50%] min-w-[30%] !mt-2 !flex !items-center !justify-center">
                 <Button className="buttonPrimaryBlack !normal-case w-[100%] min-w-[30%] !mt-2" onClick={context.toggleCartPanel(false)}>Shop now</Button>

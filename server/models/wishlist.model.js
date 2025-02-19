@@ -1,44 +1,55 @@
 import mongoose from "mongoose";
 
 const wishlistSchema = mongoose.Schema({
-    productId:{
+    productId: {
         type: String,
         required: true,
     },
-    userId:{
+    userId: {
         type: String,
         required: true,
     },
-    productTitle:{
+    productTitle: {
         type: String,
         required: true,
     },
-    image:{
+    image: {
         type: String,
         required: true,
     },
-    rating:{
+    rating: {
         type: Number,
         required: true,
     },
-    price:{
+    price: {
         type: Number,
         required: true,
     },
-    oldPrice:{
+    oldPrice: {
         type: Number,
         required: true,
     },
-    brand:{
+    brand: {
         type: String,
         required: true,
     },
-    discount:{
+    discount: {
         type: Number,
         required: true,
     },
-},{
-    timestamps:true
+    // seller: {
+    //     sellerId: {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "User",
+    //         required: true,
+    //     },
+    //     sellerName: {
+    //         type: String,
+    //         required: true,
+    //     }
+    // },
+}, {
+    timestamps: true
 })
 
 const WishlistModel = mongoose.model("Wishlist", wishlistSchema);

@@ -21,7 +21,7 @@ export const addToWishlistController = async (request, response) => {
 
     if (item) {
       return response.status(400).json({
-        message: "Item already in cart!",
+        message: "Item already in wishlist!",
       });
     }
 
@@ -79,7 +79,7 @@ export const removeFromWishlistController = async (request, response) => {
       }
 
       return response.status(200).json({
-          message: "The item removed from wishlist!",
+          message: "Product removed from wishlist!",
           error: false,
           success: true,
           data: deletedItem,
