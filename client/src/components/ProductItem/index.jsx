@@ -24,15 +24,17 @@ const ProductItem = (props) => {
 
 
   useEffect(() => {
-    if (context?.userData !== null) {
-      const isWishlistItem = context?.wishlistData?.filter((item) => item?.productId.includes(props?.product._id));
+    if (context?.userData !== null && Array.isArray(context?.wishlistData)) {
+      const isWishlistItem = context.wishlistData.filter((item) => 
+        item?.productId?.includes(props?.product._id)
+      );
+  
       setIsAddedWishlist(isWishlistItem.length > 0); // Set to true if the item exists in the wishlist
-    }else{
+    } else {
       setIsAddedWishlist(false); 
     }
-      
   }, [context?.wishlistData, props.product._id, context?.userData]);
-
+  
 
   const handleAddToMyList = async (item) => {
     if (!context?.userData) {
