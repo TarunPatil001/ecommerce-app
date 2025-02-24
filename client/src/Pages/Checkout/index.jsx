@@ -5,56 +5,40 @@ import TextField from '@mui/material/TextField';
 import CartTotal from '../Cart/cartTotal';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoBagCheck } from 'react-icons/io5';
-import { editData, fetchDataFromApi, postData } from '../../utils/api';
+import { deleteData, editData, fetchDataFromApi, postData } from '../../utils/api';
 import toast from 'react-hot-toast';
 import { FiEdit, FiPlus } from 'react-icons/fi';
 import { TbDotsVertical } from 'react-icons/tb';
 import { IoIosSave } from 'react-icons/io';
 import { RiResetLeftFill } from 'react-icons/ri';
 import { MuiPhone } from '../../components/MuiPhone';
+import { GiTakeMyMoney } from 'react-icons/gi';
+
+const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
+const VITE_APP_RAZORPAY_KEY_SECRET = import.meta.env.VITE_APP_RAZORPAY_KEY_SECRET;
 
 const Checkout = () => {
 
     const context = useContext(MyContext);
-
-    const calculateTotal = () => {
-        let totalMRP = 0;
-        let discount = 0;
-        // let couponDiscount = 0;
-        // let platformFee = 49; // If applicable
-        // let shippingFee = 79; // If applicable
-
-        context?.cartData?.forEach(item => {
-            totalMRP += item?.subTotalOldPrice || 0;
-            discount += item?.subTotalOldPrice - item?.subTotal || 0;
-        });
-
-        return { totalMRP, discount }; // Returning values separately
-    };
-
-    const { totalMRP, discount } = calculateTotal(); // Destructuring values
-
-
-
-
     const navigate = useNavigate();
 
     const formRef = useRef(); // Create ref to the form
-    const [anchorEl, setAnchorEl] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
     // const [isLoading3, setIsLoading3] = useState(false);
     const [address, setAddress] = useState([]);
     const [isAddressType, setIsAddressType] = useState("");
-    const [selectedValue, setSelectedValue] = useState(false);
+    const [selectedValue, setSelectedValue] = useState("");
     const [userIdForEdit, setUserIdForEdit] = useState("");
     const [addressIdForEdit, setAddressIdForEdit] = useState("");
+    const [deliverTo, setDeliverTo] = useState("");
 
     const [phone, setPhone] = useState('');
     const [error, setError] = useState(false);
     const [status, setStatus] = useState("");
     const [isOpenModel, setIsOpenModel] = useState(false);
+
 
     const nameRef = useRef(null);
     const addressLine1Ref = useRef(null);
@@ -80,9 +64,52 @@ const Checkout = () => {
         selected: false,
     });
 
+    // const calculateTotal = () => {
+    //     let totalMRP = 0;
+    //     let discount = 0;
+    //     // let couponDiscount = 0;
+    //     // let platformFee = 49; // If applicable
+    //     // let shippingFee = 79; // If applicable
+
+    //     context?.cartData?.forEach(item => {
+    //         totalMRP += item?.subTotalOldPrice || 0;
+    //         discount += item?.subTotalOldPrice - item?.subTotal || 0;
+    //     });
+
+    //     setTotalAmount(totalMRP - discount); // Final payable amount
+
+    //     return { totalMRP, discount, setTotalAmount };
+    // };
+
+    // const { totalMRP, discount, setTotalAmount } = calculateTotal(); // Destructuring values
 
 
-    // Effect for checking if the user is logged in and setting phone once user data is available
+
+    const [totalMRP, setTotalMRP] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
+
+    useEffect(() => {
+        if (context?.cartData?.length !== 0) {
+            const calculatedTotalMRP = context?.cartData?.reduce((total, item) => total + (item?.subTotalOldPrice || 0), 0);
+            const calculatedDiscount = context?.cartData?.reduce((total, item) => total + ((item?.subTotalOldPrice || 0) - (item?.subTotal || 0)), 0);
+            const calculatedTotalAmount = calculatedTotalMRP - calculatedDiscount;
+
+            setTotalMRP(calculatedTotalMRP);
+            setDiscount(calculatedDiscount);
+            setTotalAmount(calculatedTotalAmount);
+
+            // localStorage.setItem("totalAmount", calculatedTotalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }));
+        } else {
+            setTotalMRP(0);
+            setDiscount(0);
+            setTotalAmount(0);
+            // localStorage.setItem("totalAmount", "0");
+        }
+    }, [context?.cartData]);
+
+
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (token) {
@@ -107,6 +134,8 @@ const Checkout = () => {
                 userId: context.userData._id,
             }));
         }
+
+
     }, [context?.userData]);
 
     const fetchAddress = useCallback(() => {
@@ -217,21 +246,23 @@ const Checkout = () => {
         }
     }, [userIdForEdit, addressIdForEdit, context?.userData?._id, context?.isReducer]);
 
-    // Effect to manage selected address
-    useEffect(() => {
-        const safeAddress = address || [];  // Ensure address is an array (in case it's null or undefined)
+    // // Effect to manage selected address
+    // useEffect(() => {
+    //     const safeAddress = address || [];  // Ensure address is an array (in case it's null or undefined)
 
-        // Find the address that is selected
-        const selectedAddress = safeAddress.find(addr => addr.selected === true);
+    //     // Find the address that is selected
+    //     const selectedAddress = safeAddress.find(addr => addr.selected === true);
 
-        if (selectedAddress) {
-            // Set the selected address ID
-            setSelectedValue(selectedAddress._id);
-        } else {
-            // No address is selected, set a default value or handle as needed
-            setSelectedValue(null);  // Example: Set selectedValue to null if no address is selected
-        }
-    }, [address]); // This effect runs whenever the address list changes
+    //     if (selectedAddress) {
+    //         // Set the selected address ID
+    //         setSelectedValue(selectedAddress._id);
+    //         setDeliverTo(selectedAddress.name);
+    //     } else {
+    //         // No address is selected, set a default value or handle as needed
+    //         setSelectedValue(null);  // Example: Set selectedValue to null if no address is selected
+    //     }
+    // }, [address]); // This effect runs whenever the address list changes
+
 
     const onChangeInput = (e) => {
         const { name, value } = e.target;
@@ -287,6 +318,19 @@ const Checkout = () => {
         setError(false);
     };
 
+    const getOrderDetails = () => {
+        fetchDataFromApi(`/api/order/order-list`)
+            .then((res) => {
+                console.log("API Response:", res);
+            })
+            .catch((err) => {
+                console.error("API Error:", err);
+            });
+    }
+
+    useEffect(() => {
+        getOrderDetails();
+    }, [context?.userData])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -514,43 +558,75 @@ const Checkout = () => {
     };
 
 
+    useEffect(() => {
+        if (Array.isArray(address) && address.length > 0) {
+            const selectedAddress = address.find(addr => addr.selected === true);
+
+            if (selectedAddress) {
+                setSelectedValue(prevValue => {
+                    if (prevValue !== selectedAddress._id) {
+                        console.log("Updating selectedValue:", selectedAddress._id);
+                    }
+                    return selectedAddress._id;
+                });
+
+                setDeliverTo(prevName => {
+                    if (prevName !== selectedAddress.name) {
+                        console.log("Updating deliverTo:", selectedAddress.name);
+                    }
+                    return selectedAddress.name;
+                });
+            } else {
+                console.warn("No selected address found. Resetting values.");
+                setSelectedValue(null);
+                setDeliverTo("");
+            }
+        }
+    }, [address]); // ✅ Only depends on address
+
+
     const handleSelectAddress = async (event) => {
         const addressId = event.target.value;
         const selected = event.target.checked;
 
         try {
-            const result = await toast.promise(
+            await toast.promise(
                 editData("/api/address/select-address", {
-                    addressId: addressId,
-                    userId: context?.userData?._id,
-                    selected: selected,
+                    addressId,
+                    userId: context?.userData?._id, // Ensure this is correctly defined
+                    selected,
                 }, { withCredentials: true }),
                 {
                     loading: "Updating address selection... Please wait.",
                     success: (res) => {
                         if (res?.success) {
-                            const updatedAddresses = context?.address?.map((address) =>
-                                address._id === addressId
-                                    ? { ...address, selected: selected }
-                                    : address
+                            // ✅ Ensure only one address is selected
+                            const updatedAddresses = address.map(addr =>
+                                addr._id === addressId
+                                    ? { ...addr, selected: true } // Set selected for the chosen address
+                                    : { ...addr, selected: false } // Deselect all others
                             );
 
-                            context?.setAddress(updatedAddresses);
-                            setSelectedValue(addressId); // Set selected value to the newly selected address
-                            context.forceUpdate();
+                            setAddress(updatedAddresses);
+                            setSelectedValue(addressId);
+
+                            // ✅ Update deliverTo correctly
+                            const selectedAddress = updatedAddresses.find(addr => addr._id === addressId);
+                            if (selectedAddress) {
+                                setDeliverTo(selectedAddress.name);
+                                console.log("Updated deliverTo:", selectedAddress.name);
+                            }
+
                             return res.message || "Address selection updated successfully!";
                         } else {
                             throw new Error(res?.message || "An unexpected error occurred.");
                         }
                     },
                     error: (err) => {
-                        const errorMessage = err?.response?.data?.message || err.message || "Failed to update address selection.";
-                        return errorMessage;
+                        return err?.response?.data?.message || err.message || "Failed to update address selection.";
                     },
                 }
             );
-
-            console.log("Select Address Result:", result);
         } catch (err) {
             console.error("Error in handleSelectAddress:", err);
             toast.error(err?.message || "An unexpected error occurred.");
@@ -558,11 +634,121 @@ const Checkout = () => {
     };
 
 
+    const checkout = (e) => {
+        e.preventDefault();
+
+        var options = {
+            key: VITE_APP_RAZORPAY_KEY_ID,
+            key_secret: VITE_APP_RAZORPAY_KEY_SECRET,
+            amount: parseInt(totalAmount * 100),
+            currency: "INR",
+            order_receipt: deliverTo,
+            name: "Ecommerce App",
+            description: "for testing purpose",
+            handler: function (response) {
+                const paymentId = response.razorpay_payment_id;
+                const user = context?.userData;
+
+                const payLoad = {
+                    userId: user?._id,
+                    products: context?.cartData,
+                    paymentId: paymentId,
+                    payment_status: "COMPLETED",
+                    delivery_address: selectedValue,
+                    totalAmt: totalAmount,
+                    date: new Date().toLocaleString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                    })
+                };
+
+                console.log(payLoad);
+
+                postData(`/api/order/create-order`, payLoad).then((res) => {
+                    context?.openAlertBox("success", res?.message);
+                    if (res.error === false) {
+                        deleteData(`/api/cart/empty-cart-item/${user?._id}`).then((res) => {
+                            context?.getCartItems();
+                        })
+                        getOrderDetails();
+                        navigate("/");
+                    } else {
+                        context?.openAlertBox("error", res?.message);
+                    }
+                });
+
+            },
+            theme: {
+                color: "#ff5353",
+            }
+
+        };
+        console.log(options);
+        var pay = new window.Razorpay(options);
+        pay.open();
+    }
+
+    const cashOnDelivery = () => {
+        const user = context?.userData;
+
+        console.log("User Data:", user);
+        console.log("Selected Address ID Before Order:", selectedValue);
+        console.log("Address List:", address);
+
+        if (!user || !user._id) {
+            console.error("User data is missing!");
+            context?.openAlertBox("error", "User not logged in!");
+            return;
+        }
+
+        if (!selectedValue) {
+            console.error("No delivery address selected!");
+            context?.openAlertBox("error", "Please select a delivery address!");
+            return;
+        }
+
+        const payLoad = {
+            userId: user._id,
+            products: context?.cartData,
+            paymentId: '',
+            payment_status: "CASH ON DELIVERY",
+            delivery_address: { _id: selectedValue }, // ✅ Ensure API gets an object
+            totalAmt: totalAmount,
+            date: new Date().toLocaleString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+            }),
+        };
+
+        console.log("Final Payload:", payLoad);
+
+        postData(`/api/order/create-order`, payLoad).then((res) => {
+            if (res.error === false) {
+                context?.openAlertBox("success", res?.message);
+
+                deleteData(`/api/cart/empty-cart-item/${user._id}`).then(() => {
+                    context?.getCartItems();
+                });
+
+                getOrderDetails();
+                // navigate("/");
+            } else {
+                context?.openAlertBox("error", res?.message);
+            }
+        }).catch((error) => {
+            console.error("Error creating order:", error);
+            context?.openAlertBox("error", "Failed to place order!");
+        });
+    };
+
+
 
     return (
         <>
 
-            <form action="#">
+            <form onSubmit={checkout}>
                 <section className="section py-5 pb-10">
                     <div className="container checkoutPage w-[80%] max-w-[80%] flex gap-4">
 
@@ -582,115 +768,113 @@ const Checkout = () => {
                                     }
                                 </div>
                                 <Divider />
-                                <form action="" className="mt-6" onSubmit={handleSubmit}>
 
-                                    <div className="flex items-center gap-5">
-                                        <div
-                                            className={`w-full grid grid-cols-1 gap-4 text-md ${isLoading ? 'cursor-not-allowed' : ''}`}
-                                        >
-                                            {Array.isArray(address) && address.length > 0 ? (
-                                                address.map((address, index) => {
-                                                    const name = address?.name;
-                                                    const mobile = address?.mobile;
-                                                    const addressType = address?.addressType;
-                                                    const pincode = address?.pincode;
-                                                    const fullAddress = [
-                                                        address?.address_line1,
-                                                        address?.landmark,
-                                                        address?.city,
-                                                        address?.state,
-                                                        address?.country,
-                                                    ]
-                                                        .filter(Boolean) // Removes empty, null, or undefined values                                                
-                                                        .join(", ");
+                                <div className="flex items-center gap-5">
+                                    <div
+                                        className={`w-full grid grid-cols-1 gap-4 text-md ${isLoading ? 'cursor-not-allowed' : ''}`}
+                                    >
+                                        {Array.isArray(address) && address.length > 0 ? (
+                                            address.map((address, index) => {
+                                                const name = address?.name;
+                                                const mobile = address?.mobile;
+                                                const addressType = address?.addressType;
+                                                const pincode = address?.pincode;
+                                                const fullAddress = [
+                                                    address?.address_line1,
+                                                    address?.landmark,
+                                                    address?.city,
+                                                    address?.state,
+                                                    address?.country,
+                                                ]
+                                                    .filter(Boolean) // Removes empty, null, or undefined values                                                
+                                                    .join(", ");
 
-                                                    return (
-                                                        <div
-                                                            key={index}
-                                                            className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
-                                                            onClick={() => handleSelectAddress(address?._id)} // Clicking the box selects the radio
-                                                        >
-                                                            <div className="flex items-start w-full">
-                                                                {/* Radio Button with Label */}
-                                                                <label htmlFor={`address-${index}`} className="cursor-pointer w-full flex items-start mr-[70px] p-2">
-                                                                    <Radio
-                                                                        id={`address-${index}`}
-                                                                        name="address"
-                                                                        checked={selectedValue === address?._id}
-                                                                        value={address?._id}
-                                                                        onChange={handleSelectAddress}
-                                                                    />
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
+                                                        onClick={() => handleSelectAddress(address?._id)} // Clicking the box selects the radio
+                                                    >
+                                                        <div className="flex items-start w-full">
+                                                            {/* Radio Button with Label */}
+                                                            <label htmlFor={`address-${index}`} className="cursor-pointer w-full flex items-start mr-[70px] p-2">
+                                                                <Radio
+                                                                    id={`address-${index}`}
+                                                                    name="address"
+                                                                    checked={selectedValue === address?._id}
+                                                                    value={address?._id}
+                                                                    onChange={handleSelectAddress}
+                                                                />
 
-                                                                    {/* Address Content */}
-                                                                    <div className="w-full px-5 text-[14px] mt-2">
-                                                                        <div className="flex flex-col items-start mb-2 gap-2">
-                                                                            <span className="bg-gray-200 px-2 rounded-sm">{addressType}</span>
-                                                                            <div className="flex gap-5 font-semibold">
-                                                                                <span>{name}</span>
-                                                                                <span>{mobile}</span>
-                                                                            </div>
+                                                                {/* Address Content */}
+                                                                <div className="w-full px-5 text-[14px] mt-2">
+                                                                    <div className="flex flex-col items-start mb-2 gap-2">
+                                                                        <span className="bg-gray-200 px-2 rounded-sm">{addressType}</span>
+                                                                        <div className="flex gap-5 font-semibold">
+                                                                            <span>{name}</span>
+                                                                            <span>{mobile}</span>
                                                                         </div>
-                                                                        <div className="w-auto">{fullAddress} - <span className="font-semibold">{pincode}</span></div>
                                                                     </div>
-                                                                </label>
-
-                                                                {/* Edit/Delete Popover */}
-                                                                <div
-                                                                    className="relative inline-block"
-                                                                    onMouseEnter={() => setIsOpen(index)}
-                                                                    onMouseLeave={() => setIsOpen(false)}
-                                                                >
-                                                                    <button className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200">
-                                                                        <TbDotsVertical size={20} />
-                                                                    </button>
-
-                                                                    {isOpen === index && (
-                                                                        <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2">
-                                                                            <div
-                                                                                className="cursor-pointer p-1 hover:bg-gray-100"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleEditClick(address?.userId, address?._id);
-                                                                                }}
-                                                                            >
-                                                                                Edit
-                                                                            </div>
-                                                                            <div
-                                                                                className="cursor-pointer p-1 hover:bg-gray-100"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleDeleteAddress(e, address?._id);
-                                                                                }}
-                                                                            >
-                                                                                Delete
-                                                                            </div>
-                                                                        </span>
-                                                                    )}
+                                                                    <div className="w-auto">{fullAddress} - <span className="font-semibold">{pincode}</span></div>
                                                                 </div>
+                                                            </label>
+
+                                                            {/* Edit/Delete Popover */}
+                                                            <div
+                                                                className="relative inline-block"
+                                                                onMouseEnter={() => setIsOpen(index)}
+                                                                onMouseLeave={() => setIsOpen(false)}
+                                                            >
+                                                                <button className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200">
+                                                                    <TbDotsVertical size={20} />
+                                                                </button>
+
+                                                                {isOpen === index && (
+                                                                    <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2">
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditClick(address?.userId, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </div>
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteAddress(e, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </div>
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
+                                                    </div>
 
-                                                    );
-                                                })
-                                            ) : (
-                                                <div className='w-full h-full flex flex-col items-center'>
-                                                    <img src="../empty-myaddresses.png" className='w-[200px]' />
-                                                    <span className='font-bold mt-5'>No Addresses found in your account!</span>
-                                                    <span className='text-[14px]'>Add a delivery address.</span>
-                                                    <Button className={`h-[40px] !px-10 !mt-4 buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md p-3 text-[14px] ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => handleClickOpen()} disabled={isLoading}>
-                                                        <span className='text-center flex items-center justify-center'>
-                                                            {
-                                                                isLoading ? <CircularProgress color="inherit" /> : <><FiPlus className='text-[16px] font-bold' />Add Address</>
-                                                            }
+                                                );
+                                            })
+                                        ) : (
+                                            <div className='w-full h-full flex flex-col items-center'>
+                                                <img src="../empty-myaddresses.png" className='w-[200px]' />
+                                                <span className='font-bold mt-5'>No Addresses found in your account!</span>
+                                                <span className='text-[14px]'>Add a delivery address.</span>
+                                                <Button className={`h-[40px] !px-10 !mt-4 buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md p-3 text-[14px] ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => handleClickOpen()} disabled={isLoading}>
+                                                    <span className='text-center flex items-center justify-center'>
+                                                        {
+                                                            isLoading ? <CircularProgress color="inherit" /> : <><FiPlus className='text-[16px] font-bold' />Add Address</>
+                                                        }
 
-                                                        </span>
-                                                    </Button>
-                                                </div>
+                                                    </span>
+                                                </Button>
+                                            </div>
 
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
-                                </form>
+                                </div>
                             </div>
 
                         </div>
@@ -746,11 +930,18 @@ const Checkout = () => {
                                     <Divider />
                                     <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                                         <span>Total Amount:</span>
-                                        <span>₹{new Intl.NumberFormat('en-IN').format(totalMRP - discount)}</span>
+                                        <span>₹{new Intl.NumberFormat('en-IN').format(totalAmount)}</span>
                                     </div>
                                     <Divider />
                                     <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
-                                        <Link to="/checkout" className="w-full"><Button className="buttonPrimaryBlack w-full flex items-center gap-1" onClick={context.toggleCartPanel(false)}><IoBagCheck />Place Order</Button></Link>
+                                        <Button type='submit' className="buttonPrimaryBlack w-full flex items-center justify-center gap-1"><IoBagCheck />Checkout</Button>
+                                    </div>
+                                    <Divider />
+                                    <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
+                                        <Button className="!bg-gray-700 !text-white w-full flex items-center justify-center gap-1" onClick={cashOnDelivery}>
+                                        <GiTakeMyMoney className='text-[20px]' />
+                                            Cash On Delivery
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

@@ -210,7 +210,7 @@ export const getCartItemController = async (request, response) => {
 //         success: false,
 //       });
 //     }
-    
+
 
 //     let quantity = qty;
 
@@ -598,3 +598,20 @@ export const deleteCartItemController = async (request, response) => {
     });
   }
 };
+
+
+export const emptyCartController = async (request, response) => {
+  try {
+    const userId = request.params.id;
+
+    await CartProductModel.deleteMany({ userId: userId });
+    return response.status(200).json({
+      message: "Cart has been emptied successfully.",
+      error: false,
+      success: true,
+    });
+
+  } catch (error) {
+
+  }
+}

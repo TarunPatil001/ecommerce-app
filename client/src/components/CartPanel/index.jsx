@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Divider } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -9,22 +9,26 @@ import CartPanelItems from './cartPanelItems';
 const CartPanel = (props) => {
     const context = useContext(MyContext);
 
-    const calculateTotal = () => {
-        let totalMRP = 0;
-        let discount = 0;
-        // let couponDiscount = 0;
-        // let platformFee = 49; // If applicable
-        // let shippingFee = 79; // If applicable
+    const [totalMRP, setTotalMRP] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
 
-        context?.cartData?.forEach(item => {
-            totalMRP += item?.subTotalOldPrice || 0;
-            discount += item?.subTotalOldPrice - item?.subTotal || 0;
-        });
+    useEffect(() => {
+        if (context?.cartData?.length !== 0) {
+            const calculatedTotalMRP = context?.cartData?.reduce((total, item) => total + (item?.subTotalOldPrice || 0), 0);
+            const calculatedDiscount = context?.cartData?.reduce((total, item) => total + ((item?.subTotalOldPrice || 0) - (item?.subTotal || 0)), 0);
+            const calculatedTotalAmount = calculatedTotalMRP - calculatedDiscount;
 
-        return { totalMRP, discount }; // Returning values separately
-    };
-
-    const { totalMRP, discount } = calculateTotal(); // Destructuring values
+            setTotalMRP(calculatedTotalMRP);
+            setDiscount(calculatedDiscount);
+            setTotalAmount(calculatedTotalAmount);
+            
+             } else {
+            setTotalMRP(0);
+            setDiscount(0);
+            setTotalAmount(0);
+           }
+    }, [context?.cartData]);
 
     return (
         <>
@@ -85,7 +89,7 @@ const CartPanel = (props) => {
                 <Divider />
                 <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                     <span>Total Amount:</span>
-                    <span>₹{new Intl.NumberFormat('en-IN').format(totalMRP - discount)}</span> {/* Displaying the total amount after all discounts */}
+                    <span>₹{new Intl.NumberFormat('en-IN').format(totalAmount)}</span> {/* Displaying the total amount after all discounts */}
                 </div>
                 <Divider />
                 <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4">
