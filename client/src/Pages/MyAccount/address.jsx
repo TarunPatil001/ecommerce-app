@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import AccountSidebar from '../../components/AccountSidebar'
 import { MyContext } from '../../App';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress, Divider, Radio } from '@mui/material';
+import { Checkbox, CircularProgress, Divider, FormControlLabel, FormLabel, Popover, Radio, RadioGroup } from '@mui/material';
 import toast from 'react-hot-toast';
 import { editData, fetchDataFromApi, postData } from '../../utils/api';
 import 'react-international-phone/style.css';
-import { FiEdit } from 'react-icons/fi';
+import { FiEdit, FiPlus } from 'react-icons/fi';
 import { RiDeleteBin6Line, RiResetLeftFill } from 'react-icons/ri';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -15,6 +15,7 @@ import 'react-international-phone/style.css';
 import { MenuItem, Select, TextField, } from '@mui/material';
 import { IoIosSave } from 'react-icons/io';
 import { MuiPhone } from '../../components/MuiPhone';
+import { TbDotsVertical } from 'react-icons/tb';
 
 
 
@@ -24,10 +25,13 @@ const Address = () => {
     const navigate = useNavigate();
 
     const formRef = useRef(); // Create ref to the form
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
     // const [isLoading3, setIsLoading3] = useState(false);
     const [address, setAddress] = useState([]);
+    const [isAddressType, setIsAddressType] = useState("");
     const [selectedValue, setSelectedValue] = useState(false);
     const [userIdForEdit, setUserIdForEdit] = useState("");
     const [addressIdForEdit, setAddressIdForEdit] = useState("");
@@ -37,24 +41,31 @@ const Address = () => {
     const [status, setStatus] = useState("");
     const [isOpenModel, setIsOpenModel] = useState(false);
 
+    const nameRef = useRef(null);
     const addressLine1Ref = useRef(null);
     const cityRef = useRef(null);
     const stateRef = useRef(null);
     const countryRef = useRef(null);
     const pincodeRef = useRef(null);
     const mobileRef = useRef(null);
+    const addressTypeRef = useRef(null);
 
     const [formFields, setFormFields] = useState({
+        name: '',
         address_line1: '',
+        landmark: '',
         city: '',
         state: '',
         pincode: '',
-        country: '',
+        country: 'India',
         mobile: '',
+        addressType: '',
         status: '',
         userId: '',
         selected: false,
     });
+
+
 
     // Effect for checking if the user is logged in and setting phone once user data is available
     useEffect(() => {
@@ -83,21 +94,42 @@ const Address = () => {
         }
     }, [context?.userData]);
 
+    const fetchAddress = useCallback(() => {
+        if (!context?.userData?._id) return;
+
+        setIsLoading(true);
+        fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`)
+            .then((res) => setAddress(res.data))
+            .catch((err) => console.error("Error fetching address:", err))
+            .finally(() => setIsLoading(false));
+    }, [context?.userData]);  // ✅ Stable function that updates only when userData changes
+
+    useEffect(() => {
+        fetchAddress();
+    }, [fetchAddress]);  // ✅ Triggers only when fetchAddress reference changes
+
+    useEffect(() => {
+        setIsOpen(null); // Reset popover when addresses update
+    }, [address]); // Run whenever address list changes
+
+
     // Effect for fetching address data
     useEffect(() => {
         if (context?.userData?._id) {
             setIsLoading(true);  // Start loading
             fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`)
                 .then((res) => {
+
                     setAddress(res.data);  // Set the fetched address data
                     setIsLoading(false);    // Stop loading
+
                 })
                 .catch((err) => {
                     console.error("Error fetching data from API:", err);
                     setIsLoading(false);  // Stop loading in case of error
                 });
         }
-    }, [context?.userData, context?.isReducer]);
+    }, [context?.userData?._id]);
 
 
     // Effect for handling address edits and populating form fields
@@ -108,16 +140,20 @@ const Address = () => {
             setAddressIdForEdit(undefined);
             setUserIdForEdit(context?.userData?._id);
             setFormFields({
+                name: '',
                 address_line1: "",
+                landmark: '',
                 city: "",
                 state: "",
                 pincode: "",
-                country: "",
+                country: "India",
                 mobile: "",
+                addressType: '',
                 status: "",
                 userId: userId || context?.userData?._id,
             });
             setPhone("");
+            setIsAddressType("");
             setStatus("");
             return;
         }
@@ -134,15 +170,19 @@ const Address = () => {
 
                     if (response.success && response.data) {
                         const address = response.data;
-
+                        setIsAddressType(address.addressType || "");
                         setFormFields({
+                            name: address.name || "",
                             address_line1: address.address_line1 || "",
+                            landmark: address.landmark || "",
                             city: address.city || "",
                             state: address.state || "",
                             pincode: address.pincode || "",
                             country: address.country || "",
+                            addressType: address.addressType || "",
                             status: address.status || "",
                             userId: address.userId || userId,
+
                         });
 
                         const validPhone = address.mobile ? String(address.mobile) : "";
@@ -187,13 +227,22 @@ const Address = () => {
     };
 
     const handleStatusChange = (event) => {
-        const value = event.target.value;
+        const value = event.target.checked;
         setStatus(value);
         setFormFields((prevState) => ({
             ...prevState,
             status: value,
         }));
     };
+
+    const handleAddressType = (event) => {
+        const value = event.target.value;
+        setIsAddressType(value);
+        setFormFields((prevState) => ({
+            ...prevState,
+            addressType: value,
+        }));
+    }
 
     const handleClickOpen = (addressId) => {
         setUserIdForEdit(context?.userData?._id);
@@ -208,12 +257,15 @@ const Address = () => {
         setIsOpenModel(false);
         formRef.current.reset();
         setFormFields({
+            name: '',
             address_line1: '',
+            landmark: '',
             city: '',
             state: '',
             country: '',
             pincode: '',
             mobile: '',
+            addressType: '',
         });
         setPhone('');
         setStatus('');
@@ -225,6 +277,11 @@ const Address = () => {
         e.preventDefault();
 
         // Validate form fields
+        if (!formFields.name) {
+            context.openAlertBox("error", "Please enter name");
+            nameRef.current.focus();
+            return;
+        }
         if (!formFields.address_line1) {
             context.openAlertBox("error", "Please enter address line 1");
             addressLine1Ref.current.focus();
@@ -255,6 +312,11 @@ const Address = () => {
             mobileRef.current.focus();
             return;
         }
+        if (!isAddressType) {
+            context.openAlertBox("error", "Please select address type");
+            addressTypeRef.current.focus();
+            return;
+        }
 
         setIsLoading(true);
 
@@ -273,7 +335,7 @@ const Address = () => {
                             fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {
                                 context?.setAddress(res.data); // Update state with fresh data
                             });
-                            context.forceUpdate();
+                            fetchAddress();
                             handleClose();  // Close modal or form
                             return res.message || "Address added successfully!";
                         } else {
@@ -315,11 +377,14 @@ const Address = () => {
                     const address = response.data;
 
                     setFormFields({
+                        name: address.name || "",
                         address_line1: address.address_line1 || "",
+                        landmark: address.landmark || "",
                         city: address.city || "",
                         state: address.state || "",
                         pincode: address.pincode || "",
                         country: address.country || "",
+                        addressType: address.addressType || "",
                         status: address.status || "",
                         userId: address.userId || userId,
                     });
@@ -338,6 +403,7 @@ const Address = () => {
         };
 
         fetchAddressData();
+        fetchAddress();
 
         setIsOpenModel(true); // Open modal or form for editing
 
@@ -365,7 +431,7 @@ const Address = () => {
                                     : address
                             );
                             context?.setAddress(updatedAddresses); // Update the address state
-                            context.forceUpdate();
+                            fetchAddress();
                             handleClose();
                             return res.message || "Address updated successfully!";
                         } else {
@@ -390,7 +456,6 @@ const Address = () => {
 
     const handleDeleteAddress = async (e, addressId) => {
         e.preventDefault();
-
         // Start loading and disable the fields
         setIsLoading2(true);
 
@@ -407,7 +472,7 @@ const Address = () => {
                         if (res && res.error === false) {
                             // Handle success, e.g., remove the address from the state
                             setAddress(Array.isArray(address) ? address.filter(addr => addr._id !== addressId) : []);
-                            context.forceUpdate();
+                            fetchAddress();
                             return res?.message;
                         } else {
                             throw new Error(res?.message || "Oops! Server is slow. Try again!");
@@ -484,69 +549,126 @@ const Address = () => {
                 <div className="container flex gap-5">
                     <AccountSidebar />
                     <div className="col-2 w-[100%]">
-                        <div className="card bg-white p-5 shadow-md rounded-md mb-5">
-                            <div className="flex items-center mb-2">
+                        <div className="card bg-white p-5 shadow-md rounded-md mb-5 h-full">
+                            <div className="flex items-center justify-between mb-2">
                                 <h2 className="pb-0 font-bold text-[20px]">Address Details</h2>
-                            </div>
-                            <Divider />
-                            <form action="" className="mt-6" onSubmit={handleSubmit}>
-                                <div className="flex items-center gap-5">
-                                    <div className={`w-full h-[40px] bg-red-50 flex items-center justify-center border-2 border-dashed ${isLoading === true ? "" : "hover:border-[var(--bg-primary)] cursor-pointer"} rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => handleClickOpen()} disabled={isLoading}>
-                                        <span className='text-gray-700 text-center flex items-center justify-center'>
+                                {address?.length > 0 &&
+                                    <Button className={`h-[40px] buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md p-3 text-[14px] ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => handleClickOpen()} disabled={isLoading}>
+                                        <span className='text-center flex items-center justify-center'>
                                             {
-                                                isLoading ? <CircularProgress color="inherit" /> : "Add Address"
+                                                isLoading ? <CircularProgress color="inherit" /> : <><FiPlus className='text-[16px] font-bold' />Add Address</>
                                             }
 
                                         </span>
-                                    </div>
-                                </div>
+                                    </Button>
+                                }
+                            </div>
+                            <Divider />
+                            <form action="" className="mt-6" onSubmit={handleSubmit}>
 
                                 <div className="flex items-center gap-5">
                                     <div
-                                        className={`w-full h-full flex flex-col items-center justify-center gap-4 mt-4 text-md ${isLoading ? 'cursor-not-allowed' : ''}`}
+                                        className={`w-full grid grid-cols-1 gap-4 text-md ${isLoading ? 'cursor-not-allowed' : ''}`}
                                     >
                                         {Array.isArray(address) && address.length > 0 ? (
                                             address.map((address, index) => {
-                                                const fullAddress =
-                                                    address?.address_line1 +
-                                                    ', ' +
-                                                    address?.city +
-                                                    ', ' +
-                                                    address?.state +
-                                                    ', ' +
-                                                    address?.pincode +
-                                                    ', ' +
-                                                    address?.country +
-                                                    ', ' +
-                                                    address?.mobile;
+                                                const name = address?.name;
+                                                const mobile = address?.mobile;
+                                                const addressType = address?.addressType;
+                                                const pincode = address?.pincode;
+                                                const fullAddress = [
+                                                    address?.address_line1,
+                                                    address?.landmark,
+                                                    address?.city,
+                                                    address?.state,
+                                                    address?.country,
+                                                ]
+                                                    .filter(Boolean) // Removes empty, null, or undefined values                                                
+                                                    .join(", ");
 
                                                 return (
-                                                    <label
+                                                    <div
                                                         key={index}
-                                                        className="border-2 border-dashed addressBox w-full flex items-center justify-between rounded-md cursor-pointer p-2"
+                                                        className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
+                                                        onClick={() => handleSelectAddress(address?._id)} // Clicking the box selects the radio
                                                     >
-                                                        <div className="flex items-center">
-                                                            <Radio
-                                                                name="address"
-                                                                checked={selectedValue === address?._id}
-                                                                value={address?._id}
-                                                                onChange={handleSelectAddress}
-                                                            />
-                                                            <span className="ml-2">{fullAddress}</span>
+                                                        <div className="flex items-start w-full">
+                                                            {/* Radio Button with Label */}
+                                                            <label htmlFor={`address-${index}`} className="cursor-pointer w-full flex items-start mr-[70px] p-2">
+                                                                <Radio
+                                                                    id={`address-${index}`}
+                                                                    name="address"
+                                                                    checked={selectedValue === address?._id}
+                                                                    value={address?._id}
+                                                                    onChange={handleSelectAddress}
+                                                                />
+
+                                                                {/* Address Content */}
+                                                                <div className="w-full px-5 text-[14px] mt-2">
+                                                                    <div className="flex flex-col items-start mb-2 gap-2">
+                                                                        <span className="bg-gray-200 px-2 rounded-sm">{addressType}</span>
+                                                                        <div className="flex gap-5 font-semibold">
+                                                                            <span>{name}</span>
+                                                                            <span>{mobile}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="w-auto">{fullAddress} - <span className="font-semibold">{pincode}</span></div>
+                                                                </div>
+                                                            </label>
+
+                                                            {/* Edit/Delete Popover */}
+                                                            <div
+                                                                className="relative inline-block"
+                                                                onMouseEnter={() => setIsOpen(index)}
+                                                                onMouseLeave={() => setIsOpen(false)}
+                                                            >
+                                                                <button className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200">
+                                                                    <TbDotsVertical size={20} />
+                                                                </button>
+
+                                                                {isOpen === index && (
+                                                                    <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2">
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditClick(address?.userId, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </div>
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteAddress(e, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </div>
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className='flex items-start gap-2'>
-                                                            <Button className='!w-[35px] shadow !h-[35px] !min-w-[35px] !rounded-full !text-[50px]' onClick={() => handleEditClick(address?.userId, address?._id)}>
-                                                                <FiEdit />
-                                                            </Button>
-                                                            <Button className='!w-[35px] shadow !text-red-500 !h-[35px] !min-w-[35px] !rounded-full !text-[50px]' onClick={(e) => handleDeleteAddress(e, address?._id)}>
-                                                                <RiDeleteBin6Line />
-                                                            </Button>
-                                                        </div>
-                                                    </label>
+                                                    </div>
+
                                                 );
                                             })
                                         ) : (
-                                            <p>No addresses found.</p>
+                                            <div className='w-full h-full flex flex-col items-center'>
+                                                <img src="../empty-myaddresses.png" className='w-[200px]' />
+                                                <span className='font-bold mt-5'>No Addresses found in your account!</span>
+                                                <span className='text-[14px]'>Add a delivery address.</span>
+                                                <Button className={`h-[40px] !px-10 !mt-4 buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md p-3 text-[14px] ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => handleClickOpen()} disabled={isLoading}>
+                                                    <span className='text-center flex items-center justify-center'>
+                                                        {
+                                                            isLoading ? <CircularProgress color="inherit" /> : <><FiPlus className='text-[16px] font-bold' />Add Address</>
+                                                        }
+
+                                                    </span>
+                                                </Button>
+                                            </div>
+
                                         )}
                                     </div>
                                 </div>
@@ -561,18 +683,32 @@ const Address = () => {
             <Dialog open={isOpenModel} onClose={handleClose}>
                 <DialogTitle>{addressIdForEdit !== undefined ? 'Edit Address' : 'Add New Address'}</DialogTitle>
                 <form onSubmit={handleSubmit} ref={formRef}>
-                    <div className='flex flex-col w-auto px-5 pb-5'>
-
-                        <h2 className='text-gray-500'>
+                    <div className='flex flex-col w-auto h-[400px] overflow-y-scroll px-5 pb-5'>
+                        <h2 className='text-gray-500 sticky top-0 z-50 bg-white pb-2 border-b'>
                             Share your delivery details, and we&apos;ll take care of the rest! &#128522;
                         </h2>
 
                         <TextField
                             autoFocus
                             margin="dense"
+                            id="name"
+                            name="name"
+                            label="Name*"
+                            type="text"
+                            value={formFields?.name || ''}
+                            disabled={isLoading}
+                            className='custom-textfield'
+                            onChange={onChangeInput}
+                            inputRef={nameRef}
+                            fullWidth
+                            variant="outlined"
+                            size="small"
+                        />
+                        <TextField
+                            margin="dense"
                             id="address_line1"
                             name="address_line1"
-                            label="Address Line1 (House No, Building/Street/Area Name)"
+                            label="Address Line1 (House No, Building/Street/Area Name)*"
                             type="text"
                             value={formFields?.address_line1 || ''}
                             disabled={isLoading}
@@ -585,9 +721,23 @@ const Address = () => {
                         />
                         <TextField
                             margin="dense"
+                            id="landmark"
+                            name="landmark"
+                            label="Landmark"
+                            type="text"
+                            value={formFields?.landmark || ''}
+                            disabled={isLoading}
+                            className='custom-textfield'
+                            onChange={onChangeInput}
+                            fullWidth
+                            variant="outlined"
+                            size="small"
+                        />
+                        <TextField
+                            margin="dense"
                             id="city"
                             name="city"
-                            label="Add City/District"
+                            label="City/District*"
                             value={formFields?.city || ''}
                             disabled={isLoading}
                             onChange={onChangeInput}
@@ -602,7 +752,7 @@ const Address = () => {
                             margin="dense"
                             id="state"
                             name="state"
-                            label="Add State"
+                            label="State*"
                             value={formFields?.state || ''}
                             disabled={isLoading}
                             onChange={onChangeInput}
@@ -617,7 +767,7 @@ const Address = () => {
                             margin="dense"
                             id="country"
                             name="country"
-                            label="Add Country"
+                            label="Country*"
                             value={formFields?.country || ''}
                             disabled={isLoading}
                             onChange={onChangeInput}
@@ -633,7 +783,7 @@ const Address = () => {
                             margin="dense"
                             id="pincode"
                             name="pincode"
-                            label="Add Pincode"
+                            label="Pincode*"
                             value={formFields?.pincode || ''}
                             disabled={isLoading}
                             inputProps={{
@@ -675,28 +825,39 @@ const Address = () => {
                             size="small"
                         />
 
+                        <fieldset ref={addressTypeRef} className="border rounded-md p-2 hover:border-black">
+                            <legend className="text-[12px] font-normal text-gray-700 px-2">Address Type*</legend>
+                            <RadioGroup
+                                aria-labelledby="demo-radio-buttons-group-label"
+                                value={isAddressType}
+                                onChange={(e) => handleAddressType(e)}
+                                name="radio-buttons-group"
+                            >
+                                <div className="flex items-center space-x-4 px-4">
+                                    <FormControlLabel value="Home" control={<Radio />} label="Home" />
+                                    <FormControlLabel value="Office" control={<Radio />} label="Office" />
+                                </div>
+                            </RadioGroup>
+                        </fieldset>
 
-                        <Select
-                            value={status} // Ensure the status is converted to string
-                            onChange={handleStatusChange}
-                            displayEmpty
-                            inputProps={{ "aria-label": "Without label" }}
-                            className="h-[40px] mt-2"
-                            fullWidth
-                            size="small"
-                            margin="dense"
-                            variant="outlined"
-                            sx={{
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'var(--bg-primary) !important', // Set the focus border color
-                                },
-                            }}
-                        >
-                            <MenuItem value="" disabled>Select Status</MenuItem>
-                            <MenuItem value="true">Active</MenuItem>
-                            <MenuItem value="false">Inactive</MenuItem>
-                        </Select>
 
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={status} // Convert string to boolean
+                                    onChange={handleStatusChange}
+                                    inputProps={{ "aria-label": "Active Status" }}
+                                    sx={{
+                                        color: "var(--bg-primary)", // Default color
+                                        "&.Mui-checked": {
+                                            color: "var(--bg-primary) !important", // Checked color
+                                        },
+                                    }}
+                                />
+                            }
+                            label="Make it default"
+                            className='mt-2 px-2'
+                        />
 
                     </div>
 

@@ -29,9 +29,9 @@ export const MuiPhone = ({defaultCountry, value, onChange, ...restProps }) => {
   return (
     <TextField
       variant="outlined"
-      label="Phone number"
+      label="Mobile*"
       color="primary"
-      placeholder="Phone number"
+      placeholder="Mobile*"
       value={inputValue}
       onChange={handlePhoneValueChange}
       type="tel"

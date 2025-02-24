@@ -367,7 +367,7 @@ const Footer = () => {
 
           </DialogContent>
         </Dialog>
-
+              
 
     </>
   );

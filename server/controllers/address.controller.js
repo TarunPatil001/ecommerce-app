@@ -8,12 +8,15 @@ import UserModel from "../models/user.model.js";
 export const addAddressController = async (request, response) => {
   try {
     const {
+      name,
       address_line1,
+      landmark,
       city,
       state,
       pincode,
       country,
       mobile,
+      addressType,
       status,
       userId,
       selected = false, // Default value for selected is false
@@ -23,22 +26,51 @@ export const addAddressController = async (request, response) => {
     const normalizedStatus = status === true || status === "true" ? true : false;
     const normalizedSelected = normalizedStatus ? true : false;
 
-    // Validate required fields
-    if (!userId) {
+    const requiredFields = [
+      "name",
+      "address_line1",
+      "city",
+      "state",
+      "pincode",
+      "country",
+      "mobile",
+      "addressType",
+    ];
+    
+    const missingFields = requiredFields.filter(field => !request.body[field]);
+    
+    if (!userId || missingFields.length > 0) {
       return response.status(400).json({
-        message: "User ID is required",
+        message: `Missing required fields: ${!userId ? "userId, " : ""}${missingFields.join(", ")}`,
         error: true,
         success: false,
       });
     }
+    
+    // // Validate required fields
+    // if (!userId) {
+    //   return response.status(400).json({
+    //     message: "User ID is required",
+    //     error: true,
+    //     success: false,
+    //   });
+    // }
 
-    if (!pincode || !country) {
-      return response.status(400).json({
-        message: "Pincode and Country are required",
-        error: true,
-        success: false,
-      });
-    }
+    // if (!name) {
+    //   return response.status(400).json({
+    //     message: "Name is required",
+    //     error: true,
+    //     success: false,
+    //   });
+    // }
+
+    // if (!pincode || !country) {
+    //   return response.status(400).json({
+    //     message: "Pincode and Country are required",
+    //     error: true,
+    //     success: false,
+    //   });
+    // }
 
     // Find the user by ID
     const user = await UserModel.findById(userId);
@@ -61,11 +93,15 @@ export const addAddressController = async (request, response) => {
     // Check if the address already exists
     const existingAddress = await AddressModel.findOne({
       userId,
+      name,
       address_line1,
+      landmark,
       city,
       state,
       pincode,
       country,
+      mobile,
+      addressType,
     });
 
     if (existingAddress) {
@@ -78,12 +114,15 @@ export const addAddressController = async (request, response) => {
 
     // Create the new address
     const address = new AddressModel({
+      name,
       address_line1,
+      landmark,
       city,
       state,
       pincode,
       country,
       mobile,
+      addressType,
       status: normalizedStatus, // Use the normalized 'status'
       userId,
       selected: normalizedSelected, // 'selected' is set based on 'status'
@@ -121,66 +160,66 @@ export const addAddressController = async (request, response) => {
 // fetches all related address
 export const getAddressController = async (request, response) => {
   try {
-      const userId = request?.query?.userId;
+    const userId = request?.query?.userId;
 
-      // Validate userId presence
-      if (!userId) {
-          return response.status(400).json({
-              message: "User ID is required",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Convert userId to ObjectId if it's a valid string
-      let validUserId = userId;
-      if (typeof userId === "string" && mongoose.Types.ObjectId.isValid(userId)) {
-          validUserId = new mongoose.Types.ObjectId(userId); // Corrected: Use 'new' to instantiate ObjectId
-      }
-
-      // Validate the format of the userId (either string or ObjectId)
-      if (!mongoose.Types.ObjectId.isValid(validUserId)) {
-          return response.status(400).json({
-              message: "Invalid User ID format",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Find addresses associated with the user
-      const addresses = await AddressModel.find({ userId: validUserId });
-
-      // Check if addresses exist
-      if (!addresses || addresses.length === 0) {
-          return response.status(404).json({
-              message: "No addresses found for the given user ID",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Link addresses to the user in UserModel if not already linked
-      const addressIds = addresses.map((address) => address._id);
-      const userUpdateResult = await UserModel.updateOne(
-          { _id: validUserId },
-          { $addToSet: { address: { $each: addressIds } } } // Use $addToSet to prevent duplicates
-      );
-
-      // Return success response
-      return response.status(200).json({
-          message: "Addresses retrieved and linked successfully",
-          error: false,
-          success: true,
-          data: addresses,
-          userUpdateResult, // Optional: Include details of the update operation
+    // Validate userId presence
+    if (!userId) {
+      return response.status(400).json({
+        message: "User ID is required",
+        error: true,
+        success: false,
       });
+    }
+
+    // Convert userId to ObjectId if it's a valid string
+    let validUserId = userId;
+    if (typeof userId === "string" && mongoose.Types.ObjectId.isValid(userId)) {
+      validUserId = new mongoose.Types.ObjectId(userId); // Corrected: Use 'new' to instantiate ObjectId
+    }
+
+    // Validate the format of the userId (either string or ObjectId)
+    if (!mongoose.Types.ObjectId.isValid(validUserId)) {
+      return response.status(400).json({
+        message: "Invalid User ID format",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Find addresses associated with the user
+    const addresses = await AddressModel.find({ userId: validUserId });
+
+    // Check if addresses exist
+    if (!addresses || addresses.length === 0) {
+      return response.status(404).json({
+        message: "No addresses found for the given user ID",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Link addresses to the user in UserModel if not already linked
+    const addressIds = addresses.map((address) => address._id);
+    const userUpdateResult = await UserModel.updateOne(
+      { _id: validUserId },
+      { $addToSet: { address: { $each: addressIds } } } // Use $addToSet to prevent duplicates
+    );
+
+    // Return success response
+    return response.status(200).json({
+      message: "Addresses retrieved and linked successfully",
+      error: false,
+      success: true,
+      data: addresses,
+      userUpdateResult, // Optional: Include details of the update operation
+    });
   } catch (error) {
-      console.error("Error in getAddressController:", error);
-      return response.status(500).json({
-          message: error.message || "Internal server error",
-          error: true,
-          success: false,
-      });
+    console.error("Error in getAddressController:", error);
+    return response.status(500).json({
+      message: error.message || "Internal server error",
+      error: true,
+      success: false,
+    });
   }
 };
 
@@ -191,85 +230,85 @@ export const getAddressController = async (request, response) => {
 // fetch single address
 export const getSingleAddressController = async (request, response) => {
   try {
-      const { userId, _id: addressId } = request.query; // Destructure query parameters
+    const { userId, _id: addressId } = request.query; // Destructure query parameters
 
-      // Validate userId presence
-      if (!userId) {
-          return response.status(400).json({
-              message: "User ID is required",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Validate addressId presence if we're searching for a specific address
-      if (!addressId) {
-          return response.status(400).json({
-              message: "Address ID is required",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Convert userId to ObjectId if it's a valid string
-      let validUserId = userId;
-      if (typeof userId === "string" && mongoose.Types.ObjectId.isValid(userId)) {
-          validUserId = new mongoose.Types.ObjectId(userId); // Corrected: Use 'new' to instantiate ObjectId
-      }
-
-      // Validate the format of the userId (either string or ObjectId)
-      if (!mongoose.Types.ObjectId.isValid(validUserId)) {
-          return response.status(400).json({
-              message: "Invalid User ID format",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Convert addressId to ObjectId if it's a valid string
-      let validAddressId = addressId;
-      if (typeof addressId === "string" && mongoose.Types.ObjectId.isValid(addressId)) {
-          validAddressId = new mongoose.Types.ObjectId(addressId);
-      }
-
-      // Validate the format of the addressId
-      if (!mongoose.Types.ObjectId.isValid(validAddressId)) {
-          return response.status(400).json({
-              message: "Invalid Address ID format",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Find the specific address associated with the user and addressId
-      const address = await AddressModel.findOne({
-          userId: validUserId,
-          _id: validAddressId
+    // Validate userId presence
+    if (!userId) {
+      return response.status(400).json({
+        message: "User ID is required",
+        error: true,
+        success: false,
       });
+    }
 
-      // Check if address exists
-      if (!address) {
-          return response.status(404).json({
-              message: "Address not found for the given user ID and address ID",
-              error: true,
-              success: false,
-          });
-      }
-
-      // Return success response with the single address
-      return response.status(200).json({
-          message: "Address retrieved successfully",
-          error: false,
-          success: true,
-          data: address, // Return the single address object
+    // Validate addressId presence if we're searching for a specific address
+    if (!addressId) {
+      return response.status(400).json({
+        message: "Address ID is required",
+        error: true,
+        success: false,
       });
+    }
+
+    // Convert userId to ObjectId if it's a valid string
+    let validUserId = userId;
+    if (typeof userId === "string" && mongoose.Types.ObjectId.isValid(userId)) {
+      validUserId = new mongoose.Types.ObjectId(userId); // Corrected: Use 'new' to instantiate ObjectId
+    }
+
+    // Validate the format of the userId (either string or ObjectId)
+    if (!mongoose.Types.ObjectId.isValid(validUserId)) {
+      return response.status(400).json({
+        message: "Invalid User ID format",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Convert addressId to ObjectId if it's a valid string
+    let validAddressId = addressId;
+    if (typeof addressId === "string" && mongoose.Types.ObjectId.isValid(addressId)) {
+      validAddressId = new mongoose.Types.ObjectId(addressId);
+    }
+
+    // Validate the format of the addressId
+    if (!mongoose.Types.ObjectId.isValid(validAddressId)) {
+      return response.status(400).json({
+        message: "Invalid Address ID format",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Find the specific address associated with the user and addressId
+    const address = await AddressModel.findOne({
+      userId: validUserId,
+      _id: validAddressId
+    });
+
+    // Check if address exists
+    if (!address) {
+      return response.status(404).json({
+        message: "Address not found for the given user ID and address ID",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Return success response with the single address
+    return response.status(200).json({
+      message: "Address retrieved successfully",
+      error: false,
+      success: true,
+      data: address, // Return the single address object
+    });
   } catch (error) {
-      console.error("Error in getAddressController:", error);
-      return response.status(500).json({
-          message: error.message || "Internal server error",
-          error: true,
-          success: false,
-      });
+    console.error("Error in getAddressController:", error);
+    return response.status(500).json({
+      message: error.message || "Internal server error",
+      error: true,
+      success: false,
+    });
   }
 };
 
@@ -366,91 +405,84 @@ export const deleteAddressController = async (request, response) => {
 export const updateAddressController = async (request, response) => {
   try {
     const {
+      name,
       addressId,
       address_line1,
+      landmark,
       city,
       state,
       pincode,
       country,
       mobile,
+      addressType,
       status,
       userId,
       selected,
     } = request.body;
 
-    // Validate userId presence
-    if (!userId) {
-      return response.status(400).json({
-        message: "User ID is required",
-        error: true,
-        success: false,
-      });
-    }
+    // Validate required fields
+    if (!userId) return response.status(400).json({ message: "User ID is required", error: true, success: false });
+    if (!addressId) return response.status(400).json({ message: "Address ID is required", error: true, success: false });
+    if (!pincode || !country) return response.status(400).json({ message: "Pincode and Country are required", error: true, success: false });
 
-    // Validate addressId presence
-    if (!addressId) {
-      return response.status(400).json({
-        message: "Address ID is required",
-        error: true,
-        success: false,
-      });
-    }
+    // Find the user
+    const user = await UserModel.findById(userId).lean();
+    if (!user) return response.status(404).json({ message: "User not found", error: true, success: false });
 
-    // Validate pincode and country presence
-    if (!pincode || !country) {
-      return response.status(400).json({
-        message: "Pincode and Country are required",
-        error: true,
-        success: false,
-      });
-    }
-
-    // Find the user by ID
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return response.status(404).json({
-        message: "User not found",
-        error: true,
-        success: false,
-      });
-    }
-
-    // Find the address to be updated
+    // Find the address
     const address = await AddressModel.findOne({ _id: addressId, userId });
-    if (!address) {
-      return response.status(404).json({
-        message: "Address not found",
-        error: true,
-        success: false,
-      });
-    }
+    if (!address) return response.status(404).json({ message: "Address not found", error: true, success: false });
 
-    // Normalize 'status' to Boolean if provided, otherwise keep the existing value
-    const normalizedStatus = status !== undefined ? (status === true || status === "true" ? true : false) : address.status;
+    // Check if a similar address exists for the same user (excluding the current address)
+    const existingAddress = await AddressModel.findOne({
+      userId,
+      name: name.trim().toLowerCase(),
+      address_line1: address_line1.trim().toLowerCase(),
+      landmark: landmark ? landmark.trim().toLowerCase() : "",
+      city: city.trim().toLowerCase(),
+      state: state.trim().toLowerCase(),
+      pincode,
+      country: country.trim().toLowerCase(),
+      mobile,
+      addressType: addressType ? addressType.trim().toLowerCase() : "",
+      _id: { $ne: addressId }, // Exclude current address from check
+    }).lean();
+    
 
-    // If 'status' is false or empty, set 'selected' to false
-    const normalizedSelected = (normalizedStatus === true) ? true : false;
+    if (existingAddress) return response.status(409).json({ message: "Address already exists", error: true, success: false });
 
-    // Update the address with the provided details
-    address.address_line1 = address_line1 || address.address_line1;
-    address.city = city || address.city;
-    address.state = state || address.state;
-    address.pincode = pincode || address.pincode;
-    address.country = country || address.country;
-    address.mobile = mobile || address.mobile;
-    address.status = normalizedStatus; // Update 'status' only when provided
-    address.selected = normalizedSelected; // Set 'selected' based on 'status'
+    // Normalize status
+    const normalizedStatus = status !== undefined ? status === true || status === "true" : address.status;
 
-    // Save the updated address
-    const updatedAddress = await address.save();
+    // If status is false or empty, set selected to false
+    const normalizedSelected = normalizedStatus ? true : false;
 
-    // Return the success response with the updated address
+    // Update address using `findByIdAndUpdate`
+    const updatedAddress = await AddressModel.findByIdAndUpdate(
+      addressId,
+      {
+        name: name || address.name,
+        address_line1: address_line1 || address.address_line1,
+        landmark: landmark !== undefined ? landmark : address.landmark,
+        city: city || address.city,
+        state: state || address.state,
+        pincode: pincode || address.pincode,
+        country: country || address.country,
+        mobile: mobile || address.mobile,
+        addressType: addressType || address.addressType,
+        status: normalizedStatus,
+        selected: normalizedSelected,
+      },
+      { new: true }
+    );
+
     return response.status(200).json({
       message: "Address updated successfully",
       error: false,
       success: true,
       data: updatedAddress,
     });
+
   } catch (error) {
     console.error("Error in updateAddressController:", error);
     return response.status(500).json({
@@ -460,6 +492,7 @@ export const updateAddressController = async (request, response) => {
     });
   }
 };
+
 
 
 // ---------------------------------------------------------------------------------------------------------------------------
