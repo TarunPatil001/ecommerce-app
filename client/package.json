@@ -12,8 +12,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@lottiefiles/dotlottie-react": "^0.13.0",
     "@mui/material": "^6.2.1",
     "@mui/styled-engine-sc": "^6.2.1",
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "axios": "^1.7.9",
     "firebase": "^11.3.1",
     "prop-types": "^15.8.1",

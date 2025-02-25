@@ -18,6 +18,8 @@ import Wishlist from './Pages/Wishlist';
 import Orders from './Pages/Orders';
 import { fetchDataFromApi, postData } from './utils/api';
 import Address from './Pages/MyAccount/address';
+import OrderSuccess from './Pages/Orders/success';
+import OrderFailed from './Pages/Orders/failed';
 
 
 
@@ -319,8 +321,10 @@ function App() {
             <Route path={"/checkout"} exact={true} element={<Checkout />} />
             <Route path={"/my-account"} exact={true} element={<MyAccount />} />
             <Route path={"/my-wishlist"} exact={true} element={<Wishlist />} />
-            <Route path={"/my-orders"} exact={true} element={<Orders />} />
             <Route path={"/my-addresses"} exact={true} element={<Address />} />
+            <Route path={"/my-orders"} exact={true} element={<Orders />} />
+            <Route path={"/order/success"} exact={true} element={<OrderSuccess />} />
+            <Route path={"/order/failed"} exact={true} element={<OrderFailed />} />
           </Routes>
           <Footer />
         </MyContext.Provider>

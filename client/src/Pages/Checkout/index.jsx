@@ -13,9 +13,14 @@ import { IoIosSave } from 'react-icons/io';
 import { RiResetLeftFill } from 'react-icons/ri';
 import { MuiPhone } from '../../components/MuiPhone';
 import { GiTakeMyMoney } from 'react-icons/gi';
+import { SiRazorpay } from "react-icons/si";
+import { FaPaypal } from 'react-icons/fa';
+import axios from 'axios';
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 const VITE_APP_RAZORPAY_KEY_SECRET = import.meta.env.VITE_APP_RAZORPAY_KEY_SECRET;
+const VITE_APP_PAYPAL_CLIENT_ID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const Checkout = () => {
 
@@ -48,6 +53,10 @@ const Checkout = () => {
     const pincodeRef = useRef(null);
     const mobileRef = useRef(null);
     const addressTypeRef = useRef(null);
+
+    const [totalMRP, setTotalMRP] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
 
     const [formFields, setFormFields] = useState({
         name: '',
@@ -85,9 +94,6 @@ const Checkout = () => {
 
 
 
-    const [totalMRP, setTotalMRP] = useState(0);
-    const [discount, setDiscount] = useState(0);
-    const [totalAmount, setTotalAmount] = useState(0);
 
     useEffect(() => {
         if (context?.cartData?.length !== 0) {
@@ -127,6 +133,8 @@ const Checkout = () => {
 
     // Effect for setting userId in form fields when context changes
     useEffect(() => {
+        window.scrollTo(0, 0);
+
         const userId = context?.userData?._id;
         if (userId) {
             setFormFields((prevState) => ({
@@ -174,6 +182,8 @@ const Checkout = () => {
                 });
         }
     }, [context?.userData?._id]);
+
+
 
 
     // Effect for handling address edits and populating form fields
@@ -666,15 +676,18 @@ const Checkout = () => {
                 console.log(payLoad);
 
                 postData(`/api/order/create-order`, payLoad).then((res) => {
-                    context?.openAlertBox("success", res?.message);
+                    
                     if (res.error === false) {
                         deleteData(`/api/cart/empty-cart-item/${user?._id}`).then((res) => {
                             context?.getCartItems();
                         })
+                         
+                        context?.openAlertBox("success", res?.message);
                         getOrderDetails();
-                        navigate("/");
+                        navigate("/order/success");
                     } else {
                         context?.openAlertBox("error", res?.message);
+                        navigate("/order/failed");
                     }
                 });
 
@@ -726,16 +739,17 @@ const Checkout = () => {
 
         postData(`/api/order/create-order`, payLoad).then((res) => {
             if (res.error === false) {
-                context?.openAlertBox("success", res?.message);
-
+                
                 deleteData(`/api/cart/empty-cart-item/${user._id}`).then(() => {
                     context?.getCartItems();
                 });
-
+                
+                context?.openAlertBox("success", res?.message);
                 getOrderDetails();
-                // navigate("/");
+                navigate("/order/success");
             } else {
                 context?.openAlertBox("error", res?.message);
+                navigate("/order/failed");
             }
         }).catch((error) => {
             console.error("Error creating order:", error);
@@ -743,6 +757,198 @@ const Checkout = () => {
         });
     };
 
+    useEffect(() => {
+
+        const script = document.createElement('script');
+        script.src = `https://www.paypal.com/sdk/js?client-id=${VITE_APP_PAYPAL_CLIENT_ID}&disable-funding=card`;
+        script.async = true;
+        script.onload = () => {
+            window.paypal
+                .Buttons({
+                    createOrder: async () => {
+                        const resp = await fetch('https://v6.exchangerate-api.com/v6/c6b1f2127cf87e8f14b8103e/latest/INR');
+                        const respData = await resp.json();
+                        var convertedAmount = 0;
+
+                        if (respData.result === 'success') {
+                            const usdToInrRate = respData.conversion_rates.USD;
+                            convertedAmount = (totalAmount * usdToInrRate).toFixed(2);
+                        }
+
+                        const headers = {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include the access token in the header
+                            'Content-Type': 'application/json', // Specify the content type as JSON
+                        }
+
+                        const data = {
+                            userId: context?.userData?._id,
+                            totalAmount: convertedAmount,
+                        }
+                        // console.log(data);
+
+                        const response = await axios.get(
+                            VITE_API_URL + `/api/order/create-order-paypal?userId=${data?.userId}&totalAmount=${data?.totalAmount}`, { headers }
+                        );
+
+                        return response?.data?.id; // Return the order ID to PayPal
+                    },
+                    onApprove: async (data) => {
+                        onApprovePayment(data);
+                    },
+                    onError: (err) => {
+                        console.error("Paypal checkout onError: ", err);
+                    },
+                })
+                .render('#paypal-button-container');
+        }
+        document.body.appendChild(script);
+    }, [context?.cartData, context?.userData, selectedValue]);
+
+
+    const onApprovePayment = async (data) => {
+        const user = context?.userData;
+
+        const info = {
+            userId: user?._id,
+            products: context?.cartData,
+            payment_status: "COMPLETED",
+            delivery_address: selectedValue,
+            totalAmount: totalAmount,
+            date: new Date().toLocaleString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+            })
+        }
+
+        // Capture order on server
+        const headers = {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include the access token in the header
+            'Content-Type': 'application/json', // Specify the content type as JSON
+        }
+
+        const response = await axios.post(
+            `${VITE_API_URL}/api/order/capture-order-paypal`,
+            {
+                ...info,
+                paymentId: data.orderID, // Fixed case (was orderId)
+            },
+            { headers }
+        );
+        
+        // Check if the request was successful
+        if (response.data?.success) {
+            // Empty the cart only if the order is successfully captured
+            context?.openAlertBox("success", response?.data?.message);
+            await deleteData(`/api/cart/empty-cart-item/${user._id}`);
+            context?.getCartItems();
+            navigate("/order/success");
+        }else{
+            context?.openAlertBox("error", response?.data?.message);
+            navigate("/order/failed");
+        }
+
+    }
+
+
+    // useEffect(() => {
+    //     const script = document.createElement("script");
+    //     script.src = `https://www.paypal.com/sdk/js?client-id=${VITE_APP_PAYPAL_CLIENT_ID}&disable-funding=card`;
+    //     script.async = true;
+    //     script.onload = () => {
+    //         if (window.paypal) {
+    //             window.paypal
+    //                 .Buttons({
+    //                     createOrder: async () => {
+    //                         try {
+    //                             const resp = await fetch(
+    //                                 "https://v6.exchangerate-api.com/v6/c6b1f2127cf87e8f14b8103e/latest/INR"
+    //                             );
+    //                             const respData = await resp.json();
+    //                             let convertedAmount = 0;
+
+    //                             if (respData.result === "success") {
+    //                                 const usdToInrRate = respData.conversion_rates.USD;
+    //                                 convertedAmount = (totalAmount * usdToInrRate).toFixed(2);
+    //                             }
+
+    //                             const headers = {
+    //                                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    //                                 "Content-Type": "application/json",
+    //                             };
+
+    //                             const data = {
+    //                                 userId: context?.userData?._id,
+    //                                 totalAmount: convertedAmount,
+    //                             };
+
+    //                             const response = await axios.get(
+    //                                 `${VITE_API_URL}/api/order/create-order-paypal?userId=${data?.userId}&totalAmount=${data?.totalAmount}`,
+    //                                 { headers }
+    //                             );
+
+    //                             return response?.data?.id;
+    //                         } catch (error) {
+    //                             console.error("Error creating PayPal order: ", error);
+    //                             return null;
+    //                         }
+    //                     },
+    //                     onApprove: async (data) => {
+    //                         await onApprovePayment(data);
+    //                     },
+    //                     onError: (err) => {
+    //                         console.error("PayPal checkout onError: ", err);
+    //                     },
+    //                 })
+    //                 .render("#paypal-button-container");
+    //         }
+    //     };
+
+    //     document.body.appendChild(script);
+
+    //     // Cleanup script when component unmounts
+    //     return () => {
+    //         document.body.removeChild(script);
+    //     };
+    // }, [context?.cartData, context?.userData, selectedValue, totalAmount]);
+
+    // const onApprovePayment = async (data) => {
+    //     try {
+    //         const user = context?.userData;
+
+    //         const info = {
+    //             userId: user?._id,
+    //             products: context?.cartData,
+    //             paymentId: data.orderID,
+    //             payment_status: "COMPLETED",
+    //             delivery_address: selectedValue,
+    //             totalAmt: totalAmount,
+    //             date: new Date().toLocaleString("en-US", {
+    //                 month: "short",
+    //                 day: "2-digit",
+    //                 year: "numeric",
+    //             }),
+    //         };
+
+    //         const headers = {
+    //             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    //             "Content-Type": "application/json",
+    //         };
+
+    //         const response = await axios.post(`${VITE_API_URL}/api/order/capture-order-paypal`, info, { headers });
+
+    //         if (response.data.success) {
+    //             // Clear cart
+    //             await axios.deleteData(`${VITE_API_URL}/api/cart/emptyCart/${context?.userData?._id}`);
+    //             context?.getCartItems();
+
+    //             // Show success message
+    //             context?.openAlertBox("success", "Order completed and saved to database!");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error processing PayPal payment: ", error);
+    //     }
+    // };
 
 
     return (
@@ -934,12 +1140,19 @@ const Checkout = () => {
                                     </div>
                                     <Divider />
                                     <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
-                                        <Button type='submit' className="buttonPrimaryBlack w-full flex items-center justify-center gap-1"><IoBagCheck />Checkout</Button>
+                                        <Button type='submit' className="buttonPrimaryBlack w-full h-[45px] flex items-center justify-center gap-1"><SiRazorpay />RazorPay</Button>
+                                    </div>
+                                    <Divider />
+                                    <div id='paypal-button-container' className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
+                                        {/* <Button className="!bg-blue-700 !text-white w-full flex items-center justify-center gap-1" onClick={cashOnDelivery}>
+                                            <FaPaypal className='text-[15px]' />
+                                            Paypal
+                                        </Button> */}
                                     </div>
                                     <Divider />
                                     <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4 ">
-                                        <Button className="!bg-gray-700 !text-white w-full flex items-center justify-center gap-1" onClick={cashOnDelivery}>
-                                        <GiTakeMyMoney className='text-[20px]' />
+                                        <Button className="!bg-gray-700 !text-white w-full h-[45px] flex items-center justify-center gap-1" onClick={cashOnDelivery}>
+                                            <IoBagCheck />
                                             Cash On Delivery
                                         </Button>
                                     </div>
@@ -1123,6 +1336,7 @@ const Checkout = () => {
                                         "&.Mui-checked": {
                                             color: "var(--bg-primary) !important", // Checked color
                                         },
+
                                     }}
                                 />
                             }
