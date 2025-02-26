@@ -120,6 +120,17 @@ const Dashboard = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    fetchDataFromApi(`/api/order/order-list`).then((res) => {
+        if (res?.error === false) {
+          // console.log(res?.data);
+          setOrders(res?.data);
+        }
+      })
+    }, [])
+
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -178,26 +189,6 @@ const Dashboard = () => {
     // Fetch products when categories or filters change
     fetchProducts();
   }, [productCategory, productCategory2, productCategory3, page, rowsPerPage, categoryFilterValue, context?.isReducer]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -981,7 +972,7 @@ const Dashboard = () => {
                 <th scope="col" className="px-6 py-3 text-left">Payment Id</th>
                 <th scope="col" className="px-6 py-3 text-left">Name</th>
                 <th scope="col" className="px-6 py-3 text-left">Mobile No.</th>
-                <th scope="col" className="px-6 py-3 text-left">Address</th>
+                <th scope="col" className="px-6 py-3 text-left w-[400px] min-w-[400px]">Address</th>
                 <th scope="col" className="px-6 py-3 text-left">Pin Code</th>
                 <th scope="col" className="px-6 py-3 text-left">Email</th>
                 <th scope="col" className="px-6 py-3 text-left">Total Amount</th>
@@ -991,340 +982,122 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white border-b hover:bg-gray-50 transition">
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <Button
-                    className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
-                    onClick={() => isShowOrderedProduct(0)}
-                  >
-                    {isOpenOrder === (0) ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                  </Button>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <span className="text-[var(--bg-primary)] font-semibold">
-                    685958547548455555555555
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <span className="text-[var(--bg-primary)] font-semibold">
-                    685958547548455555555555
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  Lorem ipsum dolor sit amet Lorem, ipsum.
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  999999999999
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nemo, maiores.
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  elonmusk12345@gmail.com
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">8484</td>
-                <td className="px-6 py-4 whitespace-nowrap text-left ">
-                  Lorem252556666ipsum
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <Badge status="rejected" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left ">
-                  2025-01-01
-                </td>
-              </tr>
-              {
-                isOpenOrder === 0 && (
-                  <tr>
-                    <td colSpan="6" className="p-0">
-                      <div className="customScroll relative overflow-x-auto my-2 px-20">
-                        <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
-                          <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
-                            <tr>
-                              <th scope="col" className="px-6 py-3 text-left">Product Id</th>
-                              <th scope="col" className="px-6 py-3 text-left">Product Title</th>
-                              <th scope="col" className="px-6 py-3 text-left">Image</th>
-                              <th scope="col" className="px-6 py-3 text-left">Quantity</th>
-                              <th scope="col" className="px-6 py-3 text-left">Price</th>
-                              <th scope="col" className="px-6 py-3 text-left">SubTotal</th>
+            {
+                      orders?.length !== 0 && orders?.map((item, index) => {
+                        return (
+                          <>
+                            <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                <Button
+                                  className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
+                                  onClick={() => isShowOrderedProduct(index)}
+                                >
+                                  {isOpenOrder === (index) ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                                </Button>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                <span className="text-[var(--bg-primary)] font-semibold">
+                                  {item?._id}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                <span className="text-[var(--bg-primary)] font-semibold">
+                                  {item?.paymentId ? item?.paymentId : "CASH ON DELIVERY"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                {item?.delivery_address?.name}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                {item?.delivery_address?.mobile
+                                  ? String(item?.delivery_address?.mobile).replace(/^(\d{2})(\d{5})(\d{5})$/, '+$1 $2 $3')
+                                  : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-left whitespace-normal break-words">
+                                {[
+                                  item?.delivery_address?.address_line1,
+                                  item?.delivery_address?.landmark,
+                                  item?.delivery_address?.city,
+                                  item?.delivery_address?.state,
+                                  item?.delivery_address?.pincode,
+                                  item?.delivery_address?.country
+                                ].filter(Boolean).join(', ')}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                {item?.delivery_address?.pincode}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                {item?.userId?.email}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                {item?.totalAmt ? item.totalAmt.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left ">
+                                {item?.userId?._id}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left">
+                                <Badge status={item?.order_status} />
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-left ">
+                                {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-') : 'N/A'}
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              }
-              <tr className="bg-white border-b hover:bg-gray-50 transition">
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <Button
-                    className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
-                    onClick={() => isShowOrderedProduct(1)}
-                  >
-                    {isOpenOrder === (1) ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                  </Button>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <span className="text-[var(--bg-primary)] font-semibold">
-                    685958547548455555555555
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <span className="text-[var(--bg-primary)] font-semibold">
-                    685958547548455555555555
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  Lorem ipsum dolor sit amet Lorem, ipsum.
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  999999999999
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nemo, maiores.
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  elonmusk12345@gmail.com
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">8484</td>
-                <td className="px-6 py-4 whitespace-nowrap text-left ">
-                  Lorem252556666ipsum
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left">
-                  <Badge status="rejected" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-left ">
-                  2025-01-01
-                </td>
-              </tr>
-              {
-                isOpenOrder === 1 && (
-                  <tr>
-                    <td colSpan="6" className="p-0">
-                      <div className="customScroll relative overflow-x-auto my-2 px-20">
-                        <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
-                          <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
-                            <tr>
-                              <th scope="col" className="px-6 py-3 text-left">Product Id</th>
-                              <th scope="col" className="px-6 py-3 text-left">Product Title</th>
-                              <th scope="col" className="px-6 py-3 text-left">Image</th>
-                              <th scope="col" className="px-6 py-3 text-left">Quantity</th>
-                              <th scope="col" className="px-6 py-3 text-left">Price</th>
-                              <th scope="col" className="px-6 py-3 text-left">SubTotal</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                            <tr className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                685958547548455555555555
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                Lorem ipsum dolor sit amet Lorem, ipsum.
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <div className="!w-[50px] !h-[50px]">
-                                  <img
-                                    src="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
-                                    alt=""
-                                    className="w-full h-full object-cover rounded-md"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">5</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">2580</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">555502</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              }
+                            {
+                              isOpenOrder === index && (
+                                <tr>
+                                  <td colSpan="6" className="p-0">
+                                    <div className="customScroll relative overflow-x-auto my-2 px-20">
+                                      <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
+                                        <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
+                                          <tr>
+                                            <th scope="col" className="px-6 py-3 text-left w-[200px] min-w-[200px]">Product Id</th>
+                                            <th scope="col" className="px-6 py-3 text-left w-[300px] min-w-[300px]">Product Title</th>
+                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Image</th>
+                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Quantity</th>
+                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Price</th>
+                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">SubTotal</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {
+                                            item?.products?.map((productItem, index) => (
+                                              <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                                                <td className="px-6 py-4 whitespace-nowrap text-left">
+                                                  {productItem?.productId}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-normal break-words text-left">
+                                                  {productItem?.productTitle}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-left">
+                                                  <div className="!w-[50px] !h-[50px]">
+                                                    <img
+                                                      src={productItem?.image}
+                                                      alt=""
+                                                      className="w-full h-full object-cover"
+                                                    />
+                                                  </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-left">{productItem?.quantity}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-left">
+                                                  {productItem?.price ? productItem.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-left">
+                                                  {productItem?.subTotal ? productItem.subTotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                                </td>
+                                              </tr>
+                                            ))
+                                          }
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            }
+                          </>
+                        )
+                      })
+                    }
             </tbody>
           </table>
         </div>

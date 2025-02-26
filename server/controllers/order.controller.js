@@ -12,6 +12,7 @@ export const createOrderController = async (request, response) => {
             paymentId: request.body.paymentId,
             payment_status: request.body.payment_status,
             delivery_address: request.body.delivery_address,
+            order_status: request.body.order_status,
             totalAmt: request.body.totalAmt,
         });
 
@@ -145,6 +146,7 @@ export const captureOrderPaypalController = async (request, response) => {
             paymentId: request.body.paymentId,
             payment_status: request.body.payment_status,
             delivery_address: request.body.delivery_address,
+            order_status: request.body.order_status,
             totalAmt: request.body.totalAmount,
             data: request.body.data,
         }
@@ -167,6 +169,39 @@ export const captureOrderPaypalController = async (request, response) => {
             error: false,
             success: true,
             order: order,
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || "Internal Server Error",
+            error: true,
+            success: false,
+        });
+    }
+}
+
+
+export const orderStatusController = async (request, response) => {
+    try {
+        const { id, order_status } = request.body;
+
+        const updateOrder = await OrderModel.updateOne(
+            {
+                _id: id,
+            },
+            {
+                order_status: order_status,
+            },
+            {
+                new: true,
+            }
+        )
+
+        response.json({
+            message: 'Order Status Updated',
+            error: false,
+            success: true,
+            data: updateOrder
         });
 
     } catch (error) {

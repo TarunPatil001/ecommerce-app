@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema(
                 image: {
                     type: String
                 },
-                subTotalAmt: {
+                subTotal: {
                     type: Number,
                     default: 0
                 }
@@ -43,6 +43,10 @@ const orderSchema = new mongoose.Schema(
         delivery_address: {
             type: mongoose.Schema.ObjectId,
             ref: "address"
+        },
+        order_status: {
+            type: String,
+            default: "pending"
         },
         totalAmt: {
             type: Number,
