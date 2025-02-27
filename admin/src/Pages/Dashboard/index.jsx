@@ -20,7 +20,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Select from '@mui/material/Select';
 import { GoDotFill, GoPlus } from "react-icons/go";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis, Area, AreaChart } from 'recharts';
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
@@ -124,12 +124,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDataFromApi(`/api/order/order-list`).then((res) => {
-        if (res?.error === false) {
-          // console.log(res?.data);
-          setOrders(res?.data);
-        }
-      })
-    }, [])
+      if (res?.error === false) {
+        // console.log(res?.data);
+        setOrders(res?.data);
+      }
+    })
+  }, [])
 
 
   useEffect(() => {
@@ -982,128 +982,128 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-            {
-                      orders?.length !== 0 && orders?.map((item, index) => {
-                        return (
-                          <>
-                            <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <Button
-                                  className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
-                                  onClick={() => isShowOrderedProduct(index)}
-                                >
-                                  {isOpenOrder === (index) ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                                </Button>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <span className="text-[var(--bg-primary)] font-semibold">
-                                  {item?._id}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <span className="text-[var(--bg-primary)] font-semibold">
-                                  {item?.paymentId ? item?.paymentId : "CASH ON DELIVERY"}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                {item?.delivery_address?.name}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                {item?.delivery_address?.mobile
-                                  ? String(item?.delivery_address?.mobile).replace(/^(\d{2})(\d{5})(\d{5})$/, '+$1 $2 $3')
-                                  : 'N/A'}
-                              </td>
-                              <td className="px-6 py-4 text-left whitespace-normal break-words">
-                                {[
-                                  item?.delivery_address?.address_line1,
-                                  item?.delivery_address?.landmark,
-                                  item?.delivery_address?.city,
-                                  item?.delivery_address?.state,
-                                  item?.delivery_address?.pincode,
-                                  item?.delivery_address?.country
-                                ].filter(Boolean).join(', ')}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                {item?.delivery_address?.pincode}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                {item?.userId?.email}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                {item?.totalAmt ? item.totalAmt.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left ">
-                                {item?.userId?._id}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left">
-                                <Badge status={item?.order_status} />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-left ">
-                                {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-') : 'N/A'}
-                              </td>
-                            </tr>
-                            {
-                              isOpenOrder === index && (
-                                <tr>
-                                  <td colSpan="6" className="p-0">
-                                    <div className="customScroll relative overflow-x-auto my-2 px-20">
-                                      <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
-                                        <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
-                                          <tr>
-                                            <th scope="col" className="px-6 py-3 text-left w-[200px] min-w-[200px]">Product Id</th>
-                                            <th scope="col" className="px-6 py-3 text-left w-[300px] min-w-[300px]">Product Title</th>
-                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Image</th>
-                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Quantity</th>
-                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Price</th>
-                                            <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">SubTotal</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          {
-                                            item?.products?.map((productItem, index) => (
-                                              <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
-                                                <td className="px-6 py-4 whitespace-nowrap text-left">
-                                                  {productItem?.productId}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-normal break-words text-left">
-                                                  {productItem?.productTitle}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-left">
-                                                  <div className="!w-[50px] !h-[50px]">
-                                                    <img
-                                                      src={productItem?.image}
-                                                      alt=""
-                                                      className="w-full h-full object-cover"
-                                                    />
-                                                  </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-left">{productItem?.quantity}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-left">
-                                                  {productItem?.price ? productItem.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-left">
-                                                  {productItem?.subTotal ? productItem.subTotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                                                </td>
-                                              </tr>
-                                            ))
-                                          }
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )
-                            }
-                          </>
+              {
+                orders?.length !== 0 && orders?.map((item, index) => {
+                  return (
+                    <>
+                      <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          <Button
+                            className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
+                            onClick={() => isShowOrderedProduct(index)}
+                          >
+                            {isOpenOrder === (index) ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                          </Button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          <span className="text-[var(--bg-primary)] font-semibold">
+                            {item?._id}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          <span className="text-[var(--bg-primary)] font-semibold">
+                            {item?.paymentId ? item?.paymentId : "CASH ON DELIVERY"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          {item?.delivery_address?.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          {item?.delivery_address?.mobile
+                            ? String(item?.delivery_address?.mobile).replace(/^(\d{2})(\d{5})(\d{5})$/, '+$1 $2 $3')
+                            : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-left whitespace-normal break-words">
+                          {[
+                            item?.delivery_address?.address_line1,
+                            item?.delivery_address?.landmark,
+                            item?.delivery_address?.city,
+                            item?.delivery_address?.state,
+                            item?.delivery_address?.pincode,
+                            item?.delivery_address?.country
+                          ].filter(Boolean).join(', ')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          {item?.delivery_address?.pincode}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          {item?.userId?.email}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          {item?.totalAmt ? item.totalAmt.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left ">
+                          {item?.userId?._id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                          <Badge status={item?.order_status} />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-left ">
+                          {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-') : 'N/A'}
+                        </td>
+                      </tr>
+                      {
+                        isOpenOrder === index && (
+                          <tr>
+                            <td colSpan="6" className="p-0">
+                              <div className="customScroll relative overflow-x-auto my-2 px-20">
+                                <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
+                                  <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
+                                    <tr>
+                                      <th scope="col" className="px-6 py-3 text-left w-[200px] min-w-[200px]">Product Id</th>
+                                      <th scope="col" className="px-6 py-3 text-left w-[300px] min-w-[300px]">Product Title</th>
+                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Image</th>
+                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Quantity</th>
+                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Price</th>
+                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">SubTotal</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {
+                                      item?.products?.map((productItem, index) => (
+                                        <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                                          <td className="px-6 py-4 whitespace-nowrap text-left">
+                                            {productItem?.productId}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-normal break-words text-left">
+                                            {productItem?.productTitle}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-left">
+                                            <div className="!w-[50px] !h-[50px]">
+                                              <img
+                                                src={productItem?.image}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                              />
+                                            </div>
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-left">{productItem?.quantity}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-left">
+                                            {productItem?.price ? productItem.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-left">
+                                            {productItem?.subTotal ? productItem.subTotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                          </td>
+                                        </tr>
+                                      ))
+                                    }
+                                  </tbody>
+                                </table>
+                              </div>
+                            </td>
+                          </tr>
                         )
-                      })
-                    }
+                      }
+                    </>
+                  )
+                })
+              }
             </tbody>
           </table>
         </div>
       </div>
 
-      <div className="card my-4 bg-white border rounded-md px-1">
+      {/* <div className="card my-4 bg-white border rounded-md px-1">
         <div className='flex items-center justify-between px-5 pb-2 pt-5'>
           <h2 className='text-[20px] font-bold'>Total Sales & Total Users</h2>
         </div>
@@ -1133,6 +1133,67 @@ const Dashboard = () => {
               <Line type="monotone" dataKey="Total_Sales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
               <Line type="monotone" dataKey="Total_Users" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div> */}
+
+      <div className="card my-4 bg-white border rounded-md px-1">
+        <div className="flex items-center justify-between px-5 pb-2 pt-5">
+          <h2 className="text-[20px] font-bold">Total Sales & Total Users</h2>
+        </div>
+
+        <div className="flex items-center justify-start px-5 pt-2 pb-5 gap-5">
+          <span className="flex items-center">
+            <GoDotFill className="text-violet-500" /> Total Sales
+          </span>
+          <span className="flex items-center">
+            <GoDotFill className="text-green-500" /> Total Users
+          </span>
+        </div>
+
+        <div style={{ width: "100%", height: "500px" }}>
+          <ResponsiveContainer>
+            <AreaChart
+              data={chartData1}
+              margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+            >
+              {/* Define gradients */}
+              <defs>
+                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                </linearGradient>
+
+                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <RechartTooltip contentStyle={{ fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+
+              {/* Apply gradient fills */}
+              <Area
+                type="monotone"
+                dataKey="Total_Sales"
+                stroke="#8884d8"
+                fill="url(#colorSales)"
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="Total_Users"
+                stroke="#82ca9d"
+                fill="url(#colorUsers)"
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
