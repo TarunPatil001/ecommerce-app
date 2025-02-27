@@ -1,10 +1,86 @@
+// const mongoose = require('mongoose');
 import OrderModel from "../models/order.model.js";
 import ProductModel from "../models/product.model.js";
 import paypal from "@paypal/checkout-server-sdk";
 
 
+
+// export const createOrderController = async (request, response) => {
+//     try {
+//         // Create new order
+//         let order = new OrderModel({
+//             userId: request.body.userId,
+//             products: request.body.products,
+//             paymentId: request.body.paymentId,
+//             payment_status: request.body.payment_status,
+//             delivery_address: request.body.delivery_address,
+//             order_status: request.body.order_status,
+//             totalAmt: request.body.totalAmt,
+//         });
+
+//         // Check if order object is created properly
+//         if (!order) {
+//             return response.status(400).json({
+//                 message: "Invalid order details",
+//                 error: true,
+//                 success: false
+//             });
+//         }
+
+//         // Update stock for each product
+//         for (let i = 0; i < request.body.products.length; i++) {
+//             await ProductModel.findByIdAndUpdate(
+//                 request.body.products[i].productId,
+//                 {
+//                     $inc: { countInStock: -request.body.products[i].quantity } // Efficient stock decrement
+//                 },
+//                 { new: true }
+//             );
+//         }
+
+//         // Save the order to the database
+//         const savedOrder = await order.save();
+
+//         return response.status(201).json({
+//             message: "Order placed!",
+//             error: false,
+//             success: true,
+//             order: savedOrder,
+//         });
+
+//     } catch (error) {
+//         return response.status(500).json({
+//             message: error.message || "Internal Server Error",
+//             error: true,
+//             success: false,
+//         });
+//     }
+// };
+
 export const createOrderController = async (request, response) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
+        // Validate stock before creating the order
+        for (let i = 0; i < request.body.products.length; i++) {
+            const product = await ProductModel.findById(request.body.products[i].productId);
+            if (!product) {
+                return response.status(400).json({
+                    message: `Product not found: ${request.body.products[i].productId}`,
+                    error: true,
+                    success: false,
+                });
+            }
+            // Check if stock is sufficient for each product
+            if (product.countInStock < request.body.products[i].quantity) {
+                return response.status(400).json({
+                    message: `Insufficient stock for product: ${product.name}`,
+                    error: true,
+                    success: false,
+                });
+            }
+        }
+
         // Create new order
         let order = new OrderModel({
             userId: request.body.userId,
@@ -21,23 +97,40 @@ export const createOrderController = async (request, response) => {
             return response.status(400).json({
                 message: "Invalid order details",
                 error: true,
-                success: false
+                success: false,
             });
         }
 
-        // Update stock for each product
+        // Update stock for each product within a transaction
         for (let i = 0; i < request.body.products.length; i++) {
+            const product = await ProductModel.findById(request.body.products[i].productId);
+
+            // Ensure stock does not go negative
+            const newStock = product.countInStock - request.body.products[i].quantity;
+            if (newStock < 0) {
+                return response.status(400).json({
+                    message: `Not enough stock for product: ${product.name}`,
+                    error: true,
+                    success: false,
+                });
+            }
+
+            // Decrement stock if sufficient quantity is available
             await ProductModel.findByIdAndUpdate(
                 request.body.products[i].productId,
                 {
-                    $inc: { countInStock: -request.body.products[i].quantity } // Efficient stock decrement
+                    $inc: { countInStock: -request.body.products[i].quantity }
                 },
-                { new: true }
+                { new: true, session } // Include session for transaction
             );
         }
 
-        // Save the order to the database
-        const savedOrder = await order.save();
+        // Save the order to the database within a transaction
+        const savedOrder = await order.save({ session });
+
+        // Commit the transaction
+        await session.commitTransaction();
+        session.endSession();
 
         return response.status(201).json({
             message: "Order placed!",
@@ -47,6 +140,10 @@ export const createOrderController = async (request, response) => {
         });
 
     } catch (error) {
+        // If error, abort transaction
+        await session.abortTransaction();
+        session.endSession();
+
         return response.status(500).json({
             message: error.message || "Internal Server Error",
             error: true,
@@ -54,6 +151,7 @@ export const createOrderController = async (request, response) => {
         });
     }
 };
+
 
 
 export async function getOrderDetailsController(request, response) {

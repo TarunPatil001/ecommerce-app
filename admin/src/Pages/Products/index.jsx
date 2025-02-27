@@ -738,13 +738,15 @@ const Products = () => {
                                                 </span>
                                                 <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
                                                 <span>
-                                                    <span className="text-[14px] font-bold">{product?.countInStock - product?.sale}</span> remain
+                                                    <span className="text-[14px] font-bold">
+                                                        {Math.max(0, product?.countInStock - product?.sale)}
+                                                    </span> remain
                                                 </span>
                                             </p>
                                         </TableCell>
                                         <TableCell className="table-cell">
                                             <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
-                                            <Rating name="rating" size='small' defaultValue={product?.rating} max={5} readOnly />
+                                                <Rating name="rating" size='small' defaultValue={product?.rating} max={5} readOnly />
                                             </p>
                                         </TableCell>
                                         <TableCell className="table-cell">
