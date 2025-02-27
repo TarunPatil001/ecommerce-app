@@ -532,9 +532,6 @@ const AddProduct = () => {
 
 
 
-
-
-
     const onChangeRating = (event, newValue) => {
         setProductRating(newValue);
         setFormFields((prevFields) => ({
@@ -571,8 +568,6 @@ const AddProduct = () => {
         setIsBannerVisible(newValue);
         setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
     };
-
-
 
 
     const handleFormSubmit = async (e) => {

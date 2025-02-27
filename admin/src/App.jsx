@@ -41,6 +41,7 @@ import AddBannersV1 from './Pages/Banners/addBannersV1';
 import BannersV1List from './Pages/Banners';
 import BlogList from './Pages/Blog';
 import AddBlog from './Pages/Blog/addBlog';
+import AddingProducts from './Pages/BetaTesting/addingProducts';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -507,6 +508,7 @@ function App() {
           <div className='mt-5 p-4'>
 
             {isOpenFullScreenPanel?.model === "Product Details" && <AddProduct />}
+            {isOpenFullScreenPanel?.model === "Beta Product Details" && <AddingProducts />}
 
             {isOpenFullScreenPanel?.model === "Home Banner Details" && <AddHomeSlide />}
 

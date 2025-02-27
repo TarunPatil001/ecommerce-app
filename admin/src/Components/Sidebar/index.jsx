@@ -27,6 +27,7 @@ const Sidebar = () => {
   const [subMenuIndex3, setSubMenuIndex3] = useState(false);
   const [subMenuIndex4, setSubMenuIndex4] = useState(false);
   const [subMenuIndex5, setSubMenuIndex5] = useState(false);
+  const [subMenuIndex6, setSubMenuIndex6] = useState(false);
 
   const { id } = useParams();
 
@@ -59,7 +60,8 @@ const Sidebar = () => {
     if (currentMenu.includes("Product")) setSubMenuIndex2(true);
     if (currentMenu.includes("Categories")) setSubMenuIndex3(true);
     if (currentMenu.includes("Banners")) setSubMenuIndex4(true);
-    if (currentMenu.includes("Blogs")) setSubMenuIndex4(true);
+    if (currentMenu.includes("Blogs")) setSubMenuIndex5(true);
+    if (currentMenu.includes("Beta Testing")) setSubMenuIndex6(true);
   }, [menuMapping]);
 
 
@@ -169,7 +171,7 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
-                
+
                 <li className='w-full'>
                   <Link to="/products/addProductWeight">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Weight' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Weight')}>
@@ -178,7 +180,7 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
-                
+
                 <li className='w-full'>
                   <Link to="/products/addProductSize">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Size' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Size')}>
@@ -251,7 +253,7 @@ const Sidebar = () => {
 
             <Collapse isOpened={subMenuIndex4}>
               <ul className='w-full'>
-                
+
                 <li className='w-full'>
                   <Link to="/bannersV1/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'BannerV1 List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('BannerV1 List')}>
@@ -274,7 +276,7 @@ const Sidebar = () => {
                     <span>Add Banner V2</span>
                   </Button>
                 </li> */}
-                
+
                 {/* <li className='w-full'>
                   <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Home Banner Details" })}>
                     <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
@@ -286,9 +288,9 @@ const Sidebar = () => {
             </Collapse>
 
           </li>
-          
-          
-          
+
+
+
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex5(!subMenuIndex5) }}><RiBloggerLine className='text-[25px]' />
               <span>Blogs</span>
@@ -297,7 +299,7 @@ const Sidebar = () => {
 
             <Collapse isOpened={subMenuIndex5}>
               <ul className='w-full'>
-                
+
                 <li className='w-full'>
                   <Link to="/blog/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Blog List')}>
@@ -319,6 +321,36 @@ const Sidebar = () => {
 
           </li>
 
+
+          <li>
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Beta Testing' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex6(!subMenuIndex6) }}><RiBloggerLine className='text-[25px]' />
+              <span>Beta Testing</span>
+              <span className={`ml-auto w-[30px] h-[30px] flex !items-center !justify-center transform transition-transform duration-300 ${subMenuIndex6 ? "-rotate-180" : "rotate-0"}`}><FaAngleDown /></span>
+            </Button>
+
+            <Collapse isOpened={subMenuIndex6}>
+              <ul className='w-full'>
+
+                {/* <li className='w-full'>
+                  <Link to="/blog/list">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Blog List')}>
+                      <GoDotFill className={`${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Blog List</span>
+                    </Button>
+                  </Link>
+                </li> */}
+
+                <li className='w-full'>
+                  <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Beta Product Details" })}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add Product</span>
+                  </Button>
+                </li>
+
+              </ul>
+            </Collapse>
+
+          </li>
 
 
 
