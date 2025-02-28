@@ -426,14 +426,26 @@ export async function logoutController(request, response) {
 }
 
 // --------------------------------------------------------------------------------------
+// Utility function to extract the public ID from the Cloudinary URL
+function extractPublicId(imageUrl) {
+  // Regex to match the Cloudinary URL and extract public ID
+  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
+  const match = imageUrl.match(regex);
 
-// Controller to handle user avatar upload and update
+  if (match && match[1]) {
+    // Return the full public ID (including folder path)
+    return match[1];
+  }
+
+  return null;
+}
+
 export async function userAvatarController(request, response) {
   try {
-    const userId = request.userId; // Extracted from auth middleware
-    const images = request.files; // Extracted from multer middleware
+    const userId = request.userId;  // Get the user ID from the auth middleware
+    const images = request.files;   // Get uploaded files
 
-    // Validate that exactly one image is provided
+    // Validate that exactly one image is uploaded
     if (!images || images.length !== 1) {
       return response.status(400).json({
         message: "Please upload exactly one image file.",
@@ -443,24 +455,18 @@ export async function userAvatarController(request, response) {
     }
 
     // Validate the file type
-    const validImageTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-    ];
+    const validImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     const uploadedImageType = images[0].mimetype;
     if (!validImageTypes.includes(uploadedImageType)) {
       return response.status(400).json({
-        message:
-          "Invalid file type. Only JPG, JPEG, PNG, or WEBP files are allowed.",
+        message: "Invalid file type. Only JPG, JPEG, PNG, or WEBP files are allowed.",
         error: true,
         success: false,
       });
     }
 
-    // Validate the file size (max 5MB for example)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (max 5MB for example)
+    const maxSize = 5 * 1024 * 1024;  // 5MB
     const uploadedImageSize = images[0].size;
     if (uploadedImageSize > maxSize) {
       return response.status(400).json({
@@ -470,9 +476,8 @@ export async function userAvatarController(request, response) {
       });
     }
 
-    // Find the user by ID
+    // Find the user and update the avatar
     const user = await UserModel.findOne({ _id: userId });
-
     if (!user) {
       return response.status(404).json({
         message: "User not found.",
@@ -481,45 +486,56 @@ export async function userAvatarController(request, response) {
       });
     }
 
-    // Check if the user already has an avatar
+    // Remove the existing avatar if there is one
     if (user.avatar) {
-      const imgUrl = user.avatar;
+      const publicId = extractPublicId(user.avatar); // Extract public ID from URL
 
-      // Extract the public_id of the existing avatar from its URL
-      const urlArr = imgUrl.split("/");
-      const avatarImage = urlArr[urlArr.length - 1];
-      const publicId = `ecommerceApp/uploads/${avatarImage.split(".")[0]}`;
+      if (publicId) {
+        console.log("Attempting to delete avatar with publicId:", publicId);
 
-      // Remove the existing avatar from Cloudinary
-      const result = await cloudinary.uploader.destroy(publicId);
+        // Remove old avatar from Cloudinary
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log("Cloudinary Delete Result:", result); // Log result
 
-      if (result.result !== "ok") {
+        if (result.result !== 'ok') {
+          // If Cloudinary deletion fails, update the database to remove the avatar
+          console.error("Failed to delete avatar from Cloudinary, removing it from database.");
+          user.avatar = null;  // Remove the avatar from the database
+          await user.save();  // Save the changes
+          return response.status(500).json({
+            message: "Failed to remove the existing avatar from Cloudinary. Avatar removed from database.",
+            error: true,
+            success: false,
+          });
+        }
+      } else {
+        console.error("Invalid avatar URL format. Unable to extract public ID.");
+        user.avatar = null;  // If extraction fails, remove the avatar from the database
+        await user.save();
         return response.status(400).json({
-          message: "Failed to remove the existing avatar.",
+          message: "Invalid avatar URL format. Avatar removed from database.",
           error: true,
           success: false,
         });
       }
     }
 
-    // Upload the new avatar to Cloudinary
+    // Upload new avatar to Cloudinary
     const options = {
-      folder: "ecommerceApp/uploads", // Specify the folder in Cloudinary
+      folder: "ecommerceApp/uploads",
       use_filename: true,
       unique_filename: false,
       overwrite: false,
     };
 
-    // Use the Promise-based API correctly
-    const uploadedImage = await cloudinary.uploader.upload(
-      images[0].path,
-      options
-    );
+    const uploadedImage = await cloudinary.uploader.upload(images[0].path, options);
+    
+    // Delete local file after successful upload to Cloudinary
+    if (uploadedImage.secure_url) {
+      await fs.unlink(images[0].path);  // Delete local file
+    }
 
-    // Delete the local file after successful upload
-    await fs.unlink(images[0].path);
-
-    // Update the user's avatar in the database
+    // Update the user's avatar URL in the database
     user.avatar = uploadedImage.secure_url;
     await user.save();
 
@@ -538,6 +554,7 @@ export async function userAvatarController(request, response) {
     });
   }
 }
+
 
 // Controller for removing an image from Cloudinary
 export async function removeImageFromCloudinary(request, response) {

@@ -26,37 +26,41 @@ const AccountSidebar = () => {
         }
     }, [context?.userData?.avatar]); // Re-fetch when only the avatar in context changes
 
-    const onChangeFile = async (e, apiEndPoint) => {
 
+
+    const onChangeFile = async (e, apiEndPoint) => {
         try {
+            // Toast promise to handle loading, success, and error states
             const result = await toast.promise(
                 (async () => {
-                    const file = e.target.files[0];
+                    const file = e.target.files[0];  // Get the selected file
                     if (!file) {
                         throw new Error("No file selected.");
                     }
-
+    
                     const validFormats = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+                    console.log("File type:", file.type);  // Debug file type
+    
                     if (!validFormats.includes(file.type)) {
                         throw new Error("Please select a valid image (JPEG/JPG/PNG/WEBP).");
                     }
-
+    
                     const formData = new FormData();
-                    formData.append("avatar", file);
-
+                    formData.append("avatar", file);  // Append file to FormData
+    
                     setUploading(true);
-
+    
                     const previewUrl = URL.createObjectURL(file);
-                    setPreview(previewUrl); // Temporary preview
-
-                    // Call the API and validate the response
+                    setPreview(previewUrl);  // Temporary preview before upload
+    
+                    // Call the API for image upload
                     const response = await uploadImage(apiEndPoint, formData);
-                    console.log("API Response Debug:", response); // Debug API response
-
+                    console.log("API Response Debug:", response);  // Debug API response
+    
                     if (response?.avatar) {
-                        setAvatar(response.avatar); // Update state with the final avatar URL
-                        setPreview(response.avatar); // Update preview with the uploaded avatar
-                        context?.forceUpdate();
+                        setAvatar(response.avatar);  // Set the avatar URL to the state
+                        setPreview(response.avatar);  // Update preview with the uploaded avatar
+                        context?.forceUpdate();  // Trigger UI re-render
                         return "Avatar updated successfully!";
                     } else {
                         console.error("Unexpected response format:", response);
@@ -74,28 +78,29 @@ const AccountSidebar = () => {
                     },
                 }
             );
-
-            console.log("Result:", result); // Log success message
-            // context.openAlertBox("success", result); // Show success alert
+    
+            console.log("Result:", result);  // Log success message
+    
         } catch (error) {
             console.error("Error while uploading file:", error);
-            // context.openAlertBox("error", error?.message || "An unexpected error occurred.");
+            setUploading(false);  // Stop spinner on error
         } finally {
-            setUploading(false); // Stop spinner
+            setUploading(false);  // Always stop spinner when the upload is complete (success or failure)
         }
-
     };
+    
+    
 
     const logout = () => {
-    
+
         fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
-          if (res?.error === false) {
-            context.setIsLogin(false);
-            localStorage.clear();
-            navigate("/");
-          }
+            if (res?.error === false) {
+                context.setIsLogin(false);
+                localStorage.clear();
+                navigate("/");
+            }
         })
-      }
+    }
 
 
     return (
@@ -105,21 +110,28 @@ const AccountSidebar = () => {
                     <div className="w-full p-5 flex items-center justify-center flex-col">
                         <div className='w-[110px] h-[110px] border p-1 relative rounded-full overflow-hidden shadow-xl flex items-center justify-center mb-2'>
                             <div className="w-full h-full overflow-hidden group rounded-full shadow relative flex items-center justify-center bg-gray-300">
-
-                                {uploading === true ? (
-                                    <CircularProgress color="inherit" />
+                                {uploading ? (
+                                    <CircularProgress color="inherit" /> // Show spinner while uploading
                                 ) : (
                                     <img
-                                        src={preview || avatar || `https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png`}
+                                        src={preview || avatar || `https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png`} // Use preview if available, else use avatar or default image
                                         alt="profile"
                                         className="w-full h-full object-cover"
                                     />
                                 )}
                                 <div className="overlay w-full h-full absolute top-0 left-0 z-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center opacity-0 rounded-full group-hover:opacity-100 duration-300 transition-all">
                                     <FiUpload className="text-white text-[22px] group-hover:scale-125 duration-300 transition-all" />
-                                    <input type="file" id="" className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2 " name="avatar" accept='image/*' onChange={(e) => onChangeFile(e, "/api/user/user-avatar")} />
+                                    <input
+                                        type="file"
+                                        id="avatar-upload"
+                                        className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2"
+                                        name="avatar"
+                                        accept="image/*"
+                                        onChange={(e) => onChangeFile(e, "/api/user/user-avatar")} // Call the function to upload the avatar
+                                    />
                                 </div>
                             </div>
+
                         </div>
                         <h3 className="font-bold text-[16px] line-clamp-1">{context?.userData?.name}</h3>
                         <h6 className="text-[13px] font-medium">{context?.userData?.email}</h6>
