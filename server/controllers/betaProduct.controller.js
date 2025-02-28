@@ -1,7 +1,7 @@
-import BetaProductModel from "../models/BetaProductModel.js";
 import cloudinary from "cloudinary";
 import mongoose from "mongoose";
 import fs from "fs";
+import BetaProductModel from "../models/betaProduct.model.js";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -13,12 +13,8 @@ cloudinary.config({
 
 // =========================================================================================================================
 
-import fs from "fs";
-import cloudinary from "cloudinary"; 
-import BetaProductModel from "../models/BetaProductModel.js";
-
-// 🔹 Function to upload an array of images to Cloudinary
-export async function uploadImagesToCloudinary(files) {
+// 🔹 Helper function (Private to this file)
+async function uploadImagesToCloudinary(files) {
   try {
     if (!Array.isArray(files)) {
       throw new Error("Invalid file format received");
@@ -43,7 +39,6 @@ export async function uploadImagesToCloudinary(files) {
       })
     );
 
-    // 🔹 Handle case where all uploads fail
     if (uploadedImages.every((img) => img === null)) {
       throw new Error("All image uploads failed");
     }
@@ -55,15 +50,12 @@ export async function uploadImagesToCloudinary(files) {
   }
 }
 
-// =========================================================================================================================
-
-// 🔹 Function to create a product
+// 🔹 Controller function to create a product
 export async function createBetaProduct(req, res) {
   try {
     const { name } = req.body;
     const images = req.files; // Array of images
 
-    // 🔹 Validate required fields
     if (!name) {
       return res.status(400).json({ error: "Product name is required" });
     }
@@ -71,17 +63,15 @@ export async function createBetaProduct(req, res) {
       return res.status(400).json({ error: "At least one image is required" });
     }
 
-    // 🔹 Upload images and get URLs
     const uploadedImageUrls = await uploadImagesToCloudinary(images);
 
     if (uploadedImageUrls.length === 0) {
       return res.status(500).json({ error: "Image upload failed, try again" });
     }
 
-    // 🔹 Save product in MongoDB
     const newProduct = new BetaProductModel({
-      name: name.trim(), // Trim whitespace from name
-      images: uploadedImageUrls, // Store array of image URLs
+      name: name.trim(),
+      images: uploadedImageUrls,
     });
 
     const savedProduct = await newProduct.save();

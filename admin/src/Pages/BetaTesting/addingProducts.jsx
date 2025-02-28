@@ -1,79 +1,155 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import UploadBoxBeta from "../../Components/UploadBoxBeta";
 import toast from "react-hot-toast";
+import { MyContext } from "../../App";
+import { postData } from "../../utils/api";
 
 const AddingProducts = () => {
+    const context = useContext(MyContext);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [removedFiles, setRemovedFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
 
     const [formFields, setFormFields] = useState({
         name: "",
         images: [],
     });
 
-    const onChangeInput = (e) => {
-        const { name, value } = e.target;
-        setFormFields((prevFields) => ({
-            ...prevFields,
-            [name]: value,
-        }));
-    };
+    // Reset removedFiles when the full-screen panel is closed
+    useEffect(() => {
+        if (!context?.isOpenFullScreenPanel?.open) {
+            setRemovedFiles([]);
+            console.log("Removed files reset due to panel close.");
+        }
+    }, [context?.isOpenFullScreenPanel?.open]);
 
-    const handleFileUpload = (files) => {
-        if (!files || files.length === 0) return;
-        const newFiles = Array.from(files);
-        
-        setUploadedFiles((prevFiles) => {
-            const updatedFiles = [...prevFiles, ...newFiles];
-            console.log("Uploaded Files:", updatedFiles);
-            return updatedFiles;
+    useEffect(() => {
+        return () => {
+            previews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [previews]);
+
+    const handleFileChange = (event) => {
+        const newFiles = Array.from(event.target.files);
+
+        // Prevent duplicate file uploads
+        const filteredFiles = newFiles.filter(
+            (file) => !uploadedFiles.some((existingFile) => existingFile.name === file.name)
+        );
+
+        if (filteredFiles.length === 0) {
+            toast.error("Duplicate files are not allowed.");
+            return;
+        }
+
+        const newPreviewUrls = filteredFiles.map((file) => URL.createObjectURL(file));
+
+        setPreviews((prev) => [...prev, ...newPreviewUrls]);
+        setUploadedFiles((prev) => {
+            console.log("Files uploaded:", [...prev, ...filteredFiles]);
+            return [...prev, ...filteredFiles];
         });
     };
 
-    const handleRemoveFile = (index) => {
-        setUploadedFiles((prevFiles) => {
-            const updatedFiles = prevFiles.filter((_, i) => i !== index);
-            console.log("Remaining Uploaded Files:", updatedFiles);
-            return updatedFiles;
+    const handleRemoveImage = (index) => {
+        setRemovedFiles((prev) => {
+            const updatedRemovedFiles = [...prev, uploadedFiles[index]];
+            console.log("Files removed:", updatedRemovedFiles);
+            return updatedRemovedFiles;
         });
+
+        setPreviews((prev) => {
+            URL.revokeObjectURL(prev[index]);
+            return prev.filter((_, i) => i !== index);
+        });
+
+        setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSave = async () => {
+        try {
+            // 🔹 Validation
+            if (uploadedFiles.length === 0) {
+                context.openAlertBox("error", "Please upload at least one image.");
+                return;
+            }
     
-        setRemovedFiles((prevRemoved) => {
-            const removedFile = uploadedFiles[index]; // Get the file before updating state
-            const updatedRemoved = [...prevRemoved, removedFile];
-            console.log("Files marked for removal:", updatedRemoved);
-            return updatedRemoved;
-        });
+            const productName = formFields.name.trim();
+            if (!productName) {
+                context.openAlertBox("error", "Product name is required.");
+                return;
+            }
+    
+            // ✅ Prepare FormData for file upload
+            const formData = new FormData();
+            uploadedFiles.forEach((file) => formData.append("images", file));
+            formData.append("name", productName);
+    
+            // 🔹 Ensure sellerId is correctly included in the request payload
+            const requestBody = {
+                formData,
+                // Add any other necessary fields if required
+            };
+    
+            // 🔹 Toast promise with loading, success, and error handling
+            const result = await toast.promise(
+                postData(`/api/betaProduct/create-product`, {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include", // If using cookies for authentication
+                }), {
+                    loading: "Saving product... Please wait.",
+                    success: (res) => {
+                        if (res?.success) {
+                            context?.forceUpdate();
+                            return res.message || "Product saved successfully!";
+                        } else {
+                            throw new Error(res?.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        const errorMessage = err?.response?.data?.message || err.message || "Failed to save product. Please try again.";
+                        return errorMessage;
+                    },
+                });
+    
+            console.log("Result:", result);
+        } catch (err) {
+            console.error("Error:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
+        } finally {
+            // 🔹 Reset loading state and close full screen panel
+            setTimeout(() => {
+                // setIsLoading(false);
+                context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+            }, 500);
+        }
     };
     
     
-
-    const handleSave = () => {
-        // console.log("Saving Product with Images:", uploadedFiles);
-        // console.log("Files to be permanently deleted:", removedFiles);
-
-        setRemovedFiles([]);
-        toast.success("Product saved successfully!");
-    };
 
     return (
         <section className="p-8">
             <form className="form py-3 p-0">
                 <h3 className="text-[24px] font-bold mb-2">Create Product</h3>
+
+                {/* Product Name Input */}
                 <div className="flex flex-col gap-4 border-2 border-dashed border-gray-300 bg-white rounded-md p-5 mb-5">
-                    <h3 className="text-[14px] font-medium mb-1 text-gray-700">Product Name</h3>
+                    <h3 className="text-[14px] font-medium text-gray-700">Product Name</h3>
                     <input
                         type="text"
                         className="w-full h-[40px] border border-gray-300 focus:outline-none rounded-md p-3 text-sm"
                         placeholder="Product title"
                         name="name"
                         value={formFields.name}
-                        onChange={onChangeInput}
+                        onChange={(e) => setFormFields({ ...formFields, name: e.target.value })}
                     />
                 </div>
 
+                {/* Image Upload Section */}
                 <div className="w-full px-0">
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
                     <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-gray-300 rounded-md p-5 pt-1 mb-4">
@@ -83,18 +159,18 @@ const AddingProducts = () => {
 
                         {uploadedFiles.map((file, index) => (
                             <div
-                                key={file.name || index}
+                                key={file.name}
                                 className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative"
                             >
                                 <span
                                     className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                    onClick={() => handleRemoveFile(index)}
+                                    onClick={() => handleRemoveImage(index)}
                                 >
                                     <IoClose className="text-[15px] text-red-600" />
                                 </span>
                                 <div className="w-full h-[100px]">
                                     <img
-                                        src={URL.createObjectURL(file)}
+                                        src={previews[index]}
                                         alt={`uploaded-${index}`}
                                         className="w-full h-full object-cover rounded-md"
                                     />
@@ -105,9 +181,12 @@ const AddingProducts = () => {
                             </div>
                         ))}
 
+                        {/* Upload Box */}
                         <div className={uploadedFiles.length > 0 ? "" : "col-span-8"}>
-                            <UploadBoxBeta multiple={true} onDrop={handleFileUpload} />
+                            <UploadBoxBeta multiple={true} onFileChange={handleFileChange} />
                         </div>
+
+                        {/* File Status */}
                         <p className="text-sm mt-2 text-gray-600 col-span-full">
                             {uploadedFiles.length > 0
                                 ? `Files uploaded: ${uploadedFiles.length}`
@@ -116,19 +195,13 @@ const AddingProducts = () => {
                     </div>
                 </div>
 
+                {/* Save & Discard Buttons */}
                 <div className="w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-gray-300">
-                    <Button
-                        type="button"
-                        className="!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2"
-                    >
+                    <Button className="!bg-red-500 !text-white w-[150px] h-[40px]">
                         <FaCloudUploadAlt className="text-[20px]" />
                         Discard
                     </Button>
-                    <Button
-                        type="button"
-                        onClick={handleSave}
-                        className="custom-btn w-[150px] h-[40px] flex items-center justify-center gap-2"
-                    >
+                    <Button onClick={handleSave} className="custom-btn w-[150px] h-[40px]">
                         <FaCloudUploadAlt className="text-[20px]" />
                         Save
                     </Button>
