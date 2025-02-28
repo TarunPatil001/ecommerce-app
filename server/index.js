@@ -16,6 +16,7 @@ import homeSlideRouter from "./route/homeSlide.route.js";
 import bannerV1Router from "./route/bannerV1.route.js";
 import blogRouter from "./route/blog.route.js";
 import orderRouter from "./route/order.route.js";
+import betaProductRouter from "./route/betaProduct.route.js";
 
 const app = express();
 
@@ -47,6 +48,8 @@ app.use('/api/homeSlides', homeSlideRouter);
 app.use('/api/bannersV1', bannerV1Router);
 app.use('/api/blog', blogRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/betaProduct', betaProductRouter);
+
 
 
 connectDB().then(() => {
