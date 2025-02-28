@@ -59,7 +59,7 @@ const Sidebar = () => {
     if (currentMenu.includes("Product")) setSubMenuIndex2(true);
     if (currentMenu.includes("Categories")) setSubMenuIndex3(true);
     if (currentMenu.includes("Banners")) setSubMenuIndex4(true);
-    if (currentMenu.includes("Blogs")) setSubMenuIndex4(true);
+    if (currentMenu.includes("Blogs")) setSubMenuIndex5(true);
   }, [menuMapping]);
 
 
