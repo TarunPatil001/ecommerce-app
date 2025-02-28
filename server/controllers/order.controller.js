@@ -1,63 +1,20 @@
 // const mongoose = require('mongoose');
+import mongoose from "mongoose";
 import OrderModel from "../models/order.model.js";
 import ProductModel from "../models/product.model.js";
 import paypal from "@paypal/checkout-server-sdk";
 
 
-
-// export const createOrderController = async (request, response) => {
-//     try {
-//         // Create new order
-//         let order = new OrderModel({
-//             userId: request.body.userId,
-//             products: request.body.products,
-//             paymentId: request.body.paymentId,
-//             payment_status: request.body.payment_status,
-//             delivery_address: request.body.delivery_address,
-//             order_status: request.body.order_status,
-//             totalAmt: request.body.totalAmt,
-//         });
-
-//         // Check if order object is created properly
-//         if (!order) {
-//             return response.status(400).json({
-//                 message: "Invalid order details",
-//                 error: true,
-//                 success: false
-//             });
-//         }
-
-//         // Update stock for each product
-//         for (let i = 0; i < request.body.products.length; i++) {
-//             await ProductModel.findByIdAndUpdate(
-//                 request.body.products[i].productId,
-//                 {
-//                     $inc: { countInStock: -request.body.products[i].quantity } // Efficient stock decrement
-//                 },
-//                 { new: true }
-//             );
-//         }
-
-//         // Save the order to the database
-//         const savedOrder = await order.save();
-
-//         return response.status(201).json({
-//             message: "Order placed!",
-//             error: false,
-//             success: true,
-//             order: savedOrder,
-//         });
-
-//     } catch (error) {
-//         return response.status(500).json({
-//             message: error.message || "Internal Server Error",
-//             error: true,
-//             success: false,
-//         });
-//     }
-// };
-
 export const createOrderController = async (request, response) => {
+    // Check if delivery address is provided
+    if (!request.body.delivery_address) {
+        return response.status(400).json({
+            message: "Delivery address is required",
+            error: true,
+            success: false,
+        });
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -154,6 +111,7 @@ export const createOrderController = async (request, response) => {
 
 
 
+
 export async function getOrderDetailsController(request, response) {
     try {
 
@@ -230,9 +188,16 @@ export const createOrderPaypalController = async (request, response) => {
     }
 }
 
-
 export const captureOrderPaypalController = async (request, response) => {
     try {
+        // Check if delivery address is provided
+        if (!request.body.delivery_address) {
+            return response.status(400).json({
+                message: "Delivery address is required",
+                error: true,
+                success: false,
+            });
+        }
 
         const { paymentId } = request.body;
         const req = new paypal.orders.OrdersCaptureRequest(paymentId);
@@ -247,7 +212,7 @@ export const captureOrderPaypalController = async (request, response) => {
             order_status: request.body.order_status,
             totalAmt: request.body.totalAmount,
             data: request.body.data,
-        }
+        };
 
         const order = new OrderModel(orderInfo);
         await order.save();
@@ -262,6 +227,7 @@ export const captureOrderPaypalController = async (request, response) => {
                 { new: true }
             );
         }
+
         response.json({
             message: 'Order Placed',
             error: false,
@@ -276,7 +242,7 @@ export const captureOrderPaypalController = async (request, response) => {
             success: false,
         });
     }
-}
+};
 
 
 export const orderStatusController = async (request, response) => {
