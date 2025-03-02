@@ -4,6 +4,149 @@ import mongoose from 'mongoose';
 
 
 // ----------------------------------
+// export const addToCartItemController = async (request, response) => {
+//   try {
+//     const userId = request.userId; // middleware
+//     const {
+//       productTitle,
+//       image,
+//       sellerDetails,
+//       rating,
+//       brand,
+//       availableOptions,  // Options defined for the product (e.g., size, RAM)
+//       selectedOptions,   // User-selected options
+//       price,
+//       oldPrice,
+//       quantity,
+//       discount,
+//       subTotal,
+//       subTotalOldPrice,
+//       productId,
+//       countInStock
+//     } = request.body;
+
+//     if (!productId) {
+//       return response.status(400).json({
+//         message: "Provide productId!",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     if (!sellerDetails || !sellerDetails.sellerId || !sellerDetails.sellerName) {
+//       return response.status(400).json({
+//         message: "Provide valid seller details!",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     if (!quantity || quantity <= 0 || isNaN(quantity)) {
+//       return response.status(400).json({
+//         message: "Invalid quantity! Must be a positive number.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Ensure the quantity does not exceed 10
+//     if (quantity > 10) {
+//       return response.status(400).json({
+//         message: "You can purchase a maximum of 10 units per product in one attempt.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+
+//     if (!countInStock || isNaN(countInStock) || countInStock < 0) {
+//       return response.status(400).json({
+//         message: "Invalid stock count.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Check if at least one option is selected (size, weight, or RAM)
+//     const { productWeight, size, productRam } = selectedOptions;
+//     if (!productWeight && !size && !productRam) {
+//       return response.status(400).json({
+//         message: "Please select at least one option (size, weight, or RAM).",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     const product = await ProductModel.findById(productId);
+//     if (!product) {
+//       return response.status(404).json({
+//         message: "Product not found.",
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     if (quantity > countInStock) {
+//       return response.status(400).json({
+//         message: `Only ${countInStock} items are available for ${productTitle}.`,
+//         error: true,
+//         success: false,
+//       });
+//     }
+
+//     // Find if there is an item with the same productId and selectedOptions
+//     const checkItemCart = await CartProductModel.findOne({
+//       userId: userId,
+//       productId: productId,
+//       selectedOptions: { $eq: selectedOptions } // Compare selectedOptions
+//     });
+
+//     if (checkItemCart) {
+//       // If the same selectedOptions exist in cart, show a message
+//       return response.status(400).json({
+//         message: "This product with the same selected options is already in your cart.",
+//         success: false,
+//       });
+//     }
+
+//     // Otherwise, create a new cart item
+//     const cartItem = new CartProductModel({
+//       productTitle,
+//       image,
+//       rating,
+//       brand,
+//       availableOptions,
+//       selectedOptions,
+//       price,
+//       oldPrice,
+//       quantity,
+//       discount,
+//       subTotal,
+//       subTotalOldPrice,
+//       countInStock,
+//       userId,
+//       productId,
+//       sellerDetails,
+//     });
+
+//     const save = await cartItem.save();
+
+//     return response.status(200).json({
+//       data: save,
+//       message: "Item added to cart!",
+//       error: false,
+//       success: true,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// };
+
+
 export const addToCartItemController = async (request, response) => {
   try {
     const userId = request.userId; // middleware
@@ -58,7 +201,6 @@ export const addToCartItemController = async (request, response) => {
       });
     }
 
-
     if (!countInStock || isNaN(countInStock) || countInStock < 0) {
       return response.status(400).json({
         message: "Invalid stock count.",
@@ -67,16 +209,24 @@ export const addToCartItemController = async (request, response) => {
       });
     }
 
-    // Check if at least one option is selected (size, weight, or RAM)
-    const { productWeight, size, productRam } = selectedOptions;
-    if (!productWeight && !size && !productRam) {
-      return response.status(400).json({
-        message: "Please select at least one option (size, weight, or RAM).",
-        error: true,
-        success: false,
-      });
+    // Check if product has availableOptions
+    const isProductWithOptions = availableOptions && availableOptions.length > 0;
+
+    // If the product has no options, we skip the selected options validation
+    if (isProductWithOptions) {
+      const { productWeight, size, productRam } = selectedOptions;
+
+      // Ensure that at least one option is selected (size, weight, or RAM)
+      if (!productWeight && !size && !productRam) {
+        return response.status(400).json({
+          message: "Please select at least one option (size, weight, or RAM).",
+          error: true,
+          success: false,
+        });
+      }
     }
 
+    // Find the product in the database
     const product = await ProductModel.findById(productId);
     if (!product) {
       return response.status(404).json({
@@ -94,15 +244,14 @@ export const addToCartItemController = async (request, response) => {
       });
     }
 
-    // Find if there is an item with the same productId and selectedOptions
+    // Check if the same product with the same selected options is already in the cart
     const checkItemCart = await CartProductModel.findOne({
       userId: userId,
       productId: productId,
-      selectedOptions: { $eq: selectedOptions } // Compare selectedOptions
+      selectedOptions: { $eq: selectedOptions }, // Compare selectedOptions
     });
 
     if (checkItemCart) {
-      // If the same selectedOptions exist in cart, show a message
       return response.status(400).json({
         message: "This product with the same selected options is already in your cart.",
         success: false,
@@ -536,6 +685,7 @@ export const updateCartItemController = async (request, response) => {
     });
   }
 };
+
 
 
 

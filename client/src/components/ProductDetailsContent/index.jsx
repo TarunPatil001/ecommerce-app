@@ -25,7 +25,7 @@ const ProductDetailsContent = (props) => {
 
     const navigate = useNavigate(); // React Router's navigate hook for redirection
 
-    const availableStock = props?.product?.countInStock - props?.product?.sale;
+    // const props?.product?.countInStock = props?.product?.countInStock - props?.product?.sale;
 
     const addToCart = async (product, userId, quantity, selectedSize, selectedWeight, selectedRam) => {
     if (!context.cartData) {
@@ -178,8 +178,8 @@ const ProductDetailsContent = (props) => {
                         <span className="text-[16px] font-normal flex items-center gap-2">
                             Available in stocks:
                             {
-                                availableStock > 0 ? (
-                                    <span className="font-bold text-[var(--rating-star-color)]">{`${availableStock} Items`}</span>
+                                props?.product?.countInStock > 0 ? (
+                                    <span className="font-bold text-[var(--rating-star-color)]">{`${props?.product?.countInStock} Items`}</span>
                                 ) : (
                                     <span className="p-1 text-[12px] bg-red-50 font-bold text-red-500 border border-red-500 capitalize">
                                         Out of Stock
@@ -191,7 +191,7 @@ const ProductDetailsContent = (props) => {
 
                     <div className="flex items-start flex-col gap-2">
                         {
-                            availableStock === 0 ? (
+                            props?.product?.countInStock === 0 ? (
                                 <span className="normal-case border bg-[#fff2e5] p-1 px-2 border-orange-500 text-orange-500 text-[16px] font-medium">
                                     There are not enough products in stock
                                 </span>
@@ -222,9 +222,9 @@ const ProductDetailsContent = (props) => {
                         {props?.product?.size?.map((size, index) => (
                             <Button
                                 key={index}
-                                className={`${selectedSize === size ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
-                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("size", size); }}
-                                disableRipple={availableStock === 0}>
+                                className={`${selectedSize === size ? "!bg-[var(--bg-primary)] !text-white" : ""} ${props?.product?.countInStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { props?.product?.countInStock !== 0 && setProductActionIndex(index); handleOptionSelection("size", size); }}
+                                disableRipple={props?.product?.countInStock === 0}>
                                 {size}
                             </Button>
                         ))}
@@ -240,9 +240,9 @@ const ProductDetailsContent = (props) => {
                         {props?.product?.productWeight?.map((weight, index) => (
                             <Button
                                 key={index}
-                                className={`${selectedWeight === weight ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
-                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("weight", weight); }}
-                                disableRipple={availableStock === 0}>
+                                className={`${selectedWeight === weight ? "!bg-[var(--bg-primary)] !text-white" : ""} ${props?.product?.countInStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { props?.product?.countInStock !== 0 && setProductActionIndex(index); handleOptionSelection("weight", weight); }}
+                                disableRipple={props?.product?.countInStock === 0}>
                                 {weight}
                             </Button>
                         ))}
@@ -258,9 +258,9 @@ const ProductDetailsContent = (props) => {
                         {props?.product?.productRam?.map((ram, index) => (
                             <Button
                                 key={index}
-                                className={`${selectedRam === ram ? "!bg-[var(--bg-primary)] !text-white" : ""} ${availableStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
-                                onClick={() => { availableStock !== 0 && setProductActionIndex(index); handleOptionSelection("ram", ram); }}
-                                disableRipple={availableStock === 0}>
+                                className={`${selectedRam === ram ? "!bg-[var(--bg-primary)] !text-white" : ""} ${props?.product?.countInStock === 0 ? "!cursor-not-allowed !text-gray-400 hover:!border-none" : ""}`}
+                                onClick={() => { props?.product?.countInStock !== 0 && setProductActionIndex(index); handleOptionSelection("ram", ram); }}
+                                disableRipple={props?.product?.countInStock === 0}>
                                 {ram}
                             </Button>
                         ))}
@@ -272,7 +272,7 @@ const ProductDetailsContent = (props) => {
 
             <div className="flex items-center my-4 gap-5 rounded-md">
                 <Button
-                    className={`!h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1 ${availableStock === 0 ? "!cursor-not-allowed !bg-gray-300 !text-white" : "buttonPrimaryBlack"}`}
+                    className={`!h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1 ${props?.product?.countInStock === 0 ? "!cursor-not-allowed !bg-gray-300 !text-white" : "buttonPrimaryBlack"}`}
                     onClick={async () => {
                         if (isAdded) {
                             // Navigate to cart if "Go to Cart" is displayed
@@ -280,12 +280,12 @@ const ProductDetailsContent = (props) => {
                             navigate('/cart');
                         } else {
                             // Add to cart if "Add to Cart" is displayed
-                            if (availableStock !== 0) {
+                            if (props?.product?.countInStock !== 0) {
                                 await addToCart(props?.product, context?.userData?._id, quantity, selectedSize, selectedWeight, selectedRam);
                             }
                         }
                     }}
-                    disableRipple={availableStock === 0}
+                    disableRipple={props?.product?.countInStock === 0}
                 >
                     <MdOutlineShoppingCart className="text-[16px]" />
                     {isAdded ? 'Go to Cart' : 'Add to Cart'}

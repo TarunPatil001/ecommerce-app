@@ -739,7 +739,7 @@ const Products = () => {
                                                 <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
                                                 <span>
                                                     <span className="text-[14px] font-bold">
-                                                        {Math.max(0, product?.countInStock - product?.sale)}
+                                                        {product?.countInStock}
                                                     </span> remain
                                                 </span>
                                             </p>
