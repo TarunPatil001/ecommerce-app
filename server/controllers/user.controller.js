@@ -1050,6 +1050,49 @@ export async function userDetails(request, response) {
 }
 
 
+// get all users excluding logged-in user
+export async function getAllUsers(request, response) {
+  try {
+    // if (!request.userId) {
+    //   return response.status(401).json({
+    //     message: "Unauthorized request.",
+    //     error: true,
+    //     success: false,
+    //   });
+    // }
+
+    // const users = await UserModel.find({ _id: { $ne: request.userId } })
+    //   .select("-password -refresh_token");
+    const users = await UserModel.find();
+
+    if (!users.length) {
+      return response.status(404).json({
+        message: "No users found.",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "Users retrieved successfully.",
+      error: false,
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return response.status(500).json({
+      message: "An error occurred while retrieving users.",
+      error: true,
+      success: false,
+      details: error.message,
+    });
+  }
+}
+
+
+
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 // Add Review Details
@@ -1133,6 +1176,39 @@ export async function getReview(request, response) {
       message: "An error occurred while fetching reviews.",
       error: true,
       success: false,
+    });
+  }
+}
+
+
+// get all reviews for a specific user
+export async function getAllReviews(request, response) {
+  try {
+
+    const reviews = await ReviewModel.find();
+
+    if (!reviews.length) {
+      return response.status(404).json({
+        message: "No reviews found for this user.",
+        error: true,
+        success: false,
+      });
+    }
+
+    return response.status(200).json({
+      message: "User reviews retrieved successfully.",
+      error: false,
+      success: true,
+      data: reviews,
+    });
+
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
+    return response.status(500).json({
+      message: "An error occurred while fetching user reviews.",
+      error: true,
+      success: false,
+      details: error.message,
     });
   }
 }

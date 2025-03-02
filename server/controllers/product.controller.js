@@ -1071,6 +1071,38 @@ export async function getProduct(request, response) {
 }
 
 
+// ----------------------------------------------------------------------------------------------------------------------
+
+
+export async function getTotalSales(request, response) {
+  try {
+    // Calculate the total sales by summing the 'sale' field from all products
+    const totalSales = await ProductModel.aggregate([
+      {
+        $group: {
+          _id: null,  // We don't care about grouping, we just want the total
+          totalSales: { $sum: "$sale" },  // Sum the 'sale' field
+        },
+      },
+    ]);
+
+    // If no sales found, set totalSales to 0
+    const totalSalesAmount = totalSales.length > 0 ? totalSales[0].totalSales : 0;
+
+    // Respond with the total sales amount
+    response.status(200).json({
+      success: true,
+      error: false,
+      totalSales: totalSalesAmount,
+    });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({
+      success: false,
+      message: "Error calculating total sales",
+    });
+  }
+}
 
 
 // ----------------------------------------------------------------------------------------------------------------------

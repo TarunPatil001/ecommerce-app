@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { MyContext } from '../../App'
 import DashboardBoxes from '../../Components/DashboardBoxes'
 import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Pagination, Rating, Skeleton } from '@mui/material'
@@ -105,7 +105,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [categoryFilterValue, setCategoryFilterValue] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(4);
   // const [refreshData, setRefreshData] = useState(false); 
 
   const [productData, setProductData] = useState([]);
@@ -120,16 +120,15 @@ const Dashboard = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  const [orders, setOrders] = useState([]);
+  const [pageOrder, setPageOrder] = useState(1); // 1-based index to match backend
+  const [searchQuery, setSearchQuery] = useState('')
+  const [allOrders, setAllOrders] = useState([]); // Stores all orders globally
+  const [filteredOrders, setFilteredOrders] = useState([]); // Stores search results
+  const [rowsPerPage2, setRowsPerPage2] = useState(4);
 
-  useEffect(() => {
-    fetchDataFromApi(`/api/order/order-list`).then((res) => {
-      if (res?.error === false) {
-        // console.log(res?.data);
-        setOrders(res?.data);
-      }
-    })
-  }, [])
+  const [users, setUsers] = useState([]);
+  const [allReviews, setAllReviews] = useState([]);
+  const [overallTotalSales, setOverallTotalSales] = useState(0);
 
 
   useEffect(() => {
@@ -373,6 +372,26 @@ const Dashboard = () => {
     console.log("Page: ", page, "Rows Per Page: ", rowsPerPage);
   }, [page, rowsPerPage]);
 
+  useEffect(() => {
+    fetchDataFromApi('/api/user/get-all-user').then((res) => {
+      if (res?.error === false) {
+        setUsers(res?.data);
+      }
+    })
+
+    fetchDataFromApi('/api/user/get-all-reviews').then((res) => {
+      if (res?.error === false) {
+        setAllReviews(res?.data);
+      }
+    })
+
+    fetchDataFromApi('/api/product/get-total-sales').then((res) => {
+      if (res?.error === false) {
+        setOverallTotalSales(res?.totalSales);
+      }
+    })
+  }, []);
+
 
 
 
@@ -499,29 +518,96 @@ const Dashboard = () => {
 
 
 
+  // Fetch all orders once on mount
+  const getOrderDetails = () => {
+    fetchDataFromApi(`/api/order/order-list`)
+      .then((res) => {
+        if (res?.error === false) {
+          const orders = res?.data || [];
+          setAllOrders(orders);
+          setFilteredOrders(orders);
+          setPageOrder(1); // Reset pagination
+        }
+      });
+  };
+
+  // Update displayed orders based on current pagination
+  const paginatedOrders = useMemo(() => {
+    const startIndex = (pageOrder - 1) * rowsPerPage2;
+    return filteredOrders.slice(startIndex, startIndex + rowsPerPage2);
+  }, [filteredOrders, pageOrder, rowsPerPage2]);
+
+
+  // Fetch all orders on component mount
+  useEffect(() => {
+    getOrderDetails();
+  }, []);
+
+  // Handle search functionality
+  useEffect(() => {
+    if (searchQuery.trim() !== "") {
+      const lowerCaseQuery = searchQuery.toLowerCase().trim();
+      const filteredResults = allOrders.filter((order) => {
+        const paymentId = order?.paymentId
+          ? order.paymentId.toString().trim().toLowerCase()
+          : "cash_on_delivery";
+
+        const fields = [
+          order?._id,
+          paymentId,
+          order?.delivery_address?.mobile,
+          order?.delivery_address?.name,
+          order?.delivery_address?.address_line1,
+          order?.delivery_address?.landmark,
+          order?.delivery_address?.city,
+          order?.delivery_address?.state,
+          order?.delivery_address?.country,
+          order?.delivery_address?.pincode,
+          order?.userId?.email,
+          order?.createdAt
+        ];
+
+        return fields.some((field) => {
+          if (typeof field === "string") {
+            return field.toLowerCase().includes(lowerCaseQuery);
+          } else if (typeof field === "number") {
+            return field.toString().includes(searchQuery);
+          }
+          return false;
+        });
+      });
+
+      setFilteredOrders(filteredResults);
+      setPageOrder(1);
+    } else {
+      setFilteredOrders(allOrders);
+    }
+  }, [searchQuery, allOrders]);
+
+
 
 
   const [chartData1, setChartData1] = useState([
     {
-      name: "JANUARY",
+      name: "JAN",
       Total_Users: 4000,
       Total_Sales: 2400,
       amt: 2400,
     },
     {
-      name: "FEBRUARY",
+      name: "FEB",
       Total_Users: 3000,
       Total_Sales: 1398,
       amt: 2210,
     },
     {
-      name: "MARCH",
+      name: "MAR",
       Total_Users: 2000,
       Total_Sales: 9800,
       amt: 2290,
     },
     {
-      name: "APRIL",
+      name: "APR",
       Total_Users: 2780,
       Total_Sales: 3908,
       amt: 2000,
@@ -533,43 +619,43 @@ const Dashboard = () => {
       amt: 2181,
     },
     {
-      name: "JUNE",
+      name: "JUN",
       Total_Users: 2390,
       Total_Sales: 3800,
       amt: 2500,
     },
     {
-      name: "JULY",
+      name: "JUL",
       Total_Users: 3490,
       Total_Sales: 4300,
       amt: 2100,
     },
     {
-      name: "AUGUST",
+      name: "AUG",
       Total_Users: 5490,
       Total_Sales: 4900,
       amt: 2100,
     },
     {
-      name: "SEPTEMBER",
+      name: "SEPT",
       Total_Users: 8490,
       Total_Sales: 4700,
       amt: 2100,
     },
     {
-      name: "OCTOBER",
+      name: "OCT",
       Total_Users: 7490,
       Total_Sales: 6300,
       amt: 2100,
     },
     {
-      name: "NOVEMBER",
+      name: "NOV",
       Total_Users: 9490,
       Total_Sales: 2300,
       amt: 2100,
     },
     {
-      name: "DECEMBER",
+      name: "DEC",
       Total_Users: 5490,
       Total_Sales: 7300,
       amt: 2100,
@@ -580,6 +666,9 @@ const Dashboard = () => {
 
   return (
     <>
+    {
+      console.log("sale: ", overallTotalSales)
+    }
       <div className={'w-full px-5 py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md'}>
         <div className="info">
           <h1 className='text-[30px] font-bold leading-9 mb-2'>Good Morning, <br /> Cameron &#128075;</h1>
@@ -588,7 +677,11 @@ const Dashboard = () => {
         </div>
         <img src="/shop-illustration.webp" alt="image" className='w-[250px] object-cover' />
       </div>
-      <DashboardBoxes />
+
+      {
+        productData?.length !== 0 && users?.length !== 0 && allReviews?.length !== 0 &&
+        <DashboardBoxes orders={allOrders?.length} products={productData?.length} users={users?.length - 1 || 0} reviews={allReviews?.length} category={context?.catData?.length} sales={overallTotalSales} />
+      }
 
       <div className="card my-4 bg-white border rounded-md px-1">
 
@@ -749,7 +842,7 @@ const Dashboard = () => {
               </TableRow>
             </TableHead>
 
-            <TableBody>
+            <TableBody className='overflow-y-scroll'>
 
 
               {loading ? (
@@ -867,7 +960,7 @@ const Dashboard = () => {
                         </span>
                         <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
                         <span>
-                          <span className="text-[14px] font-bold">{product?.countInStock - product?.sale}</span> remain
+                          <span className="text-[14px] font-bold">{product?.countInStock}</span> remain
                         </span>
                       </p>
                     </TableCell>
@@ -944,7 +1037,7 @@ const Dashboard = () => {
         }
 
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
+          rowsPerPageOptions={[3, 4, 5, 10, 25, 100]}
           component="div"
           count={productData?.length}
           rowsPerPage={rowsPerPage}
@@ -954,14 +1047,22 @@ const Dashboard = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
 
-
-
-
       </div>
 
       <div className="card my-4 bg-white border rounded-md px-1">
         <div className='flex items-center justify-between p-5'>
           <h2 className='text-[20px] font-bold'>Recent Orders</h2>
+          <div className='w-[40%]'>
+            <SearchBox
+              searchName="orders"
+              searchQuery={searchQuery}
+              setSearchQuery={(query) => {
+                setSearchQuery(query);
+                setPageOrder(1); // ✅ Reset pagination when searching
+              }}
+            />
+
+          </div>
         </div>
         <div className="customScroll relative overflow-x-auto rounded-md pb-5">
           <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)] rounded-md">
@@ -982,124 +1083,146 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {
-                orders?.length !== 0 && orders?.map((item, index) => {
-                  return (
-                    <>
-                      <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          <Button
-                            className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
-                            onClick={() => isShowOrderedProduct(index)}
-                          >
-                            {isOpenOrder === (index) ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                          </Button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          <span className="text-[var(--bg-primary)] font-semibold">
-                            {item?._id}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          <span className="text-[var(--bg-primary)] font-semibold">
-                            {item?.paymentId ? item?.paymentId : "CASH ON DELIVERY"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          {item?.delivery_address?.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          {item?.delivery_address?.mobile
-                            ? String(item?.delivery_address?.mobile).replace(/^(\d{2})(\d{5})(\d{5})$/, '+$1 $2 $3')
-                            : 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 text-left whitespace-normal break-words">
-                          {[
-                            item?.delivery_address?.address_line1,
-                            item?.delivery_address?.landmark,
-                            item?.delivery_address?.city,
-                            item?.delivery_address?.state,
-                            item?.delivery_address?.pincode,
-                            item?.delivery_address?.country
-                          ].filter(Boolean).join(', ')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          {item?.delivery_address?.pincode}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          {item?.userId?.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          {item?.totalAmt ? item.totalAmt.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left ">
-                          {item?.userId?._id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left">
-                          <Badge status={item?.order_status} />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-left ">
-                          {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-') : 'N/A'}
-                        </td>
-                      </tr>
-                      {
-                        isOpenOrder === index && (
-                          <tr>
-                            <td colSpan="6" className="p-0">
-                              <div className="customScroll relative overflow-x-auto my-2 px-20">
-                                <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
-                                  <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
-                                    <tr>
-                                      <th scope="col" className="px-6 py-3 text-left w-[200px] min-w-[200px]">Product Id</th>
-                                      <th scope="col" className="px-6 py-3 text-left w-[300px] min-w-[300px]">Product Title</th>
-                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Image</th>
-                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Quantity</th>
-                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Price</th>
-                                      <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">SubTotal</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {
-                                      item?.products?.map((productItem, index) => (
-                                        <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
-                                          <td className="px-6 py-4 whitespace-nowrap text-left">
-                                            {productItem?.productId}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-normal break-words text-left">
-                                            {productItem?.productTitle}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-left">
-                                            <div className="!w-[50px] !h-[50px]">
-                                              <img
-                                                src={productItem?.image}
-                                                alt=""
-                                                className="w-full h-full object-cover"
-                                              />
-                                            </div>
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-left">{productItem?.quantity}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-left">
-                                            {productItem?.price ? productItem.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-left">
-                                            {productItem?.subTotal ? productItem.subTotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
-                                          </td>
-                                        </tr>
-                                      ))
-                                    }
-                                  </tbody>
-                                </table>
-                              </div>
-                            </td>
-                          </tr>
-                        )
-                      }
-                    </>
-                  )
-                })
-              }
+              {filteredOrders.length === 0 ? (
+                allOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="px-6 py-4 text-center text-gray-500">
+                      No Orders Received Yet
+                    </td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan="9" rowSpan="4" className="px-6 py-4 text-center text-gray-500">
+                      No Matching Orders Found
+                    </td>
+                  </tr>
+                )
+              ) : (
+                paginatedOrders.map((item, index) => (
+                  <>
+                    <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        <Button
+                          className="!text-black !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-[#f1f1f1] flex items-center justify-center"
+                          onClick={() => isShowOrderedProduct(index)}
+                        >
+                          {isOpenOrder === (index) ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                        </Button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        <span className="text-[var(--bg-primary)] font-semibold">
+                          {item?._id}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        <span className="text-[var(--bg-primary)] font-semibold">
+                          {item?.paymentId}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        {item?.delivery_address?.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        {item?.delivery_address?.mobile
+                          ? String(item?.delivery_address?.mobile).replace(/^(\d{2})(\d{5})(\d{5})$/, '+$1 $2 $3')
+                          : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 text-left whitespace-normal break-words">
+                        {[
+                          item?.delivery_address?.address_line1,
+                          item?.delivery_address?.landmark,
+                          item?.delivery_address?.city,
+                          item?.delivery_address?.state,
+                          item?.delivery_address?.pincode,
+                          item?.delivery_address?.country
+                        ].filter(Boolean).join(', ')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        {item?.delivery_address?.pincode}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        {item?.userId?.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        {item?.totalAmt ? item.totalAmt.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left ">
+                        {item?.userId?._id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        <Badge status={item?.order_status} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-left ">
+                        {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-') : 'N/A'}
+                      </td>
+                    </tr>
+                    {
+                      isOpenOrder === index && (
+                        <tr>
+                          <td colSpan="6" className="p-0">
+                            <div className="customScroll relative overflow-x-auto my-2 px-20">
+                              <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)]">
+                                <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
+                                  <tr>
+                                    <th scope="col" className="px-6 py-3 text-left w-[200px] min-w-[200px]">Product Id</th>
+                                    <th scope="col" className="px-6 py-3 text-left w-[300px] min-w-[300px]">Product Title</th>
+                                    <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Image</th>
+                                    <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Quantity</th>
+                                    <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">Price</th>
+                                    <th scope="col" className="px-6 py-3 text-left w-[100px] min-w-[100px]">SubTotal</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    item?.products?.map((productItem, index) => (
+                                      <tr key={index} className="bg-white border-b hover:bg-gray-50 transition">
+                                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                                          {productItem?.productId}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-normal break-words text-left">
+                                          {productItem?.productTitle}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                                          <div className="!w-[50px] !h-[50px]">
+                                            <img
+                                              src={productItem?.image}
+                                              alt=""
+                                              className="w-full h-full object-cover"
+                                            />
+                                          </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-left">{productItem?.quantity}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                                          {productItem?.price ? productItem.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-left">
+                                          {productItem?.subTotal ? productItem.subTotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '₹0'}
+                                        </td>
+                                      </tr>
+                                    ))
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    }
+                  </>
+                ))
+              )}
             </tbody>
           </table>
+
+          < div className="mt-4 p-4 flex items-center justify-center " >
+            <Pagination
+              count={Math.ceil(filteredOrders.length / rowsPerPage2)}
+              page={pageOrder}
+              onChange={(event, value) => setPageOrder(value)}
+              showFirstButton
+              showLastButton
+            />
+          </div >
         </div>
       </div>
 
@@ -1170,8 +1293,8 @@ const Dashboard = () => {
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" opacity={0.7} />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
               <YAxis tick={{ fontSize: 12 }} />
               <RechartTooltip contentStyle={{ fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />

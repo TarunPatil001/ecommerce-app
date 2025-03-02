@@ -289,7 +289,49 @@ input[type=number]::-webkit-outer-spin-button {
   color: rgba(0, 0, 0, 0.3);
   font-weight: 200;
 }
+
 .separator::before {
   content: "|";
   margin: 0 10px;
+}
+
+
+.swiper-button-prev,
+.swiper-button-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  border-radius: 100%;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
+  box-shadow: 0 1px 3px #0000001f, 0 1px 2px #0000003d !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 25px !important;
+  font-weight: bold;
+  color: #000;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: var(--bg-primary) !important;
+  opacity: 1;
+}
+
+.swiper-button-prev:hover::after,
+.swiper-button-next:hover::after {
+  color: #fff !important;
+}
+
+.swiper-button-prev.swiper-button-disabled,
+.swiper-button-next.swiper-button-disabled {
+  display: none !important;
 }

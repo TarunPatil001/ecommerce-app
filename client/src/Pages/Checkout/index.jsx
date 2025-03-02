@@ -743,8 +743,8 @@ const Checkout = () => {
         const payLoad = {
             userId: user._id,
             products: context?.cartData,
-            paymentId: '',
-            payment_status: "CASH ON DELIVERY",
+            paymentId: 'CASH_ON_DELIVERY',
+            payment_status: "CASH_ON_DELIVERY",
             delivery_address: { _id: selectedValue }, // ✅ Ensure API gets an object
             totalAmt: totalAmount,
             date: new Date().toLocaleString("en-US", {

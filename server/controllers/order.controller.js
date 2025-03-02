@@ -76,7 +76,10 @@ export const createOrderController = async (request, response) => {
             await ProductModel.findByIdAndUpdate(
                 request.body.products[i].productId,
                 {
-                    $inc: { countInStock: -request.body.products[i].quantity }
+                    $inc: {
+                        countInStock: -request.body.products[i].quantity,
+                        sale: request.body.products[i].quantity,
+                    }
                 },
                 { new: true, session } // Include session for transaction
             );
@@ -111,22 +114,54 @@ export const createOrderController = async (request, response) => {
 
 
 
-
 export async function getOrderDetailsController(request, response) {
     try {
-
         const userId = request.userId;
+        const page = parseInt(request.query.page) || 1;
+        const perPage = parseInt(request.query.perPage) || 10; // Default to 10 orders per page
 
-        const orderList = await OrderModel.find({ userId: userId }).sort({ createdAt: -1 }).populate('delivery_address userId');
+        const totalOrders = await OrderModel.countDocuments({ userId: userId });
+        const totalPages = Math.ceil(totalOrders / perPage);
+
+        // ✅ Instead of 404, return an empty array for non-existent pages
+        if (page > totalPages && totalOrders > 0) {
+            return response.status(200).json({
+                message: "No more orders",
+                error: false,
+                success: true,
+                data: [],
+                totalOrders: totalOrders,
+                totalPages: totalPages,
+                page: page,
+                perPage: perPage,
+                totalAddresses: 0, // No addresses if no orders
+            });
+        }
+
+        const orderList = await OrderModel.find({ userId: userId })
+            .sort({ createdAt: -1 })
+            .populate('delivery_address userId')
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .exec();
+
+        // ✅ Fix: `distinct()` returns an array, so use `.length`
+        const totalAddresses = (await OrderModel.distinct("delivery_address", { userId: userId })).length;
 
         return response.status(200).json({
             message: "Order details fetched successfully",
             error: false,
             success: true,
             data: orderList,
+            totalOrders: totalOrders,
+            totalPages: totalPages,
+            page: page,
+            perPage: perPage,
+            totalAddresses: totalAddresses,
         });
 
     } catch (error) {
+        console.error("Error in getOrderDetailsController:", error.message || error);
         return response.status(500).json({
             message: error.message || "Internal Server Error",
             error: true,
@@ -134,6 +169,7 @@ export async function getOrderDetailsController(request, response) {
         });
     }
 }
+
 
 
 function getPaypalClient() {
@@ -188,7 +224,11 @@ export const createOrderPaypalController = async (request, response) => {
     }
 }
 
+
 export const captureOrderPaypalController = async (request, response) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();  // Start transaction
+
     try {
         // Check if delivery address is provided
         if (!request.body.delivery_address) {
@@ -203,6 +243,13 @@ export const captureOrderPaypalController = async (request, response) => {
         const req = new paypal.orders.OrdersCaptureRequest(paymentId);
         req.requestBody({});
 
+        // Capture Payment (Simulated)
+        const captureResponse = await paypalClient.execute(req);
+        if (!captureResponse || captureResponse.statusCode !== 201) {
+            throw new Error("PayPal Payment Capture Failed");
+        }
+
+        // Create Order
         const orderInfo = {
             userId: request.body.userId,
             products: request.body.products,
@@ -215,27 +262,48 @@ export const captureOrderPaypalController = async (request, response) => {
         };
 
         const order = new OrderModel(orderInfo);
-        await order.save();
+        await order.save({ session });
 
         // Update stock for each product
         for (let i = 0; i < request.body.products.length; i++) {
-            await ProductModel.findByIdAndUpdate(
+            const productUpdate = await ProductModel.findByIdAndUpdate(
                 request.body.products[i].productId,
                 {
-                    $inc: { countInStock: -request.body.products[i].quantity } // Efficient stock decrement
+                    $inc: {
+                        countInStock: -request.body.products[i].quantity,
+                        sale: request.body.products[i].quantity,
+                    }
                 },
-                { new: true }
+                { new: true, session }
             );
+
+            if (!productUpdate) {
+                throw new Error(`Stock update failed for product ${request.body.products[i].productId}`);
+            }
         }
 
+        // Commit transaction if everything is successful
+        await session.commitTransaction();
+        session.endSession();
+
         response.json({
-            message: 'Order Placed',
+            message: "Order Placed",
             error: false,
             success: true,
             order: order,
         });
 
     } catch (error) {
+        await session.abortTransaction(); // Rollback changes
+        session.endSession();
+
+        console.error("Order Processing Error:", error);
+
+        // Delete the created order if it exists
+        if (request.body.paymentId) {
+            await OrderModel.findOneAndDelete({ paymentId: request.body.paymentId });
+        }
+
         return response.status(500).json({
             message: error.message || "Internal Server Error",
             error: true,
@@ -243,6 +311,7 @@ export const captureOrderPaypalController = async (request, response) => {
         });
     }
 };
+
 
 
 export const orderStatusController = async (request, response) => {
