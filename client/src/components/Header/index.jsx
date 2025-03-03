@@ -62,8 +62,8 @@ const Header = () => {
       if (res?.error === false) {
         context.setIsLogin(false);
         localStorage.clear();
-        context.setUserData(null)
-        context?.setCartData(0);
+        context.setUserData([])
+        context?.setCartData([]);
         context?.setWishlistData([]);
         navigate("/");
       }

@@ -227,8 +227,7 @@ export async function createProduct(request, response) {
       });
     }
 
-    // ✅ Fetch seller details from DB
-    const sellerData = await UserModel.findById(seller).select("sellerName").lean();
+    const sellerData = await UserModel.findById(seller).select("sellerName role").lean();
 
     if (!sellerData) {
       return response.status(404).json({
@@ -238,7 +237,17 @@ export async function createProduct(request, response) {
       });
     }
 
+    // ✅ Ensure ADMIN has a sellerName before adding products
+    if (sellerData.role === "ADMIN" && (!sellerData.sellerName || sellerData.sellerName.trim() === "")) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Admins must set a seller name before adding products.",
+      });
+    }
+
     console.log("Seller found:", sellerData.sellerName);
+
 
     // Validate and fetch product images
     const productId =
@@ -368,10 +377,10 @@ export async function getAllProducts(request, response) {
     }
 
     const products = await ProductModel.find()
-    .populate("category") // Populating category details
-    .skip((page - 1) * perPage)
-    .limit(perPage)
-    .exec();
+      .populate("category") // Populating category details
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
 
     return response.status(200).json({
       message: "Products retrieved successfully",

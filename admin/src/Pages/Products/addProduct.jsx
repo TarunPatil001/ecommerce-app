@@ -654,6 +654,12 @@ const AddProduct = () => {
                 success: (res) => {
                     if (res?.success) {
                         context?.forceUpdate();
+                        
+                        setTimeout(() => {
+                            setIsLoading(false);
+                            context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+                        }, 500);
+
                         return res.message || "Product added successfully!";
                     } else {
                         throw new Error(res?.message || "An unexpected error occurred.");
@@ -670,10 +676,7 @@ const AddProduct = () => {
             console.error("Error:", err);
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
-            }, 500);
+            setIsLoading(false);
         }
     };
 

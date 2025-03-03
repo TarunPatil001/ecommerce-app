@@ -329,7 +329,7 @@ const Address = () => {
                         if (res?.success) {
                             // Optimistically update the address list by adding the new address
                             const newAddress = res?.data;  // Assuming the new address data is returned
-                            context?.setAddress((prevAddresses) => [...prevAddresses, newAddress]);  // Add the new address to the list
+                            context?.setAddress((prevAddresses = []) => [...prevAddresses, newAddress]); // Add the new address to the list
 
                             // Optionally, fetch updated addresses from the API to get the full list
                             fetchDataFromApi(`/api/address/get-address?userId=${context?.userData?._id}`).then((res) => {

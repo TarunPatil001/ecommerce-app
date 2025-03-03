@@ -22,25 +22,26 @@ const CartPanel = (props) => {
             setTotalMRP(calculatedTotalMRP);
             setDiscount(calculatedDiscount);
             setTotalAmount(calculatedTotalAmount);
-            
-             } else {
+
+        } else {
             setTotalMRP(0);
             setDiscount(0);
             setTotalAmount(0);
-           }
+        }
     }, [context?.cartData]);
 
     return (
         <>
             <div className="scroll w-[400px] h-full max-h-full overflow-y-scroll customScroll overflow-x-hidden">
-                {
-                    props?.data?.map((item, index) => {
-                        return (
-                            <CartPanelItems key={index} item={item} />
-                        );
-                    })
-                }
+                {Array.isArray(props?.data) && props?.data?.length > 0 ? (
+                    props?.data?.map((item, index) => (
+                        <CartPanelItems key={index} item={item} />
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">No items in cart</p>
+                )}
             </div>
+
 
             <div className="bottomInfo w-full border-t border pt-4">
                 <h3 className="uppercase px-4 py-1 text-[12px] font-bold text-[var(--text-light)] pb-2">Price Details <span className="capitalize">({context?.cartData?.length} Item{context?.cartData?.length >= 2 ? ("s") : ("")})</span></h3>

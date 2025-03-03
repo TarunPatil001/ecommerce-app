@@ -96,23 +96,26 @@ const Checkout = () => {
 
 
     useEffect(() => {
-        if (context?.cartData?.length !== 0) {
-            const calculatedTotalMRP = context?.cartData?.reduce((total, item) => total + (item?.subTotalOldPrice || 0), 0);
-            const calculatedDiscount = context?.cartData?.reduce((total, item) => total + ((item?.subTotalOldPrice || 0) - (item?.subTotal || 0)), 0);
+        // Ensure cartData is always an array
+        const cartData = Array.isArray(context?.cartData) ? context?.cartData : [];
+
+        if (cartData.length > 0) {
+            const calculatedTotalMRP = cartData.reduce((total, item) => total + (item?.subTotalOldPrice || 0), 0);
+            const calculatedDiscount = cartData.reduce((total, item) => total + ((item?.subTotalOldPrice || 0) - (item?.subTotal || 0)), 0);
             const calculatedTotalAmount = calculatedTotalMRP - calculatedDiscount;
 
             setTotalMRP(calculatedTotalMRP);
             setDiscount(calculatedDiscount);
             setTotalAmount(calculatedTotalAmount);
-
-            // localStorage.setItem("totalAmount", calculatedTotalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }));
         } else {
             setTotalMRP(0);
             setDiscount(0);
             setTotalAmount(0);
-            // localStorage.setItem("totalAmount", "0");
         }
     }, [context?.cartData]);
+
+
+
 
 
 
@@ -695,12 +698,12 @@ const Checkout = () => {
                 console.log(payLoad);
 
                 postData(`/api/order/create-order`, payLoad).then((res) => {
-                    
+
                     if (res.error === false) {
                         deleteData(`/api/cart/empty-cart-item/${user?._id}`).then((res) => {
                             context?.getCartItems();
                         })
-                         
+
                         context?.openAlertBox("success", res?.message);
                         getOrderDetails();
                         navigate("/order/success");
@@ -758,11 +761,11 @@ const Checkout = () => {
 
         postData(`/api/order/create-order`, payLoad).then((res) => {
             if (res.error === false) {
-                
+
                 deleteData(`/api/cart/empty-cart-item/${user._id}`).then(() => {
                     context?.getCartItems();
                 });
-                
+
                 context?.openAlertBox("success", res?.message);
                 getOrderDetails();
                 navigate("/order/success");
@@ -790,37 +793,37 @@ const Checkout = () => {
                             context?.openAlertBox("error", "Please select a delivery address!");
                             return; // Prevent proceeding if no address is selected
                         }
-    
+
                         const user = context?.userData;
                         if (!user || !user._id) {
                             console.error("User data is missing!");
                             context?.openAlertBox("error", "User not logged in!");
                             return; // Prevent proceeding if user is not logged in
                         }
-    
+
                         const resp = await fetch('https://v6.exchangerate-api.com/v6/c6b1f2127cf87e8f14b8103e/latest/INR');
                         const respData = await resp.json();
                         let convertedAmount = 0;
-    
+
                         if (respData.result === 'success') {
                             const usdToInrRate = respData.conversion_rates.USD;
                             convertedAmount = (totalAmount * usdToInrRate).toFixed(2);
                         }
-    
+
                         const headers = {
                             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
                             'Content-Type': 'application/json',
                         }
-    
+
                         const data = {
                             userId: context?.userData?._id,
                             totalAmount: convertedAmount,
                         }
-    
+
                         const response = await axios.get(
                             VITE_API_URL + `/api/order/create-order-paypal?userId=${data?.userId}&totalAmount=${data?.totalAmount}`, { headers }
                         );
-    
+
                         return response?.data?.id; // Return the order ID to PayPal
                     },
                     onApprove: async (data) => {
@@ -834,23 +837,23 @@ const Checkout = () => {
         };
         document.body.appendChild(script);
     }, [context?.cartData, context?.userData, selectedValue]);
-    
+
     const onApprovePayment = async (data) => {
         const user = context?.userData;
-    
+
         // This validation happens when the user approves the payment, just before capturing the order.
         if (!user || !user._id) {
             console.error("User data is missing!");
             context?.openAlertBox("error", "User not logged in!");
             return;
         }
-    
+
         if (!selectedValue) {
             console.error("No delivery address selected!");
             context?.openAlertBox("error", "Please select a delivery address!");
             return;
         }
-    
+
         const info = {
             userId: user?._id,
             products: context?.cartData,
@@ -863,18 +866,18 @@ const Checkout = () => {
                 year: "numeric",
             })
         }
-    
+
         const headers = {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
         }
-    
+
         const response = await axios.post(
             `${VITE_API_URL}/api/order/capture-order-paypal`,
             { ...info, paymentId: data.orderID },
             { headers }
         );
-        
+
         if (response.data?.success) {
             context?.openAlertBox("success", response?.data?.message);
             await deleteData(`/api/cart/empty-cart-item/${user._id}`);
@@ -885,7 +888,7 @@ const Checkout = () => {
             navigate("/order/failed");
         }
     }
-    
+
 
 
 
