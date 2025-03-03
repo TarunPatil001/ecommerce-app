@@ -68,7 +68,7 @@ const DashboardBoxes = (props) => {
                                 <ImGift className="text-[40px] text-[var(--text-active)]" />
                                 <div className="info w-[70%]">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
-                                        New Orders
+                                        Total Orders
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.orders}</h2>
                                 </div>

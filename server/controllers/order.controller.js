@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import OrderModel from "../models/order.model.js";
 import ProductModel from "../models/product.model.js";
 import paypal from "@paypal/checkout-server-sdk";
+import UserModel from './../models/user.model.js';
 
 
 export const createOrderController = async (request, response) => {
@@ -345,3 +346,114 @@ export const orderStatusController = async (request, response) => {
         });
     }
 }
+
+export const totalSalesController = async (request, response) => {
+    try {
+        const currentYear = new Date().getFullYear();
+
+        const orderList = await OrderModel.find();
+
+        let totalSales = 0;
+        let monthlySales = [
+            { name: 'JAN', TotalSales: 0 },
+            { name: 'FEB', TotalSales: 0 },
+            { name: 'MAR', TotalSales: 0 },
+            { name: 'APR', TotalSales: 0 },
+            { name: 'MAY', TotalSales: 0 },
+            { name: 'JUN', TotalSales: 0 },
+            { name: 'JUL', TotalSales: 0 },
+            { name: 'AUG', TotalSales: 0 },
+            { name: 'SEPT', TotalSales: 0 },
+            { name: 'OCT', TotalSales: 0 },
+            { name: 'NOV', TotalSales: 0 },
+            { name: 'DEC', TotalSales: 0 }
+        ];
+
+        for (let i = 0; i < orderList.length; i++) {
+            totalSales += parseInt(orderList[i].totalAmt);
+
+            const createdAt = new Date(orderList[i].createdAt);
+            const year = createdAt.getFullYear();
+            const month = createdAt.getMonth(); // 0 (Jan) to 11 (Dec)
+
+            if (currentYear === year) {
+                monthlySales[month].TotalSales += parseInt(orderList[i].totalAmt);
+            }
+        }
+
+        return response.status(200).json({
+            totalSales: totalSales,
+            monthlySales: monthlySales,
+            success: true,
+            error: false,
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || "Internal Server Error",
+            error: true,
+            success: false,
+        })
+    }
+}
+
+
+
+export const totalUsersController = async (request, response) => {
+    try {
+        const currentYear = new Date().getFullYear();
+
+        const users = await UserModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" }, 
+                        month: { $month: "$createdAt" }
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1 },
+            }
+        ]);
+
+        let monthlyUsers = [
+            { name: 'JAN', TotalUsers: 0 },
+            { name: 'FEB', TotalUsers: 0 },
+            { name: 'MAR', TotalUsers: 0 },
+            { name: 'APR', TotalUsers: 0 },
+            { name: 'MAY', TotalUsers: 0 },
+            { name: 'JUN', TotalUsers: 0 },
+            { name: 'JUL', TotalUsers: 0 },
+            { name: 'AUG', TotalUsers: 0 },
+            { name: 'SEPT', TotalUsers: 0 },
+            { name: 'OCT', TotalUsers: 0 },
+            { name: 'NOV', TotalUsers: 0 },
+            { name: 'DEC', TotalUsers: 0 }
+        ];
+
+        let totalUsers = 0;
+
+        for (let i = 0; i < users.length; i++) {
+            const { year, month } = users[i]._id;
+
+            if (year === currentYear) {
+                monthlyUsers[month - 1].TotalUsers = users[i].count;
+                totalUsers += users[i].count;
+            }
+        }
+
+        return response.status(200).json({
+            TotalUsers: totalUsers,
+            monthlyUsers: monthlyUsers,
+            success: true,
+            error: false,
+        });
+
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
+    }
+};
+
+

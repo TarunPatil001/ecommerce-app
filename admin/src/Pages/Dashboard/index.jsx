@@ -130,6 +130,9 @@ const Dashboard = () => {
   const [allReviews, setAllReviews] = useState([]);
   const [overallTotalSales, setOverallTotalSales] = useState(0);
 
+  const [chartData, setChartData] = useState([]);
+  const [year, setYear] = useState(new Date().getFullYear());
+
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -138,6 +141,8 @@ const Dashboard = () => {
     } else {
       navigate("/sign-in");
     }
+
+    window.scrollTo(0, 0);
   }, [context, navigate]);
 
 
@@ -390,6 +395,10 @@ const Dashboard = () => {
         setOverallTotalSales(res?.totalSales);
       }
     })
+
+    getTotalSalesByYear();
+    getTotalUsersByYear();
+
   }, []);
 
 
@@ -587,88 +596,72 @@ const Dashboard = () => {
 
 
 
-  const [chartData1, setChartData1] = useState([
-    {
-      name: "JAN",
-      Total_Users: 4000,
-      Total_Sales: 2400,
-      amt: 2400,
-    },
-    {
-      name: "FEB",
-      Total_Users: 3000,
-      Total_Sales: 1398,
-      amt: 2210,
-    },
-    {
-      name: "MAR",
-      Total_Users: 2000,
-      Total_Sales: 9800,
-      amt: 2290,
-    },
-    {
-      name: "APR",
-      Total_Users: 2780,
-      Total_Sales: 3908,
-      amt: 2000,
-    },
-    {
-      name: "MAY",
-      Total_Users: 1890,
-      Total_Sales: 4800,
-      amt: 2181,
-    },
-    {
-      name: "JUN",
-      Total_Users: 2390,
-      Total_Sales: 3800,
-      amt: 2500,
-    },
-    {
-      name: "JUL",
-      Total_Users: 3490,
-      Total_Sales: 4300,
-      amt: 2100,
-    },
-    {
-      name: "AUG",
-      Total_Users: 5490,
-      Total_Sales: 4900,
-      amt: 2100,
-    },
-    {
-      name: "SEPT",
-      Total_Users: 8490,
-      Total_Sales: 4700,
-      amt: 2100,
-    },
-    {
-      name: "OCT",
-      Total_Users: 7490,
-      Total_Sales: 6300,
-      amt: 2100,
-    },
-    {
-      name: "NOV",
-      Total_Users: 9490,
-      Total_Sales: 2300,
-      amt: 2100,
-    },
-    {
-      name: "DEC",
-      Total_Users: 5490,
-      Total_Sales: 7300,
-      amt: 2100,
-    },
-  ]
-  );
+  const getTotalUsersByYear = async () => {
+    try {
+      const res = await fetchDataFromApi(`/api/order/users`);
+      if (!res?.monthlyUsers) return;
+
+      const users = res.monthlyUsers.map(item => ({
+        name: item?.name,
+        Total_Users: (parseInt(item?.TotalUsers) || 0),
+      }));
+
+      setChartData(prevData => mergeChartData(prevData, users));
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const getTotalSalesByYear = async () => {
+    try {
+      const res = await fetchDataFromApi(`/api/order/sales`);
+      if (!res?.monthlySales) return;
+
+      const sales = res.monthlySales.map(item => ({
+        name: item?.name,
+        Total_Sales: parseInt(item?.TotalSales) || 0,
+      }));
+
+      setChartData(prevData => mergeChartData(prevData, sales));
+    } catch (error) {
+      console.error("Error fetching sales:", error);
+    }
+  };
+
+
+  // Merge sales and user data to prevent overriding existing values
+  const mergeChartData = (prevData, newData) => {
+    const dataMap = new Map(prevData.map(item => [item.name, item]));
+
+    newData.forEach(newItem => {
+      if (dataMap.has(newItem.name)) {
+        Object.assign(dataMap.get(newItem.name), newItem);
+      } else {
+        dataMap.set(newItem.name, newItem);
+      }
+    });
+
+    return Array.from(dataMap.values());
+  };
+
+  const handleAddStock = (productId, amount) => {
+    setProductData(prevProducts =>
+      prevProducts.map(product =>
+        product._id === productId
+          ? { ...product, countInStock: product.countInStock + amount }
+          : product
+      )
+    );
+  };
+
+
 
 
   return (
     <>
-    {
-      console.log("sale: ", overallTotalSales)
-    }
+      {
+        console.log("sale: ", overallTotalSales)
+      }
       <div className={'w-full px-5 py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md'}>
         <div className="info">
           <h1 className='text-[30px] font-bold leading-9 mb-2'>Good Morning, <br /> Cameron &#128075;</h1>
@@ -953,17 +946,26 @@ const Dashboard = () => {
                         <span className="text-[12px] text-[var(--off-color)] font-medium">{product?.discount}% off</span>
                       </div>
                     </TableCell>
+
                     <TableCell className="table-cell">
                       <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
                         <span>
                           <span className="font-bold">{product?.sale}</span> sold
                         </span>
-                        <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
+
+                        <ProgressBar
+                          value={product?.sale + product?.countInStock === 0 ? 0 : (product?.sale / (product?.sale + product?.countInStock)) * 100}
+                          type="success"
+                        />
+
+
                         <span>
                           <span className="text-[14px] font-bold">{product?.countInStock}</span> remain
                         </span>
                       </p>
                     </TableCell>
+
+
                     <TableCell className="table-cell">
                       <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
                         <Rating name="rating" size='small' defaultValue={product?.rating} max={5} readOnly />
@@ -1226,40 +1228,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* <div className="card my-4 bg-white border rounded-md px-1">
-        <div className='flex items-center justify-between px-5 pb-2 pt-5'>
-          <h2 className='text-[20px] font-bold'>Total Sales & Total Users</h2>
-        </div>
-
-        <div className='flex items-center justify-start px-5 pt-2 pb-5 gap-5'>
-          <span className='flex items-center'><span><GoDotFill className='text-violet-500' /></span>Total Sales</span>
-          <span className='flex items-center'><span><GoDotFill className='text-green-500' /></span>Total Users</span>
-        </div>
-        <div style={{ width: '100%', height: '500px' }}>
-          <ResponsiveContainer>
-            <LineChart
-              width={1000}
-              height={500}
-              data={chartData1}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="none" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <RechartTooltip contentStyle={{ fontSize: 12 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="Total_Sales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="Total_Users" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div> */}
-
       <div className="card my-4 bg-white border rounded-md px-1">
         <div className="flex items-center justify-between px-5 pb-2 pt-5">
           <h2 className="text-[20px] font-bold">Total Sales & Total Users</h2>
@@ -1277,7 +1245,7 @@ const Dashboard = () => {
         <div style={{ width: "100%", height: "500px" }}>
           <ResponsiveContainer>
             <AreaChart
-              data={chartData1}
+              data={chartData}
               margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
             >
               {/* Define gradients */}
@@ -1302,7 +1270,7 @@ const Dashboard = () => {
               {/* Apply gradient fills */}
               <Area
                 type="monotone"
-                dataKey="Total_Sales"
+                dataKey="Total_Sales" // Fixed Key
                 stroke="#8884d8"
                 fill="url(#colorSales)"
                 strokeWidth={2}
@@ -1310,12 +1278,13 @@ const Dashboard = () => {
               />
               <Area
                 type="monotone"
-                dataKey="Total_Users"
+                dataKey="Total_Users" // Fixed Key
                 stroke="#82ca9d"
                 fill="url(#colorUsers)"
                 strokeWidth={2}
                 activeDot={{ r: 6 }}
               />
+
             </AreaChart>
           </ResponsiveContainer>
         </div>
