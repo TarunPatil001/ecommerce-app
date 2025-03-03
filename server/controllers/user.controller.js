@@ -8,6 +8,7 @@ import UserModel from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
 import ReviewModel from "../models/reviews.model.js";
+import mongoose from "mongoose";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -427,18 +428,19 @@ export async function logoutController(request, response) {
 
 // --------------------------------------------------------------------------------------
 // Utility function to extract the public ID from the Cloudinary URL
-function extractPublicId(imageUrl) {
-  // Regex to match the Cloudinary URL and extract public ID
-  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
-  const match = imageUrl.match(regex);
+// function extractPublicId(imageUrl) {
+//   // Regex to match the Cloudinary URL and extract public ID
+//   const regex = /https:\/\/response\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
+//   const match = imageUrl.match(regex);
 
-  if (match && match[1]) {
-    // Return the full public ID (including folder path)
-    return match[1];
-  }
+//   if (match && match[1]) {
+//     // Return the full public ID (including folder path)
+//     return match[1];
+//   }
 
-  return null;
-}
+//   return null;
+// }
+
 
 export async function userAvatarController(request, response) {
   try {
@@ -529,7 +531,7 @@ export async function userAvatarController(request, response) {
     };
 
     const uploadedImage = await cloudinary.uploader.upload(images[0].path, options);
-    
+
     // Delete local file after successful upload to Cloudinary
     if (uploadedImage.secure_url) {
       await fs.unlink(images[0].path);  // Delete local file
@@ -1212,3 +1214,186 @@ export async function getAllReviews(request, response) {
     });
   }
 }
+
+
+
+// Function to extract Public ID from Cloudinary URL
+function extractPublicId(imageUrl) {
+  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
+  const match = imageUrl.match(regex);
+  return match ? match[1] : null;
+}
+
+// Function to delete images from Cloudinary
+async function deleteImages(images) {
+  if (!images || images.length === 0) return [];
+
+  return Promise.allSettled(
+    images.map(async (imageUrl, index) => {
+      const publicId = extractPublicId(imageUrl);
+      if (!publicId) return `Failed to extract Public ID for image ${index + 1}.`;
+
+      console.log(`Deleting Image: ${publicId}`);
+      try {
+        const result = await cloudinary.uploader.destroy(publicId);
+        return result.result === "ok"
+          ? `Image ${index + 1} deleted successfully.`
+          : `Failed to delete image ${index + 1}: ${result.error?.message || "Unknown error"}`;
+      } catch (error) {
+        return `Error deleting image ${index + 1}: ${error.message}`;
+      }
+    })
+  );
+}
+
+// Controller to delete multiple users (Using req.query)
+export async function deleteMultipleUsers(req, res) {
+  try {
+    const { ids } = req.query;
+
+    if (!ids || ids.length === 0) {
+      return res.status(400).json({
+        message: "User IDs are required.",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Convert `ids` to an array (handles single and multiple values)
+    const userIds = Array.isArray(ids) ? ids : ids.split(",").map((id) => id.trim());
+
+    // Validate MongoDB ObjectId format
+    if (userIds.some((id) => !mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({
+        message: "Invalid user IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    // Find users by IDs
+    const users = await UserModel.find({ _id: { $in: userIds } });
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        message: "No users found with the given IDs.",
+        success: false,
+        error: true,
+      });
+    }
+
+    console.log(`Found ${users.length} users for deletion.`);
+
+    // Delete avatars from Cloudinary
+    const avatarUrls = users.map((user) => user.avatar).filter(Boolean);
+    const cloudinaryResults = await deleteImages(avatarUrls);
+
+    // Delete users from database
+    await UserModel.deleteMany({ _id: { $in: userIds } });
+
+    console.log("Users and their avatars deleted successfully.");
+
+    return res.status(200).json({
+      message: "Users and associated avatars deleted successfully.",
+      success: true,
+      error: false,
+      cloudinaryResults,
+    });
+  } catch (error) {
+    console.error("Error deleting users:", error);
+    return res.status(500).json({
+      message: "Internal Server Error.",
+      success: false,
+      error: true,
+    });
+  }
+}
+
+
+// export async function deleteMultipleUsers(request, response) {
+//   console.log("Incoming Request Query:", request.query);
+
+//   try {
+//     const { ids } = request.query;
+
+//     if (!ids || ids.length === 0) {
+//       return response.status(400).json({
+//         message: "No user IDs provided.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     const idArray = Array.isArray(ids) ? ids : ids.split(",").map((id) => id.trim());
+
+//     if (idArray.some((id) => !mongoose.Types.ObjectId.isValid(id))) {
+//       return response.status(400).json({
+//         message: "Invalid user IDs.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     const users = await UserModel.find({ _id: { $in: idArray } });
+
+//     if (users.length === 0) {
+//       return response.status(404).json({
+//         message: "No users found with the given IDs.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     console.log("⚡ Deleting avatars from Cloudinary...");
+//     const failedAvatars = [];
+
+//     for (const user of users) {
+//       if (!user.avatar) continue; // Skip users with no avatar
+
+//       const cloudinaryPublicId = extractPublicId(user.avatar);
+//       if (!cloudinaryPublicId) {
+//         console.error(`Invalid Cloudinary URL for user ${user._id}: ${user.avatar}`);
+//         failedAvatars.push(user._id);
+//         continue;
+//       }
+
+//       try {
+//         await cloudinary.v2.uploader.destroy(cloudinaryPublicId);
+//         console.log(`Avatar deleted for user ${user._id}`);
+//       } catch (error) {
+//         failedAvatars.push(user._id);
+//         console.error(`Failed to delete avatar for user ${user._id}:`, error.message);
+//       }
+//     }
+
+//     if (failedAvatars.length > 0) {
+//       return response.status(400).json({
+//         message: "Some avatars failed to delete. User deletion stopped.",
+//         success: false,
+//         error: true,
+//         failedAvatars,
+//       });
+//     }
+
+//     console.log("Deleting users from the database...");
+//     const deleteResult = await UserModel.deleteMany({ _id: { $in: idArray } });
+
+//     return response.status(200).json({
+//       message: "Users and avatars deleted successfully.",
+//       success: true,
+//       error: false,
+//       deleteResult,
+//     });
+
+//   } catch (error) {
+//     console.error("Error in deleteMultipleUsers:", error.message);
+//     if (!response.headersSent) {
+//       return response.status(500).json({
+//         message: "Internal Server Error.",
+//         success: false,
+//         error: true,
+//         details: error.message,
+//       });
+//     }
+//   }
+// }

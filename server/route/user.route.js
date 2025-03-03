@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {addReview, authWithGoogle, forgotPasswordController, getAllReviews, getAllUsers, getReview, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resendOtpController, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
+import {addReview, authWithGoogle, deleteMultipleUsers, forgotPasswordController, getAllReviews, getAllUsers, getReview, loginUserController, logoutController, refreshToken, registerUserController, removeImageFromCloudinary, resendOtpController, resetPassword, updateUserDetails, userAvatarController, userDetails, verifyEmailController, verifyForgotPasswordOtp} from '../controllers/user.controller.js';
 import auth from '../middlewares/auth.js';
 import upload from '../middlewares/multer.js';
 
@@ -22,6 +22,6 @@ userRouter.get('/get-all-user', auth, getAllUsers);
 userRouter.post('/addReview', auth, addReview);
 userRouter.get('/getReviews', getReview);
 userRouter.get('/get-all-reviews', getAllReviews);
-
+userRouter.post("/delete-multiple-users", auth, deleteMultipleUsers);
 
 export default userRouter;
