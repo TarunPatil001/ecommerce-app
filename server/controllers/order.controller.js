@@ -118,13 +118,28 @@ export const createOrderController = async (request, response) => {
 export async function getOrderDetailsController(request, response) {
     try {
         const userId = request.userId;
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return response.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false,
+            });
+        }
+
         const page = parseInt(request.query.page) || 1;
         const perPage = parseInt(request.query.perPage) || 10; // Default to 10 orders per page
 
-        const totalOrders = await OrderModel.countDocuments({ userId: userId });
+        let orderFilter = {};
+        if (user.role !== "ADMIN") {
+            // If user is not admin, only fetch their own orders
+            orderFilter.userId = userId;
+        }
+
+        const totalOrders = await OrderModel.countDocuments(orderFilter);
         const totalPages = Math.ceil(totalOrders / perPage);
 
-        // ✅ Instead of 404, return an empty array for non-existent pages
         if (page > totalPages && totalOrders > 0) {
             return response.status(200).json({
                 message: "No more orders",
@@ -135,19 +150,18 @@ export async function getOrderDetailsController(request, response) {
                 totalPages: totalPages,
                 page: page,
                 perPage: perPage,
-                totalAddresses: 0, // No addresses if no orders
+                totalAddresses: 0,
             });
         }
 
-        const orderList = await OrderModel.find({ userId: userId })
+        const orderList = await OrderModel.find(orderFilter)
             .sort({ createdAt: -1 })
-            .populate('delivery_address userId')
+            .populate("delivery_address userId")
             .skip((page - 1) * perPage)
             .limit(perPage)
             .exec();
 
-        // ✅ Fix: `distinct()` returns an array, so use `.length`
-        const totalAddresses = (await OrderModel.distinct("delivery_address", { userId: userId })).length;
+        const totalAddresses = (await OrderModel.distinct("delivery_address", orderFilter)).length;
 
         return response.status(200).json({
             message: "Order details fetched successfully",
@@ -160,7 +174,6 @@ export async function getOrderDetailsController(request, response) {
             perPage: perPage,
             totalAddresses: totalAddresses,
         });
-
     } catch (error) {
         console.error("Error in getOrderDetailsController:", error.message || error);
         return response.status(500).json({
@@ -170,6 +183,7 @@ export async function getOrderDetailsController(request, response) {
         });
     }
 }
+
 
 
 
