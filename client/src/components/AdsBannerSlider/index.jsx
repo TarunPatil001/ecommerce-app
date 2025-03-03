@@ -7,7 +7,7 @@ import { Autoplay, Navigation } from "swiper/modules";
 import BannerBox from "../BannerBox";
 import PropTypes from "prop-types";
 
-const AdsBannerSlider = ({ items, timedelay, images, showNavigation = false }) => {
+const AdsBannerSlider = ({ items, timedelay, showNavigation = false }) => {
   return (
     <div className="py-5 w-full">
       <Swiper

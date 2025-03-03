@@ -9,6 +9,7 @@ import "swiper/css/navigation";
 
 // import required modules
 import { Autoplay, Pagination, Navigation, EffectFlip } from "swiper/modules";
+import PropTypes from "prop-types";
 
 const HomeSlider = (props) => {
   return (
@@ -57,5 +58,16 @@ const HomeSlider = (props) => {
     </div>
   );
 };
+
+
+
+HomeSlider.propTypes = {
+  data: PropTypes.arrayOf(
+      PropTypes.shape({
+          images: PropTypes.arrayOf(PropTypes.string).isRequired
+      })
+  ).isRequired
+};
+
 
 export default HomeSlider;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
@@ -9,7 +9,7 @@ import { MyContext } from '../../App';
 import { postData } from '../../utils/api';
 import { CircularProgress } from '@mui/material';
 
-import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { firebaseApp } from '../../firebase';
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
@@ -87,7 +87,7 @@ const Login = () => {
             }
 
             // Login API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/user/forgot-password", formFields, { withCredentials: true }),
                 {
                     loading: "OTP is sending... Please wait.",
@@ -180,7 +180,7 @@ const Login = () => {
             }
 
             // Login API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/user/login", formFields, { withCredentials: true }),
                 {
                     loading: "Logging in... Please wait.",
@@ -225,8 +225,8 @@ const Login = () => {
         signInWithPopup(auth, googleProvider)
             .then((result) => {
                 // This gives you a Google Access Token. You can use it to access the Google API.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential.accessToken;
                 // The signed-in user info.
                 const user = result.user;
                 // IdP data available using getAdditionalUserInfo(result)
@@ -258,15 +258,23 @@ const Login = () => {
                 console.log(user);
                 // ...
             }).catch((error) => {
-                // Handle Errors here.
+                // Log the error code and message to the console for debugging
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
+            
+                // Optionally, log the email and credential if needed
+                const email = error.customData?.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
+            
+                // Display a message to the user, showing a generic error or custom error message
+                context.openAlertBox("error", "An error occurred while signing in with Google. Please try again.");
+            
+                // You can log the error information for development purposes
+                console.error("Google Auth Error:", { errorCode, errorMessage, email, credential });
+            
+                // Optionally, you can also send the error details to an analytics service like Sentry
             });
+            
     }
 
 

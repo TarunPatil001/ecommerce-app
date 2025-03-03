@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Divider } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -103,12 +103,13 @@ const CartPanel = (props) => {
 };
 
 CartPanel.propTypes = {
-    cartItemsQty: PropTypes.number.isRequired,
-    platformFee: PropTypes.number.isRequired,
-    shippingFee: PropTypes.number.isRequired,
-    onCartItemQtyChange: PropTypes.func.isRequired,
-    onPlatformFeeChange: PropTypes.func.isRequired,
-    onShippingFeeChange: PropTypes.func.isRequired,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired, // Ensures data is an array of objects (cart items)
+    cartItemsQty: PropTypes.number, // Optional: Number of cart items
+    platformFee: PropTypes.number, // Optional: Platform fee (if applicable)
+    shippingFee: PropTypes.number, // Optional: Shipping fee (if applicable)
+    onCartItemQtyChange: PropTypes.func, // Optional: Callback for quantity change
+    onPlatformFeeChange: PropTypes.func, // Optional: Callback for platform fee change
+    onShippingFeeChange: PropTypes.func, // Optional: Callback for shipping fee change
 };
 
 export default CartPanel;

@@ -1,5 +1,7 @@
 // import React from 'react'
 
+import PropTypes from "prop-types";
+
 const ProductImageOpacityChange = (props) => {
     return (
         <div className="h-full w-full flex items-center justify-center overflow-hidden relative">
@@ -14,5 +16,10 @@ const ProductImageOpacityChange = (props) => {
         </div>
     )
 }
+
+ProductImageOpacityChange.propTypes = {
+    firstImg: PropTypes.string.isRequired,
+    SecondImg: PropTypes.string.isRequired,
+};
 
 export default ProductImageOpacityChange

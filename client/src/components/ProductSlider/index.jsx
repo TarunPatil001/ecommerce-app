@@ -38,7 +38,9 @@ const ProductSlider = (props) => {
 };
 
 ProductSlider.propTypes = {
-  items: PropTypes.number.isRequired,
+  items: PropTypes.number.isRequired, // Number of slides per view
+  data: PropTypes.arrayOf(PropTypes.object).isRequired, // Array of product objects
 };
+
 
 export default ProductSlider;

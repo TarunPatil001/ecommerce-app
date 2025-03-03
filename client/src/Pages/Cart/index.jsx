@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button, Divider } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { MyContext } from '../../App'
-import { IoBagCheck } from 'react-icons/io5'
 import CartItems from './cartItems'
 
 const CartPage = () => {

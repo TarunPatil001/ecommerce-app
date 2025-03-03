@@ -1,9 +1,8 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MyContext } from '../../App';
 import { Button, Checkbox, CircularProgress, Dialog, DialogTitle, Divider, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import CartTotal from '../Cart/cartTotal';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IoBagCheck } from 'react-icons/io5';
 import { deleteData, editData, fetchDataFromApi, postData } from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -12,9 +11,7 @@ import { TbDotsVertical } from 'react-icons/tb';
 import { IoIosSave } from 'react-icons/io';
 import { RiResetLeftFill } from 'react-icons/ri';
 import { MuiPhone } from '../../components/MuiPhone';
-import { GiTakeMyMoney } from 'react-icons/gi';
 import { SiRazorpay } from "react-icons/si";
-import { FaPaypal } from 'react-icons/fa';
 import axios from 'axios';
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
@@ -30,7 +27,7 @@ const Checkout = () => {
     const formRef = useRef(); // Create ref to the form
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
+    const [setIsLoading2] = useState(false);
     // const [isLoading3, setIsLoading3] = useState(false);
     const [address, setAddress] = useState([]);
     const [isAddressType, setIsAddressType] = useState("");
@@ -533,7 +530,7 @@ const Checkout = () => {
 
         try {
             // Delete address API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/address/delete-address", {
                     userId: context?.userData?._id, // Replace with the actual userId
                     addressId: addressId, // Address ID to delete
@@ -700,7 +697,7 @@ const Checkout = () => {
                 postData(`/api/order/create-order`, payLoad).then((res) => {
 
                     if (res.error === false) {
-                        deleteData(`/api/cart/empty-cart-item/${user?._id}`).then((res) => {
+                        deleteData(`/api/cart/empty-cart-item/${user?._id}`).then(() => {
                             context?.getCartItems();
                         })
 

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import PropTypes from 'prop-types';
+import { useState } from 'react'
 
 const OtpBox = ({ length, onChange }) => {
 
@@ -30,5 +31,11 @@ const OtpBox = ({ length, onChange }) => {
         </>
     )
 }
+
+
+OtpBox.propTypes = {
+    length: PropTypes.number.isRequired, // Ensures length is a number
+    onChange: PropTypes.func.isRequired, // Ensures onChange is a function
+};
 
 export default OtpBox

@@ -1,4 +1,4 @@
-import React from 'react'
+import PropTypes from 'prop-types';
 
 const ProductImageFlipChange = () => {
   return (
@@ -19,5 +19,11 @@ const ProductImageFlipChange = () => {
     </div>
   )
 }
+
+
+ProductImageFlipChange.propTypes = {
+  frontImage: PropTypes.string.isRequired, // URL of the front image
+  backImage: PropTypes.string.isRequired // URL of the back image
+};
 
 export default ProductImageFlipChange

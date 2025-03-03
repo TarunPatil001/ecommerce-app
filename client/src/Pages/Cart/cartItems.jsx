@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Button, Dialog, DialogTitle, Menu, MenuItem, Rating } from '@mui/material';
+import  { useContext, useEffect, useState } from 'react'
+import { Button, Dialog, Rating } from '@mui/material';
 import { FaCaretDown } from 'react-icons/fa';
 import { RiCloseLargeLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -16,7 +16,7 @@ const CartItems = (props) => {
     const context = useContext(MyContext);
 
     const [isOpenModel, setIsOpenModel] = useState(false);
-    const [itemId, setItemId] = useState(null);
+    const [setItemId] = useState(null);
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedWeight, setSelectedWeight] = useState("");
     const [selectedRam, setSelectedRam] = useState("");

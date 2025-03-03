@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import PropTypes from 'prop-types';
 import {
   defaultCountries,
   FlagImage,
@@ -99,4 +99,11 @@ export const MuiPhone = ({defaultCountry, value, onChange, ...restProps }) => {
       {...restProps}
     />
   );
+};
+
+
+MuiPhone.propTypes = {
+  defaultCountry: PropTypes.string.isRequired, // Ensures defaultCountry is a string
+  value: PropTypes.string.isRequired, // Ensures value is a string
+  onChange: PropTypes.func.isRequired, // Ensures onChange is a function
 };

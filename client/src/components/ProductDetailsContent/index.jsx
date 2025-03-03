@@ -1,27 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react'
-import QtyBox from '../../components/QtyBox';
+import { useContext, useEffect, useState } from 'react'
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io';
 import { IoGitCompareOutline } from 'react-icons/io5';
 import { Button, Rating } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { MyContext } from '../../App';
-import toast from 'react-hot-toast';
-import { deleteData, editData } from '../../utils/api';
 import { PropTypes } from 'prop-types';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const ProductDetailsContent = (props) => {
 
     const [checked, setChecked] = useState(false);
     const context = useContext(MyContext);
-    const [productActionIndex, setProductActionIndex] = useState(null);
+    const [setProductActionIndex] = useState(null);
     const [quantity, setQuantity] = useState(1); // Default quantity
     const [selectedSize, setSelectedSize] = useState(null);
     const [selectedWeight, setSelectedWeight] = useState(null);
     const [selectedRam, setSelectedRam] = useState(null);
     const [isAdded, setIsAdded] = useState(false);
-    const [cartItem, setCartItem] = useState(null);
+    const [setCartItem] = useState(null);
 
     const navigate = useNavigate(); // React Router's navigate hook for redirection
 
@@ -312,8 +308,24 @@ const ProductDetailsContent = (props) => {
     );
 };
 
-ProductDetailsContent.PropTypes = {
+ProductDetailsContent.propTypes = {
+    product: PropTypes.shape({
+        _id: PropTypes.string,
+        brand: PropTypes.string,
+        name: PropTypes.string,
+        rating: PropTypes.number,
+        price: PropTypes.number,
+        oldPrice: PropTypes.number,
+        discount: PropTypes.number,
+        countInStock: PropTypes.number,
+        description: PropTypes.string,
+        size: PropTypes.arrayOf(PropTypes.string),
+        productWeight: PropTypes.arrayOf(PropTypes.string),
+        productRam: PropTypes.arrayOf(PropTypes.string),
+    }),
+    gotoReviews: PropTypes.func,
+    reviewsCount: PropTypes.number,
+};
 
-}
 
 export default ProductDetailsContent;

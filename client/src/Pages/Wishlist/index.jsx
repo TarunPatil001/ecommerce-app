@@ -1,11 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { Divider } from '@mui/material'
 import { MyContext } from '../../App'
 import WishlistItems from './wishlistItems'
 import AccountSidebar from '../../components/AccountSidebar'
-import ProductItem from '../../components/ProductItem'
-import toast from 'react-hot-toast'
-import { deleteData } from '../../utils/api'
 
 const Wishlist = () => {
 

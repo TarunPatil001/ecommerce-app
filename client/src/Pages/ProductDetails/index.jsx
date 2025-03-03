@@ -6,12 +6,10 @@ import ProductZoom from '../../components/ProductZoom';
 
 import ProductSlider from '../../components/ProductSlider';
 import ProductDetailsContent from '../../components/ProductDetailsContent';
-import { CircularProgress, Rating } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { deleteData, editData, fetchDataFromApi } from '../../utils/api';
+import { CircularProgress } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { fetchDataFromApi } from '../../utils/api';
 import Reviews from './reviews';
-import { MyContext } from '../../App';
-import toast from 'react-hot-toast';
 
 
 function handleClick(event) {
@@ -21,8 +19,8 @@ function handleClick(event) {
 
 const ProductDetails = () => {
 
-    const context = useContext(MyContext);
-    const [activeTab, setActiveTab] = useState(0);
+    // const context = useContext(MyContext);
+    // const [activeTab, setActiveTab] = useState(0);
     const [productData, setProductData] = useState();
     const [isLoading, setIsLoading] = useState(false);
     const [reviewsCount, setReviewsCount] = useState(0);

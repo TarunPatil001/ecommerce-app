@@ -1,21 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext, useEffect, useState } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { BsArrowsFullscreen } from "react-icons/bs";
-import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { Checkbox, Tooltip } from "@mui/material";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
-import { MdOutlineShoppingCart } from "react-icons/md";
 import { MyContext } from "../../App";
 import { deleteData, postData } from "../../utils/api";
 import toast from "react-hot-toast";
+import PropTypes from "prop-types";
 
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+// const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const ProductItemListView = (props) => {
 
@@ -199,6 +198,20 @@ const ProductItemListView = (props) => {
       </div>
     </div>
   );
+};
+
+ProductItemListView.propTypes = {
+  product: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    brand: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    price: PropTypes.number.isRequired,
+    oldPrice: PropTypes.number,
+    discount: PropTypes.number,
+    rating: PropTypes.number,
+    images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
 };
 
 export default ProductItemListView;

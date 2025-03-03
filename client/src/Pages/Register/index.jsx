@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
@@ -10,8 +10,9 @@ import toast from 'react-hot-toast';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 
-import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { firebaseApp } from '../../firebase';
+import PropTypes from 'prop-types';
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
 
@@ -84,7 +85,7 @@ const Register = () => {
 
         try {
             // Wrap the registration API call inside a toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/user/register", formFields),
                 {
                     loading: "Registering... Please wait.",
@@ -129,8 +130,8 @@ const Register = () => {
         signInWithPopup(auth, googleProvider)
             .then((result) => {
                 // This gives you a Google Access Token. You can use it to access the Google API.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential.accessToken;
                 // The signed-in user info.
                 const user = result.user;
                 // IdP data available using getAdditionalUserInfo(result)
@@ -162,15 +163,22 @@ const Register = () => {
                 console.log(user);
                 // ...
             }).catch((error) => {
-                // Handle Errors here.
+                // Log the error code and message to the console for debugging
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
+            
+                // Optionally, log the email and credential if needed
+                const email = error.customData?.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
-            });
+            
+                // Display a message to the user, showing a generic error or custom error message
+                context.openAlertBox("error", "An error occurred while signing in with Google. Please try again.");
+            
+                // You can log the error information for development purposes
+                console.error("Google Auth Error:", { errorCode, errorMessage, email, credential });
+            
+                // Optionally, you can also send the error details to an analytics service like Sentry
+            });            
     }
 
 
@@ -278,5 +286,15 @@ const Register = () => {
         </div>
     )
 }
+
+
+Register.propTypes = {
+    // No props are passed directly, but if you want to validate context, do so by defining the context's shape.
+    // Example for context:
+    context: PropTypes.shape({
+      openAlertBox: PropTypes.func.isRequired,
+      setIsLogin: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
 export default Register

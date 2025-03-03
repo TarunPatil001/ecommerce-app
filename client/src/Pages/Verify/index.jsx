@@ -1,18 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import OtpBox from '../../components/OtpBox';
 import { Button, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { postData } from '../../utils/api';
-import { MyContext } from '../../App';
 
 const Verify = () => {
-    const context = useContext(MyContext);
+    // const context = useContext(MyContext);
     const navigate = useNavigate();
     const [otp, setOtp] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading] = useState(false);
     const [timer, setTimer] = useState(0); // Initial timer state
-    const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
+    const [setIsOtpResent] = useState(false); // Track if OTP has been resent
     
     const handleOtpChange = (value) => {
         setOtp(value);

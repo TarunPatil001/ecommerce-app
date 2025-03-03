@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import Sidebar from "../../components/Sidebar"
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -11,12 +11,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { BsSortAlphaDown, BsSortAlphaUp } from 'react-icons/bs';
 import { BiTrendingDown, BiTrendingUp } from 'react-icons/bi';
-import { PiTargetLight } from 'react-icons/pi';
-import { HiBarsArrowDown } from 'react-icons/hi2';
 import ProductItemListView from '../../components/ProductItemListview';
 import Pagination from '@mui/material/Pagination';
 import ProductLoadingGrid from './productLoadingGrid';
-import { fetchDataFromApi, postData } from '../../utils/api';
+import { postData } from '../../utils/api';
 
 
 function handleClick(event) {
@@ -33,7 +31,7 @@ const ProductListing = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [selectedName, setSelectedName] = useState('');
+  const [setSelectedName] = useState('');
   const [selectedSortValue, setSelectedSortValue] = useState('Name: A to Z');
 
 
@@ -46,10 +44,10 @@ const ProductListing = () => {
     setAnchorEl(null);
   };
 
-  const handleMenuItemClick = (value) => {
-    setSelectedSortValue(value); // Update the selected value
-    handleDropdownClose(); // Close the menu
-  };
+  // const handleMenuItemClick = (value) => {
+  //   setSelectedSortValue(value); // Update the selected value
+  //   handleDropdownClose(); // Close the menu
+  // };
 
   const handleSortBy = (name, order, products, value) => {
     if (!Array.isArray(products)) {

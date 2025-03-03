@@ -22,7 +22,6 @@ import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import CartPanel from "../CartPanel";
 import { MyContext } from "../../App";
-import { MdOutlineRemoveShoppingCart } from "react-icons/md";
 import ProductZoom from "../ProductZoom";
 import ProductDetailsContent from "../ProductDetailsContent";
 

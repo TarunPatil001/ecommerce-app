@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -11,6 +9,7 @@ import "swiper/css/pagination";
 // import required modules
 import { Autoplay, Navigation } from "swiper/modules";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const HomeCatSlider = (props) => {
   return (
@@ -53,6 +52,15 @@ const HomeCatSlider = (props) => {
       </div>
     </div>
   );
+};
+
+HomeCatSlider.propTypes = {
+  data: PropTypes.arrayOf(
+      PropTypes.shape({
+          images: PropTypes.arrayOf(PropTypes.string).isRequired,
+          name: PropTypes.string.isRequired
+      })
+  ).isRequired
 };
 
 export default HomeCatSlider;

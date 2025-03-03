@@ -1,7 +1,6 @@
-import React, { useContext } from 'react'
+import  { useContext } from 'react'
 import { MyContext } from '../../App';
-import { Link } from 'react-router-dom';
-import { Button, Divider } from '@mui/material';
+import { Divider } from '@mui/material';
 
 const CartTotal = () => {
 

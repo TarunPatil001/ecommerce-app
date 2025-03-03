@@ -1,5 +1,5 @@
 import { Button, Dialog, Divider, Rating } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MyContext } from '../../App';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -14,7 +14,7 @@ import { RxCross2 } from 'react-icons/rx';
 const CartPanelItems = (props) => {
   const context = useContext(MyContext);
   const [isOpenModel, setIsOpenModel] = useState(false);
-  const [itemId, setItemId] = useState(null);
+  const [setItemId] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedWeight, setSelectedWeight] = useState("");
   const [selectedRam, setSelectedRam] = useState("");

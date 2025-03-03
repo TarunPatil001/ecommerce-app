@@ -13,7 +13,7 @@ const Navigation = () => {
 
   const context = useContext(MyContext);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-  const [isSticky, setIsSticky] = useState(true); // Track sticky state
+  const [setIsSticky] = useState(true); // Track sticky state
   const [lastScrollY, setLastScrollY] = useState(0); // Track last scroll position
   const [catData, setCatData] = useState([]);
 

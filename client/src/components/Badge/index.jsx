@@ -1,4 +1,4 @@
-import React from 'react'
+import PropTypes from 'prop-types';
 
 const Badge = (props) => {
     return (
@@ -15,5 +15,11 @@ const Badge = (props) => {
 
     )
 }
+
+
+Badge.propTypes = {
+    status: PropTypes.oneOf(['pending', 'confirm', 'delivered']).isRequired
+};
+
 
 export default Badge

@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect, useReducer } from 'react';
+import  { useState, createContext, useEffect, useReducer } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -34,7 +34,7 @@ function App() {
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
-  const apiUrl = import.meta.env.VITE_API_URL;
+  // const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
   const [catData, setCatData] = useState([]);
   const [productData, setProductData] = useState([]);
@@ -57,7 +57,7 @@ function App() {
     });
   };
 
-  const handleCloseProductDetailsModal = (status, product) => {
+  const handleCloseProductDetailsModal = () => {
     setOpenProductDetailsModal({
       open: false,
       product: {},
@@ -336,6 +336,7 @@ function App() {
 
   );
 }
+
 
 export default App;
 

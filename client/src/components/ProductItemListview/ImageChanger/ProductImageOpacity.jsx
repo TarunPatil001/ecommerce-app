@@ -1,4 +1,4 @@
-import React from 'react'
+import PropTypes from 'prop-types';
 
 const ProductImageOpacityChange = (props) => {
     return (
@@ -16,5 +16,10 @@ const ProductImageOpacityChange = (props) => {
         </div>
     )
 }
+
+ProductImageOpacityChange.propTypes = {
+    firstImg: PropTypes.string.isRequired, // Ensures firstImg is a string (URL)
+    SecondImg: PropTypes.string.isRequired, // Ensures SecondImg is a string (URL)
+};
 
 export default ProductImageOpacityChange

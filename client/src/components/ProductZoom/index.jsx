@@ -6,6 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useRef, useState, useEffect } from 'react';
+import { PropTypes } from 'prop-types';
 
 const ProductZoom = (props) => {
     const [slideIndex, setSlideIndex] = useState(0);
@@ -143,5 +144,14 @@ const ProductZoom = (props) => {
         </>
     );
 };
+
+ProductZoom.propTypes = {
+    images: PropTypes.arrayOf(PropTypes.string).isRequired, // Array of image URLs (strings)
+    bgColor: PropTypes.string, // Background color (optional)
+    goto: PropTypes.func.isRequired, // Function to change slide index
+    onSlideChange: PropTypes.func, // Optional function for slide change event
+    slideIndex: PropTypes.number, // Current slide index (optional)
+};
+
 
 export default ProductZoom;

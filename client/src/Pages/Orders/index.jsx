@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AccountSidebar from "../../components/AccountSidebar";
-import { MyContext } from "../../App";
-import { Button, Collapse, Divider } from "@mui/material";
+import { Button, Divider } from "@mui/material";
 import Badge from "../../components/Badge";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
 
 const Orders = () => {
-  const context = useContext(MyContext);
+  // const context = useContext(MyContext);
   const [isOpenOrder, setIsOpenOrder] = useState(null);
   const [orders, setOrders] = useState([]);
 
@@ -41,7 +40,7 @@ const Orders = () => {
                   <div className="p-5 pb-2">
                     <h2 className="font-bold">My Orders</h2>
                     <p className="mt-0">
-                      You've completed&nbsp;<span className="font-bold text-[var(--bg-primary)]">{orders?.length}</span>&nbsp;order{orders?.length <= 1 ? "" : "s"} so far. Amazing!
+                      You&apos;ve completed&nbsp;<span className="font-bold text-[var(--bg-primary)]">{orders?.length}</span>&nbsp;order{orders?.length <= 1 ? "" : "s"} so far. Amazing!
                     </p>
                   </div>
                   <Divider />
@@ -196,7 +195,7 @@ const Orders = () => {
                     className="w-32 h-32 mb-4 opacity-70"
                   />
                   <h2 className="text-xl font-semibold text-gray-700">My Order is empty!</h2>
-                  <p className="text-gray-500">Looks like you haven't placed any orders yet.</p>
+                  <p className="text-gray-500">Looks like you haven&apos;t placed any orders yet.</p>
                   <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                     Start Shopping
                   </button>

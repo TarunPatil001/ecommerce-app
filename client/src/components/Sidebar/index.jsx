@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import "./styles.css"
@@ -11,6 +11,7 @@ import Rating from '@mui/material/Rating';
 import { MyContext } from '../../App';
 import { useLocation } from 'react-router-dom';
 import { postData } from '../../utils/api';
+import PropTypes from 'prop-types';
 
 const Sidebar = (props) => {
 
@@ -288,6 +289,17 @@ const Sidebar = (props) => {
 
         </aside >
     );
+};
+
+// ✅ Define propTypes for validation
+Sidebar.propTypes = {
+    setSelectedName: PropTypes.func.isRequired,  // Function to update selected name
+    setIsLoading: PropTypes.func.isRequired,    // Function to set loading state
+    setProductsData: PropTypes.func.isRequired, // Function to update product data
+    setTotalPages: PropTypes.func.isRequired,   // Function to set total number of pages
+    setTotal: PropTypes.func.isRequired,        // Function to update total product count
+    page: PropTypes.number.isRequired,          // Current page number
+    filtersData: PropTypes.object,              // Filters data (add a shape if needed)
 };
 
 export default Sidebar;

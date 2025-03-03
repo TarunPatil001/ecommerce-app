@@ -1,19 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Button, Dialog, Rating } from '@mui/material';
+import { useContext, useEffect, useState } from 'react'
+import { Button, Rating } from '@mui/material';
 import { RiCloseLargeLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { MyContext } from '../../App';
-import { GiReturnArrow } from 'react-icons/gi';
-import { RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
-import { deleteData, editData, fetchDataFromApi } from '../../utils/api';
-import { FiMinus, FiPlus } from 'react-icons/fi';
-import { FaCaretDown } from 'react-icons/fa';
+import { deleteData } from '../../utils/api';
+import PropTypes from 'prop-types';
 
 const WishlistItems = (props) => {
 
     const context = useContext(MyContext);
-    const [isAddedWishlist, setIsAddedWishlist] = useState(false);
+    const [setIsAddedWishlist] = useState(false);
 
     useEffect(() => {
         window?.scroll(0, 0);
@@ -107,5 +104,19 @@ const WishlistItems = (props) => {
         </>
     )
 }
+
+WishlistItems.propTypes = {
+    item: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        productId: PropTypes.string.isRequired,
+        image: PropTypes.string.isRequired,
+        rating: PropTypes.number.isRequired,
+        brand: PropTypes.string.isRequired,
+        productTitle: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        oldPrice: PropTypes.number.isRequired,
+        discount: PropTypes.number.isRequired,
+    }).isRequired,
+};
 
 export default WishlistItems

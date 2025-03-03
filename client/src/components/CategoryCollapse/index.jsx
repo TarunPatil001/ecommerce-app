@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 import { FaRegSquareMinus, FaRegSquarePlus } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { Collapse } from "react-collapse";
+import PropTypes from "prop-types";
 
 const CategoryCollapse = ({ data = [] }) => {
   const [submenuOpen, setSubmenuOpen] = useState({});
@@ -110,6 +111,25 @@ const CategoryCollapse = ({ data = [] }) => {
       </ul>
     </div>
   );
+};
+
+
+CategoryCollapse.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      children: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          children: PropTypes.arrayOf(
+            PropTypes.shape({
+              name: PropTypes.string.isRequired,
+            })
+          ),
+        })
+      ),
+    })
+  ).isRequired,
 };
 
 export default CategoryCollapse;

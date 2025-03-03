@@ -37,8 +37,10 @@ const CategoryPanel = (props) => {
 };
 
 CategoryPanel.propTypes = {
-  isOpenPanel: PropTypes.bool.isRequired,
-  openCategoryPanel: PropTypes.func.isRequired,
+  isOpenPanel: PropTypes.bool.isRequired, // Ensures isOpenPanel is a boolean
+  openCategoryPanel: PropTypes.func.isRequired, // Ensures openCategoryPanel is a function
+  categoryData: PropTypes.array.isRequired, // Ensures categoryData is an array
 };
+
 
 export default CategoryPanel;

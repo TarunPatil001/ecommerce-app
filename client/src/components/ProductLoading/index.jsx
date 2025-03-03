@@ -1,4 +1,4 @@
-import React from 'react'
+import PropTypes from "prop-types";
 
 const ProductLoading = (props) => {
     return (
@@ -26,5 +26,9 @@ const ProductLoading = (props) => {
 
     )
 }
+
+ProductLoading.propTypes = {
+    size: PropTypes.number.isRequired, // Ensures size is a number
+};
 
 export default ProductLoading

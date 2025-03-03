@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
@@ -72,7 +72,7 @@ const ForgotPassword = () => {
             }
 
             // Login API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/user/reset-password", formFields),
                 {
                     loading: "Resetting Password... Please wait.",

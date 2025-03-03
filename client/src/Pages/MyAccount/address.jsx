@@ -1,18 +1,18 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import AccountSidebar from '../../components/AccountSidebar'
 import { MyContext } from '../../App';
 import { useNavigate } from 'react-router-dom';
-import { Checkbox, CircularProgress, Divider, FormControlLabel, FormLabel, Popover, Radio, RadioGroup } from '@mui/material';
+import { Checkbox, CircularProgress, Divider, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import toast from 'react-hot-toast';
 import { editData, fetchDataFromApi, postData } from '../../utils/api';
 import 'react-international-phone/style.css';
 import { FiEdit, FiPlus } from 'react-icons/fi';
-import { RiDeleteBin6Line, RiResetLeftFill } from 'react-icons/ri';
+import { RiResetLeftFill } from 'react-icons/ri';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import 'react-international-phone/style.css';
-import { MenuItem, Select, TextField, } from '@mui/material';
+import { TextField, } from '@mui/material';
 import { IoIosSave } from 'react-icons/io';
 import { MuiPhone } from '../../components/MuiPhone';
 import { TbDotsVertical } from 'react-icons/tb';
@@ -25,10 +25,9 @@ const Address = () => {
     const navigate = useNavigate();
 
     const formRef = useRef(); // Create ref to the form
-    const [anchorEl, setAnchorEl] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
+    const [setIsLoading2] = useState(false);
     // const [isLoading3, setIsLoading3] = useState(false);
     const [address, setAddress] = useState([]);
     const [isAddressType, setIsAddressType] = useState("");
@@ -461,7 +460,7 @@ const Address = () => {
 
         try {
             // Delete address API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/address/delete-address", {
                     userId: context?.userData?._id, // Replace with the actual userId
                     addressId: addressId, // Address ID to delete

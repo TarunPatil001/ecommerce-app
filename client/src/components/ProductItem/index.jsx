@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext, useEffect, useState } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -10,12 +10,10 @@ import { Checkbox, Tooltip } from "@mui/material";
 import ProductImageOpacityChange from "./ImageChanger/ProductImageOpacity";
 import { MyContext } from "../../App";
 import PropTypes from "prop-types";
-import { FiMinus, FiPlus } from "react-icons/fi";
-import { MdOutlineShoppingCart } from "react-icons/md";
-import { deleteData, editData, fetchDataFromApi, postData } from "../../utils/api";
+import { deleteData, postData } from "../../utils/api";
 import toast from "react-hot-toast";
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+// const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const ProductItem = (props) => {
 
@@ -237,6 +235,7 @@ ProductItem.propTypes = {
     rating: PropTypes.number,
     images: PropTypes.arrayOf(PropTypes.string),
   }),
+  fromWishlist: PropTypes.bool,
 };
 
 export default ProductItem;

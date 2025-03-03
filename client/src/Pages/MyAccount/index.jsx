@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button, CircularProgress, Divider, TextField } from '@mui/material'
 import AccountSidebar from '../../components/AccountSidebar'
 import { MyContext } from '../../App'
@@ -24,7 +24,7 @@ const MyAccount = () => {
     const [isShowPassword2, setIsShowPassword2] = useState(false);
     const [isShowPassword3, setIsShowPassword3] = useState(false);
     const [userId, setUserId] = useState("");
-    const [address, setAddress] = useState([]);
+    const [setAddress] = useState([]);
     const [phone, setPhone] = useState('')
     const [formFields, setFormFields] = useState({
         name: '',
@@ -159,7 +159,7 @@ const MyAccount = () => {
         try {
 
             // Login API call wrapped with toast.promise
-            const result = await toast.promise(
+            await toast.promise(
                 postData("/api/user/reset-password", changePassword, { withCredentials: true }),
                 {
                     loading: "Updating password... Please wait.",

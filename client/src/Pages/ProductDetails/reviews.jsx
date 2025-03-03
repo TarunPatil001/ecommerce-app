@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsPencilSquare } from "react-icons/bs";
 import { Button, CircularProgress, Rating, TextField } from "@mui/material";
 import { MyContext } from "../../App";
 import { fetchDataFromApi, postData } from "../../utils/api";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const Reviews = (props) => {
     const context = useContext(MyContext);
@@ -219,6 +220,12 @@ const Reviews = (props) => {
             )}
         </div>
     );
+};
+
+
+Reviews.propTypes = {
+    productId: PropTypes.string.isRequired, // Ensures productId is a string
+    setReviewsCount: PropTypes.func.isRequired, // Ensures setReviewsCount is a function
 };
 
 export default Reviews;

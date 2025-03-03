@@ -39,7 +39,16 @@ const AdsBannerSliderV2 = (props) => {
 AdsBannerSliderV2.propTypes = {
   items: PropTypes.number.isRequired,
   timedelay: PropTypes.number.isRequired,
-  height: PropTypes.number
-}
+  height: PropTypes.number,
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      alignInfo: PropTypes.string.isRequired,
+      images: PropTypes.arrayOf(PropTypes.string).isRequired,
+      bannerTitle: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+    })
+  ).isRequired, // Make sure 'data' is required and follows this structure
+};
+
 
 export default AdsBannerSliderV2;

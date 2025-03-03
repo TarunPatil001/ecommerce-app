@@ -1,4 +1,5 @@
-import React from 'react'
+// import React from 'react'
+import { PropTypes } from 'prop-types';
 
 const ProductLoadingGrid = (props) => {
     return (
@@ -53,5 +54,12 @@ const ProductLoadingGrid = (props) => {
         </>
     )
 }
+
+
+ProductLoadingGrid.propTypes = {
+    view: PropTypes.oneOf(['grid', 'list']).isRequired, // Ensures 'view' is either 'grid' or 'list'
+    size: PropTypes.number.isRequired, // Ensures 'size' is a number (the number of items to display)
+};
+
 
 export default ProductLoadingGrid
