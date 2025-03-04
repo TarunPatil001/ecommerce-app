@@ -1,7 +1,8 @@
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
-import fs from "fs";
+import fs from 'fs/promises';
 import BetaProductModel from "../models/betaProduct.model.js";
+import UserModel from "../models/user.model.js";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -13,39 +14,58 @@ cloudinary.config({
 
 // =========================================================================================================================
 
-// 🔹 Helper function (Private to this file)
-async function uploadImagesToCloudinary(files) {
+// 🔹 Helper function to upload images (Stores per User ID)
+async function uploadImagesToCloudinary(files, userId) {
   try {
-    if (!Array.isArray(files)) {
-      throw new Error("Invalid file format received");
+    if (!Array.isArray(files) || files.length === 0) {
+      throw new Error("Invalid or empty file array received");
     }
+    if (!userId) {
+      throw new Error("Missing userId. Cannot upload images.");
+    }
+
+    console.log("🚀 Uploading images to Cloudinary for user:", userId);
+    
+    // Use a separate folder for each user
+    const folderPath = `ecommerceApp/product_images/${userId}`;
 
     const uploadedImages = await Promise.all(
       files.map(async (file) => {
         try {
+          console.log(`📤 Uploading file: ${file.originalname} to ${folderPath}`);
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: "ecommerceApp/uploads",
+            folder: folderPath, 
             use_filename: true,
             unique_filename: false,
             overwrite: false,
           });
 
-          await fs.promises.unlink(file.path); // Delete the local file after upload
-          return result.secure_url; // Return uploaded image URL
+          console.log("✅ Upload successful:", result.secure_url);
+
+          // ✅ Ensure correct use of `fs.unlink` to avoid errors
+          await fs.unlink(file.path).catch((err) => {
+            console.error(`❌ Error deleting local file ${file.path}:`, err);
+          });
+
+          return result.secure_url;
         } catch (error) {
-          console.error("Cloudinary upload error:", error.message);
+          console.error(`❌ Cloudinary upload error for ${file.originalname}:`, error);
           return null; // Return null for failed uploads
         }
       })
     );
 
-    if (uploadedImages.every((img) => img === null)) {
+    // ✅ Filter out failed uploads before checking length
+    const validUploads = uploadedImages.filter((img) => img !== null);
+    console.log("✅ Successfully uploaded images:", validUploads);
+
+    if (validUploads.length === 0) {
       throw new Error("All image uploads failed");
     }
 
-    return uploadedImages.filter(Boolean); // Remove failed uploads
+    return validUploads;
   } catch (error) {
-    console.error("Image upload function error:", error.message);
+    console.error("❌ Image upload function error:", error);
     return [];
   }
 }
@@ -53,8 +73,21 @@ async function uploadImagesToCloudinary(files) {
 // 🔹 Controller function to create a product
 export async function createBetaProduct(req, res) {
   try {
-    const { name } = req.body;
+    console.log("📥 Incoming request:", req.body);
+    console.log("📂 Uploaded Files:", req.files);
+
+    const { name, userId } = req.body; // Get userId from request
     const images = req.files; // Array of images
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    // ✅ Check if user exists
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     if (!name) {
       return res.status(400).json({ error: "Product name is required" });
@@ -63,31 +96,34 @@ export async function createBetaProduct(req, res) {
       return res.status(400).json({ error: "At least one image is required" });
     }
 
-    const uploadedImageUrls = await uploadImagesToCloudinary(images);
+    // ✅ Upload images under the user's specific folder
+    const uploadedImageUrls = await uploadImagesToCloudinary(images, userId);
+
+    console.log("📸 Uploaded image URLs:", uploadedImageUrls); // ✅ Debugging log
 
     if (uploadedImageUrls.length === 0) {
-      return res.status(500).json({ error: "Image upload failed, try again" });
+      console.error("❌ No images were uploaded.");
+      return res.status(500).json({ error: "Image upload failed, check logs" });
     }
 
     const newProduct = new BetaProductModel({
       name: name.trim(),
       images: uploadedImageUrls,
+      userId, // Save user ID in product
     });
 
     const savedProduct = await newProduct.save();
 
     return res.status(201).json({
-      message: "Product created successfully",
+      success: true,
+      message: "✅ Product created successfully",
       product: savedProduct,
     });
   } catch (error) {
-    console.error("Error creating product:", error.message);
+    console.error("❌ Error creating product:", error);
     return res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }
-
-
-
 
 
 
