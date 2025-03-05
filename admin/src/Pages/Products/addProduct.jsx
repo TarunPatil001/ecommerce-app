@@ -114,7 +114,10 @@ const AddProduct = () => {
 
     const [previews, setPreviews] = useState([]);
     const [bannerPreviews, setBannerPreviews] = useState([]);
-    const [deletedImages, setDeletedImages] = useState([]);
+    // const [deletedImages, setDeletedImages] = useState([]);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [removedFiles, setRemovedFiles] = useState([]);
+    // const [previews, setPreviews] = useState([]);
 
     const [isBannerVisible, setIsBannerVisible] = useState(false);
 
@@ -148,11 +151,27 @@ const AddProduct = () => {
 
 
 
+    // useEffect(() => {
+    //     setFormFields((prev) => ({
+    //         ...prev,
+    //         images: previews, // Sync images with updated previews
+    //     }));
+    // }, [previews]);
+
+    // Reset removedFiles when the full-screen panel is closed
+    // Reset removed files when panel is closed
     useEffect(() => {
-        setFormFields((prev) => ({
-            ...prev,
-            images: previews, // Sync images with updated previews
-        }));
+        if (!context?.isOpenFullScreenPanel?.open) {
+            setRemovedFiles([]);
+            console.log("Removed files reset due to panel close.");
+        }
+    }, [context?.isOpenFullScreenPanel?.open]);
+
+    // Revoke object URL on cleanup for preview images
+    useEffect(() => {
+        return () => {
+            previews.forEach((url) => URL.revokeObjectURL(url));
+        };
     }, [previews]);
 
 
@@ -543,142 +562,182 @@ const AddProduct = () => {
         }));
     };
 
-    const setPreviewFun = (previewArr) => {
-        // Update the previews state to reflect the new image array
-        setPreviews(previewArr);
+    // const setPreviewFun = (previewArr) => {
+    //     // Update the previews state to reflect the new image array
+    //     setPreviews(previewArr);
 
-        // Update formFields.images state properly without direct mutation
-        setFormFields((prevFormFields) => ({
-            ...prevFormFields,
-            images: previewArr, // Assign the previewArr to images
-        }));
-    };
+    //     // Update formFields.images state properly without direct mutation
+    //     setFormFields((prevFormFields) => ({
+    //         ...prevFormFields,
+    //         images: previewArr, // Assign the previewArr to images
+    //     }));
+    // };
 
-    const setBannerImagesFun = (previewArr) => {
-        // Update the previews state to reflect the new image array
-        setBannerPreviews(previewArr);
+    // const setBannerImagesFun = (previewArr) => {
+    //     // Update the previews state to reflect the new image array
+    //     setBannerPreviews(previewArr);
 
-        // Update formFields.images state properly without direct mutation
-        setFormFields((prevFormFields) => ({
-            ...prevFormFields,
-            bannerImages: previewArr, // Assign the previewArr to images
-        }));
-    };
+    //     // Update formFields.images state properly without direct mutation
+    //     setFormFields((prevFormFields) => ({
+    //         ...prevFormFields,
+    //         bannerImages: previewArr, // Assign the previewArr to images
+    //     }));
+    // };
 
 
+    // Toggle banner visibility
     const handleToggle = async (event) => {
-        const newValue = event.target.checked; // Get the new toggle state
+        const newValue = event.target.checked;
         setIsBannerVisible(newValue);
-        setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
+        setFormFields({ ...formFields, isBannerVisible: newValue });
+    };
+
+    // Handle file selection
+    const handleFileChange = (e) => {
+        const files = e.target.files;
+        if (files) {
+            setUploadedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+
+            // Create file previews
+            const newPreviews = [...previews];
+            Array.from(files).forEach((file) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    newPreviews.push(reader.result);
+                    setPreviews([...newPreviews]); // Update preview images
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    };
+
+    // Remove selected file
+    const handleRemoveImage = (index) => {
+        setRemovedFiles((prev) => {
+            const updatedRemovedFiles = [...prev, uploadedFiles[index]];
+            console.log("Files removed:", updatedRemovedFiles);
+            return updatedRemovedFiles;
+        });
+
+        setPreviews((prev) => {
+            URL.revokeObjectURL(prev[index]);
+            return prev.filter((_, i) => i !== index);
+        });
+
+        setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
 
+    // Handle form submission
+const handleFormSubmit = async (e) => {
+    e.preventDefault();
 
+    // Basic form validation
+    if (!formFields.name.trim()) return context.openAlertBox("error", "Please enter product name");
+    if (!formFields.description.trim()) return context.openAlertBox("error", "Please enter description");
+    if (!formFields.brand.trim()) return context.openAlertBox("error", "Please enter brand");
+    if (!formFields.price) return context.openAlertBox("error", "Please enter price");
+    if (!formFields.oldPrice) return context.openAlertBox("error", "Please enter old price");
+    if (!formFields.discount) return context.openAlertBox("error", "Please enter discount");
+    if (!formFields.countInStock) return context.openAlertBox("error", "Please enter count in stock");
+    if (!formFields.seller?.sellerId) return context.openAlertBox("error", "Seller information is missing.");
+    if (!uploadedFiles || uploadedFiles.length === 0) return context.openAlertBox("error", "No images uploaded. Please attach product images.");
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
+    // Banner validation if enabled
+    if (formFields.isBannerVisible) {
+        if (!formFields.bannerTitleName.trim()) {
+            return context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+        }
+        if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
+            return context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
+        }
+    }
 
-        if (formFields.name === "") {
-            context.openAlertBox("error", "Please enter product name");
-            return;
-        }
-        if (formFields.description === "") {
-            context.openAlertBox("error", "Please enter description");
-            return;
-        }
-        if (formFields.brand === "") {
-            context.openAlertBox("error", "Please enter brand");
-            return;
-        }
-        if (formFields.price === "") {
-            context.openAlertBox("error", "Please enter price");
-            return;
-        }
-        if (formFields.oldPrice === "") {
-            context.openAlertBox("error", "Please enter oldPrice");
-            return;
-        }
-        if (formFields.discount === "") {
-            context.openAlertBox("error", "Please enter discount");
-            return;
-        }
-        if (formFields.countInStock === "") {
-            context.openAlertBox("error", "Please enter countInStock");
-            return;
-        }
-        if (productRams === "") {
-            context.openAlertBox("error", "Please enter productRams");
-            return;
-        }
-        if (productWeight === "") {
-            context.openAlertBox("error", "Please enter productWeight");
-            return;
-        }
-        if (productSize === "") {
-            context.openAlertBox("error", "Please enter productSize");
-            return;
-        }
-        if (formFields.images.length === 0) {
-            context.openAlertBox("error", "Please upload images");
-            return;
-        }
-        if (!formFields.seller || !formFields.seller.sellerId) {
-            context.openAlertBox("error", "Seller information is missing.");
-            return;
-        }
+    setIsLoading(true);
 
-        // ✅ Banner Validation
-        if (formFields.isBannerVisible) {
-            if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
-                context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
-                return;
+    try {
+        const formData = new FormData();
+
+        // Append images to FormData
+        appendImagesToFormData(formData, uploadedFiles);
+
+        // Append other form fields
+        Object.keys(formFields).forEach((key) => {
+            if (key !== "images" && key !== "seller") {
+                formData.append(key, formFields[key]);
             }
-            if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
-                context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
-                return;
+        });
+
+        // Append seller ID
+        const sellerId = formFields.seller?.sellerId || context?.userData?._id || "";
+        formData.append("sellerId", sellerId);
+
+        // Debug FormData entries
+        console.log("📂 FormData Debugging:");
+        for (let [key, value] of formData.entries()) {
+            if (Array.isArray(value)) {
+                // If value is an array (e.g., images array)
+                console.log(`🖼️ ${key}:`);
+                value.forEach((file, index) => {
+                    if (file instanceof File) {
+                        console.log(`  - Image ${index + 1}:`, file.name);
+                    } else {
+                        console.log(`  - Value ${index + 1}:`, file);
+                    }
+                });
+            } else if (value instanceof File) {
+                console.log(`📂 ${key}:`, value.name);
+            } else {
+                console.log(`📝 ${key}:`, value);
             }
         }
 
-        setIsLoading(true);
-
-        try {
-            // Ensure sellerId is correctly included in the request payload
-            const requestBody = {
-                ...formFields,
-                seller: formFields.seller.sellerId, // ✅ Send only sellerId, not the whole object
-            };
-
-            const result = await toast.promise(
-                postData(`/api/product/create-product`, requestBody), {
+        // Submit the request
+        const result = await toast.promise(
+            postData("/api/product/create-product", formData),
+            {
                 loading: "Adding product... Please wait.",
                 success: (res) => {
                     if (res?.success) {
                         context?.forceUpdate();
-                        
                         setTimeout(() => {
                             setIsLoading(false);
                             context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
                         }, 500);
-
                         return res.message || "Product added successfully!";
                     } else {
                         throw new Error(res?.message || "An unexpected error occurred.");
                     }
                 },
                 error: (err) => {
-                    const errorMessage = err?.response?.data?.message || err.message || "Failed to add product. Please try again.";
-                    return errorMessage;
+                    return err?.response?.data?.message || err.message || "Failed to add product. Please try again.";
                 },
-            });
+            }
+        );
 
-            console.log("Result:", result);
-        } catch (err) {
-            console.error("Error:", err);
-            toast.error(err?.message || "An unexpected error occurred.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        console.log("✅ Product Created Successfully:", result);
+    } catch (err) {
+        console.error("❌ Error:", err);
+        toast.error(err?.message || "An unexpected error occurred.");
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+// Append images to FormData
+const appendImagesToFormData = (formData, uploadedFiles) => {
+    if (uploadedFiles && Array.isArray(uploadedFiles)) {
+        uploadedFiles.forEach((file, index) => {
+            if (file instanceof File) {
+                console.log(`Appending image ${index + 1}:`, file.name); // Log image name
+                formData.append("images[]", file); // Append each file to FormData
+            } else {
+                console.log(`Invalid file type at index ${index}:`, file); // Log if something unexpected is found
+            }
+        });
+    }
+};
+
 
 
     const handleUpdate = async (e) => {
@@ -780,79 +839,79 @@ const AddProduct = () => {
 
 
     // Image Deletion Handling
-    const handleRemoveImage = async (image) => {
-        try {
-            if (!image) {
-                throw new Error("Invalid image.");
-            }
+    // const handleRemoveImage = async (image) => {
+    //     try {
+    //         if (!image) {
+    //             throw new Error("Invalid image.");
+    //         }
 
-            if (!productIdNo) {
-                // If productIdNo doesn't exist, remove only by image URL
-                console.log("Removing image without productIdNo:", image);
+    //         if (!productIdNo) {
+    //             // If productIdNo doesn't exist, remove only by image URL
+    //             console.log("Removing image without productIdNo:", image);
 
-                // Correct API request to delete image from Cloudinary
-                const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}`);
+    //             // Correct API request to delete image from Cloudinary
+    //             const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}`);
 
-                if (response?.success) {
-                    // Remove image from previews state
-                    const updatedImages = previews.filter((img) => img !== image); // Compare by URL
+    //             if (response?.success) {
+    //                 // Remove image from previews state
+    //                 const updatedImages = previews.filter((img) => img !== image); // Compare by URL
 
-                    // Log the updated images to verify
-                    console.log("Updated images after deletion:", updatedImages);
+    //                 // Log the updated images to verify
+    //                 console.log("Updated images after deletion:", updatedImages);
 
-                    // Update previews state
-                    setPreviews(updatedImages);
+    //                 // Update previews state
+    //                 setPreviews(updatedImages);
 
-                    // Update formFields state for images
-                    setFormFields((prevFields) => {
-                        const updatedFormFields = {
-                            ...prevFields,
-                            images: updatedImages, // Update the images array
-                        };
-                        console.log("Updated formFields after deletion:", updatedFormFields);
-                        return updatedFormFields;
-                    });
+    //                 // Update formFields state for images
+    //                 setFormFields((prevFields) => {
+    //                     const updatedFormFields = {
+    //                         ...prevFields,
+    //                         images: updatedImages, // Update the images array
+    //                     };
+    //                     console.log("Updated formFields after deletion:", updatedFormFields);
+    //                     return updatedFormFields;
+    //                 });
 
-                    toast.success("Image removed successfully.");
-                } else {
-                    throw new Error(response?.message || "Failed to remove image.");
-                }
-            } else {
-                // If productIdNo exists, need both imgUrl and productIdNo for the API request
-                console.log("Removing image with productIdNo:", image, "for product:", productIdNo);
+    //                 toast.success("Image removed successfully.");
+    //             } else {
+    //                 throw new Error(response?.message || "Failed to remove image.");
+    //             }
+    //         } else {
+    //             // If productIdNo exists, need both imgUrl and productIdNo for the API request
+    //             console.log("Removing image with productIdNo:", image, "for product:", productIdNo);
 
-                const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}&productId=${productIdNo}`);
+    //             const response = await deleteImages(`/api/product/delete-product-image?imgUrl=${image}&productId=${productIdNo}`);
 
-                if (response?.success) {
-                    // Remove image from previews state
-                    const updatedImages = previews.filter((img) => img !== image); // Compare by URL
+    //             if (response?.success) {
+    //                 // Remove image from previews state
+    //                 const updatedImages = previews.filter((img) => img !== image); // Compare by URL
 
-                    // Log the updated images to verify
-                    console.log("Updated images after deletion:", updatedImages);
+    //                 // Log the updated images to verify
+    //                 console.log("Updated images after deletion:", updatedImages);
 
-                    // Update previews state
-                    setPreviews(updatedImages);
+    //                 // Update previews state
+    //                 setPreviews(updatedImages);
 
-                    // Update formFields state for images
-                    setFormFields((prevFields) => {
-                        const updatedFormFields = {
-                            ...prevFields,
-                            images: updatedImages, // Update the images array
-                        };
-                        console.log("Updated formFields after deletion:", updatedFormFields);
-                        return updatedFormFields;
-                    });
+    //                 // Update formFields state for images
+    //                 setFormFields((prevFields) => {
+    //                     const updatedFormFields = {
+    //                         ...prevFields,
+    //                         images: updatedImages, // Update the images array
+    //                     };
+    //                     console.log("Updated formFields after deletion:", updatedFormFields);
+    //                     return updatedFormFields;
+    //                 });
 
-                    toast.success("Image removed successfully.");
-                } else {
-                    throw new Error(response?.message || "Failed to remove image.");
-                }
-            }
-        } catch (error) {
-            console.error("Error removing image:", error);
-            toast.error(error?.message || "An unexpected error occurred.");
-        }
-    };
+    //                 toast.success("Image removed successfully.");
+    //             } else {
+    //                 throw new Error(response?.message || "Failed to remove image.");
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error("Error removing image:", error);
+    //         toast.error(error?.message || "An unexpected error occurred.");
+    //     }
+    // };
 
 
     const handleRemoveBannerImage = async (image) => {
@@ -925,6 +984,7 @@ const AddProduct = () => {
 
     return (
         <section className='p-8 bg-gray-100'>
+
             <form action="#" ref={formRef} onSubmit={handleFormSubmit} className='form py-3'>
                 <h3 className='text-[24px] font-bold mb-2'>{productIdNo === undefined ? ("Create ") : ("Update ")}Product</h3>
                 <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Basic Information</h3>
@@ -1269,7 +1329,7 @@ const AddProduct = () => {
                             Choose a product photo or simply drag and drop
                         </span>
 
-                        {previews?.length > 0 &&
+                        {/* {previews?.length > 0 &&
                             previews.map((image, index) => (
                                 <div
                                     className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
@@ -1293,10 +1353,10 @@ const AddProduct = () => {
                                         )}
                                     </div>
                                 </div>
-                            ))}
+                            ))} */}
 
                         {/* Upload Box */}
-                        <div className={previews?.length > 0 ? "col-span-1" : "col-span-8"}>
+                        {/* <div className={previews?.length > 0 ? "col-span-1" : "col-span-8"}>
                             <UploadBox
                                 multiple={true}
                                 productId={productIdNo}
@@ -1312,7 +1372,46 @@ const AddProduct = () => {
                                 setPreviewFun={setPreviewFun}
                                 isBanner={false} // For product images
                             />
+                        </div> */}
+
+                        {uploadedFiles.map((file, index) => (
+                            <div
+                                key={file.name}
+                                className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative"
+                            >
+                                <span
+                                    className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                    onClick={() => handleRemoveImage(index)}
+                                >
+                                    <IoClose className="text-[15px] text-red-600" />
+                                </span>
+                                <div className="w-full h-[100px]">
+                                    <img
+                                        src={previews[index]}
+                                        alt={`uploaded-${index}`}
+                                        className="w-full h-full object-cover rounded-md"
+                                    />
+                                </div>
+                                <p className="text-[14px] text-center mt-2 line-clamp-1 overflow-hidden">
+                                    {file.name}
+                                </p>
+                            </div>
+                        ))}
+
+                        {/* Upload Box */}
+                        <div className={uploadedFiles.length > 0 ? "" : "col-span-8"}>
+                            <UploadBox multiple={true} onFileChange={handleFileChange} />
                         </div>
+
+                        {/* File Status */}
+                        <p className="text-sm mt-2 text-gray-600 col-span-full">
+                            {uploadedFiles.length > 0
+                                ? `Files uploaded: ${uploadedFiles.length}`
+                                : "No files uploaded yet."}
+                        </p>
+
+
+
                     </div>
                 </div>
 
@@ -1383,7 +1482,7 @@ const AddProduct = () => {
 
                                 {/* Upload Box */}
                                 <div className={bannerPreviews?.length > 0 ? "col-span-1" : "col-span-8"}>
-                                    <UploadBox
+                                    {/* <UploadBox
                                         multiple={true}
                                         productId={productIdNo}
                                         existingImages={bannerPreviews}
@@ -1397,7 +1496,7 @@ const AddProduct = () => {
                                         url={"/api/product/upload-banner-images"}
                                         setPreviewFun={setBannerImagesFun}
                                         isBanner={true} // For product images
-                                    />
+                                    /> */}
                                 </div>
                             </div>
                         </div>

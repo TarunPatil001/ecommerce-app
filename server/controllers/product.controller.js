@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+import fs from 'fs/promises';
 import ProductModel from "../models/product.model.js";
 import { mongoose } from 'mongoose';
 import ProductRamsModel from "../models/productRams.model.js";
@@ -20,168 +20,394 @@ cloudinary.config({
 // Product
 
 
-var imagesArr = {}; // Store images per product ID, replace with database storage in production
+// var imagesArr = {}; // Store images per product ID, replace with database storage in production
 
-// Helper function to check if image exists in Cloudinary
-async function checkImageExists(imageUrl) {
+// // Helper function to check if image exists in Cloudinary
+// async function checkImageExists(imageUrl) {
+//   try {
+//     const response = await axios.head(imageUrl); // HEAD request to check image existence
+//     return response.status === 200; // If status is 200, image exists
+//   } catch (error) {
+//     return false; // If request fails, image doesn't exist
+//   }
+// }
+
+// // Upload product images
+// export async function uploadProductImages(request, response) {
+//   try {
+//     const { productId } = request.body;
+//     const images = request.files;
+
+//     console.log("Received productId:", productId);
+//     console.log("Uploaded files:", images);
+
+//     if (!images || images.length === 0) {
+//       return response.status(400).json({ error: "No images provided" });
+//     }
+
+//     // Initialize imagesArr per product ID (replace with a database in production)
+//     if (!productId) {
+//       if (!Array.isArray(imagesArr["new"])) imagesArr["new"] = []; // Ensure it's an array
+//     } else {
+//       if (!Array.isArray(imagesArr[productId])) imagesArr[productId] = []; // Ensure it's an array
+//     }
+
+//     // Upload images and update imagesArr after successful upload
+//     const uploadedImages = await Promise.all(
+//       images.map(async (file) => {
+//         try {
+//           const result = await cloudinary.uploader.upload(file.path, {
+//             folder: "ecommerceApp/uploads",
+//             use_filename: true,
+//             unique_filename: false,
+//             overwrite: false,
+//           });
+
+//           console.log("Uploaded image URL:", result.secure_url);
+
+//           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
+//           return result.secure_url; // Return uploaded image URL
+//         } catch (error) {
+//           console.log("Cloudinary upload error:", error);
+//           return null; // Return null in case of an error
+//         }
+//       })
+//     );
+
+//     // Filter out null values (failed uploads)
+//     const validImages = uploadedImages.filter(Boolean);
+//     console.log("Valid uploaded images:", validImages);
+
+//     // Update imagesArr after all uploads are completed
+//     if (productId) {
+//       imagesArr[productId].push(...validImages);
+//     } else {
+//       imagesArr["new"].push(...validImages);
+//     }
+
+//     // Debugging: Check imagesArr before returning response
+//     console.log("Updated imagesArr:", imagesArr);
+
+//     return response.status(200).json({
+//       images: productId ? imagesArr[productId] : imagesArr["new"],
+//     });
+
+//   } catch (error) {
+//     console.log("Server Error:", error);
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       status: false,
+//     });
+//   }
+// }
+
+// var bannerImagesArr = {}; // Ensure structure consistency
+
+// // Upload product banner images
+// export async function uploadProductBannerImages(request, response) {
+//   try {
+//     const { productId } = request.body;
+//     const bannerImages = request.files;
+
+//     console.log("Received productId:", productId);
+//     console.log("Uploaded files:", bannerImages);
+
+//     if (!bannerImages || bannerImages.length === 0) {
+//       return response.status(400).json({ error: "No banner images provided" });
+//     }
+
+//     // Ensure bannerImagesArr is properly initialized as an object containing arrays
+//     if (!productId) {
+//       if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = [];
+//     } else {
+//       if (!Array.isArray(bannerImagesArr[productId])) bannerImagesArr[productId] = [];
+//     }
+
+//     // Upload banner images and update bannerImagesArr after successful upload
+//     const uploadedImages = await Promise.all(
+//       bannerImages.map(async (file) => {
+//         try {
+//           const result = await cloudinary.uploader.upload(file.path, {
+//             folder: "ecommerceApp/uploads",
+//             use_filename: true,
+//             unique_filename: false,
+//             overwrite: false,
+//           });
+
+//           console.log("Uploaded image URL:", result.secure_url);
+
+//           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
+//           return result.secure_url; // Return uploaded image URL
+//         } catch (error) {
+//           console.log("Cloudinary upload error:", error);
+//           return null; // Return null in case of an error
+//         }
+//       })
+//     );
+
+//     // Filter out null values (failed uploads)
+//     const validImages = uploadedImages.filter(Boolean);
+//     console.log("Valid uploaded banner images:", validImages);
+
+//     // Append images to array
+//     if (productId) {
+//       bannerImagesArr[productId].push(...validImages);
+//     } else {
+//       bannerImagesArr["new"].push(...validImages);
+//     }
+
+//     // Debugging: Check bannerImagesArr before returning response
+//     console.log("Updated bannerImagesArr:", bannerImagesArr);
+
+//     return response.status(200).json({
+//       bannerImages: productId ? bannerImagesArr[productId] : bannerImagesArr["new"],
+//     });
+
+//   } catch (error) {
+//     console.log("Server Error:", error);
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       status: false,
+//     });
+//   }
+// }
+/**
+ * ✅ Upload images to Cloudinary
+ */
+// 🔹 Helper function to upload images (Stores per User ID)
+async function uploadImagesToCloudinary(files) {
   try {
-    const response = await axios.head(imageUrl); // HEAD request to check image existence
-    return response.status === 200; // If status is 200, image exists
-  } catch (error) {
-    return false; // If request fails, image doesn't exist
-  }
-}
-
-// Upload product images
-export async function uploadProductImages(request, response) {
-  try {
-    const { productId } = request.body;
-    const images = request.files;
-
-    console.log("Received productId:", productId);
-    console.log("Uploaded files:", images);
-
-    if (!images || images.length === 0) {
-      return response.status(400).json({ error: "No images provided" });
+    if (!Array.isArray(files) || files.length === 0) {
+      throw new Error("Invalid or empty file array received");
     }
 
-    // Initialize imagesArr per product ID (replace with a database in production)
-    if (!productId) {
-      if (!Array.isArray(imagesArr["new"])) imagesArr["new"] = []; // Ensure it's an array
-    } else {
-      if (!Array.isArray(imagesArr[productId])) imagesArr[productId] = []; // Ensure it's an array
-    }
+    console.log("🚀 Uploading images to Cloudinary");
 
-    // Upload images and update imagesArr after successful upload
+    // Use a common folder for all product images
+    const folderPath = `ecommerceApp/product_images`;
+
     const uploadedImages = await Promise.all(
-      images.map(async (file) => {
+      files.map(async (file) => {
         try {
+          console.log(`📤 Uploading file: ${file.originalname} to ${folderPath}`);
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: "ecommerceApp/uploads",
+            folder: folderPath, 
             use_filename: true,
             unique_filename: false,
             overwrite: false,
           });
 
-          console.log("Uploaded image URL:", result.secure_url);
+          console.log("✅ Upload successful:", result.secure_url);
 
-          fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
-          return result.secure_url; // Return uploaded image URL
-        } catch (error) {
-          console.log("Cloudinary upload error:", error);
-          return null; // Return null in case of an error
-        }
-      })
-    );
-
-    // Filter out null values (failed uploads)
-    const validImages = uploadedImages.filter(Boolean);
-    console.log("Valid uploaded images:", validImages);
-
-    // Update imagesArr after all uploads are completed
-    if (productId) {
-      imagesArr[productId].push(...validImages);
-    } else {
-      imagesArr["new"].push(...validImages);
-    }
-
-    // Debugging: Check imagesArr before returning response
-    console.log("Updated imagesArr:", imagesArr);
-
-    return response.status(200).json({
-      images: productId ? imagesArr[productId] : imagesArr["new"],
-    });
-
-  } catch (error) {
-    console.log("Server Error:", error);
-    return response.status(500).json({
-      message: error.message || error,
-      error: true,
-      status: false,
-    });
-  }
-}
-
-var bannerImagesArr = {}; // Ensure structure consistency
-
-// Upload product banner images
-export async function uploadProductBannerImages(request, response) {
-  try {
-    const { productId } = request.body;
-    const bannerImages = request.files;
-
-    console.log("Received productId:", productId);
-    console.log("Uploaded files:", bannerImages);
-
-    if (!bannerImages || bannerImages.length === 0) {
-      return response.status(400).json({ error: "No banner images provided" });
-    }
-
-    // Ensure bannerImagesArr is properly initialized as an object containing arrays
-    if (!productId) {
-      if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = [];
-    } else {
-      if (!Array.isArray(bannerImagesArr[productId])) bannerImagesArr[productId] = [];
-    }
-
-    // Upload banner images and update bannerImagesArr after successful upload
-    const uploadedImages = await Promise.all(
-      bannerImages.map(async (file) => {
-        try {
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: "ecommerceApp/uploads",
-            use_filename: true,
-            unique_filename: false,
-            overwrite: false,
+          // ✅ Ensure correct use of `fs.unlink` to avoid errors
+          await fs.unlink(file.path).catch((err) => {
+            console.error(`❌ Error deleting local file ${file.path}:`, err);
           });
 
-          console.log("Uploaded image URL:", result.secure_url);
-
-          fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
-          return result.secure_url; // Return uploaded image URL
+          return result.secure_url;
         } catch (error) {
-          console.log("Cloudinary upload error:", error);
-          return null; // Return null in case of an error
+          console.error(`❌ Cloudinary upload error for ${file.originalname}:`, error);
+          return null; // Return null for failed uploads
         }
       })
     );
 
-    // Filter out null values (failed uploads)
-    const validImages = uploadedImages.filter(Boolean);
-    console.log("Valid uploaded banner images:", validImages);
+    // ✅ Filter out failed uploads before checking length
+    const validUploads = uploadedImages.filter((img) => img !== null);
+    console.log("✅ Successfully uploaded images:", validUploads);
 
-    // Append images to array
-    if (productId) {
-      bannerImagesArr[productId].push(...validImages);
-    } else {
-      bannerImagesArr["new"].push(...validImages);
+    if (validUploads.length === 0) {
+      throw new Error("All image uploads failed");
     }
 
-    // Debugging: Check bannerImagesArr before returning response
-    console.log("Updated bannerImagesArr:", bannerImagesArr);
-
-    return response.status(200).json({
-      bannerImages: productId ? bannerImagesArr[productId] : bannerImagesArr["new"],
-    });
-
+    return validUploads;
   } catch (error) {
-    console.log("Server Error:", error);
-    return response.status(500).json({
-      message: error.message || error,
-      error: true,
-      status: false,
-    });
+    console.error("❌ Image upload function error:", error);
+    return [];
   }
 }
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
 
 // Create Product  
+// export async function createProduct(request, response) {
+//   try {
+
+//     const {
+//       name,
+//       description,
+//       isBannerVisible,
+//       bannerTitleName,
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//       seller,
+//     } = request.body;
+
+//     // Check if required fields are present
+//     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Missing required fields. Please provide all necessary product details.",
+//       });
+//     }
+
+//     console.log("Received sellerId:", seller); // 🔍 Debugging Log
+
+//     // ✅ Validate sellerId
+//     if (!seller || !mongoose.Types.ObjectId.isValid(seller)) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Invalid or missing seller ID.",
+//       });
+//     }
+
+//     const sellerData = await UserModel.findById(seller).select("sellerName role").lean();
+
+//     if (!sellerData) {
+//       return response.status(404).json({
+//         error: true,
+//         success: false,
+//         message: "Seller not found.",
+//       });
+//     }
+
+//     // ✅ Ensure ADMIN has a sellerName before adding products
+//     if (sellerData.role === "ADMIN" && (!sellerData.sellerName || sellerData.sellerName.trim() === "")) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Admins must set a seller name before adding products.",
+//       });
+//     }
+
+//     console.log("Seller found:", sellerData.sellerName);
+
+
+//     // Validate and fetch product images
+//     const productId =
+//       request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
+//         ? new mongoose.Types.ObjectId(request.body.productId)
+//         : null;
+
+//     const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
+
+//     if (!Array.isArray(imagesForProduct) || imagesForProduct.length === 0) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Images array is missing or empty.",
+//       });
+//     }
+
+//     let bannerImagesForProduct = [];
+
+//     if (isBannerVisible) {
+//       if (!bannerTitleName || !Array.isArray(request.body.bannerImages) || request.body.bannerImages.length === 0) {
+//         return response.status(400).json({
+//           error: true,
+//           success: false,
+//           message: "Banner is enabled, but bannerTitleName or bannerImages are missing.",
+//         });
+//       }
+//       bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
+//     }
+
+//     // Create new product object
+//     let product = new ProductModel({
+//       name,
+//       description,
+//       images: [...imagesForProduct],
+//       isBannerVisible,
+//       bannerImages: [...bannerImagesForProduct],
+//       bannerTitleName: isBannerVisible ? bannerTitleName : "",
+//       brand,
+//       price,
+//       oldPrice,
+//       categoryName,
+//       categoryId,
+//       subCategoryName,
+//       subCategoryId,
+//       thirdSubCategoryName,
+//       thirdSubCategoryId,
+//       category,
+//       countInStock,
+//       rating,
+//       isFeatured,
+//       discount,
+//       productRam,
+//       size,
+//       productWeight,
+//       seller: {
+//         sellerId: seller, // ✅ Store sellerId inside object
+//         sellerName: sellerData.sellerName, // ✅ Store sellerName from DB
+//       },
+//     });
+
+//     // Save the product to the database
+//     product = await product.save();
+
+//     if (!product) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Product creation failed",
+//       });
+//     }
+
+//     // Clear images array after product creation to avoid conflicts with subsequent uploads
+//     if (productId) {
+//       imagesArr[productId] = new Set();
+//       bannerImagesArr[productId] = new Set();
+//     } else {
+//       imagesArr["new"] = new Set();
+//       bannerImagesArr["new"] = new Set();
+//     }
+
+//     return response.status(200).json({
+//       message: "Product created successfully.",
+//       success: true,
+//       error: false,
+//       data: {
+//         ...product._doc,
+//         sellerName: seller.sellerName || "Unknown Seller",  // Ensure sellerName is included in response
+//       },
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || "Internal Server Error",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
+
+
+/**
+ * ✅ Create Product Function
+ */
 export async function createProduct(request, response) {
   try {
-
     const {
       name,
       description,
@@ -190,36 +416,28 @@ export async function createProduct(request, response) {
       brand,
       price,
       oldPrice,
-      categoryName,
       categoryId,
-      subCategoryName,
       subCategoryId,
-      thirdSubCategoryName,
-      thirdSubCategoryId,
-      category,
-      countInStock,
-      rating,
-      isFeatured,
       discount,
+      countInStock,
       productRam,
       size,
       productWeight,
-      seller,
+      sellerId,
     } = request.body;
 
-    // Check if required fields are present
+    console.log("📂 Received Files:", request.files);
+    console.log("📦 Request Body:", request.body);
+
     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
       return response.status(400).json({
         error: true,
         success: false,
-        message: "Missing required fields. Please provide all necessary product details.",
+        message: "Missing required fields.",
       });
     }
 
-    console.log("Received sellerId:", seller); // 🔍 Debugging Log
-
-    // ✅ Validate sellerId
-    if (!seller || !mongoose.Types.ObjectId.isValid(seller)) {
+    if (!sellerId || !mongoose.Types.ObjectId.isValid(sellerId)) {
       return response.status(400).json({
         error: true,
         success: false,
@@ -227,8 +445,7 @@ export async function createProduct(request, response) {
       });
     }
 
-    const sellerData = await UserModel.findById(seller).select("sellerName role").lean();
-
+    const sellerData = await UserModel.findById(sellerId).select("sellerName role").lean();
     if (!sellerData) {
       return response.status(404).json({
         error: true,
@@ -237,106 +454,49 @@ export async function createProduct(request, response) {
       });
     }
 
-    // ✅ Ensure ADMIN has a sellerName before adding products
-    if (sellerData.role === "ADMIN" && (!sellerData.sellerName || sellerData.sellerName.trim() === "")) {
+    if (!request.files || request.files.length === 0) {
       return response.status(400).json({
         error: true,
         success: false,
-        message: "Admins must set a seller name before adding products.",
+        message: "No images uploaded. Please attach product images.",
       });
     }
 
-    console.log("Seller found:", sellerData.sellerName);
+    const imagesForProduct = await uploadImagesToCloudinary(request.files);
 
-
-    // Validate and fetch product images
-    const productId =
-      request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
-        ? new mongoose.Types.ObjectId(request.body.productId)
-        : null;
-
-    const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
-
-    if (!Array.isArray(imagesForProduct) || imagesForProduct.length === 0) {
+    if (imagesForProduct.length === 0) {
       return response.status(400).json({
         error: true,
         success: false,
-        message: "Images array is missing or empty.",
+        message: "Image upload failed.",
       });
     }
 
-    let bannerImagesForProduct = [];
-
-    if (isBannerVisible) {
-      if (!bannerTitleName || !Array.isArray(request.body.bannerImages) || request.body.bannerImages.length === 0) {
-        return response.status(400).json({
-          error: true,
-          success: false,
-          message: "Banner is enabled, but bannerTitleName or bannerImages are missing.",
-        });
-      }
-      bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
-    }
-
-    // Create new product object
     let product = new ProductModel({
       name,
       description,
-      images: [...imagesForProduct],
+      images: imagesForProduct,
       isBannerVisible,
-      bannerImages: [...bannerImagesForProduct],
       bannerTitleName: isBannerVisible ? bannerTitleName : "",
       brand,
       price,
       oldPrice,
-      categoryName,
       categoryId,
-      subCategoryName,
       subCategoryId,
-      thirdSubCategoryName,
-      thirdSubCategoryId,
-      category,
-      countInStock,
-      rating,
-      isFeatured,
       discount,
+      countInStock,
       productRam,
       size,
       productWeight,
-      seller: {
-        sellerId: seller, // ✅ Store sellerId inside object
-        sellerName: sellerData.sellerName, // ✅ Store sellerName from DB
-      },
+      seller: { sellerId, sellerName: sellerData.sellerName },
     });
 
-    // Save the product to the database
     product = await product.save();
-
-    if (!product) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "Product creation failed",
-      });
-    }
-
-    // Clear images array after product creation to avoid conflicts with subsequent uploads
-    if (productId) {
-      imagesArr[productId] = new Set();
-      bannerImagesArr[productId] = new Set();
-    } else {
-      imagesArr["new"] = new Set();
-      bannerImagesArr["new"] = new Set();
-    }
 
     return response.status(200).json({
       message: "Product created successfully.",
       success: true,
-      error: false,
-      data: {
-        ...product._doc,
-        sellerName: seller.sellerName || "Unknown Seller",  // Ensure sellerName is included in response
-      },
+      data: { ...product._doc, sellerName: sellerData.sellerName || "Unknown Seller" },
     });
   } catch (error) {
     return response.status(500).json({

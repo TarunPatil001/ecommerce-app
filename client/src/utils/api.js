@@ -92,18 +92,33 @@ const getAuthHeader = () => ({
 /** POST Request */
 export const postData = async (url, formData) => {
   try {
-    const response = await axios.post(apiUrl + url, formData, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
-    });
+    // Check if formData is valid
+    if (!formData) {
+      throw new Error("Form data is required.");
+    }
+
+    // Determine if the payload includes files (e.g., images)
+    const isMultipart = formData instanceof FormData;
+
+    // Set headers dynamically
+    const headers = {
+      ...getAuthHeader(),
+      ...(isMultipart ? {} : { "Content-Type": "application/json" }), // Set JSON content type if no files
+    };
+
+    // Send the request
+    const response = await axios.post(apiUrl + url, formData, { headers });
+
     return response.data; // Return response data
   } catch (error) {
     console.error("Error in postData:", error);
-    return error.response ? error.response.data : { message: error.message, error: true };
+
+    return error.response
+      ? error.response.data
+      : { message: error.message, error: true };
   }
 };
+// --------------------------------------------------------------------------------------------------------------------------
 
 /** GET Request */
 export const fetchDataFromApi = async (url) => {
