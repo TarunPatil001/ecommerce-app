@@ -185,7 +185,7 @@ async function uploadImagesToCloudinary(files) {
 
     console.log("🚀 Uploading images to Cloudinary");
 
-    // Use a common folder for all product images
+    // Use a general folder for all uploads (you can customize it as needed)
     const folderPath = `ecommerceApp/product_images`;
 
     const uploadedImages = await Promise.all(
@@ -193,7 +193,7 @@ async function uploadImagesToCloudinary(files) {
         try {
           console.log(`📤 Uploading file: ${file.originalname} to ${folderPath}`);
           const result = await cloudinary.uploader.upload(file.path, {
-            folder: folderPath, 
+            folder: folderPath,
             use_filename: true,
             unique_filename: false,
             overwrite: false,
@@ -228,6 +228,7 @@ async function uploadImagesToCloudinary(files) {
     return [];
   }
 }
+
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -406,8 +407,11 @@ async function uploadImagesToCloudinary(files) {
 /**
  * ✅ Create Product Function
  */
-export async function createProduct(request, response) {
+export async function createProduct(req, res) {
   try {
+    console.log("📥 Incoming request:", req.body);
+    console.log("📂 Uploaded Files:", req.files);
+
     const {
       name,
       description,
@@ -416,90 +420,136 @@ export async function createProduct(request, response) {
       brand,
       price,
       oldPrice,
+      categoryName,
       categoryId,
+      subCategoryName,
       subCategoryId,
-      discount,
+      thirdSubCategoryName,
+      thirdSubCategoryId,
+      category,
       countInStock,
+      rating,
+      isFeatured,
+      discount,
       productRam,
       size,
       productWeight,
-      sellerId,
-    } = request.body;
+      seller,
+    } = req.body;
 
-    console.log("📂 Received Files:", request.files);
-    console.log("📦 Request Body:", request.body);
-
+    // ✅ Validate required fields
     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
-      return response.status(400).json({
+      return res.status(400).json({
         error: true,
         success: false,
-        message: "Missing required fields.",
+        message: "Missing required fields. Please provide all necessary product details.",
       });
     }
 
-    if (!sellerId || !mongoose.Types.ObjectId.isValid(sellerId)) {
-      return response.status(400).json({
+    console.log("🛒 Received sellerId:", seller);
+
+    // ✅ Validate sellerId
+    if (!seller || !mongoose.Types.ObjectId.isValid(seller)) {
+      return res.status(400).json({
         error: true,
         success: false,
         message: "Invalid or missing seller ID.",
       });
     }
 
-    const sellerData = await UserModel.findById(sellerId).select("sellerName role").lean();
+    // ✅ Fetch seller details from DB
+    const sellerData = await UserModel.findById(seller).select("sellerName").lean();
     if (!sellerData) {
-      return response.status(404).json({
+      return res.status(404).json({
         error: true,
         success: false,
         message: "Seller not found.",
       });
     }
 
-    if (!request.files || request.files.length === 0) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "No images uploaded. Please attach product images.",
-      });
+    console.log("✅ Seller found:", sellerData.sellerName);
+
+    // ✅ Separate product images and banner images
+    const images = req.files;  // Use uploaded product images
+    const bannerImages = req.files; // Use uploaded banner images
+
+    if (!images.length) {
+      return res.status(400).json({ error: "At least one product image is required." });
     }
 
-    const imagesForProduct = await uploadImagesToCloudinary(request.files);
+    // ✅ Upload images to Cloudinary
+    const uploadedImageUrls = await uploadImagesToCloudinary(images);
+    console.log("📸 Uploaded product image URLs:", uploadedImageUrls);
 
-    if (imagesForProduct.length === 0) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "Image upload failed.",
-      });
+    if (!uploadedImageUrls.length) {
+      return res.status(500).json({ error: "Product image upload failed." });
     }
 
+    let uploadedBannerImageUrls = [];
+
+    if (isBannerVisible === "true" && bannerImages.length > 0) {
+      uploadedBannerImageUrls = await uploadImagesToCloudinary(bannerImages);
+      console.log("📸 Uploaded banner image URLs:", uploadedBannerImageUrls);
+
+      if (!uploadedBannerImageUrls.length) {
+        return res.status(500).json({ error: "Banner image upload failed." });
+      }
+    }
+
+    // ✅ Create new product object
     let product = new ProductModel({
       name,
       description,
-      images: imagesForProduct,
+      images: uploadedImageUrls,
       isBannerVisible,
-      bannerTitleName: isBannerVisible ? bannerTitleName : "",
+      bannerImages: uploadedBannerImageUrls,
+      bannerTitleName: isBannerVisible === "true" ? bannerTitleName : "",
       brand,
       price,
       oldPrice,
+      categoryName,
       categoryId,
+      subCategoryName,
       subCategoryId,
-      discount,
+      thirdSubCategoryName,
+      thirdSubCategoryId,
+      category,
       countInStock,
+      rating,
+      isFeatured,
+      discount,
       productRam,
       size,
       productWeight,
-      seller: { sellerId, sellerName: sellerData.sellerName },
+      seller: {
+        sellerId: seller,
+        sellerName: sellerData.sellerName,
+      },
     });
 
+    // ✅ Save the product to the database
     product = await product.save();
 
-    return response.status(200).json({
-      message: "Product created successfully.",
+    if (!product) {
+      return res.status(400).json({
+        error: true,
+        success: false,
+        message: "Product creation failed.",
+      });
+    }
+
+    return res.status(201).json({
+      message: "✅ Product created successfully.",
       success: true,
-      data: { ...product._doc, sellerName: sellerData.sellerName || "Unknown Seller" },
+      error: false,
+      data: {
+        ...product._doc,
+        sellerName: sellerData.sellerName || "Unknown Seller",
+      },
     });
   } catch (error) {
-    return response.status(500).json({
+    console.error("❌ Error creating product:", error);
+    return res.status(500).json({
       message: error.message || "Internal Server Error",
       error: true,
       success: false,

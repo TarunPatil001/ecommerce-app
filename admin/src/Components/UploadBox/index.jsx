@@ -174,7 +174,7 @@ import { useState } from "react";
 import { CircularProgress } from "@mui/material";
 import PropTypes from "prop-types";
 
-const UploadBox = ({ multiple, onFileChange, name }) => {
+const UploadBox = ({ multiple, onFileChange }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -187,7 +187,8 @@ const UploadBox = ({ multiple, onFileChange, name }) => {
         multiple: multiple ?? false,
         onDrop: (acceptedFiles) => {
             if (acceptedFiles.length > 0) {
-                onFileChange({ target: { files: acceptedFiles } });
+                // Pass only the files, no wrapping in { target: { files: ... } }
+                onFileChange(acceptedFiles);
             }
         },
     });
@@ -195,7 +196,7 @@ const UploadBox = ({ multiple, onFileChange, name }) => {
     return (
         <div
             {...getRootProps()}
-            className={`uploadBoxBeta p-3 rounded-md overflow-hidden border-2 border-dashed 
+            className={`uploadBox p-3 rounded-md overflow-hidden border-2 border-dashed 
             ${isDragActive ? "border-blue-500" : "border-gray-300"} 
             hover:border-blue-300 h-[150px] bg-white cursor-pointer hover:bg-gray-100 transition-all 
             flex flex-col items-center justify-center relative`}
@@ -219,9 +220,8 @@ const UploadBox = ({ multiple, onFileChange, name }) => {
                         className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-50"
                         type="file"
                         accept="image/*"
-                        name={name}
                         multiple={multiple}
-                        onChange={onFileChange}
+                        onChange={(e) => onFileChange(e.target.files)} // Pass directly the files array
                     />
                 </>
             )}
@@ -232,7 +232,6 @@ const UploadBox = ({ multiple, onFileChange, name }) => {
 UploadBox.propTypes = {
     multiple: PropTypes.bool,
     onFileChange: PropTypes.func.isRequired,
-    name: PropTypes.string,
 };
 
 export default UploadBox;

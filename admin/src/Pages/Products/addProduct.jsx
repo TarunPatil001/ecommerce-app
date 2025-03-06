@@ -112,12 +112,21 @@ const AddProduct = () => {
     const [productRating, setProductRating] = useState(0);
     const [productIdNo, setProductIdNo] = useState(undefined);
 
-    const [previews, setPreviews] = useState([]);
-    const [bannerPreviews, setBannerPreviews] = useState([]);
-    // const [deletedImages, setDeletedImages] = useState([]);
-    const [uploadedFiles, setUploadedFiles] = useState([]);
-    const [removedFiles, setRemovedFiles] = useState([]);
-    // const [previews, setPreviews] = useState([]);
+
+    // Consolidated states for product and banner files
+    const [productFiles, setProductFiles] = useState({
+        uploadedFiles: [],
+        previews: [],
+        removedFiles: []
+    });
+
+    const [bannerFiles, setBannerFiles] = useState({
+        uploadedFiles: [],
+        previews: [],
+        removedFiles: []
+    });
+
+
 
     const [isBannerVisible, setIsBannerVisible] = useState(false);
 
@@ -145,8 +154,10 @@ const AddProduct = () => {
         productRam: [],
         size: [],
         productWeight: [],
-        sellerId: context?.userData?._id,  // ✅ Ensure sellerId is set
-        sellerName: context?.userData?.sellerName,
+        seller: {
+            sellerId: context?.userData?._id, // Ensure seller ID exists
+            sellerName: context?.userData?.sellerName, // Ensure sellerName is available
+        },
     });
 
 
@@ -160,19 +171,19 @@ const AddProduct = () => {
 
     // Reset removedFiles when the full-screen panel is closed
     // Reset removed files when panel is closed
-    useEffect(() => {
-        if (!context?.isOpenFullScreenPanel?.open) {
-            setRemovedFiles([]);
-            console.log("Removed files reset due to panel close.");
-        }
-    }, [context?.isOpenFullScreenPanel?.open]);
+    // useEffect(() => {
+    //     if (!context?.isOpenFullScreenPanel?.open) {
+    //         setRemovedFiles([]);
+    //         console.log("Removed files reset due to panel close.");
+    //     }
+    // }, [context?.isOpenFullScreenPanel?.open]);
 
-    // Revoke object URL on cleanup for preview images
-    useEffect(() => {
-        return () => {
-            previews.forEach((url) => URL.revokeObjectURL(url));
-        };
-    }, [previews]);
+    // // Revoke object URL on cleanup for preview images
+    // useEffect(() => {
+    //     return () => {
+    //         previews.forEach((url) => URL.revokeObjectURL(url));
+    //     };
+    // }, [previews]);
 
 
 
@@ -183,9 +194,17 @@ const AddProduct = () => {
 
         if (!productId) {
             setProductIdNo(undefined);
-            setPreviews([]);
+            setProductFiles({
+                uploadedFiles: [],
+                previews: [],
+                removedFiles: []
+            });
             setIsBannerVisible(false);
-            setBannerPreviews([]);
+            setBannerFiles({
+                uploadedFiles: [],
+                previews: [],
+                removedFiles: []
+            });
             setProductRams([]);
             setProductSize([]);
             setProductWeight([]);
@@ -220,7 +239,6 @@ const AddProduct = () => {
                     sellerId: context?.userData?._id, // Ensure seller ID exists
                     sellerName: context?.userData?.sellerName, // Ensure sellerName is available
                 },
-
             });
 
             setProductCategory("");
@@ -240,11 +258,18 @@ const AddProduct = () => {
 
                     if (response.success && response.data) {
                         const product = response.data;
-                        // console.log("Response Data:", product);
 
-                        setPreviews(product?.images || []);
+                        setProductFiles({
+                            uploadedFiles: product?.images || [],
+                            previews: product?.images || [],
+                            removedFiles: []
+                        });
                         setIsBannerVisible(product?.isBannerVisible || false);
-                        setBannerPreviews(product?.bannerImages || []);
+                        setBannerFiles({
+                            uploadedFiles: product?.bannerImages || [],
+                            previews: product?.bannerImages || [],
+                            removedFiles: []
+                        });
                         setProductRams(product?.productRam || []);
                         setProductSize(product?.size || []);
                         setProductWeight(product?.productWeight || []);
@@ -294,7 +319,6 @@ const AddProduct = () => {
                         const selectedSubCategory = selectedCategory?.children?.find(cat => cat._id === product?.subCategoryId);
                         setFilteredSubCategories(selectedSubCategory?.children || []);
 
-                        // console.log("Populated form fields:", product);
                     } else {
                         console.error("Category data not found or response unsuccessful.");
                     }
@@ -585,158 +609,220 @@ const AddProduct = () => {
     // };
 
 
+
+
+    // Effect to reset removed files when panel closes
+    useEffect(() => {
+        if (context?.isOpenFullScreenPanel?.open === false) {
+            setProductFiles((prev) => ({
+                ...prev,
+                removedFiles: []
+            }));
+            setBannerFiles((prev) => ({
+                ...prev,
+                removedFiles: []
+            }));
+        }
+    }, [context?.isOpenFullScreenPanel?.open]);
+
+
+    // Cleanup image previews when the component unmounts or images change
+    useEffect(() => {
+        return () => {
+            productFiles.previews.forEach((url) => URL.revokeObjectURL(url));
+            bannerFiles.previews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [productFiles.previews, bannerFiles.previews]);
+
+
+    // Handle file selection for product images
+    const handleProductFileChange = (newFiles) => {
+        // Ensure newFiles is an array
+        const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+        // Filter out duplicate files (check by name & size)
+        const filteredFiles = filesArray.filter((newFile) => {
+            return !productFiles.uploadedFiles.some(
+                (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+            );
+        });
+
+        if (filteredFiles.length === 0) {
+            toast.error("Oops! File already exists."); // Optional alert
+            return;
+        }
+
+        setProductFiles((prev) => ({
+            ...prev,
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+        }));
+
+        // Generate previews for new files
+        filteredFiles.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProductFiles((prev) => ({
+                    ...prev,
+                    previews: [...prev.previews, reader.result], // Append preview
+                }));
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+
+    const handleRemoveImage = (index) => {
+        const updatedFiles = [...productFiles.uploadedFiles];
+        updatedFiles.splice(index, 1);
+
+        const updatedPreviews = [...productFiles.previews];
+        updatedPreviews.splice(index, 1);
+
+        setProductFiles({
+            ...productFiles,
+            uploadedFiles: updatedFiles,
+            previews: updatedPreviews,
+        });
+    };
+
+
     // Toggle banner visibility
     const handleToggle = async (event) => {
-        const newValue = event.target.checked;
+        const newValue = event.target.checked; // Get the new toggle state
         setIsBannerVisible(newValue);
-        setFormFields({ ...formFields, isBannerVisible: newValue });
+        setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
     };
 
-    // Handle file selection
-    const handleFileChange = (e) => {
-        const files = e.target.files;
-        if (files) {
-            setUploadedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
 
-            // Create file previews
-            const newPreviews = [...previews];
-            Array.from(files).forEach((file) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    newPreviews.push(reader.result);
-                    setPreviews([...newPreviews]); // Update preview images
-                };
-                reader.readAsDataURL(file);
-            });
+    // Handle file selection for banner images
+    const handleBannerFileChange = (newFiles) => {
+        // Ensure newFiles is an array
+        const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+        // Filter out duplicate files (check by name & size)
+        const filteredFiles = filesArray.filter((newFile) => {
+            return !bannerFiles.uploadedFiles.some(
+                (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+            );
+        });
+
+        if (filteredFiles.length === 0) {
+            alert("Oops! File already exists."); // Optional alert
+            return;
         }
+
+        setBannerFiles((prev) => ({
+            ...prev,
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+        }));
+
+        // Generate previews for new files
+        filteredFiles.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setBannerFiles((prev) => ({
+                    ...prev,
+                    previews: [...prev.previews, reader.result], // Append preview
+                }));
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
-    // Remove selected file
-    const handleRemoveImage = (index) => {
-        setRemovedFiles((prev) => {
-            const updatedRemovedFiles = [...prev, uploadedFiles[index]];
-            console.log("Files removed:", updatedRemovedFiles);
-            return updatedRemovedFiles;
-        });
 
-        setPreviews((prev) => {
-            URL.revokeObjectURL(prev[index]);
-            return prev.filter((_, i) => i !== index);
-        });
+    const handleRemoveBannerImage = (index) => {
+        const updatedFiles = [...bannerFiles.uploadedFiles];
+        updatedFiles.splice(index, 1);
 
-        setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+        const updatedPreviews = [...bannerFiles.previews];
+        updatedPreviews.splice(index, 1);
+
+        setBannerFiles({
+            ...bannerFiles,
+            uploadedFiles: updatedFiles,
+            previews: updatedPreviews,
+        });
     };
 
 
     // Handle form submission
-const handleFormSubmit = async (e) => {
-    e.preventDefault();
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
 
-    // Basic form validation
-    if (!formFields.name.trim()) return context.openAlertBox("error", "Please enter product name");
-    if (!formFields.description.trim()) return context.openAlertBox("error", "Please enter description");
-    if (!formFields.brand.trim()) return context.openAlertBox("error", "Please enter brand");
-    if (!formFields.price) return context.openAlertBox("error", "Please enter price");
-    if (!formFields.oldPrice) return context.openAlertBox("error", "Please enter old price");
-    if (!formFields.discount) return context.openAlertBox("error", "Please enter discount");
-    if (!formFields.countInStock) return context.openAlertBox("error", "Please enter count in stock");
-    if (!formFields.seller?.sellerId) return context.openAlertBox("error", "Seller information is missing.");
-    if (!uploadedFiles || uploadedFiles.length === 0) return context.openAlertBox("error", "No images uploaded. Please attach product images.");
+        // Basic form validation
+        if (!formFields.name.trim()) return toast.error("Please enter product name.");
+        if (!formFields.description.trim()) return toast.error("Please enter description.");
+        if (!formFields.brand.trim()) return toast.error("Please enter brand.");
+        if (!formFields.price) return toast.error("Please enter price.");
+        if (!formFields.oldPrice) return toast.error("Please enter old price.");
+        if (!formFields.discount) return toast.error("Please enter discount.");
+        if (!formFields.countInStock) return toast.error("Please enter count in stock.");
+        if (!formFields.seller?.sellerId) return toast.error("Seller information is missing.");
+        if (productFiles.uploadedFiles.length === 0) return toast.error("Please upload at least one product image.");
 
-    // Banner validation if enabled
-    if (formFields.isBannerVisible) {
-        if (!formFields.bannerTitleName.trim()) {
-            return context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+        // Banner validation if banner is visible
+        if (formFields.isBannerVisible && bannerFiles.uploadedFiles.length === 0) {
+            return toast.error("Please upload at least one banner image.");
         }
-        if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
-            return context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
-        }
-    }
 
-    setIsLoading(true);
+        setIsLoading(true);
 
-    try {
-        const formData = new FormData();
+        try {
+            const formData = new FormData();
 
-        // Append images to FormData
-        appendImagesToFormData(formData, uploadedFiles);
+            // ✅ Append text fields
+            Object.keys(formFields).forEach((key) => {
+                if (key !== "images" && key !== "bannerImages" && key !== "seller") {
+                    formData.append(key, formFields[key]);
+                }
+            });
 
-        // Append other form fields
-        Object.keys(formFields).forEach((key) => {
-            if (key !== "images" && key !== "seller") {
-                formData.append(key, formFields[key]);
-            }
-        });
+            // ✅ Append sellerId separately as a string
+            const sellerId = String(formFields.seller?.sellerId || context?.userData?._id);
+            formData.append("seller", sellerId);
 
-        // Append seller ID
-        const sellerId = formFields.seller?.sellerId || context?.userData?._id || "";
-        formData.append("sellerId", sellerId);
+            // ✅ Append product images
+            productFiles.uploadedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
 
-        // Debug FormData entries
-        console.log("📂 FormData Debugging:");
-        for (let [key, value] of formData.entries()) {
-            if (Array.isArray(value)) {
-                // If value is an array (e.g., images array)
-                console.log(`🖼️ ${key}:`);
-                value.forEach((file, index) => {
-                    if (file instanceof File) {
-                        console.log(`  - Image ${index + 1}:`, file.name);
-                    } else {
-                        console.log(`  - Value ${index + 1}:`, file);
-                    }
+            // ✅ Append banner images only if banner is visible
+            if (formFields.isBannerVisible) {
+                bannerFiles.uploadedFiles.forEach((file) => {
+                    formData.append("bannerImages", file);
                 });
-            } else if (value instanceof File) {
-                console.log(`📂 ${key}:`, value.name);
-            } else {
-                console.log(`📝 ${key}:`, value);
             }
+
+            // ✅ Debugging: Log FormData before sending the request
+            for (let pair of formData.entries()) {
+                console.log(`${pair[0]}:`, pair[1]);
+            }
+
+
+            // ✅ Submit the request
+            await toast.promise(
+                postData("/api/product/create-product", formData),
+                {
+                    loading: "Adding product...",
+                    success: (res) => {
+                        if (res?.success) {
+                            toast.success("Product added successfully!");
+                        } else {
+                            throw new Error(res?.message || "Error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        toast.error(err?.message || "Failed to add product.");
+                    },
+                }
+            );
+        } catch (err) {
+            toast.error(err?.message || "An error occurred.");
+        } finally {
+            setIsLoading(false);
         }
+    };
 
-        // Submit the request
-        const result = await toast.promise(
-            postData("/api/product/create-product", formData),
-            {
-                loading: "Adding product... Please wait.",
-                success: (res) => {
-                    if (res?.success) {
-                        context?.forceUpdate();
-                        setTimeout(() => {
-                            setIsLoading(false);
-                            context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
-                        }, 500);
-                        return res.message || "Product added successfully!";
-                    } else {
-                        throw new Error(res?.message || "An unexpected error occurred.");
-                    }
-                },
-                error: (err) => {
-                    return err?.response?.data?.message || err.message || "Failed to add product. Please try again.";
-                },
-            }
-        );
-
-        console.log("✅ Product Created Successfully:", result);
-    } catch (err) {
-        console.error("❌ Error:", err);
-        toast.error(err?.message || "An unexpected error occurred.");
-    } finally {
-        setIsLoading(false);
-    }
-};
-
-// Append images to FormData
-const appendImagesToFormData = (formData, uploadedFiles) => {
-    if (uploadedFiles && Array.isArray(uploadedFiles)) {
-        uploadedFiles.forEach((file, index) => {
-            if (file instanceof File) {
-                console.log(`Appending image ${index + 1}:`, file.name); // Log image name
-                formData.append("images[]", file); // Append each file to FormData
-            } else {
-                console.log(`Invalid file type at index ${index}:`, file); // Log if something unexpected is found
-            }
-        });
-    }
-};
 
 
 
@@ -914,56 +1000,56 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
     // };
 
 
-    const handleRemoveBannerImage = async (image) => {
-        try {
-            if (!image) throw new Error("Invalid image.");
+    // const handleRemoveBannerImage = async (image) => {
+    //     try {
+    //         if (!image) throw new Error("Invalid image.");
 
-            console.log("Attempting to remove banner image:", image, "for productId:", productIdNo || "No productId");
+    //         console.log("Attempting to remove banner image:", image, "for productId:", productIdNo || "No productId");
 
-            // Check if the image is NEWLY uploaded but not saved in the backend
-            const isNewImage = !formFields.bannerImages?.includes(image); // Image is not in backend
+    //         // Check if the image is NEWLY uploaded but not saved in the backend
+    //         const isNewImage = !formFields.bannerImages?.includes(image); // Image is not in backend
 
-            if (isNewImage) {
-                // Just remove it from the frontend state, no need to call the backend
-                console.log("Removing unsaved image from state:", image);
-                setBannerPreviews((prev) => prev.filter((img) => img !== image));
+    //         if (isNewImage) {
+    //             // Just remove it from the frontend state, no need to call the backend
+    //             console.log("Removing unsaved image from state:", image);
+    //             setBannerPreviews((prev) => prev.filter((img) => img !== image));
 
-                // Also update formFields state
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
-                }));
+    //             // Also update formFields state
+    //             setFormFields((prevFields) => ({
+    //                 ...prevFields,
+    //                 bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
+    //             }));
 
-                toast.success("Unsaved banner image removed.");
-                return;
-            }
+    //             toast.success("Unsaved banner image removed.");
+    //             return;
+    //         }
 
-            // If the image exists in the backend, delete it from the server
-            let apiUrl = `/api/product/delete-banner-image?imgUrl=${encodeURIComponent(image)}`;
-            if (productIdNo) {
-                apiUrl += `&productId=${productIdNo}`;
-            }
+    //         // If the image exists in the backend, delete it from the server
+    //         let apiUrl = `/api/product/delete-banner-image?imgUrl=${encodeURIComponent(image)}`;
+    //         if (productIdNo) {
+    //             apiUrl += `&productId=${productIdNo}`;
+    //         }
 
-            const response = await deleteImages(apiUrl);
+    //         const response = await deleteImages(apiUrl);
 
-            if (response?.success) {
-                // Update state after deletion
-                setBannerPreviews((prev) => prev.filter((img) => img !== image));
+    //         if (response?.success) {
+    //             // Update state after deletion
+    //             setBannerPreviews((prev) => prev.filter((img) => img !== image));
 
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
-                }));
+    //             setFormFields((prevFields) => ({
+    //                 ...prevFields,
+    //                 bannerImages: prevFields.bannerImages?.filter((img) => img !== image) || [],
+    //             }));
 
-                toast.success("Banner image removed successfully.");
-            } else {
-                throw new Error(response?.error || "Failed to remove banner image.");
-            }
-        } catch (error) {
-            console.error("Error removing banner image:", error);
-            toast.error(error.message || "An unexpected error occurred.");
-        }
-    };
+    //             toast.success("Banner image removed successfully.");
+    //         } else {
+    //             throw new Error(response?.error || "Failed to remove banner image.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error removing banner image:", error);
+    //         toast.error(error.message || "An unexpected error occurred.");
+    //     }
+    // };
 
 
 
@@ -1329,52 +1415,7 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
                             Choose a product photo or simply drag and drop
                         </span>
 
-                        {/* {previews?.length > 0 &&
-                            previews.map((image, index) => (
-                                <div
-                                    className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
-                                    key={index}
-                                >
-                                    <span
-                                        className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                        onClick={() => handleRemoveImage(image, index)}
-                                    >
-                                        <IoClose className="text-[15px] text-red-600 bg" />
-                                    </span>
-                                    <div className="w-full h-full">
-                                        {isLoading2 ? (
-                                            <CircularProgress color="inherit" />
-                                        ) : (
-                                            <img
-                                                src={productIdNo === undefined ? image : formFields.images[index]}
-                                                alt="Product Image"
-                                                className="w-full h-full object-cover rounded-md"
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            ))} */}
-
-                        {/* Upload Box */}
-                        {/* <div className={previews?.length > 0 ? "col-span-1" : "col-span-8"}>
-                            <UploadBox
-                                multiple={true}
-                                productId={productIdNo}
-                                existingImages={previews}
-                                onDrop={(acceptedFiles) => {
-                                    const previewUrls = acceptedFiles.map((file) =>
-                                        URL.createObjectURL(file)
-                                    );
-                                    setPreviewFun([...previews, ...previewUrls]); // ✅ Append new images
-                                }}
-                                name="images"
-                                url={"/api/product/upload-product-images"}
-                                setPreviewFun={setPreviewFun}
-                                isBanner={false} // For product images
-                            />
-                        </div> */}
-
-                        {uploadedFiles.map((file, index) => (
+                        {productFiles.uploadedFiles.map((file, index) => (
                             <div
                                 key={file.name}
                                 className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative"
@@ -1387,7 +1428,7 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
                                 </span>
                                 <div className="w-full h-[100px]">
                                     <img
-                                        src={previews[index]}
+                                        src={productFiles.previews[index]}
                                         alt={`uploaded-${index}`}
                                         className="w-full h-full object-cover rounded-md"
                                     />
@@ -1398,42 +1439,46 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
                             </div>
                         ))}
 
+
                         {/* Upload Box */}
-                        <div className={uploadedFiles.length > 0 ? "" : "col-span-8"}>
-                            <UploadBox multiple={true} onFileChange={handleFileChange} />
+                        <div className={productFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
+                            <UploadBox
+                                multiple={true}
+                                onFileChange={handleProductFileChange}
+                            />
                         </div>
 
                         {/* File Status */}
                         <p className="text-sm mt-2 text-gray-600 col-span-full">
-                            {uploadedFiles.length > 0
-                                ? `Files uploaded: ${uploadedFiles.length}`
+                            {productFiles.uploadedFiles.length > 0
+                                ? `Files uploaded: ${productFiles.uploadedFiles.length}`
                                 : "No files uploaded yet."}
                         </p>
-
-
-
                     </div>
                 </div>
+
 
                 {/* BANNER IMAGES */}
                 <div className="col w-full px-0">
                     <div className="flex items-center gap-4 mb-2">
                         <h3 className="text-[18px] font-bold">Product Banner</h3>
+                        {/* <FormControlLabel
+                            control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
+                            label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
+                        /> */}
+
                         <FormControlLabel
                             control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
                             label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
                         />
-
                     </div>
 
-                    {
-                        isBannerVisible &&
+                    {isBannerVisible && (
                         <div className="flex flex-col">
+                            {/* Banner Title Input */}
                             <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
                                 <div className="col col-span-full mt-3">
-                                    <h3 className="text-[14px] font-medium mb-1 text-gray-700">
-                                        Banner Name
-                                    </h3>
+                                    <h3 className="text-[14px] font-medium mb-1 text-gray-700">Banner Name</h3>
                                     <input
                                         type="text"
                                         className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
@@ -1445,33 +1490,30 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
                                 </div>
                             </div>
 
+                            {/* Banner File Upload */}
                             <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
                                 <span className="opacity-50 col-span-full text-[14px]">
                                     Choose a banner photo or simply drag and drop
                                 </span>
 
-                                {bannerPreviews?.length > 0 &&
-                                    bannerPreviews.map((image, index) => (
+                                {bannerFiles.uploadedFiles.length > 0 &&
+                                    bannerFiles.uploadedFiles.map((image, index) => (
                                         <div
                                             className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
                                             key={index}
                                         >
                                             <span
                                                 className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                                onClick={() => handleRemoveBannerImage(image, index)}
+                                                onClick={() => handleRemoveBannerImage(index)} // Pass index directly to remove
                                             >
-                                                <IoClose className="text-[15px] text-red-600 bg" />
+                                                <IoClose className="text-[15px] text-red-600" />
                                             </span>
                                             <div className="w-full h-full">
                                                 {isLoading3 ? (
                                                     <CircularProgress color="inherit" />
                                                 ) : (
                                                     <img
-                                                        src={
-                                                            productIdNo === undefined
-                                                                ? image
-                                                                : formFields.bannerImages[index]
-                                                        }
+                                                        src={bannerFiles.previews[index]}
                                                         alt="Banner Image"
                                                         className="w-full h-full object-cover rounded-md"
                                                     />
@@ -1481,27 +1523,25 @@ const appendImagesToFormData = (formData, uploadedFiles) => {
                                     ))}
 
                                 {/* Upload Box */}
-                                <div className={bannerPreviews?.length > 0 ? "col-span-1" : "col-span-8"}>
-                                    {/* <UploadBox
+                                <div className={bannerFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
+                                    <UploadBox
                                         multiple={true}
-                                        productId={productIdNo}
-                                        existingImages={bannerPreviews}
-                                        onDrop={(acceptedFiles) => {
-                                            const previewUrls = acceptedFiles.map((file) =>
-                                                URL.createObjectURL(file)
-                                            );
-                                            setBannerImagesFun([...bannerPreviews, ...previewUrls]); // ✅ Append new images
-                                        }}
-                                        name="bannerImages"
-                                        url={"/api/product/upload-banner-images"}
-                                        setPreviewFun={setBannerImagesFun}
-                                        isBanner={true} // For product images
-                                    /> */}
+                                        onFileChange={handleBannerFileChange} // Pass the banner file handler
+                                    />
                                 </div>
+
+                                {/* File Status */}
+                                <p className="text-sm mt-2 text-gray-600 col-span-full">
+                                    {bannerFiles.uploadedFiles.length > 0
+                                        ? `Files uploaded: ${bannerFiles.uploadedFiles.length}`
+                                        : "No files uploaded yet."}
+                                </p>
                             </div>
                         </div>
-                    }
+                    )}
                 </div>
+
+
 
 
                 <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>

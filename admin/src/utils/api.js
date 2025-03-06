@@ -90,20 +90,53 @@ const getAuthHeader = () => ({
 });
 
 /** POST Request */
+// export const postData = async (url, formData) => {
+//   try {
+//     const response = await axios.post(apiUrl + url, formData, {
+//       headers: {
+//         ...getAuthHeader(),
+//         "Content-Type": "application/json",
+//       },
+//     });
+//     return response.data; // Return response data
+//   } catch (error) {
+//     console.error("Error in postData:", error);
+//     return error.response ? error.response.data : { message: error.message, error: true };
+//   }
+// };
+
 export const postData = async (url, formData) => {
   try {
-    const response = await axios.post(apiUrl + url, formData, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
-    });
-    return response.data; // Return response data
+    if (!formData) {
+      throw new Error("Form data is required.");
+    }
+
+    // Check if formData contains files (FormData instance)
+    const isMultipart = formData instanceof FormData;
+
+    // Set headers dynamically
+    const headers = {
+      ...getAuthHeader(),
+      ...(isMultipart ? {} : { "Content-Type": "application/json" }),
+    };
+
+    // Make the POST request
+    const response = await axios.post(`${apiUrl}${url}`, formData, { headers });
+
+    return response.data; // Return response data on success
   } catch (error) {
     console.error("Error in postData:", error);
-    return error.response ? error.response.data : { message: error.message, error: true };
+
+    // Handle network errors or backend response errors
+    return {
+      success: false,
+      message: error.response?.data?.message || "An error occurred",
+      error: true,
+    };
   }
 };
+
+
 
 /** GET Request */
 export const fetchDataFromApi = async (url) => {

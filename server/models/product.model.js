@@ -16,6 +16,11 @@ const productSchema = mongoose.Schema(
         required: true,
       }
     ],
+    // images: {
+    //   type: [String], // Ensures an array of strings
+    //   required: true,
+    //   validate: [(val) => val.length > 0, "At least one image is required"],
+    // },
     brand: {
       type: String,
       default: "",
