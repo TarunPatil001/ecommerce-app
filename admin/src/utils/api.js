@@ -203,21 +203,38 @@ export const deleteImages = async (url, image) => {
   }
 };
 
+
 /** Edit Data (PUT) */
 export const editData = async (url, updatedData) => {
   try {
-    const response = await axios.put(apiUrl + url, updatedData, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",  
-      },
-    });
-    return response.data; // Return response data
+    if (!updatedData) {
+      throw new Error("Updated data is required.");
+    }
+
+    // Check if updatedData is a FormData instance
+    const isMultipart = updatedData instanceof FormData;
+
+    // Set headers dynamically
+    const headers = {
+      ...getAuthHeader(),
+      ...(isMultipart ? {} : { "Content-Type": "application/json" }),
+    };
+
+    // Make the PUT request
+    const response = await axios.put(`${apiUrl}${url}`, updatedData, { headers });
+
+    return response.data; // Return response data on success
   } catch (error) {
     console.error("Error editing data:", error);
-    return error.response ? error.response.data : { message: error.message, error: true };
+
+    return {
+      success: false,
+      message: error.response?.data?.message || "An error occurred while updating data",
+      error: true,
+    };
   }
 };
+
 
 /** Delete Data (DELETE) */
 export const deleteData = async (url) => {

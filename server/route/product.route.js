@@ -24,7 +24,8 @@ productRouter.delete("/delete-product-image", auth, removeImageProductFromCloudi
 productRouter.delete("/delete-banner-image", auth, removeImageBannerFromCloudinary);
 
 // Create a new product
-productRouter.post("/create-product", auth, upload.array("images"), createProduct);
+productRouter.post("/create-product", auth, upload.fields([{ name: "images" }, { name: "bannerImages" }]), createProduct);
+// productRouter.post("/create-product", auth, upload.array("images"), createProduct);
 // productRouter.post("/create-product", auth, createProduct);
 
 // Get all products
@@ -76,7 +77,8 @@ productRouter.post("/delete-multiple-products", auth,  deleteMultipleProduct);
 productRouter.get("/:id", getProduct);
 
 // update product
-productRouter.put("/updateProduct/:id", auth, updateProduct);
+productRouter.put("/updateProduct/:id", auth, upload.fields([{ name: "newProductImages" }, { name: "newBannerImages" }]), updateProduct);
+// productRouter.put("/updateProduct/:id", auth, updateProduct);
  
 // delete All UnWanted Images
 productRouter.post("/deleteAllUnWantedImages", auth, deleteAllUnWantedImages);

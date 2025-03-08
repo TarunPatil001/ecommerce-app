@@ -11,6 +11,7 @@ import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/
 import { RiResetLeftFill } from 'react-icons/ri';
 import { IoIosSave } from 'react-icons/io';
 import { FiEdit } from 'react-icons/fi';
+import { motion, AnimatePresence } from "framer-motion";
 
 
 const ITEM_HEIGHT = 48;
@@ -161,32 +162,6 @@ const AddProduct = () => {
     });
 
 
-
-    // useEffect(() => {
-    //     setFormFields((prev) => ({
-    //         ...prev,
-    //         images: previews, // Sync images with updated previews
-    //     }));
-    // }, [previews]);
-
-    // Reset removedFiles when the full-screen panel is closed
-    // Reset removed files when panel is closed
-    // useEffect(() => {
-    //     if (!context?.isOpenFullScreenPanel?.open) {
-    //         setRemovedFiles([]);
-    //         console.log("Removed files reset due to panel close.");
-    //     }
-    // }, [context?.isOpenFullScreenPanel?.open]);
-
-    // // Revoke object URL on cleanup for preview images
-    // useEffect(() => {
-    //     return () => {
-    //         previews.forEach((url) => URL.revokeObjectURL(url));
-    //     };
-    // }, [previews]);
-
-
-
     useEffect(() => {
         const { productId, productName } = context.isOpenFullScreenPanel || {};
         console.log("AddNewProductPage - Seller ID:", context?.userData?._id);
@@ -249,6 +224,86 @@ const AddProduct = () => {
             return;
         }
 
+        // if (productId && productName) {
+        //     setProductIdNo(productId);
+
+        //     const fetchProductData = async () => {
+        //         try {
+        //             const response = await fetchDataFromApi(`/api/product/${productId}`, { withCredentials: true });
+
+        //             if (response.success && response.data) {
+        //                 const product = response.data;
+
+        //                 setProductFiles({
+        //                     uploadedFiles: product?.images || [],
+        //                     previews: product?.images || [],
+        //                     removedFiles: []
+        //                 });
+        //                 setIsBannerVisible(product?.isBannerVisible || false);
+        //                 setBannerFiles({
+        //                     uploadedFiles: product?.bannerImages || [],
+        //                     previews: product?.bannerImages || [],
+        //                     removedFiles: []
+        //                 });
+        //                 setProductRams(product?.productRam || []);
+        //                 setProductSize(product?.size || []);
+        //                 setProductWeight(product?.productWeight || []);
+        //                 setIsFeatured(product?.isFeatured || false);
+        //                 setProductRating(product?.rating || 0);
+
+        //                 setFormFields((prev) => ({
+        //                     ...prev,
+        //                     name: product?.name || "",
+        //                     description: product?.description || "",
+        //                     images: product?.images || [],
+        //                     isBannerVisible: product?.isBannerVisible || false,
+        //                     bannerImages: product?.bannerImages || [],
+        //                     bannerTitleName: product?.bannerTitleName || "",
+        //                     brand: product?.brand || "",
+        //                     price: product?.price || "",
+        //                     oldPrice: product?.oldPrice || "",
+        //                     categoryName: product?.categoryName || "",
+        //                     categoryId: product?.categoryId || "",
+        //                     subCategoryName: product?.subCategoryName || "",
+        //                     subCategoryId: product?.subCategoryId || "",
+        //                     thirdSubCategoryName: product?.thirdSubCategoryName || "",
+        //                     thirdSubCategoryId: product?.thirdSubCategoryId || "",
+        //                     category: product?.category || "",
+        //                     countInStock: product?.countInStock || "",
+        //                     rating: product?.rating || 0,
+        //                     isFeatured: product?.isFeatured || false,
+        //                     discount: product?.discount || "",
+        //                     productRam: product?.productRam || [],
+        //                     size: product?.size || [],
+        //                     productWeight: product?.productWeight || [],
+        //                     seller: {
+        //                         sellerId: product?.seller?._id || context?.userData?._id || null,
+        //                         sellerName: product?.seller?.sellerName || context?.userData?.sellerName || "Unknown Seller",
+        //                     },
+        //                 }));
+
+        //                 // Automatically populate categories
+        //                 setProductCategory(product?.categoryId || "");
+        //                 setProductCategory2(product?.subCategoryId || "");
+        //                 setProductCategory3(product?.thirdSubCategoryId || "");
+
+        //                 // Set filtered categories based on existing selections
+        //                 const selectedCategory = context?.catData?.find(cat => cat._id === product?.categoryId);
+        //                 setFilteredCategories(selectedCategory?.children || []);
+
+        //                 const selectedSubCategory = selectedCategory?.children?.find(cat => cat._id === product?.subCategoryId);
+        //                 setFilteredSubCategories(selectedSubCategory?.children || []);
+
+        //             } else {
+        //                 console.error("Category data not found or response unsuccessful.");
+        //             }
+        //         } catch (error) {
+        //             console.error("Error fetching category:", error);
+        //         }
+        //     };
+
+        //     fetchProductData();
+        // }
         if (productId && productName) {
             setProductIdNo(productId);
 
@@ -318,7 +373,6 @@ const AddProduct = () => {
 
                         const selectedSubCategory = selectedCategory?.children?.find(cat => cat._id === product?.subCategoryId);
                         setFilteredSubCategories(selectedSubCategory?.children || []);
-
                     } else {
                         console.error("Category data not found or response unsuccessful.");
                     }
@@ -331,14 +385,6 @@ const AddProduct = () => {
         }
     }, [context, context.isOpenFullScreenPanel, setProductIdNo]);
 
-
-    // const onChangeInput = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormFields((formFields) => ({
-    //         ...formFields,
-    //         [name]: value,
-    //     }));
-    // };
 
     const onChangeInput = (e) => {
         const { name, value } = e.target;
@@ -636,9 +682,79 @@ const AddProduct = () => {
 
 
     // Handle file selection for product images
+    // const handleProductFileChange = (newFiles) => {
+    //     // Ensure newFiles is an array
+    //     const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+    //     // Filter out duplicate files (check by name & size)
+    //     const filteredFiles = filesArray.filter((newFile) => {
+    //         return !productFiles.uploadedFiles.some(
+    //             (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+    //         );
+    //     });
+
+    //     if (filteredFiles.length === 0) {
+    //         toast.error("Oops! File already exists."); // Optional alert
+    //         return;
+    //     }
+
+    //     setProductFiles((prev) => ({
+    //         ...prev,
+    //         uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+    //     }));
+
+    //     // Generate previews for new files
+    //     filteredFiles.forEach((file) => {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             setProductFiles((prev) => ({
+    //                 ...prev,
+    //                 previews: [...prev.previews, reader.result], // Append preview
+    //             }));
+    //         };
+    //         reader.readAsDataURL(file);
+    //     });
+    // };
+
+    // const handleRemoveImage = (index) => {
+    //     const updatedFiles = [...productFiles.uploadedFiles];
+    //     updatedFiles.splice(index, 1);
+
+    //     const updatedPreviews = [...productFiles.previews];
+    //     updatedPreviews.splice(index, 1);
+
+    //     setProductFiles({
+    //         ...productFiles,
+    //         uploadedFiles: updatedFiles,
+    //         previews: updatedPreviews,
+    //     });
+    // };
+
+    // // Handle image rearrangement with smooth movement
+    // const handleRearrangeImages = (dragIndex, hoverIndex) => {
+    //     setProductFiles((prev) => {
+    //         const updatedFiles = [...prev.uploadedFiles];
+    //         const updatedPreviews = [...prev.previews];
+
+    //         const [draggedFile] = updatedFiles.splice(dragIndex, 1);
+    //         const [draggedPreview] = updatedPreviews.splice(dragIndex, 1);
+
+    //         updatedFiles.splice(hoverIndex, 0, draggedFile);
+    //         updatedPreviews.splice(hoverIndex, 0, draggedPreview);
+
+    //         return {
+    //             ...prev,
+    //             uploadedFiles: updatedFiles,
+    //             previews: updatedPreviews,
+    //         };
+    //     });
+    // };
+
+    // Handle file selection for product images
     const handleProductFileChange = (newFiles) => {
         // Ensure newFiles is an array
         const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
 
         // Filter out duplicate files (check by name & size)
         const filteredFiles = filesArray.filter((newFile) => {
@@ -654,7 +770,7 @@ const AddProduct = () => {
 
         setProductFiles((prev) => ({
             ...prev,
-            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles], // Append new images
         }));
 
         // Generate previews for new files
@@ -670,20 +786,46 @@ const AddProduct = () => {
         });
     };
 
-
+    // Handle image removal dynamically
     const handleRemoveImage = (index) => {
-        const updatedFiles = [...productFiles.uploadedFiles];
-        updatedFiles.splice(index, 1);
+        setProductFiles((prev) => {
+            const updatedFiles = [...prev.uploadedFiles];
+            const updatedPreviews = [...prev.previews];
+            const removedFile = updatedFiles[index]; // Store removed file
 
-        const updatedPreviews = [...productFiles.previews];
-        updatedPreviews.splice(index, 1);
+            updatedFiles.splice(index, 1);
+            updatedPreviews.splice(index, 1);
 
-        setProductFiles({
-            ...productFiles,
-            uploadedFiles: updatedFiles,
-            previews: updatedPreviews,
+            return {
+                ...prev,
+                uploadedFiles: updatedFiles,
+                previews: updatedPreviews,
+                removedFiles: [...prev.removedFiles, removedFile], // Add to removed files
+            };
         });
     };
+
+
+    // Handle image rearrangement with smooth movement
+    const handleRearrangeImages = (dragIndex, hoverIndex) => {
+        setProductFiles((prev) => {
+            const updatedFiles = [...prev.uploadedFiles];
+            const updatedPreviews = [...prev.previews];
+
+            const [draggedFile] = updatedFiles.splice(dragIndex, 1);
+            const [draggedPreview] = updatedPreviews.splice(dragIndex, 1);
+
+            updatedFiles.splice(hoverIndex, 0, draggedFile);
+            updatedPreviews.splice(hoverIndex, 0, draggedPreview);
+
+            return {
+                ...prev,
+                uploadedFiles: updatedFiles,
+                previews: updatedPreviews,
+            };
+        });
+    };
+
 
 
     // Toggle banner visibility
@@ -692,6 +834,57 @@ const AddProduct = () => {
         setIsBannerVisible(newValue);
         setFormFields({ ...formFields, isBannerVisible: newValue }); // ✅ Correct way to update formFields
     };
+
+
+    // Handle file selection for banner images
+    // const handleBannerFileChange = (newFiles) => {
+    //     // Ensure newFiles is an array
+    //     const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+    //     // Filter out duplicate files (check by name & size)
+    //     const filteredFiles = filesArray.filter((newFile) => {
+    //         return !bannerFiles.uploadedFiles.some(
+    //             (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+    //         );
+    //     });
+
+    //     if (filteredFiles.length === 0) {
+    //         alert("Oops! File already exists."); // Optional alert
+    //         return;
+    //     }
+
+    //     setBannerFiles((prev) => ({
+    //         ...prev,
+    //         uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+    //     }));
+
+    //     // Generate previews for new files
+    //     filteredFiles.forEach((file) => {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             setBannerFiles((prev) => ({
+    //                 ...prev,
+    //                 previews: [...prev.previews, reader.result], // Append preview
+    //             }));
+    //         };
+    //         reader.readAsDataURL(file);
+    //     });
+    // };
+
+
+    // const handleRemoveBannerImage = (index) => {
+    //     const updatedFiles = [...bannerFiles.uploadedFiles];
+    //     updatedFiles.splice(index, 1);
+
+    //     const updatedPreviews = [...bannerFiles.previews];
+    //     updatedPreviews.splice(index, 1);
+
+    //     setBannerFiles({
+    //         ...bannerFiles,
+    //         uploadedFiles: updatedFiles,
+    //         previews: updatedPreviews,
+    //     });
+    // };
 
 
     // Handle file selection for banner images
@@ -707,13 +900,13 @@ const AddProduct = () => {
         });
 
         if (filteredFiles.length === 0) {
-            alert("Oops! File already exists."); // Optional alert
+            toast.error("Oops! File already exists."); // Optional alert
             return;
         }
 
         setBannerFiles((prev) => ({
             ...prev,
-            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles],
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles], // Append new images
         }));
 
         // Generate previews for new files
@@ -729,20 +922,25 @@ const AddProduct = () => {
         });
     };
 
-
+    // Handle banner image removal dynamically
     const handleRemoveBannerImage = (index) => {
-        const updatedFiles = [...bannerFiles.uploadedFiles];
-        updatedFiles.splice(index, 1);
+        setBannerFiles((prev) => {
+            const updatedFiles = [...prev.uploadedFiles];
+            const updatedPreviews = [...prev.previews];
+            const removedFile = updatedFiles[index]; // Store removed file
 
-        const updatedPreviews = [...bannerFiles.previews];
-        updatedPreviews.splice(index, 1);
+            updatedFiles.splice(index, 1);
+            updatedPreviews.splice(index, 1);
 
-        setBannerFiles({
-            ...bannerFiles,
-            uploadedFiles: updatedFiles,
-            previews: updatedPreviews,
+            return {
+                ...prev,
+                uploadedFiles: updatedFiles,
+                previews: updatedPreviews,
+                removedFiles: [...prev.removedFiles, removedFile], // Add to removed files
+            };
         });
     };
+
 
 
     // Handle form submission
@@ -806,7 +1004,11 @@ const AddProduct = () => {
                     loading: "Adding product...",
                     success: (res) => {
                         if (res?.success) {
-                            toast.success("Product added successfully!");
+                            // toast.success("Product added successfully!");
+                            setTimeout(() => {
+                                context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+                            }, 500);
+                            return res.message || "Product added successfully!";
                         } else {
                             throw new Error(res?.message || "Error occurred.");
                         }
@@ -824,105 +1026,101 @@ const AddProduct = () => {
     };
 
 
+    // const handleUpdate = async (e) => {
+    //     e.preventDefault();
 
+    //     if (formFields.name === "") {
+    //         context.openAlertBox("error", "Please enter product name");
+    //         return;
+    //     }
+    //     if (formFields.description === "") {
+    //         context.openAlertBox("error", "Please enter description");
+    //         return;
+    //     }
+    //     if (formFields.brand === "") {
+    //         context.openAlertBox("error", "Please enter brand");
+    //         return;
+    //     }
+    //     if (formFields.price === "") {
+    //         context.openAlertBox("error", "Please enter price");
+    //         return;
+    //     }
+    //     if (formFields.oldPrice === "") {
+    //         context.openAlertBox("error", "Please enter oldPrice");
+    //         return;
+    //     }
+    //     if (formFields.discount === "") {
+    //         context.openAlertBox("error", "Please enter discount");
+    //         return;
+    //     }
+    //     if (formFields.countInStock === "") {
+    //         context.openAlertBox("error", "Please enter countInStock");
+    //         return;
+    //     }
+    //     if (productRams === "") {
+    //         context.openAlertBox("error", "Please enter productRams");
+    //         return;
+    //     }
+    //     if (productWeight === "") {
+    //         context.openAlertBox("error", "Please enter productWeight");
+    //         return;
+    //     }
+    //     if (productSize === "") {
+    //         context.openAlertBox("error", "Please enter productSize");
+    //         return;
+    //     }
+    //     if (formFields.images.length === 0) {
+    //         context.openAlertBox("error", "Please upload images");
+    //         return;
+    //     }
 
-    const handleUpdate = async (e) => {
-        e.preventDefault();
+    //     // ✅ Banner Validation
+    //     if (formFields.isBannerVisible) {
+    //         if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
+    //             context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+    //             return;
+    //         }
+    //         if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
+    //             context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
+    //             return;
+    //         }
+    //     }
 
-        if (formFields.name === "") {
-            context.openAlertBox("error", "Please enter product name");
-            return;
-        }
-        if (formFields.description === "") {
-            context.openAlertBox("error", "Please enter description");
-            return;
-        }
-        if (formFields.brand === "") {
-            context.openAlertBox("error", "Please enter brand");
-            return;
-        }
-        if (formFields.price === "") {
-            context.openAlertBox("error", "Please enter price");
-            return;
-        }
-        if (formFields.oldPrice === "") {
-            context.openAlertBox("error", "Please enter oldPrice");
-            return;
-        }
-        if (formFields.discount === "") {
-            context.openAlertBox("error", "Please enter discount");
-            return;
-        }
-        if (formFields.countInStock === "") {
-            context.openAlertBox("error", "Please enter countInStock");
-            return;
-        }
-        if (productRams === "") {
-            context.openAlertBox("error", "Please enter productRams");
-            return;
-        }
-        if (productWeight === "") {
-            context.openAlertBox("error", "Please enter productWeight");
-            return;
-        }
-        if (productSize === "") {
-            context.openAlertBox("error", "Please enter productSize");
-            return;
-        }
-        if (formFields.images.length === 0) {
-            context.openAlertBox("error", "Please upload images");
-            return;
-        }
+    //     try {
+    //         const result = await toast.promise(
+    //             editData(`/api/product/updateProduct/${productIdNo}`, {
+    //                 ...formFields,
+    //                 userId: context?.userData?._id,
+    //                 productId: productIdNo,
+    //             }),
+    //             {
+    //                 loading: "Updating product... Please wait.",
+    //                 success: (res) => {
+    //                     if (res?.success) {
+    //                         context?.forceUpdate();
+    //                         setTimeout(() => {
+    //                             context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+    //                         }, 500);
+    //                         return res.message || "Product updated successfully!";
+    //                     } else {
+    //                         throw new Error(res?.message || "An unexpected error occurred.");
+    //                     }
+    //                 },
+    //                 error: (err) => {
+    //                     const errorMessage = err?.response?.data?.message || err.message || "Failed to update product. Please try again.";
+    //                     return errorMessage;
+    //                 },
+    //             }
+    //         );
 
-        // ✅ Banner Validation
-        if (formFields.isBannerVisible) {
-            if (!formFields.bannerTitleName || formFields.bannerTitleName.trim() === "") {
-                context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
-                return;
-            }
-            if (!Array.isArray(formFields.bannerImages) || formFields.bannerImages.length === 0) {
-                context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
-                return;
-            }
-        }
-
-        try {
-            const result = await toast.promise(
-                editData(`/api/product/updateProduct/${productIdNo}`, {
-                    ...formFields,
-                    userId: context?.userData?._id,
-                    productId: productIdNo,
-                }),
-                {
-                    loading: "Updating product... Please wait.",
-                    success: (res) => {
-                        if (res?.success) {
-                            context?.forceUpdate();
-                            return res.message || "Product updated successfully!";
-                        } else {
-                            throw new Error(res?.message || "An unexpected error occurred.");
-                        }
-                    },
-                    error: (err) => {
-                        const errorMessage = err?.response?.data?.message || err.message || "Failed to update product. Please try again.";
-                        return errorMessage;
-                    },
-                }
-            );
-
-            console.log("Update Result:", result);
-        } catch (err) {
-            console.error("Error in handleUpdate:", err);
-            toast.error(err?.message || "An unexpected error occurred.");
-        } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
-            }, 500);
-        }
-    };
-
-
+    //         console.log("Update Result:", result);
+    //     } catch (err) {
+    //         console.error("Error in handleUpdate:", err);
+    //         toast.error(err?.message || "An unexpected error occurred.");
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     // Image Deletion Handling
     // const handleRemoveImage = async (image) => {
@@ -1051,6 +1249,469 @@ const AddProduct = () => {
     //     }
     // };
 
+    // useEffect(()=>{
+    //     console.log("isBannerVisible:", formFields.isBannerVisible);
+    // },[isBannerVisible])
+
+    // const handleUpdate = async (e) => {
+    //     e.preventDefault();
+
+    //     // Form validation for product details
+    //     if (formFields.name.trim() === "") {
+    //         context.openAlertBox("error", "Please enter product name");
+    //         return;
+    //     }
+    //     if (formFields.description.trim() === "") {
+    //         context.openAlertBox("error", "Please enter description");
+    //         return;
+    //     }
+    //     if (formFields.brand.trim() === "") {
+    //         context.openAlertBox("error", "Please enter brand");
+    //         return;
+    //     }
+    //     if (!formFields.price) {
+    //         context.openAlertBox("error", "Please enter price");
+    //         return;
+    //     }
+    //     if (!formFields.oldPrice) {
+    //         context.openAlertBox("error", "Please enter old price");
+    //         return;
+    //     }
+    //     if (!formFields.discount) {
+    //         context.openAlertBox("error", "Please enter discount");
+    //         return;
+    //     }
+    //     if (!formFields.countInStock) {
+    //         context.openAlertBox("error", "Please enter count in stock");
+    //         return;
+    //     }
+    //     if (!productRams) {
+    //         context.openAlertBox("error", "Please enter product RAM");
+    //         return;
+    //     }
+    //     if (!productWeight) {
+    //         context.openAlertBox("error", "Please enter product weight");
+    //         return;
+    //     }
+    //     if (!productSize) {
+    //         context.openAlertBox("error", "Please enter product size");
+    //         return;
+    //     }
+    //     if (formFields.images.length === 0 && productFiles.uploadedFiles.length === 0) {
+    //         context.openAlertBox("error", "Please upload images");
+    //         return;
+    //     }
+
+    //     console.log("isBannerVisible:", formFields.isBannerVisible); // Log the state before validation
+
+    //     // ✅ Handle banner visibility validation only if the banner is enabled
+    //     if (formFields.isBannerVisible) {
+    //         if (!formFields.bannerTitleName?.trim()) {
+    //             context.openAlertBox("error", "Banner is enabled, but banner title is missing.");
+    //             return;
+    //         }
+    //         if (!Array.isArray(formFields.bannerImages) || (formFields.bannerImages.length === 0 && bannerFiles.uploadedFiles.length === 0)) {
+    //             context.openAlertBox("error", "Banner is enabled, but banner images are missing.");
+    //             return;
+    //         }
+    //     } else {
+    //         // If banner is not enabled, ensure no banner data is provided
+    //         if (formFields.bannerTitleName?.trim() || formFields.bannerImages.length > 0 || bannerFiles.uploadedFiles.length > 0) {
+    //             context.openAlertBox("error", "Banner is disabled, so title and images should not be provided.");
+    //             return;
+    //         }
+    //     }
+
+    //     try {
+    //         setIsLoading(true);
+
+    //         // Prepare FormData for image uploads
+    //         const formData = new FormData();
+
+    //         // ✅ Ensure category is correctly formatted
+    //         if (formFields.category && typeof formFields.category === "object") {
+    //             if (formFields.category._id) {
+    //                 formFields.category = formFields.category._id.toString(); // Convert to string if it's an object
+    //             } else {
+    //                 context.openAlertBox("error", "Invalid category format");
+    //                 return;
+    //             }
+    //         }
+
+    //         // Append all form fields to FormData
+    //         Object.keys(formFields).forEach((key) => {
+    //             if (Array.isArray(formFields[key])) {
+    //                 formFields[key].forEach((item) => formData.append(key, item));
+    //             } else {
+    //                 formData.append(key, formFields[key]);
+    //             }
+    //         });
+
+    //         // ✅ Append new product images
+    //         productFiles.uploadedFiles.forEach((file) => {
+    //             formData.append("newProductImages", file);
+    //         });
+
+
+    //         // ✅ Append new banner images
+    //         bannerFiles.uploadedFiles.forEach((file) => {
+    //             formData.append("newBannerImages", file);
+    //         });
+
+    //         // ✅ Append removed product images
+    //         if (productFiles.removedFiles.length > 0) {
+    //             const cloudinaryFiles = productFiles.removedFiles.filter(file => typeof file === "string"); 
+    //             formData.append("removedProductImages", JSON.stringify(cloudinaryFiles));
+    //         }
+
+
+    //         // ✅ Append removed banner images
+    //         if (bannerFiles.removedFiles.length > 0) {
+    //             formData.append("removedBannerImages", JSON.stringify(bannerFiles.removedFiles));
+    //         }
+
+    //         // ✅ Append required fields
+    //         formData.append("userId", context?.userData?._id);
+    //         formData.append("productId", productIdNo);
+
+    //         // ✅ Call API to update product
+    //         const result = await toast.promise(
+    //             editData(`/api/product/updateProduct/${productIdNo}`, formData),
+    //             {
+    //                 loading: "Updating product... Please wait.",
+    //                 success: (res) => {
+    //                     if (res?.success) {
+    //                         context?.forceUpdate();
+    //                         setTimeout(() => {
+    //                             context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+    //                         }, 500);
+    //                         return res.message || "Product updated successfully!";
+    //                     } else {
+    //                         throw new Error(res?.message || "An unexpected error occurred.");
+    //                     }
+    //                 },
+    //                 error: (err) => {
+    //                     return err?.response?.data?.message || err.message || "Failed to update product. Please try again.";
+    //                 },
+    //             }
+    //         );
+
+    //         console.log("Update Result:", result);
+    //     } catch (err) {
+    //         console.error("Error in handleUpdate:", err);
+    //         toast.error(err?.message || "An unexpected error occurred.");
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
+    // const handleUpdate = async (e) => {
+    //     e.preventDefault();
+
+    //     // Form validation
+    //     if (formFields.name.trim() === "") {
+    //         context.openAlertBox("error", "Please enter product name");
+    //         return;
+    //     }
+    //     if (formFields.description.trim() === "") {
+    //         context.openAlertBox("error", "Please enter description");
+    //         return;
+    //     }
+    //     if (formFields.brand.trim() === "") {
+    //         context.openAlertBox("error", "Please enter brand");
+    //         return;
+    //     }
+    //     if (!formFields.price) {
+    //         context.openAlertBox("error", "Please enter price");
+    //         return;
+    //     }
+    //     if (!formFields.oldPrice) {
+    //         context.openAlertBox("error", "Please enter old price");
+    //         return;
+    //     }
+    //     if (!formFields.discount) {
+    //         context.openAlertBox("error", "Please enter discount");
+    //         return;
+    //     }
+    //     if (!formFields.countInStock) {
+    //         context.openAlertBox("error", "Please enter count in stock");
+    //         return;
+    //     }
+    //     if (!productRams) {
+    //         context.openAlertBox("error", "Please enter product RAM");
+    //         return;
+    //     }
+    //     if (!productWeight) {
+    //         context.openAlertBox("error", "Please enter product weight");
+    //         return;
+    //     }
+    //     if (!productSize) {
+    //         context.openAlertBox("error", "Please enter product size");
+    //         return;
+    //     }
+    //     if (formFields.images.length === 0 && productFiles.uploadedFiles.length === 0) {
+    //         context.openAlertBox("error", "Please upload images");
+    //         return;
+    //     }
+
+    //     try {
+    //         setIsLoading(true);
+
+    //         const formData = new FormData();
+
+    //         // Convert category to string if it's an object
+    //         if (formFields.category && typeof formFields.category === "object") {
+    //             if (formFields.category._id) {
+    //                 formFields.category = formFields.category._id.toString();
+    //             } else {
+    //                 context.openAlertBox("error", "Invalid category format");
+    //                 return;
+    //             }
+    //         }
+
+    //         // Append all form fields
+    //         Object.keys(formFields).forEach((key) => {
+    //             if (Array.isArray(formFields[key])) {
+    //                 formFields[key].forEach((item) => formData.append(key, item));
+    //             } else {
+    //                 formData.append(key, formFields[key]);
+    //             }
+    //         });
+
+    //         console.log("Form fields after appending:", formFields);
+
+    //         // Validate and append seller details
+    //         const sellerData = {
+    //             sellerId: formFields.seller?.sellerId || context?.userData?._id,
+    //             sellerName: formFields.seller?.sellerName || context?.userData?.sellerName,
+    //         };
+
+    //         // Validate seller data
+    //         if (!sellerData.sellerId || !sellerData.sellerName) {
+    //             context.openAlertBox("error", "Seller details are required.");
+    //             return;
+    //         }
+
+    //         console.log("Seller Data Before Appending:", sellerData);
+    //         formData.append("seller", JSON.stringify(sellerData));
+
+    //         // Append new product images
+    //         productFiles.uploadedFiles.forEach((file) => {
+    //             formData.append("newProductImages", file);
+    //         });
+
+    //         // Append new banner images
+    //         bannerFiles.uploadedFiles.forEach((file) => {
+    //             formData.append("newBannerImages", file);
+    //         });
+
+    //         console.log("Product and Banner images appended:", formData);
+
+    //         // ✅ Filter removed files (only keep Cloudinary URLs)
+    //         const cloudinaryFilesToRemove = productFiles.removedFiles.filter(
+    //             (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+    //         );
+    //         console.log("cloudinaryFilesToRemove:", cloudinaryFilesToRemove);
+
+    //         if (cloudinaryFilesToRemove.length > 0) {
+    //             formData.append("removedFiles", JSON.stringify(cloudinaryFilesToRemove));
+    //         }
+
+    //         const cloudinaryBannerFilesToRemove = bannerFiles.removedFiles.filter(
+    //             (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+    //         );
+    //         console.log("cloudinaryBannerFilesToRemove:", cloudinaryBannerFilesToRemove);
+
+    //         if (cloudinaryBannerFilesToRemove.length > 0) {
+    //             formData.append("removedBannerFiles", JSON.stringify(cloudinaryBannerFilesToRemove));
+    //         }
+
+    //         formData.append("userId", context?.userData?._id);
+    //         formData.append("productId", productIdNo);
+
+    //         console.log("Final FormData before sending:", formData);
+
+    //         // Call API
+    //         const result = await toast.promise(
+    //             editData(`/api/product/updateProduct/${productIdNo}`, formData),
+    //             {
+    //                 loading: "Updating product... Please wait.",
+    //                 success: (res) => {
+    //                     if (res?.success) {
+    //                         context?.forceUpdate();
+    //                         setTimeout(() => {
+    //                             context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+    //                         }, 500);
+    //                         return res.message || "Product updated successfully!";
+    //                     } else {
+    //                         throw new Error(res?.message || "An unexpected error occurred.");
+    //                     }
+    //                 },
+    //                 error: (err) => {
+    //                     return err?.response?.data?.message || err.message || "Failed to update product. Please try again.";
+    //                 },
+    //             }
+    //         );
+
+    //         console.log("Update Result:", result);
+    //     } catch (err) {
+    //         console.error("Error in handleUpdate:", err);
+    //         toast.error(err?.message || "An unexpected error occurred.");
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+
+        // Form validation
+        const requiredFields = [
+            { field: "name", message: "Please enter product name" },
+            { field: "description", message: "Please enter description" },
+            { field: "brand", message: "Please enter brand" },
+            { field: "price", message: "Please enter price" },
+            { field: "oldPrice", message: "Please enter old price" },
+            { field: "discount", message: "Please enter discount" },
+            { field: "countInStock", message: "Please enter count in stock" },
+        ];
+
+        for (const { field, message } of requiredFields) {
+            if (!formFields[field] || (typeof formFields[field] === "string" && formFields[field].trim() === "")) {
+                context.openAlertBox("error", message);
+                return;
+            }
+        }
+
+        if (!productRams) {
+            context.openAlertBox("error", "Please enter product RAM");
+            return;
+        }
+        if (!productWeight) {
+            context.openAlertBox("error", "Please enter product weight");
+            return;
+        }
+        if (!productSize) {
+            context.openAlertBox("error", "Please enter product size");
+            return;
+        }
+        if (formFields.images.length === 0 && productFiles.uploadedFiles.length === 0) {
+            context.openAlertBox("error", "Please upload images");
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            const formData = new FormData();
+
+            // Convert category to string if it's an object
+            if (formFields.category && typeof formFields.category === "object") {
+                if (formFields.category._id) {
+                    formFields.category = formFields.category._id.toString();
+                } else {
+                    context.openAlertBox("error", "Invalid category format");
+                    return;
+                }
+            }
+
+            // Append all form fields
+            Object.keys(formFields).forEach((key) => {
+                if (Array.isArray(formFields[key])) {
+                    formFields[key].forEach((item) => formData.append(key, item));
+                } else {
+                    formData.append(key, formFields[key]);
+                }
+            });
+
+            console.log("Form fields after appending:", formFields);
+
+            // Validate and append seller details
+            const sellerData = {
+                sellerId: formFields.seller?.sellerId || context?.userData?._id,
+                sellerName: formFields.seller?.sellerName || context?.userData?.sellerName,
+            };
+
+            // Validate seller data
+            if (!sellerData.sellerId || !sellerData.sellerName) {
+                context.openAlertBox("error", "Seller details are required.");
+                return;
+            }
+
+            console.log("Seller Data Before Appending:", sellerData);
+
+            // Append the seller object as a JSON string
+            formData.append("seller", JSON.stringify(sellerData));
+
+            // Append the seller object as a JSON string
+            formData.append("seller", JSON.stringify(sellerData));
+
+            // Append new product images
+            productFiles.uploadedFiles.forEach((file) => {
+                formData.append("newProductImages", file);
+            });
+
+            // Append new banner images
+            bannerFiles.uploadedFiles.forEach((file) => {
+                formData.append("newBannerImages", file);
+            });
+
+            console.log("Product and Banner images appended:", formData);
+
+            // ✅ Filter removed files (only keep Cloudinary URLs)
+            const cloudinaryFilesToRemove = productFiles.removedFiles.filter(
+                (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+            );
+            console.log("cloudinaryFilesToRemove:", cloudinaryFilesToRemove);
+
+            if (cloudinaryFilesToRemove.length > 0) {
+                formData.append("removedFiles", JSON.stringify(cloudinaryFilesToRemove));
+            }
+
+            const cloudinaryBannerFilesToRemove = bannerFiles.removedFiles.filter(
+                (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+            );
+            console.log("cloudinaryBannerFilesToRemove:", cloudinaryBannerFilesToRemove);
+
+            if (cloudinaryBannerFilesToRemove.length > 0) {
+                formData.append("removedBannerFiles", JSON.stringify(cloudinaryBannerFilesToRemove));
+            }
+
+            formData.append("userId", context?.userData?._id);
+            formData.append("productId", productIdNo);
+
+            console.log("Final FormData before sending:", formData);
+
+            // Call API
+            const result = await toast.promise(
+                editData(`/api/product/updateProduct/${productIdNo}`, formData),
+                {
+                    loading: "Updating product... Please wait.",
+                    success: (res) => {
+                        if (res?.success) {
+                            context?.forceUpdate();
+                            setTimeout(() => {
+                                context.setIsOpenFullScreenPanel({ open: false, model: "Product Details" });
+                            }, 500);
+                            return res.message || "Product updated successfully!";
+                        } else {
+                            throw new Error(res?.message || "An unexpected error occurred.");
+                        }
+                    },
+                    error: (err) => {
+                        return err?.response?.data?.message || err.message || "Failed to update product. Please try again.";
+                    },
+                }
+            );
+
+            console.log("Update Result:", result);
+        } catch (err) {
+            console.error("Error in handleUpdate:", err);
+            toast.error(err?.message || "An unexpected error occurred.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     const handleDiscard = async () => {
@@ -1407,52 +2068,63 @@ const AddProduct = () => {
 
                 </div>
 
+                {/* Component rendering images with smooth drag and drop */}
                 <div className="col w-full px-0">
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
-
                     <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                        <span className="opacity-50 col-span-full text-[14px]">
-                            Choose a product photo or simply drag and drop
-                        </span>
+                        <span className="opacity-50 col-span-full text-[14px]">Choose a product photo or simply drag and drop</span>
 
-                        {productFiles.uploadedFiles.map((file, index) => (
-                            <div
-                                key={file.name}
-                                className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative"
-                            >
-                                <span
-                                    className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                    onClick={() => handleRemoveImage(index)}
+                        <AnimatePresence>
+                            {productFiles.uploadedFiles.map((file, index) => (
+                                <motion.div
+                                    key={file.name}
+                                    className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative cursor-grab"
+                                    draggable
+                                    onDragStart={(e) => e.dataTransfer.setData("index", index.toString())}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => {
+                                        const dragIndex = parseInt(e.dataTransfer.getData("index"), 10);
+                                        if (!isNaN(dragIndex) && dragIndex !== index) {
+                                            handleRearrangeImages(dragIndex, index);
+                                        }
+                                    }}
+                                    initial={{ opacity: 0, y: 20 }} // Animates in from below
+                                    animate={{ opacity: 1, y: 0 }} // Normal position
+                                    exit={{ opacity: 0, scale: 0.8 }} // Shrink on exit
+                                    transition={{ duration: 0.3, ease: "easeInOut" }} // Smooth transition
                                 >
-                                    <IoClose className="text-[15px] text-red-600" />
-                                </span>
-                                <div className="w-full h-[100px]">
-                                    <img
-                                        src={productFiles.previews[index]}
-                                        alt={`uploaded-${index}`}
-                                        className="w-full h-full object-cover rounded-md"
-                                    />
-                                </div>
-                                <p className="text-[14px] text-center mt-2 line-clamp-1 overflow-hidden">
-                                    {file.name}
-                                </p>
-                            </div>
-                        ))}
+                                    {/* Remove Button */}
+                                    <span
+                                        className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                        onClick={() => handleRemoveImage(index)}
+                                        aria-label="Remove Image"
+                                    >
+                                        <IoClose className="text-[15px] text-red-600" />
+                                    </span>
+
+                                    {/* Image Preview */}
+                                    <div className="w-full h-[100px] overflow-hidden">
+                                        <img
+                                            src={productFiles.previews[index]}
+                                            alt={`Uploaded file: ${file.name}`}
+                                            className="w-full h-full object-cover rounded-md cursor-grab transition-transform duration-300 ease-in-out"
+                                            draggable={false}
+                                        />
+                                    </div>
+
+                                    {/* File Name */}
+                                    <p className="text-[14px] text-center mt-2 truncate">{file.name}</p>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
 
-                        {/* Upload Box */}
                         <div className={productFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
-                            <UploadBox
-                                multiple={true}
-                                onFileChange={handleProductFileChange}
-                            />
+                            <UploadBox multiple={true} onFileChange={handleProductFileChange} />
                         </div>
 
-                        {/* File Status */}
                         <p className="text-sm mt-2 text-gray-600 col-span-full">
-                            {productFiles.uploadedFiles.length > 0
-                                ? `Files uploaded: ${productFiles.uploadedFiles.length}`
-                                : "No files uploaded yet."}
+                            {productFiles.uploadedFiles.length > 0 ? `Files uploaded: ${productFiles.uploadedFiles.length}` : "No files uploaded yet."}
                         </p>
                     </div>
                 </div>
@@ -1462,11 +2134,6 @@ const AddProduct = () => {
                 <div className="col w-full px-0">
                     <div className="flex items-center gap-4 mb-2">
                         <h3 className="text-[18px] font-bold">Product Banner</h3>
-                        {/* <FormControlLabel
-                            control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
-                            label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
-                        /> */}
-
                         <FormControlLabel
                             control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
                             label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
@@ -1499,7 +2166,7 @@ const AddProduct = () => {
                                 {bannerFiles.uploadedFiles.length > 0 &&
                                     bannerFiles.uploadedFiles.map((image, index) => (
                                         <div
-                                            className="border p-2 h-[200px] rounded-md flex flex-col items-center bg-white relative"
+                                            className="border p-2 h-[150px] rounded-md flex flex-col items-center bg-white relative"
                                             key={index}
                                         >
                                             <span
@@ -1525,7 +2192,7 @@ const AddProduct = () => {
                                 {/* Upload Box */}
                                 <div className={bannerFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
                                     <UploadBox
-                                        multiple={true}
+                                        multiple={false}
                                         onFileChange={handleBannerFileChange} // Pass the banner file handler
                                     />
                                 </div>

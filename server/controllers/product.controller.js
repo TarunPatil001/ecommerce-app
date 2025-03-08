@@ -19,163 +19,7 @@ cloudinary.config({
 
 // Product
 
-
-// var imagesArr = {}; // Store images per product ID, replace with database storage in production
-
-// // Helper function to check if image exists in Cloudinary
-// async function checkImageExists(imageUrl) {
-//   try {
-//     const response = await axios.head(imageUrl); // HEAD request to check image existence
-//     return response.status === 200; // If status is 200, image exists
-//   } catch (error) {
-//     return false; // If request fails, image doesn't exist
-//   }
-// }
-
-// // Upload product images
-// export async function uploadProductImages(request, response) {
-//   try {
-//     const { productId } = request.body;
-//     const images = request.files;
-
-//     console.log("Received productId:", productId);
-//     console.log("Uploaded files:", images);
-
-//     if (!images || images.length === 0) {
-//       return response.status(400).json({ error: "No images provided" });
-//     }
-
-//     // Initialize imagesArr per product ID (replace with a database in production)
-//     if (!productId) {
-//       if (!Array.isArray(imagesArr["new"])) imagesArr["new"] = []; // Ensure it's an array
-//     } else {
-//       if (!Array.isArray(imagesArr[productId])) imagesArr[productId] = []; // Ensure it's an array
-//     }
-
-//     // Upload images and update imagesArr after successful upload
-//     const uploadedImages = await Promise.all(
-//       images.map(async (file) => {
-//         try {
-//           const result = await cloudinary.uploader.upload(file.path, {
-//             folder: "ecommerceApp/uploads",
-//             use_filename: true,
-//             unique_filename: false,
-//             overwrite: false,
-//           });
-
-//           console.log("Uploaded image URL:", result.secure_url);
-
-//           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
-//           return result.secure_url; // Return uploaded image URL
-//         } catch (error) {
-//           console.log("Cloudinary upload error:", error);
-//           return null; // Return null in case of an error
-//         }
-//       })
-//     );
-
-//     // Filter out null values (failed uploads)
-//     const validImages = uploadedImages.filter(Boolean);
-//     console.log("Valid uploaded images:", validImages);
-
-//     // Update imagesArr after all uploads are completed
-//     if (productId) {
-//       imagesArr[productId].push(...validImages);
-//     } else {
-//       imagesArr["new"].push(...validImages);
-//     }
-
-//     // Debugging: Check imagesArr before returning response
-//     console.log("Updated imagesArr:", imagesArr);
-
-//     return response.status(200).json({
-//       images: productId ? imagesArr[productId] : imagesArr["new"],
-//     });
-
-//   } catch (error) {
-//     console.log("Server Error:", error);
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       status: false,
-//     });
-//   }
-// }
-
-// var bannerImagesArr = {}; // Ensure structure consistency
-
-// // Upload product banner images
-// export async function uploadProductBannerImages(request, response) {
-//   try {
-//     const { productId } = request.body;
-//     const bannerImages = request.files;
-
-//     console.log("Received productId:", productId);
-//     console.log("Uploaded files:", bannerImages);
-
-//     if (!bannerImages || bannerImages.length === 0) {
-//       return response.status(400).json({ error: "No banner images provided" });
-//     }
-
-//     // Ensure bannerImagesArr is properly initialized as an object containing arrays
-//     if (!productId) {
-//       if (!Array.isArray(bannerImagesArr["new"])) bannerImagesArr["new"] = [];
-//     } else {
-//       if (!Array.isArray(bannerImagesArr[productId])) bannerImagesArr[productId] = [];
-//     }
-
-//     // Upload banner images and update bannerImagesArr after successful upload
-//     const uploadedImages = await Promise.all(
-//       bannerImages.map(async (file) => {
-//         try {
-//           const result = await cloudinary.uploader.upload(file.path, {
-//             folder: "ecommerceApp/uploads",
-//             use_filename: true,
-//             unique_filename: false,
-//             overwrite: false,
-//           });
-
-//           console.log("Uploaded image URL:", result.secure_url);
-
-//           fs.unlinkSync(`uploads/${file.filename}`); // Remove uploaded file from local storage
-//           return result.secure_url; // Return uploaded image URL
-//         } catch (error) {
-//           console.log("Cloudinary upload error:", error);
-//           return null; // Return null in case of an error
-//         }
-//       })
-//     );
-
-//     // Filter out null values (failed uploads)
-//     const validImages = uploadedImages.filter(Boolean);
-//     console.log("Valid uploaded banner images:", validImages);
-
-//     // Append images to array
-//     if (productId) {
-//       bannerImagesArr[productId].push(...validImages);
-//     } else {
-//       bannerImagesArr["new"].push(...validImages);
-//     }
-
-//     // Debugging: Check bannerImagesArr before returning response
-//     console.log("Updated bannerImagesArr:", bannerImagesArr);
-
-//     return response.status(200).json({
-//       bannerImages: productId ? bannerImagesArr[productId] : bannerImagesArr["new"],
-//     });
-
-//   } catch (error) {
-//     console.log("Server Error:", error);
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       status: false,
-//     });
-//   }
-// }
-/**
- * ✅ Upload images to Cloudinary
- */
+// Upload images to Cloudinary
 // 🔹 Helper function to upload images (Stores per User ID)
 async function uploadImagesToCloudinary(files) {
   try {
@@ -233,180 +77,7 @@ async function uploadImagesToCloudinary(files) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
-// Create Product  
-// export async function createProduct(request, response) {
-//   try {
-
-//     const {
-//       name,
-//       description,
-//       isBannerVisible,
-//       bannerTitleName,
-//       brand,
-//       price,
-//       oldPrice,
-//       categoryName,
-//       categoryId,
-//       subCategoryName,
-//       subCategoryId,
-//       thirdSubCategoryName,
-//       thirdSubCategoryId,
-//       category,
-//       countInStock,
-//       rating,
-//       isFeatured,
-//       discount,
-//       productRam,
-//       size,
-//       productWeight,
-//       seller,
-//     } = request.body;
-
-//     // Check if required fields are present
-//     if (!name || !description || !brand || !price || !categoryId || !subCategoryId) {
-//       return response.status(400).json({
-//         error: true,
-//         success: false,
-//         message: "Missing required fields. Please provide all necessary product details.",
-//       });
-//     }
-
-//     console.log("Received sellerId:", seller); // 🔍 Debugging Log
-
-//     // ✅ Validate sellerId
-//     if (!seller || !mongoose.Types.ObjectId.isValid(seller)) {
-//       return response.status(400).json({
-//         error: true,
-//         success: false,
-//         message: "Invalid or missing seller ID.",
-//       });
-//     }
-
-//     const sellerData = await UserModel.findById(seller).select("sellerName role").lean();
-
-//     if (!sellerData) {
-//       return response.status(404).json({
-//         error: true,
-//         success: false,
-//         message: "Seller not found.",
-//       });
-//     }
-
-//     // ✅ Ensure ADMIN has a sellerName before adding products
-//     if (sellerData.role === "ADMIN" && (!sellerData.sellerName || sellerData.sellerName.trim() === "")) {
-//       return response.status(400).json({
-//         error: true,
-//         success: false,
-//         message: "Admins must set a seller name before adding products.",
-//       });
-//     }
-
-//     console.log("Seller found:", sellerData.sellerName);
-
-
-//     // Validate and fetch product images
-//     const productId =
-//       request.body.productId && mongoose.Types.ObjectId.isValid(request.body.productId)
-//         ? new mongoose.Types.ObjectId(request.body.productId)
-//         : null;
-
-//     const imagesForProduct = productId ? imagesArr[productId] || [] : imagesArr["new"] || [];
-
-//     if (!Array.isArray(imagesForProduct) || imagesForProduct.length === 0) {
-//       return response.status(400).json({
-//         error: true,
-//         success: false,
-//         message: "Images array is missing or empty.",
-//       });
-//     }
-
-//     let bannerImagesForProduct = [];
-
-//     if (isBannerVisible) {
-//       if (!bannerTitleName || !Array.isArray(request.body.bannerImages) || request.body.bannerImages.length === 0) {
-//         return response.status(400).json({
-//           error: true,
-//           success: false,
-//           message: "Banner is enabled, but bannerTitleName or bannerImages are missing.",
-//         });
-//       }
-//       bannerImagesForProduct = productId ? bannerImagesArr[productId] || [] : bannerImagesArr["new"] || [];
-//     }
-
-//     // Create new product object
-//     let product = new ProductModel({
-//       name,
-//       description,
-//       images: [...imagesForProduct],
-//       isBannerVisible,
-//       bannerImages: [...bannerImagesForProduct],
-//       bannerTitleName: isBannerVisible ? bannerTitleName : "",
-//       brand,
-//       price,
-//       oldPrice,
-//       categoryName,
-//       categoryId,
-//       subCategoryName,
-//       subCategoryId,
-//       thirdSubCategoryName,
-//       thirdSubCategoryId,
-//       category,
-//       countInStock,
-//       rating,
-//       isFeatured,
-//       discount,
-//       productRam,
-//       size,
-//       productWeight,
-//       seller: {
-//         sellerId: seller, // ✅ Store sellerId inside object
-//         sellerName: sellerData.sellerName, // ✅ Store sellerName from DB
-//       },
-//     });
-
-//     // Save the product to the database
-//     product = await product.save();
-
-//     if (!product) {
-//       return response.status(400).json({
-//         error: true,
-//         success: false,
-//         message: "Product creation failed",
-//       });
-//     }
-
-//     // Clear images array after product creation to avoid conflicts with subsequent uploads
-//     if (productId) {
-//       imagesArr[productId] = new Set();
-//       bannerImagesArr[productId] = new Set();
-//     } else {
-//       imagesArr["new"] = new Set();
-//       bannerImagesArr["new"] = new Set();
-//     }
-
-//     return response.status(200).json({
-//       message: "Product created successfully.",
-//       success: true,
-//       error: false,
-//       data: {
-//         ...product._doc,
-//         sellerName: seller.sellerName || "Unknown Seller",  // Ensure sellerName is included in response
-//       },
-//     });
-//   } catch (error) {
-//     return response.status(500).json({
-//       message: error.message || "Internal Server Error",
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
-
-
-
-/**
- * ✅ Create Product Function
- */
+// Create Product Function
 export async function createProduct(req, res) {
   try {
     console.log("📥 Incoming request:", req.body);
@@ -470,8 +141,8 @@ export async function createProduct(req, res) {
     console.log("✅ Seller found:", sellerData.sellerName);
 
     // ✅ Separate product images and banner images
-    const images = req.files;  // Use uploaded product images
-    const bannerImages = req.files; // Use uploaded banner images
+    const images = req.files?.images || [];  // Use uploaded product images
+    const bannerImages = req.files?.bannerImages || []; // Use uploaded banner images
 
     if (!images.length) {
       return res.status(400).json({ error: "At least one product image is required." });
@@ -558,8 +229,6 @@ export async function createProduct(req, res) {
 }
 
 
-
-
 // ----------------------------------------------------------------------------------------------------------------------
 
 export async function getAllProducts(request, response) {
@@ -609,8 +278,6 @@ export async function getAllProducts(request, response) {
     });
   }
 }
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -686,11 +353,7 @@ export async function getAllFilteredProducts(request, response) {
 }
 
 
-
-
-
 // ----------------------------------------------------------------------------------------------------------------------
-
 
 // get all products by categoryId
 export async function getAllProductsByCategoryId(request, response) {
@@ -746,10 +409,7 @@ export async function getAllProductsByCategoryId(request, response) {
 }
 
 
-
 // ----------------------------------------------------------------------------------------------------------------------
-
-
 
 // get all products by categoryName
 export async function getAllProductsByCategoryName(request, response) {
@@ -801,7 +461,6 @@ export async function getAllProductsByCategoryName(request, response) {
     });
   }
 }
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -860,7 +519,6 @@ export async function getAllProductsBySubCategoryId(request, response) {
 }
 
 
-
 // ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by subCategoryName
@@ -913,10 +571,6 @@ export async function getAllProductsBySubCategoryName(request, response) {
     });
   }
 }
-
-
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -975,7 +629,6 @@ export async function getAllProductsByThirdSubCategoryId(request, response) {
 }
 
 
-
 // ----------------------------------------------------------------------------------------------------------------------
 
 // get all products by thirdSubCategoryName
@@ -1028,8 +681,6 @@ export async function getAllProductsByThirdSubCategoryName(request, response) {
     });
   }
 }
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -1095,9 +746,6 @@ export async function getAllProductsByPrice(request, response) {
     page: 0,
   });
 }
-
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -1177,7 +825,6 @@ export async function getAllProductsByRating(request, response) {
 }
 
 
-
 // ----------------------------------------------------------------------------------------------------------------------
 
 // get all products count
@@ -1212,9 +859,6 @@ export async function getAllProductsCount(request, response) {
     });
   }
 }
-
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -1255,8 +899,6 @@ export async function getAllFeaturedProducts(request, response) {
 }
 
 
-
-
 // ----------------------------------------------------------------------------------------------------------------------------------
 
 // get single products
@@ -1292,7 +934,6 @@ export async function getProduct(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
-
 export async function getTotalSales(request, response) {
   try {
     // Calculate the total sales by summing the 'sale' field from all products
@@ -1326,18 +967,74 @@ export async function getTotalSales(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
-function extractPublicId(imageUrl) {
-  // Regex to match the Cloudinary URL and extract public ID
-  const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
-  const match = imageUrl.match(regex);
+// function extractPublicId(imageUrl) {
+//   // Regex to match the Cloudinary URL and extract public ID
+//   const regex = /https:\/\/res\.cloudinary\.com\/.*\/(ecommerceApp\/uploads\/.*)\.[a-zA-Z0-9]+$/;
+//   const match = imageUrl.match(regex);
 
-  if (match && match[1]) {
-    // Return the full public ID (including folder path)
-    return match[1];
+//   if (match && match[1]) {
+//     // Return the full public ID (including folder path)
+//     return match[1];
+//   }
+
+//   return null;
+// }
+
+
+// function extractPublicId(imageUrl) {
+//   const regex = /\/upload\/(?:v\d+\/)?(ecommerceApp\/uploads\/[^.]+)\.[a-zA-Z0-9]+$/;
+//   const match = imageUrl.match(regex);
+//   return match ? match[1] : null;
+// }
+
+// function extractPublicId(imageUrl) {
+//   // Updated regex to properly extract the public ID from Cloudinary URLs
+//   const regex = /\/upload\/(?:v\d+\/)?([^/.]+)\.[a-zA-Z0-9]+$/;
+//   const match = imageUrl.match(regex);
+//   return match ? match[1] : null;
+// }
+
+const extractPublicId = (url) => {
+  try {
+    if (!url.includes("res.cloudinary.com")) return null;
+    const parts = url.split("/");
+    const filename = parts.pop().split(".")[0]; // Get filename without extension
+    const folderIndex = parts.indexOf("ecommerceApp"); // Find "ecommerceApp" folder
+    if (folderIndex !== -1) {
+      return `${parts.slice(folderIndex).join("/")}/${filename}`;
+    }
+    return filename;
+  } catch (error) {
+    console.error("❌ Error extracting public ID:", error);
+    return null;
   }
+};
 
-  return null;
-}
+
+const deleteCloudinaryImages = async (imageUrls) => {
+  const cloudinaryImages = imageUrls.filter(url => url.startsWith("https://res.cloudinary.com"));
+  if (cloudinaryImages.length === 0) return;
+
+  await Promise.all(
+    cloudinaryImages.map(async (url) => {
+      try {
+        const publicId = extractPublicId(url);
+        if (publicId) {
+          const result = await cloudinary.uploader.destroy(publicId);
+          if (result.result === "ok") {
+            console.log(`Successfully deleted from Cloudinary: ${publicId}`);
+          } else {
+            console.error(`Failed to delete from Cloudinary: ${publicId}`);
+          }
+        } else {
+          console.error(`Invalid public ID for URL: ${url}`);
+        }
+      } catch (error) {
+        console.error(`Error deleting image from Cloudinary: ${url}`, error);
+      }
+    })
+  );
+};
 
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -1693,6 +1390,7 @@ const parseRamSize = (ramSize) => {
   return 0; // Default case if no match
 };
 
+
 // Function to get valid RAMs dynamically from DB and sort from small to large
 const getValidProductRams = async () => {
   try {
@@ -1718,170 +1416,239 @@ const getValidProductRams = async () => {
 };
 
 
-
+// Function to update product
 export async function updateProduct(request, response) {
   try {
     const productId = request.params.id;
-    const product = await ProductModel.findById(productId).populate("seller").lean(); // Fetch seller details
+    const product = await ProductModel.findById(productId).populate("seller").lean();
 
     if (!product) {
-      return response.status(404).json({
-        error: true,
-        success: false,
-        message: "Product not found!",
-      });
+      return response.status(404).json({ error: true, success: false, message: "Product not found!" });
     }
 
-    // ✅ Check if seller exists
-    if (!product.seller) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "Seller details not found!",
-      });
-    }
+    let { seller, images, bannerImages, removedFiles, removedBannerFiles, bannerTitleName, isBannerVisible } = request.body;
 
-    let newImages = request.body.images || [];
-    let newBannerImages = request.body.bannerImages || [];
-    let cloudinaryMessages = [];
-    let validNewImages = [];
-    let validNewBannerImages = [];
+    console.log("Incoming request body:", request.body); // Log incoming request body
 
-    // ✅ Validate new images exist in Cloudinary
-    for (let newImageUrl of newImages) {
-      const publicId = extractPublicId(newImageUrl);
-      if (publicId) {
+    // Parse and validate the seller object
+    if (seller) {
+      if (typeof seller === "string") {
+        // If seller is a string, parse it directly
         try {
-          const result = await cloudinary.api.resource(publicId);
-          if (result) validNewImages.push(newImageUrl);
-          else cloudinaryMessages.push(`Image does not exist in Cloudinary: ${newImageUrl}`);
-        } catch (error) {
-          cloudinaryMessages.push(`Error checking image in Cloudinary: ${newImageUrl}`);
+          seller = JSON.parse(seller);
+        } catch (err) {
+          console.error("Error parsing seller:", err);
+          seller = null;
         }
-      }
-    }
+      } else if (Array.isArray(seller)) {
+        // If seller is an array, find the valid JSON string
+        const validSellerString = seller.find((item) => {
+          try {
+            JSON.parse(item); // Check if the item is a valid JSON string
+            return true;
+          } catch (e) {
+            return false;
+          }
+        });
 
-    // ✅ Validate new banner images exist in Cloudinary
-    for (let newBannerUrl of newBannerImages) {
-      const publicId = extractPublicId(newBannerUrl);
-      if (publicId) {
-        try {
-          const result = await cloudinary.api.resource(publicId);
-          if (result) validNewBannerImages.push(newBannerUrl);
-          else cloudinaryMessages.push(`Banner image does not exist in Cloudinary: ${newBannerUrl}`);
-        } catch (error) {
-          cloudinaryMessages.push(`Error checking banner image in Cloudinary: ${newBannerUrl}`);
+        if (validSellerString) {
+          try {
+            seller = JSON.parse(validSellerString); // Parse the valid JSON string
+          } catch (err) {
+            console.error("Error parsing valid seller string:", err);
+            seller = null;
+          }
+        } else {
+          console.error("No valid seller JSON string found in the array:", seller);
+          seller = null;
         }
+      } else if (typeof seller === "object") {
+        // If seller is already an object, use it directly
+        console.log("Seller is already an object:", seller);
+      } else {
+        console.error("Invalid seller format:", seller);
+        seller = null;
       }
+    } else {
+      console.error("Seller is missing or null.");
+      seller = null;
     }
 
-    // ✅ Preserve existing images if new images are not provided
-    product.images = validNewImages.length > 0 ? validNewImages : product.images;
-
-    // ✅ Handle `isBannerVisible` toggle without deleting banner data
-    if (request.body.isBannerVisible !== undefined) {
-      product.isBannerVisible = request.body.isBannerVisible;
+    // If seller is still invalid, delete the previous seller data
+    if (!seller || typeof seller !== "object" || !seller.sellerId || !seller.sellerName) {
+      console.log("Invalid seller data. Deleting previous seller data.");
+      seller = {
+        sellerId: product.seller?.sellerId || null,
+        sellerName: product.seller?.sellerName || null,
+      };
     }
 
-    // ✅ Only update banner title & images if new values are provided
-    if (request.body.isBannerVisible) {
-      if (!request.body.bannerTitleName || request.body.bannerTitleName.trim() === "") {
+    console.log("Parsed seller object:", seller); // Log the parsed seller object
+
+    // Rest of the code remains the same...
+    isBannerVisible = isBannerVisible === "true";
+    console.log("isBannerVisible:", isBannerVisible); // Log the banner visibility status
+
+    // ✅ Ensure `removedFiles` and `removedBannerFiles` are parsed correctly and only contain valid Cloudinary URLs
+    if (removedFiles && typeof removedFiles === "string") {
+      try {
+        removedFiles = JSON.parse(removedFiles);
+        if (!Array.isArray(removedFiles)) {
+          removedFiles = [];
+        }
+        removedFiles = removedFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"));
+      } catch (err) {
+        console.error("Error parsing removedFiles:", err);
+        removedFiles = [];
+      }
+    } else if (!Array.isArray(removedFiles)) {
+      removedFiles = [];
+    }
+
+    if (removedBannerFiles && typeof removedBannerFiles === "string") {
+      try {
+        removedBannerFiles = JSON.parse(removedBannerFiles);
+        if (!Array.isArray(removedBannerFiles)) {
+          removedBannerFiles = [];
+        }
+        removedBannerFiles = removedBannerFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"));
+      } catch (err) {
+        console.error("Error parsing removedBannerFiles:", err);
+        removedBannerFiles = [];
+      }
+    } else if (!Array.isArray(removedBannerFiles)) {
+      removedBannerFiles = [];
+    }
+
+    console.log("removedFiles after parsing:", removedFiles); // Log the parsed removed files
+    console.log("removedBannerFiles after parsing:", removedBannerFiles); // Log the parsed removed banner files
+
+    // ✅ Ensure `images` and `bannerImages` are parsed correctly
+    try {
+      images = Array.isArray(images) ? images : images ? JSON.parse(images) : product.images || [];
+      bannerImages = Array.isArray(bannerImages) ? bannerImages : bannerImages ? JSON.parse(bannerImages) : product.bannerImages || [];
+    } catch (err) {
+      console.error("Error parsing images or bannerImages:", err);
+      images = product.images || [];
+      bannerImages = product.bannerImages || [];
+    }
+
+    console.log("images after parsing:", images); // Log the parsed images
+    console.log("bannerImages after parsing:", bannerImages); // Log the parsed banner images
+
+    // ✅ Upload new images if provided
+    const newImages = request.files?.newProductImages ? await uploadImagesToCloudinary(request.files.newProductImages) : [];
+    const newBannerImages = request.files?.newBannerImages ? await uploadImagesToCloudinary(request.files.newBannerImages) : [];
+
+    console.log("newImages uploaded:", newImages); // Log new images uploaded
+    console.log("newBannerImages uploaded:", newBannerImages); // Log new banner images uploaded
+
+    // ✅ Remove only Cloudinary product images
+    await deleteCloudinaryImages(removedFiles);
+    images = images.filter((img) => !removedFiles.includes(img));
+
+    console.log("images after removal:", images); // Log images after removal of Cloudinary images
+
+    // ✅ Remove only Cloudinary banner images
+    await deleteCloudinaryImages(removedBannerFiles);
+    bannerImages = bannerImages.filter((img) => !removedBannerFiles.includes(img));
+
+    console.log("bannerImages after removal:", bannerImages); // Log banner images after removal
+
+    // ✅ Append new images and banners in the pattern you provided
+    const updatedImages = [...images, ...newImages];
+    let updatedBannerImages = [...bannerImages, ...newBannerImages];
+
+    console.log("updatedImages:", updatedImages); // Log the updated images
+    console.log("updatedBannerImages:", updatedBannerImages); // Log the updated banner images
+
+    // ✅ Handle banner logic based on `isBannerVisible`
+    if (!isBannerVisible) {
+      // Do not delete bannerTitleName or updatedBannerImages
+      // Just set isBannerVisible to false
+      isBannerVisible = false;
+    } else {
+      // If isBannerVisible is true, ensure bannerTitleName and updatedBannerImages are valid
+      if (!bannerTitleName?.trim()) {
+        console.log("Banner title is missing!");
         return response.status(400).json({
           error: true,
           success: false,
           message: "Banner is enabled but missing title.",
         });
       }
-      if (!Array.isArray(validNewBannerImages) || validNewBannerImages.length === 0) {
-        // If banner images are missing, but existing ones are present, keep them
-        if (product.bannerImages.length > 0) {
-          validNewBannerImages = product.bannerImages;
-        } else {
-          return response.status(400).json({
-            error: true,
-            success: false,
-            message: "Banner is enabled but no valid banner images provided.",
-          });
-        }
+
+      if (updatedBannerImages.length === 0) {
+        console.log("No valid banner images provided!");
+        return response.status(400).json({
+          error: true,
+          success: false,
+          message: "Banner is enabled but no valid banner images provided.",
+        });
       }
-      product.bannerTitleName = request.body.bannerTitleName;
-      product.bannerImages = validNewBannerImages;
     }
 
-
-
-    // ✅ Fetch valid RAMs dynamically
+    // ✅ Filter and sort product RAM
     const validProductRams = await getValidProductRams();
     const filteredProductRams = (request.body.productRam || [])
-      .filter(ram => validProductRams.includes(ram))
+      .filter((ram) => validProductRams.includes(ram))
       .sort((a, b) => parseRamSize(a) - parseRamSize(b));
 
-    // ✅ Fetch and sort valid weights dynamically
+    // ✅ Filter and sort product weight
     const validWeights = await ProductWeightModel.find({});
-    const weightOrder = validWeights.reduce((acc, weight, index) => {
-      acc[weight.name] = index + 1;
-      return acc;
-    }, {});
-
-    const parseWeightToGrams = weight => (weight.includes('kg') ? parseFloat(weight) * 1000 : parseFloat(weight));
+    const weightOrder = validWeights.reduce((acc, weight, index) => ({ ...acc, [weight.name]: index + 1 }), {});
+    const parseWeightToGrams = (weight) => (weight.includes("kg") ? parseFloat(weight) * 1000 : parseFloat(weight));
     const sortedWeights = (request.body.productWeight || [])
-      .filter(weight => weightOrder[weight])
+      .filter((weight) => weightOrder[weight])
       .sort((a, b) => parseWeightToGrams(a) - parseWeightToGrams(b));
 
-    // ✅ Fetch and sort valid sizes dynamically
+    // ✅ Filter and sort product sizes
     const predefinedSizeOrder = ["S", "M", "L", "XL", "XXL", "XXXL"];
     const validSizesFromDB = await ProductSizeModel.find({});
-    const validSizeNames = validSizesFromDB.map(size => size.name);
-    const filteredSizes = (request.body.size || []).filter(size => validSizeNames.includes(size));
-    const sortedSizes = filteredSizes.sort((a, b) => predefinedSizeOrder.indexOf(a) - predefinedSizeOrder.indexOf(b));
+    const validSizeNames = validSizesFromDB.map((size) => size.name);
+    const sortedSizes = (request.body.size || [])
+      .filter((size) => validSizeNames.includes(size))
+      .sort((a, b) => predefinedSizeOrder.indexOf(a) - predefinedSizeOrder.indexOf(b));
 
-    // ✅ Update product in the database
+    // ✅ Update product in DB
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
       {
         ...request.body,
-        images: product.images,
-        bannerImages: product.bannerImages,
+        images: updatedImages,
+        bannerImages: updatedBannerImages,
         productRam: filteredProductRams,
         productWeight: sortedWeights,
         size: sortedSizes,
-        isBannerVisible: product.isBannerVisible,
-        bannerTitleName: product.bannerTitleName,
+        isBannerVisible: isBannerVisible,
+        bannerTitleName: bannerTitleName,
+        seller: seller, // Use the formatted seller object
       },
       { new: true }
-    ).populate("seller", "sellerName contact"); // Ensure seller remains populated
+    ).populate("seller", "sellerName contact");
 
     if (!updatedProduct) {
-      return response.status(400).json({
-        error: true,
-        success: false,
-        message: "Product update failed!",
-      });
+      return response.status(400).json({ error: true, success: false, message: "Product update failed!" });
     }
 
     return response.status(200).json({
       message: "Product updated successfully.",
       success: true,
-      cloudinaryMessages,
       product: updatedProduct,
-      seller: updatedProduct.seller, // ✅ Include seller details in response
+      seller: updatedProduct.seller, // Use the formatted seller object
     });
   } catch (error) {
-    return response.status(500).json({
-      message: error.message || "An error occurred during product update.",
-      success: false,
-      error: error.message || error,
-    });
+    console.error("Error in updateProduct:", error);
+    return response.status(500).json({ message: error.message || "An error occurred during product update.", success: false, error });
   }
 }
-
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------
 
 // delete all unwanted images from cloudinary
+
+
 export async function deleteAllUnWantedImages(req, res) {
   try {
     console.log("Fetching all products from DB...");
