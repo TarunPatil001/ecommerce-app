@@ -1039,6 +1039,68 @@ const deleteCloudinaryImages = async (imageUrls) => {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
+// export async function deleteProduct(request, response) {
+//   try {
+//     const productId = request.params.id;
+//     const product = await ProductModel.findById(productId);
+
+//     if (!product) {
+//       return response.status(404).json({
+//         message: "Product not found.",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     // Function to delete images from Cloudinary
+//     async function deleteImages(images, type) {
+//       if (!images || images.length === 0) return [];
+
+//       return Promise.allSettled(
+//         images.map(async (imageUrl, index) => {
+//           const publicId = extractPublicId(imageUrl);
+//           if (!publicId) return `Failed to extract public ID for ${type} image ${index + 1}.`;
+
+//           console.log(`Deleting ${type} image: ${publicId}`);
+//           try {
+//             const result = await cloudinary.uploader.destroy(publicId);
+//             return result.result === "ok"
+//               ? `${type} Image ${index + 1} deleted successfully.`
+//               : `Failed to delete ${type} image ${index + 1}: ${result.error?.message || "Unknown error"}`;
+//           } catch (error) {
+//             return `Error deleting ${type} image ${index + 1}: ${error.message}`;
+//           }
+//         })
+//       );
+//     }
+
+//     // Delete product images and banner images
+//     const [productImageResults, bannerImageResults] = await Promise.all([
+//       deleteImages(product.images, "Product"),
+//       deleteImages(product.bannerImages, "Banner"),
+//     ]);
+
+//     // Delete the product from the database
+//     await ProductModel.findByIdAndDelete(productId);
+
+//     console.log(`Product ${productId} and its images deleted successfully.`);
+//     return response.status(200).json({
+//       message: "Product and associated images deleted successfully.",
+//       success: true,
+//       error: false,
+//       productImageResults,
+//       bannerImageResults,
+//     });
+//   } catch (error) {
+//     console.error("Error deleting product:", error);
+//     return response.status(500).json({
+//       message: error.message || "Internal Server Error",
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
 export async function deleteProduct(request, response) {
   try {
     const productId = request.params.id;
@@ -1052,33 +1114,8 @@ export async function deleteProduct(request, response) {
       });
     }
 
-    // Function to delete images from Cloudinary
-    async function deleteImages(images, type) {
-      if (!images || images.length === 0) return [];
-
-      return Promise.allSettled(
-        images.map(async (imageUrl, index) => {
-          const publicId = extractPublicId(imageUrl);
-          if (!publicId) return `Failed to extract public ID for ${type} image ${index + 1}.`;
-
-          console.log(`Deleting ${type} image: ${publicId}`);
-          try {
-            const result = await cloudinary.uploader.destroy(publicId);
-            return result.result === "ok"
-              ? `${type} Image ${index + 1} deleted successfully.`
-              : `Failed to delete ${type} image ${index + 1}: ${result.error?.message || "Unknown error"}`;
-          } catch (error) {
-            return `Error deleting ${type} image ${index + 1}: ${error.message}`;
-          }
-        })
-      );
-    }
-
-    // Delete product images and banner images
-    const [productImageResults, bannerImageResults] = await Promise.all([
-      deleteImages(product.images, "Product"),
-      deleteImages(product.bannerImages, "Banner"),
-    ]);
+    // Delete product and banner images from Cloudinary
+    await deleteCloudinaryImages([...product.images, ...product.bannerImages]);
 
     // Delete the product from the database
     await ProductModel.findByIdAndDelete(productId);
@@ -1088,8 +1125,6 @@ export async function deleteProduct(request, response) {
       message: "Product and associated images deleted successfully.",
       success: true,
       error: false,
-      productImageResults,
-      bannerImageResults,
     });
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -1100,7 +1135,6 @@ export async function deleteProduct(request, response) {
     });
   }
 }
-
 
 
 
@@ -1140,38 +1174,9 @@ export async function deleteMultipleProduct(req, res) {
 
     console.log(`Found ${products.length} products for deletion.`);
 
-    // Extract and delete images
-    async function deleteImages(images, type) {
-      if (!images || images.length === 0) return [];
-
-      return Promise.allSettled(
-        images.map(async (imageUrl, index) => {
-          const publicId = extractPublicId(imageUrl);
-          if (!publicId) return `Failed to extract public ID for ${type} image ${index + 1}.`;
-
-          console.log(`Deleting ${type} image: ${publicId}`);
-
-          try {
-            const result = await cloudinary.uploader.destroy(publicId);
-            return result.result === "ok"
-              ? `${type} Image ${index + 1} deleted successfully.`
-              : `Failed to delete ${type} image ${index + 1}: ${result.error?.message || "Unknown error"}`;
-          } catch (error) {
-            return `Error deleting ${type} image ${index + 1}: ${error.message}`;
-          }
-        })
-      );
-    }
-
-    const deletionPromises = products.map(async (product) => {
-      const [productImageMessages, bannerImageMessages] = await Promise.all([
-        deleteImages(product.images, "Product"),
-        deleteImages(product.bannerImages, "Banner"),
-      ]);
-      return [...productImageMessages, ...bannerImageMessages];
-    });
-
-    const cloudinaryMessages = (await Promise.all(deletionPromises)).flat();
+    // Extract and delete images using helper function
+    const allImages = products.flatMap(product => [...product.images, ...product.bannerImages]);
+    await deleteCloudinaryImages(allImages);
 
     // Delete products from DB
     await ProductModel.deleteMany({ _id: { $in: idArray } });
@@ -1182,9 +1187,7 @@ export async function deleteMultipleProduct(req, res) {
       message: "Products and associated images deleted successfully.",
       success: true,
       error: false,
-      cloudinaryMessages,
     });
-
   } catch (error) {
     console.error("Error deleting products:", error);
     return res.status(500).json({
@@ -1198,223 +1201,6 @@ export async function deleteMultipleProduct(req, res) {
 
 
 // ----------------------------------------------------------------------------------------------------------------------
-
-// Combined logic for both creating a new product and updating an existing product
-export async function removeImageProductFromCloudinary(request, response) {
-  try {
-    const { imgUrl, productId } = request.query;  // Expecting both imgUrl and productId in query
-    console.log("Request Query:", request.query);  // Log the incoming request query
-
-    // Validate input
-    if (!imgUrl) {
-      return response.status(400).json({ error: "Image URL is required" });
-    }
-
-    // Handle image removal logic for both new and existing products
-    if (productId) {
-      // If productId is provided, handle for editing an existing product
-      const product = await ProductModel.findById(productId);
-
-      if (!product) {
-        return response.status(404).json({ error: "Product not found" });
-      }
-
-      // Remove the image from the product's image array
-      const updatedImages = product.images.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
-      if (updatedImages.length === product.images.length) {
-        return response.status(404).json({ error: "Image not found in product images" });
-      }
-
-      // Update the product in the database
-      product.images = updatedImages;
-      await product.save();
-
-      // Also update the imagesArr in-memory (or your state management) to reflect the changes
-      if (imagesArr[productId]) {
-        imagesArr[productId] = imagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
-      }
-
-      console.log("Image removed from product", productId);
-    } else {
-      // If no productId is provided, handle as new product
-      if (imagesArr["new"] && imagesArr["new"].includes(imgUrl)) {
-        const index = imagesArr["new"].indexOf(imgUrl);
-        imagesArr["new"].splice(index, 1);  // Remove from the global new set
-        console.log("Image removed from global set");
-      } else {
-        return response.status(404).json({ error: "Image URL not found in global images" });
-      }
-    }
-
-    // Extract the public ID from the imgUrl for Cloudinary deletion
-    const publicId = extractPublicId(imgUrl);
-    if (!publicId) {
-      return response.status(400).json({
-        message: "Invalid image URL format",
-        success: false,
-        error: true,
-      });
-    }
-
-    console.log("Deleting image with public ID:", publicId);
-
-    // Attempt to delete the image from Cloudinary
-    const result = await cloudinary.uploader.destroy(publicId);
-
-    if (result.result === "ok") {
-      console.log("Image successfully deleted from Cloudinary:", imgUrl);
-      return response.status(200).json({
-        message: "Image removed successfully from Cloudinary and product",
-        success: true,
-      });
-    }
-
-    // If the Cloudinary deletion result is not 'ok'
-    return response.status(404).json({
-      message: "Image not found in Cloudinary",
-      success: false,
-      error: true,
-    });
-  } catch (error) {
-    console.error("Error in removeImageProduct:", error);
-    return response.status(500).json({
-      message: "Failed to remove image",
-      success: false,
-      error: true,
-    });
-  }
-}
-
-
-// ----------------------------------------------------------------------------------------------------------------------
-
-export async function removeImageBannerFromCloudinary(request, response) {
-  try {
-    const { imgUrl, productId } = request.query;  // Expecting both imgUrl and productId in query
-    console.log("Request Query:", request.query);  // Log the incoming request query
-
-    // Validate input
-    if (!imgUrl) {
-      return response.status(400).json({ error: "Banner image URL is required" });
-    }
-
-    // Handle image removal logic for both new and existing products
-    if (productId) {
-      // If productId is provided, handle for editing an existing product
-      const product = await ProductModel.findById(productId);
-
-      if (!product) {
-        return response.status(404).json({ error: "Product not found" });
-      }
-
-      // Remove the image from the product's bannerImages array
-      const updatedBannerImages = product.bannerImages.filter(imageUrl => imageUrl.trim() !== imgUrl.trim());
-      if (updatedBannerImages.length === product.bannerImages.length) {
-        return response.status(404).json({ error: "Banner image not found in product images" });
-      }
-
-      // Update the product in the database
-      product.bannerImages = updatedBannerImages;
-      await product.save();
-
-      // Also update the bannerImagesArr in-memory (or your state management) to reflect the changes
-      if (bannerImagesArr[productId]) {
-        bannerImagesArr[productId] = bannerImagesArr[productId].filter(url => url.trim() !== imgUrl.trim());
-      }
-
-      console.log("Banner image removed from product", productId);
-    } else {
-      // If no productId is provided, handle as new product
-      if (bannerImagesArr["new"] && bannerImagesArr["new"].includes(imgUrl)) {
-        const index = bannerImagesArr["new"].indexOf(imgUrl);
-        bannerImagesArr["new"].splice(index, 1);  // Remove from the global new set
-        console.log("Banner image removed from global set");
-      } else {
-        return response.status(404).json({ error: "Banner image URL not found in global images" });
-      }
-    }
-
-    // Extract the public ID from the imgUrl for Cloudinary deletion
-    const publicId = extractPublicId(imgUrl);
-    if (!publicId) {
-      return response.status(400).json({
-        message: "Invalid banner image URL format",
-        success: false,
-        error: true,
-      });
-    }
-
-    console.log("Deleting banner image with public ID:", publicId);
-
-    // Attempt to delete the image from Cloudinary
-    const result = await cloudinary.uploader.destroy(publicId);
-
-    if (result.result === "ok") {
-      console.log("Banner image successfully deleted from Cloudinary:", imgUrl);
-      return response.status(200).json({
-        message: "Banner image removed successfully from Cloudinary and product",
-        success: true,
-      });
-    }
-
-    // If the Cloudinary deletion result is not 'ok'
-    return response.status(404).json({
-      message: "Banner image not found in Cloudinary",
-      success: false,
-      error: true,
-    });
-  } catch (error) {
-    console.error("Error in removeImageBannerFromCloudinary:", error);
-    return response.status(500).json({
-      message: "Failed to remove banner image",
-      success: false,
-      error: true,
-    });
-  }
-}
-
-
-
-// ----------------------------------------------------------------------------------------------------------------------
-
-// Function to parse RAM size into GB for sorting
-const parseRamSize = (ramSize) => {
-  const sizeValue = parseInt(ramSize);
-  if (ramSize.includes("TB")) {
-    return sizeValue * 1024; // Convert TB to GB
-  } else if (ramSize.includes("GB")) {
-    return sizeValue; // In GB
-  } else if (ramSize.includes("MB")) {
-    return sizeValue / 1024; // Convert MB to GB
-  }
-  return 0; // Default case if no match
-};
-
-
-// Function to get valid RAMs dynamically from DB and sort from small to large
-const getValidProductRams = async () => {
-  try {
-    const res = await ProductRamsModel.find().select("name"); // Fetch only RAM names
-
-    if (res.length === 0) {
-      console.log("No product RAMs found.");
-      return [];
-    }
-
-    // Extract RAM names from the database response
-    const validProductRams = res.map((ram) => ram.name);
-
-    // Sort RAM sizes from small to large by numerical value
-    const sortedValidProductRams = validProductRams.sort((a, b) => parseRamSize(a) - parseRamSize(b));
-
-    return sortedValidProductRams;
-
-  } catch (error) {
-    console.error("Error fetching product RAMs:", error);
-    return []; // Return empty array if there's an error
-  }
-};
-
 
 // Function to update product
 export async function updateProduct(request, response) {
@@ -1646,9 +1432,51 @@ export async function updateProduct(request, response) {
 
 // ----------------------------------------------------------------------------------------------------------------------
 
+// Function to parse RAM size into GB for sorting
+const parseRamSize = (ramSize) => {
+  const sizeValue = parseInt(ramSize);
+  if (ramSize.includes("TB")) {
+    return sizeValue * 1024; // Convert TB to GB
+  } else if (ramSize.includes("GB")) {
+    return sizeValue; // In GB
+  } else if (ramSize.includes("MB")) {
+    return sizeValue / 1024; // Convert MB to GB
+  }
+  return 0; // Default case if no match
+};
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+
+// Function to get valid RAMs dynamically from DB and sort from small to large
+const getValidProductRams = async () => {
+  try {
+    const res = await ProductRamsModel.find().select("name"); // Fetch only RAM names
+
+    if (res.length === 0) {
+      console.log("No product RAMs found.");
+      return [];
+    }
+
+    // Extract RAM names from the database response
+    const validProductRams = res.map((ram) => ram.name);
+
+    // Sort RAM sizes from small to large by numerical value
+    const sortedValidProductRams = validProductRams.sort((a, b) => parseRamSize(a) - parseRamSize(b));
+
+    return sortedValidProductRams;
+
+  } catch (error) {
+    console.error("Error fetching product RAMs:", error);
+    return []; // Return empty array if there's an error
+  }
+};
+
+
+// ----------------------------------------------------------------------------------------------------------------------
+
 // delete all unwanted images from cloudinary
-
-
 export async function deleteAllUnWantedImages(req, res) {
   try {
     console.log("Fetching all products from DB...");
@@ -1670,15 +1498,13 @@ export async function deleteAllUnWantedImages(req, res) {
     });
     console.log("Cloudinary images fetched:", cloudinaryImages);
 
-    const imagesToDelete = cloudinaryImages.resources.filter(
-      (img) => !linkedImages.has(img.secure_url)
-    );
+    const imagesToDelete = cloudinaryImages.resources
+      .map((img) => img.secure_url)
+      .filter((imgUrl) => !linkedImages.has(imgUrl));
+
     console.log("Images to delete:", imagesToDelete);
 
-    for (const img of imagesToDelete) {
-      console.log("Deleting image:", img.public_id);
-      await cloudinary.uploader.destroy(img.public_id);
-    }
+    await deleteCloudinaryImages(imagesToDelete);
 
     return res.status(200).json({
       message: "Unwanted images deleted successfully.",
@@ -1692,8 +1518,6 @@ export async function deleteAllUnWantedImages(req, res) {
     });
   }
 }
-
-
 
 
 

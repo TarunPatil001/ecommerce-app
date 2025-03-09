@@ -7,7 +7,7 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import { IoClose } from "react-icons/io5";
 import { MyContext } from '../../App';
 import toast from 'react-hot-toast';
-import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/api';
+import { editData, fetchDataFromApi, postData } from '../../utils/api';
 import { RiResetLeftFill } from 'react-icons/ri';
 import { IoIosSave } from 'react-icons/io';
 import { FiEdit } from 'react-icons/fi';

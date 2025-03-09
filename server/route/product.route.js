@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
-import { createProduct, createProductRams, createProductSize, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductSize, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductSize, deleteProductWeight, filters, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductSize,  getAllProductWeight, getProduct, getProductRamById, getProductSizeById, getProductWeightById, getTotalSales, removeImageBannerFromCloudinary, removeImageProductFromCloudinary, sortBy, updateProduct, updateProductRams, updateProductSize, updateProductWeight, } from "../controllers/product.controller.js";
+import { createProduct, createProductRams, createProductSize, createProductWeight, deleteAllUnWantedImages, deleteMultipleProduct, deleteMultipleProductRams, deleteMultipleProductSize, deleteMultipleProductWeight, deleteProduct, deleteProductRams, deleteProductSize, deleteProductWeight, filters, getAllFeaturedProducts, getAllFilteredProducts, getAllProductRams, getAllProducts, getAllProductsByCategoryId, getAllProductsByCategoryName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCategoryId, getAllProductsBySubCategoryName, getAllProductsByThirdSubCategoryId, getAllProductsByThirdSubCategoryName, getAllProductsCount,  getAllProductSize,  getAllProductWeight, getProduct, getProductRamById, getProductSizeById, getProductWeightById, getTotalSales, sortBy, updateProduct, updateProductRams, updateProductSize, updateProductWeight, } from "../controllers/product.controller.js";
 
 
 // const productRouter = Router();
@@ -10,23 +10,8 @@ const productRouter = Router();
 // ---------------------------------------------------------------------------------------------
 // Product Routes
 
-// Upload product images
-// productRouter.post("/upload-product-images", auth, upload.array("images"), uploadProductImages);
-
-
-// Upload banner images
-// productRouter.post("/upload-banner-images", auth, upload.array("bannerImages"), uploadProductBannerImages);
-
-// remove image from cloudinary
-productRouter.delete("/delete-product-image", auth, removeImageProductFromCloudinary);
-
-// remove image from cloudinary
-productRouter.delete("/delete-banner-image", auth, removeImageBannerFromCloudinary);
-
 // Create a new product
 productRouter.post("/create-product", auth, upload.fields([{ name: "images" }, { name: "bannerImages" }]), createProduct);
-// productRouter.post("/create-product", auth, upload.array("images"), createProduct);
-// productRouter.post("/create-product", auth, createProduct);
 
 // Get all products
 productRouter.get("/get-all-products", getAllProducts);
@@ -78,7 +63,6 @@ productRouter.get("/:id", getProduct);
 
 // update product
 productRouter.put("/updateProduct/:id", auth, upload.fields([{ name: "newProductImages" }, { name: "newBannerImages" }]), updateProduct);
-// productRouter.put("/updateProduct/:id", auth, updateProduct);
  
 // delete All UnWanted Images
 productRouter.post("/deleteAllUnWantedImages", auth, deleteAllUnWantedImages);
