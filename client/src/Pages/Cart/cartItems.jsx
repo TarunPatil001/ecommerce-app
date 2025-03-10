@@ -1,4 +1,4 @@
-import  { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button, Dialog, Rating } from '@mui/material';
 import { FaCaretDown } from 'react-icons/fa';
 import { RiCloseLargeLine } from 'react-icons/ri';
@@ -16,7 +16,7 @@ const CartItems = (props) => {
     const context = useContext(MyContext);
 
     const [isOpenModel, setIsOpenModel] = useState(false);
-    const [setItemId] = useState(null);
+    const [itemId, setItemId] = useState(null);
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedWeight, setSelectedWeight] = useState("");
     const [selectedRam, setSelectedRam] = useState("");
@@ -298,6 +298,7 @@ const CartItems = (props) => {
                             </span>
                         </div>
                     </div>
+                   
                     <div className="flex items-center gap-2 mt-2">
                         <span className="price text-black text-[16px] font-bold flex items-center">
                             ₹{new Intl.NumberFormat('en-IN').format(`${props?.item?.subTotal}`)}

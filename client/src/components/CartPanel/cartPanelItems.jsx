@@ -14,7 +14,7 @@ import { RxCross2 } from 'react-icons/rx';
 const CartPanelItems = (props) => {
   const context = useContext(MyContext);
   const [isOpenModel, setIsOpenModel] = useState(false);
-  const [setItemId] = useState(null);
+  const [itemId, setItemId] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedWeight, setSelectedWeight] = useState("");
   const [selectedRam, setSelectedRam] = useState("");
@@ -258,7 +258,7 @@ const CartPanelItems = (props) => {
           </h4>
 
           <h6 className="text-[12px] line-clamp-1 text-[rgba(0,0,0,0.4)]">Seller: <span className="capitalize">{props?.item?.sellerDetails?.sellerName}</span></h6>
-          <div className="flex items-center gap-2 mt-1">
+          {/* <div className="flex items-center gap-2 mt-1">
             <div className="relative">
               <span
                 className="bg-gray-100 px-2 border hover:border-black rounded-sm font-bold text-[13px] flex items-center gap-1 cursor-pointer"
@@ -292,6 +292,45 @@ const CartPanelItems = (props) => {
                   onClick={addQty}
                 >
                   <FiPlus className='!text-[20px] !font-bold' />
+                </Button>
+              </span>
+            </div>
+          </div> */}
+
+          <div className="flex items-center gap-2 mt-1">
+            <div className="relative">
+              <span
+                className="bg-gray-100 px-2 border hover:border-black rounded-sm font-bold text-[13px] flex items-center gap-1 cursor-pointer"
+                onClick={handleClickOpen}
+              >
+                {props?.item?.availableOptions.size?.length > 0
+                  ? "Size: "
+                  : props?.item?.availableOptions.productWeight?.length > 0
+                    ? "Weight: "
+                    : props?.item?.availableOptions.productRam?.length > 0
+                      ? "RAM: "
+                      : ""}
+                <span>
+                  {`${props?.item?.selectedOptions?.size || ""} ${props?.item?.selectedOptions?.productWeight || ""} ${props?.item?.selectedOptions?.productRam || ""}`.trim()}
+                </span>
+                <FaCaretDown />
+              </span>
+            </div>
+            <div className="w-auto">
+              <span className="w-full border flex items-center rounded-full">
+                <Button
+                  className={`!w-[30px] !min-w-[30px] !h-[20px] !rounded-l-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black ${props?.item?.quantity <= 1 ? "opacity-30 cursor-not-allowed" : ""}`}
+                  onClick={removeQty}
+                  disabled={props?.item?.quantity <= 1}
+                >
+                  <FiMinus className="!text-[20px] !font-bold" />
+                </Button>
+                <span className="w-[40px] text-center text-[13px]">{props?.item?.quantity}</span>
+                <Button
+                  className={`!w-[30px] !min-w-[30px] !h-[20px] !rounded-r-full !bg-gray-200 shadow !text-[20px] !font-bold !text-black`}
+                  onClick={addQty}
+                >
+                  <FiPlus className="!text-[20px] !font-bold" />
                 </Button>
               </span>
             </div>

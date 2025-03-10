@@ -23,6 +23,7 @@ const Sidebar = (props) => {
     const [isOpenCategoryFilter4, setIsOpenCategoryFilter4] = useState(true);
     const [isOpenCategoryFilter5, setIsOpenCategoryFilter5] = useState(true);
     const ratings = [5, 4, 3, 2, 1];
+    // const [selectedName, setSelectedName] = useState('All Categories');
 
 
 
@@ -108,7 +109,9 @@ const Sidebar = (props) => {
             });
         }
 
+
         props?.setSelectedName(selectedName);
+
     }, [filters.categoryId, filters.subCategoryId, filters.thirdSubCategoryId, context?.catData]); // Runs when filters/context data changes
 
 
@@ -145,6 +148,7 @@ const Sidebar = (props) => {
 
     return (
         <aside className="sidebar">
+            
             <div className="p-1 border-x border-t rounded-t-md">
                 <h3 className="p-2 px-4 text-[18px] font-semibold uppercase">Filters</h3>
             </div>

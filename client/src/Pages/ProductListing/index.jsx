@@ -31,7 +31,7 @@ const ProductListing = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [setSelectedName] = useState('');
+  const [selectedName, setSelectedName] = useState('');
   const [selectedSortValue, setSelectedSortValue] = useState('Name: A to Z');
 
 
@@ -137,6 +137,7 @@ const ProductListing = () => {
               page={page}
               setTotalPages={setTotalPages}
               setTotal={setTotal}
+              // selectedName={selectedName}
               setSelectedName={setSelectedName}
             />
           </div>
