@@ -10,7 +10,8 @@ import PropTypes from 'prop-types';
 const WishlistItems = (props) => {
 
     const context = useContext(MyContext);
-    const [setIsAddedWishlist] = useState(false);
+    const [isAddedWishlist, setIsAddedWishlist] = useState(false);
+
 
     useEffect(() => {
         window?.scroll(0, 0);
@@ -20,7 +21,7 @@ const WishlistItems = (props) => {
     useEffect(() => {
         if (context?.userData) {
             const isWishlistItem = context?.wishlistData?.find((w) => w?.productId === props?.item?._id);
-            setIsAddedWishlist(!!isWishlistItem); // Convert to boolean
+            setIsAddedWishlist(!isWishlistItem); // Convert to boolean
         } else {
             setIsAddedWishlist(false);
         }

@@ -2525,3 +2525,59 @@ export async function sortBy(request, response) {
     });
   }
 }
+
+
+
+
+export async function searchProductController(request, response) {
+  try {
+    const { query, page, limit } = request.body; // Get values from body
+
+    if (!query) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Query is required.",
+      });
+    }
+
+    // Ensure proper numeric values for pagination
+    const pageNumber = parseInt(page) || 1;
+    const limitNumber = parseInt(limit) || 30; // Default to 30 if not provided
+
+    const filters = {
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { brand: { $regex: query, $options: "i" } },
+        { categoryName: { $regex: query, $options: "i" } },
+        { subCategoryName: { $regex: query, $options: "i" } },
+        { thirdSubCategoryName: { $regex: query, $options: "i" } },
+      ],
+    };
+
+    // Get total count of matching products
+    const total = await ProductModel.countDocuments(filters);
+
+    // Fetch paginated items
+    const items = await ProductModel.find(filters)
+      .populate("category")
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    return response.status(200).json({
+      error: false,
+      success: true,
+      data: items,
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: Math.ceil(total / limitNumber),
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}

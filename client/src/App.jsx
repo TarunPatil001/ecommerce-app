@@ -20,6 +20,7 @@ import { fetchDataFromApi, postData } from './utils/api';
 import Address from './Pages/MyAccount/address';
 import OrderSuccess from './Pages/Orders/success';
 import OrderFailed from './Pages/Orders/failed';
+import SearchPage from './Pages/Search';
 
 
 
@@ -47,6 +48,9 @@ function App() {
   const [cartItem, setCartItem] = useState(null);
   const [wishlistData, setWishlistData] = useState([]);
   // const [isWishlist, setIsWishlist] = useState(false);
+  const [searchData, setSearchData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
@@ -301,6 +305,16 @@ function App() {
     // isWishlist,
     // setIsWishlist,
 
+    searchData,
+    setSearchData,
+
+    isSearchTriggered,
+    setIsSearchTriggered,
+
+    searchQuery, 
+    setSearchQuery
+
+
   };
 
   return (
@@ -325,6 +339,7 @@ function App() {
             <Route path={"/my-orders"} exact={true} element={<Orders />} />
             <Route path={"/order/success"} exact={true} element={<OrderSuccess />} />
             <Route path={"/order/failed"} exact={true} element={<OrderFailed />} />
+            <Route path={"/search"} exact={true} element={<SearchPage />} />
           </Routes>
           <Footer />
         </MyContext.Provider>

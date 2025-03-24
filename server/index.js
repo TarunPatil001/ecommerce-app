@@ -16,6 +16,7 @@ import homeSlideRouter from "./route/homeSlide.route.js";
 import bannerV1Router from "./route/bannerV1.route.js";
 import blogRouter from "./route/blog.route.js";
 import orderRouter from "./route/order.route.js";
+import { searchProductController } from "./controllers/product.controller.js";
 
 const app = express();
 
