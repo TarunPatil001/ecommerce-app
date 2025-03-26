@@ -50,7 +50,8 @@ function App() {
   // const [isWishlist, setIsWishlist] = useState(false);
   const [searchData, setSearchData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchTriggered, setIsSearchTriggered] = useState(false);
+  const [isSearch, setIsSearch] = useState('');
+  const [filteredProductData, setFilteredProductData] = useState([]);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
 
@@ -307,12 +308,13 @@ function App() {
 
     searchData,
     setSearchData,
-
-    isSearchTriggered,
-    setIsSearchTriggered,
+    filteredProductData, 
+    setFilteredProductData,
 
     searchQuery, 
-    setSearchQuery
+    setSearchQuery,
+    isSearch, 
+    setIsSearch,
 
 
   };

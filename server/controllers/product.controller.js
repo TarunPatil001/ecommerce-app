@@ -2457,6 +2457,7 @@ export async function filters(request, response) {
       success: true,
       data: products,
       total: total,
+      limit: limit,
       page: parseInt(page),
       totalPages: Math.ceil(total / limit),
     });
@@ -2471,27 +2472,27 @@ export async function filters(request, response) {
 }
 
 
-// Utility function to sort products
-const sortItems = ({ data: products }, sortBy = "name", order = "asc") => {
-  // Create a copy of the array to avoid mutating the original
-  return products.slice().sort((a, b) => {
-    if (sortBy === "name") {
-      return order === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    }
+// // Utility function to sort products
+// const sortItems = ({ data: products }, sortBy = "name", order = "asc") => {
+//   // Create a copy of the array to avoid mutating the original
+//   return products.slice().sort((a, b) => {
+//     if (sortBy === "name") {
+//       return order === "asc"
+//         ? a.name.localeCompare(b.name)
+//         : b.name.localeCompare(a.name);
+//     }
 
-    if (sortBy === "price") {
-      return order === "asc" ? a.price - b.price : b.price - a.price;
-    }
+//     if (sortBy === "price") {
+//       return order === "asc" ? a.price - b.price : b.price - a.price;
+//     }
 
-    if (sortBy === "rating") {
-      return order === "asc" ? a.rating - b.rating : b.rating - a.rating;
-    }
+//     if (sortBy === "rating") {
+//       return order === "asc" ? a.rating - b.rating : b.rating - a.rating;
+//     }
 
-    return 0; // Default case: no sorting
-  });
-};
+//     return 0; // Default case: no sorting
+//   });
+// };
 
 // API endpoint to handle sorting
 export async function sortBy(request, response) {
@@ -2528,10 +2529,273 @@ export async function sortBy(request, response) {
 
 
 
+// Enhanced utility function to sort products with price range support
+const sortItems = ({ data: products }, sortBy = "relevance", order = "asc", priceRange = null) => {
+  let filteredProducts = products.slice();
+  
+  // Apply price range filter if specified
+  if (priceRange) {
+    filteredProducts = filteredProducts.filter(product => {
+      return product.price <= priceRange;
+    });
+  }
+
+  // Apply sorting
+  return filteredProducts.sort((a, b) => {
+    if (sortBy === "relevance") {
+      // Maintain original order if relevance is selected
+      return 0;
+    }
+    if (sortBy === "name") {
+      return order === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    }
+    if (sortBy === "price") {
+      return order === "asc" ? a.price - b.price : b.price - a.price;
+    }
+    if (sortBy === "rating") {
+      return order === "asc" ? a.rating - b.rating : b.rating - a.rating;
+    }
+    return 0;
+  });
+};
+
+// export async function searchProductController(request, response) {
+//   try {
+//     const { query, page, limit, sortBy, category } = request.body;
+
+//     if (!query) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "Query is required.",
+//       });
+//     }
+
+//     const pageNumber = parseInt(page) || 1;
+//     const limitNumber = parseInt(limit) || 30;
+//     const sortOption = sortBy || 'relevance';
+
+//     // Extract price range from query (e.g., "mobiles under 5000")
+//     let priceRange = null;
+//     const priceRangeMatch = query.match(/(under|below|less than)\s*(\d+)/i);
+//     if (priceRangeMatch) {
+//       priceRange = parseInt(priceRangeMatch[2]);
+//     }
+
+//     // Process query into individual terms (excluding price range terms)
+//     const queryTerms = query
+//       .replace(/(under|below|less than)\s*\d+/i, '') // Remove price range terms
+//       .trim()
+//       .toLowerCase()
+//       .split(/\s+/)
+//       .filter(word => word.length > 0);
+
+//     if (queryTerms.length === 0 && !priceRange) {
+//       return response.status(400).json({
+//         error: true,
+//         success: false,
+//         message: "No valid search terms provided.",
+//       });
+//     }
+
+//     // Base filter - include category filter if provided
+//     const baseFilter = category ? { categoryName: new RegExp(category, 'i') } : {};
+
+//     // Add price range to filter if specified
+//     if (priceRange) {
+//       baseFilter.price = { $lte: priceRange };
+//     }
+
+//     // Function to create regex that matches words starting with term
+//     const createStartsWithRegex = (term) => {
+//       const chars = term.split('');
+//       const abbrevPattern = chars.join('[.\\s]*');
+//       return `(^|\\s)${abbrevPattern}`;
+//     };
+
+//     // Build search conditions
+//     const searchConditions = queryTerms.length > 0 ? queryTerms.map(term => ({
+//       $or: [
+//         { name: { $regex: createStartsWithRegex(term), $options: 'i' } },
+//         { brand: { $regex: createStartsWithRegex(term), $options: 'i' } },
+//         { categoryName: { $regex: `^${term}`, $options: 'i' } },
+//         { subCategoryName: { $regex: `^${term}`, $options: 'i' } },
+//         { thirdSubCategoryName: { $regex: `^${term}`, $options: 'i' } },
+//         { tags: { $regex: `^${term}`, $options: 'i' } }
+//       ]
+//     })) : [{}]; // If only price range specified
+
+//     // Combine filters
+//     const filters = {
+//       ...baseFilter,
+//       $and: [
+//         { $or: searchConditions }
+//       ]
+//     };
+
+//     // Enhanced scoring pipeline
+//     const scorePipeline = [
+//       {
+//         $addFields: {
+//           score: {
+//             $add: [
+//               { $multiply: [
+//                 { $size: {
+//                   $filter: {
+//                     input: queryTerms,
+//                     as: "term",
+//                     cond: { 
+//                       $regexMatch: { 
+//                         input: "$brand", 
+//                         regex: createStartsWithRegex("$$term"), 
+//                         options: "i" 
+//                       }
+//                     }
+//                   }
+//                 }},
+//                 60
+//               ]},
+//               { $multiply: [
+//                 { $size: {
+//                   $filter: {
+//                     input: queryTerms,
+//                     as: "term",
+//                     cond: { 
+//                       $regexMatch: { 
+//                         input: "$name", 
+//                         regex: createStartsWithRegex("$$term"), 
+//                         options: "i" 
+//                       }
+//                     }
+//                   }
+//                 }},
+//                 50
+//               ]},
+//               { $multiply: [
+//                 { $size: {
+//                   $filter: {
+//                     input: queryTerms,
+//                     as: "term",
+//                     cond: { $or: [
+//                       { $regexMatch: { input: "$categoryName", regex: `^$$term`, options: "i" } },
+//                       { $regexMatch: { input: "$subCategoryName", regex: `^$$term`, options: "i" } },
+//                       { $regexMatch: { input: "$thirdSubCategoryName", regex: `^$$term`, options: "i" } }
+//                     ]}
+//                   }
+//                 }},
+//                 40
+//               ]},
+//               { $cond: [
+//                 { $regexMatch: { input: "$name", regex: `^${queryTerms.join(' ')}`, options: "i" } },
+//                 100,
+//                 { $cond: [
+//                   { $regexMatch: { input: "$brand", regex: `^${queryTerms.join(' ')}`, options: "i" } },
+//                   90,
+//                   0
+//                 ]}
+//               ]},
+//               { $cond: [
+//                 { $ifNull: ["$popularity", false] },
+//                 { $multiply: ["$popularity", 0.1] },
+//                 0
+//               ]},
+//               { $cond: [
+//                 { $gt: ["$stock", 0] },
+//                 15,
+//                 0
+//               ]}
+//             ]
+//           }
+//         }
+//       }
+//     ];
+
+//     // Sorting options
+//     const sortOptions = {
+//       relevance: { score: -1, popularity: -1 },
+//       newest: { createdAt: -1 },
+//       oldest: { createdAt: 1 },
+//       price_asc: { price: 1 },
+//       price_desc: { price: -1 },
+//       popular: { popularity: -1 }
+//     };
+
+//     // Count pipeline
+//     const countPipeline = [
+//       { $match: filters },
+//       ...scorePipeline,
+//       { $count: "total" }
+//     ];
+
+//     const countResult = await ProductModel.aggregate(countPipeline);
+//     const total = countResult[0]?.total || 0;
+
+//     // Items pipeline with projection
+//     const itemsPipeline = [
+//       { $match: filters },
+//       ...scorePipeline,
+//       { $sort: sortOptions[sortOption] || sortOptions.relevance },
+//       { $skip: (pageNumber - 1) * limitNumber },
+//       { $limit: limitNumber },
+//       { $lookup: {
+//         from: "categories",
+//         localField: "category",
+//         foreignField: "_id",
+//         as: "category"
+//       }},
+//       { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+//       { $project: {
+//         _id: 1,
+//         name: 1,
+//         brand: 1,
+//         price: 1,
+//         images: 1,
+//         categoryName: 1,
+//         subCategoryName: 1,
+//         thirdSubCategoryName: 1,
+//         stock: 1,
+//         popularity: 1,
+//         score: 1,
+//         category: {
+//           _id: 1,
+//           name: 1,
+//           slug: 1
+//         }
+//       }}
+//     ];
+
+//     let items = await ProductModel.aggregate(itemsPipeline);
+
+//     // Apply additional sorting if needed (client-side fallback)
+//     if (sortOption === 'price_asc' || sortOption === 'price_desc') {
+//       items = sortItems({ data: items }, 'price', sortOption === 'price_asc' ? 'asc' : 'desc');
+//     }
+
+//     return response.status(200).json({
+//       error: false,
+//       success: true,
+//       data: items,
+//       total,
+//       page: pageNumber,
+//       limit: limitNumber,
+//       totalPages: Math.ceil(total / limitNumber),
+//       searchTerms: queryTerms,
+//       priceRange: priceRange || undefined
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
 
 export async function searchProductController(request, response) {
   try {
-    const { query, page, limit } = request.body; // Get values from body
+    const { query, page, limit, sortBy, category } = request.body;
 
     if (!query) {
       return response.status(400).json({
@@ -2541,37 +2805,154 @@ export async function searchProductController(request, response) {
       });
     }
 
-    // Ensure proper numeric values for pagination
     const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 30; // Default to 30 if not provided
+    const limitNumber = parseInt(limit) || 30;
+    const sortOption = sortBy || 'relevance';
 
-    const filters = {
-      $or: [
-        { name: { $regex: query, $options: "i" } },
-        { brand: { $regex: query, $options: "i" } },
-        { categoryName: { $regex: query, $options: "i" } },
-        { subCategoryName: { $regex: query, $options: "i" } },
-        { thirdSubCategoryName: { $regex: query, $options: "i" } },
-      ],
+    // Extract price range from query (e.g., "mobiles under 5000")
+    let priceRange = null;
+    const priceRangeMatch = query.match(/(under|below|less than)\s*(\d+)/i);
+    if (priceRangeMatch) {
+      priceRange = parseInt(priceRangeMatch[2]);
+    }
+
+    // Process query into individual terms (excluding price range terms)
+    const queryTerms = query
+      .replace(/(under|below|less than)\s*\d+/i, '')
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word => word.length > 0);
+
+    if (queryTerms.length === 0 && !priceRange) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "No valid search terms provided.",
+      });
+    }
+
+    // Base filter - include category filter if provided
+    const baseFilter = category ? { categoryName: new RegExp(category, 'i') } : {};
+
+    // Add price range to filter if specified
+    if (priceRange) {
+      baseFilter.price = { $lte: priceRange };
+    }
+
+    // Function to create regex that matches words starting with term
+    const createStartsWithRegex = (term) => {
+      const chars = term.split('');
+      const abbrevPattern = chars.join('[.\\s]*');
+      return `(^|\\s)${abbrevPattern}`;
     };
 
-    // Get total count of matching products
+    // Build search conditions
+    const searchConditions = queryTerms.length > 0 ? queryTerms.map(term => ({
+      $or: [
+        { name: { $regex: createStartsWithRegex(term), $options: 'i' } },
+        { brand: { $regex: createStartsWithRegex(term), $options: 'i' } },
+        { categoryName: { $regex: `^${term}`, $options: 'i' } },
+        { subCategoryName: { $regex: `^${term}`, $options: 'i' } },
+        { thirdSubCategoryName: { $regex: `^${term}`, $options: 'i' } },
+        { tags: { $regex: `^${term}`, $options: 'i' } }
+      ]
+    })) : [{}];
+
+    // Combine filters
+    const filters = {
+      ...baseFilter,
+      $and: [
+        { $or: searchConditions }
+      ]
+    };
+
+    // Count total matching products
     const total = await ProductModel.countDocuments(filters);
 
-    // Fetch paginated items
-    const items = await ProductModel.find(filters)
-      .populate("category")
+    // Calculate score for each product
+    const calculateScore = (product) => {
+      let score = 0;
+      
+      queryTerms.forEach(term => {
+        // Brand matches
+        if (product.brand && new RegExp(createStartsWithRegex(term), 'i').test(product.brand)) {
+          score += 60;
+        }
+        
+        // Name matches
+        if (product.name && new RegExp(createStartsWithRegex(term), 'i').test(product.name)) {
+          score += 50;
+        }
+        
+        // Category matches
+        if (
+          (product.categoryName && new RegExp(`^${term}`, 'i').test(product.categoryName)) ||
+          (product.subCategoryName && new RegExp(`^${term}`, 'i').test(product.subCategoryName)) ||
+          (product.thirdSubCategoryName && new RegExp(`^${term}`, 'i').test(product.thirdSubCategoryName))
+        ) {
+          score += 40;
+        }
+      });
+
+      // Exact matches
+      if (product.name && new RegExp(`^${queryTerms.join(' ')}`, 'i').test(product.name)) {
+        score += 100;
+      } else if (product.brand && new RegExp(`^${queryTerms.join(' ')}`, 'i').test(product.brand)) {
+        score += 90;
+      }
+
+      // Popularity boost
+      if (product.popularity) {
+        score += product.popularity * 0.1;
+      }
+
+      // In stock boost
+      if (product.countInStock > 0) {
+        score += 15;
+      }
+
+      return score;
+    };
+
+    // Fetch products with all fields
+    let products = await ProductModel.find(filters)
+      .populate('seller')
+      .populate('category')
       .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
+      .limit(limitNumber)
+      .lean(); // Use lean() to get plain JavaScript objects
+
+    // Add score to each product without modifying other fields
+    products = products.map(product => ({
+      ...product,
+      score: calculateScore(product)
+    }));
+
+    // Apply sorting based on the score and other criteria
+    const sortProducts = (a, b) => {
+      if (sortOption === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortOption === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortOption === 'price_asc') return a.price - b.price;
+      if (sortOption === 'price_desc') return b.price - a.price;
+      if (sortOption === 'popular') return (b.popularity || 0) - (a.popularity || 0);
+      
+      // Default: sort by relevance (score)
+      return b.score - a.score;
+    };
+
+    products.sort(sortProducts);
 
     return response.status(200).json({
       error: false,
       success: true,
-      data: items,
+      data: products,
       total,
       page: pageNumber,
       limit: limitNumber,
       totalPages: Math.ceil(total / limitNumber),
+      searchTerms: queryTerms,
+      priceRange: priceRange || undefined
     });
   } catch (error) {
     return response.status(500).json({

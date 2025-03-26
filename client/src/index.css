@@ -725,3 +725,9 @@ input[type=number]::-webkit-outer-spin-button {
   -ms-border-radius: 6px 0px 0px 6px !important;
   -o-border-radius: 6px 0px 0px 6px !important;
 }
+
+.searchBox .MuiCircularProgress-root, .suggestionBox .MuiCircularProgress-root{
+  color: var(--bg-primary) !important;
+  width: 20px !important;
+  height: 20px !important;
+}

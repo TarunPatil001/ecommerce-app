@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import Sidebar from "../../components/Sidebar"
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -15,6 +15,7 @@ import ProductItemListView from '../../components/ProductItemListview';
 import Pagination from '@mui/material/Pagination';
 import ProductLoadingGrid from './productLoadingGrid';
 import { postData } from '../../utils/api';
+import { MyContext } from '../../App';
 
 
 function handleClick(event) {
@@ -24,22 +25,24 @@ function handleClick(event) {
 
 const ProductListing = () => {
 
+  const context = useContext(MyContext);
   const [itemView, setItemView] = useState('grid');
-
   const [productsData, setProductsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [selectedName, setSelectedName] = useState('');
+  const [index, setIndex] = useState({ startIndex: 0, endIndex: 0 });
   const [selectedSortValue, setSelectedSortValue] = useState('Name: A to Z');
-
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleDropdownClose = () => {
     setAnchorEl(null);
   };
@@ -134,11 +137,12 @@ const ProductListing = () => {
               setProductsData={setProductsData}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
-              page={page}
+              page={page}               // Current page number
+              setPage={setPage}         // Function to update page
               setTotalPages={setTotalPages}
               setTotal={setTotal}
-              // selectedName={selectedName}
               setSelectedName={setSelectedName}
+              setIndex={setIndex}
             />
           </div>
 
@@ -154,7 +158,19 @@ const ProductListing = () => {
                 <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'list' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}
                 ><TfiLayoutListThumbAlt className={`text-[20px] ${itemView === 'list' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} /></Button>
 
-                <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]"><span className='font-bold'>{'Total'}</span> - {total || 0} Product{total > 2 ? 's' : ''}</span>
+                {
+                  console.log("Selected Name ProductListing: ", selectedName) // Debugging log
+                }
+                <span className='font-semibold'>
+                  {total === 0
+                    ? `No results found for ${selectedName?.trim() ? `"${selectedName}"` : context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`}`
+                    : index.startIndex === index.endIndex
+                      ? `Showing ${index.startIndex} of ${total} results for ${selectedName?.trim() ? `"${selectedName}"` : context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`
+                      }`
+                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${selectedName?.trim() ? `"${selectedName}"` : context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`
+                      }`}
+                </span>
+
               </div>
 
               <div className="col2 ml-auto flex items-center justify-end gap-2">
@@ -194,64 +210,33 @@ const ProductListing = () => {
 
             <div className={`grid ${itemView === 'grid' ? "grid-cols-4 md:grid-cols-4" : "grid-cols-1 md:grid-cols-1"} gap-3`}>
               {
-                itemView === 'grid' ? (
+                itemView === "grid" ? (
                   <>
-                    {
-                      isLoading === true ?
-                        <ProductLoadingGrid view={itemView} size={8} /> :
-                        productsData?.data?.length !== 0 && productsData?.data?.map((item, index) => {
-                          return (
-                            <ProductItem product={item} key={index} />
-                          )
-                        })
-                    }
+                    {isLoading ? (
+                      <ProductLoadingGrid view={itemView} size={8} />
+                    ) : productsData?.data?.length > 0 ? (
+                      productsData?.data?.map((item, index) => (
+                        <ProductItem product={item} key={index} />
+                      ))
+                    ) : (
+                      <p>No products found.</p>
+                    )}
                   </>
                 ) : (
                   <>
-                    {
-                      isLoading === true ?
-                        <>
-                          <ProductLoadingGrid view={itemView} size={8} />
-                        </>
-                        :
-                        productsData?.data?.length !== 0 && productsData?.data?.map((item, index) => {
-                          return (
-                            <ProductItemListView product={item} key={index} />
-                          )
-                        })
-                    }
+                    {isLoading ? (
+                      <ProductLoadingGrid view={itemView} size={8} />
+                    ) : productsData?.data?.length > 0 ? (
+                      productsData?.data?.map((item, index) => (
+                        <ProductItemListView product={item} key={index} />
+                      ))
+                    ) : (
+                      <p>No products found.</p>
+                    )}
                   </>
                 )
               }
 
-
-              {/* {
-                itemView === 'grid' ? (
-                  <>
-                    {isLoading ? (
-                      <ProductLoadingGrid view={itemView} />
-                    ) : (
-                      Array.isArray(productsData) && productsData.length > 0 ? (
-                        productsData.map((item, index) => <ProductItem product={item} key={index} />)
-                      ) : (
-                        <p>No products found.</p> // Handle empty state
-                      )
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {isLoading ? (
-                      <ProductLoadingGrid view={itemView} />
-                    ) : (
-                      Array.isArray(productsData) && productsData.length > 0 ? (
-                        productsData.map((item, index) => <ProductItemListView product={item} key={index} />)
-                      ) : (
-                        <p>No products found.</p> // Handle empty state
-                      )
-                    )}
-                  </>
-                )
-              } */}
             </div>
 
             {

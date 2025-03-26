@@ -288,6 +288,7 @@ import Pagination from '@mui/material/Pagination';
 import ProductLoadingGrid from './productLoadingGrid';
 import { postData } from '../../utils/api';
 import { MyContext } from '../../App';
+import { IoIosArrowDown } from 'react-icons/io';
 
 function handleClick(event) {
   event.preventDefault();
@@ -303,10 +304,12 @@ const SearchPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [selectedName, setSelectedName] = useState('');
-  const [selectedSortValue, setSelectedSortValue] = useState('Name: A to Z');
+  const [selectedSortValue, setSelectedSortValue] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [index, setIndex] = useState({ startIndex: 0, endIndex: 0 });
   const open = Boolean(anchorEl);
+  const sortedData = context?.searchData?.data || context?.filteredProductData?.data;
+
 
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -316,7 +319,64 @@ const SearchPage = () => {
     setAnchorEl(null);
   };
 
-  const handleSortBy = (name, order, products, value) => {
+  // const handleSortBy = (name, order, products, value) => {
+  //   if (!Array.isArray(products)) {
+  //     console.error("Invalid products data:", products);
+  //     return;
+  //   }
+
+  //   setSelectedSortValue(value);
+
+  //   postData(`/api/product/sortBy`, {
+  //     data: products,
+  //     sortBy: name,
+  //     order: order,
+  //   })
+  //     .then((res) => {
+  //       if (res.success) {
+  //         setProductsData((prev) => ({ ...prev, data: res.data }));
+  //         setAnchorEl(null);
+  //       } else {
+  //         console.error("Failed to sort products:", res.message);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error sorting products:", error);
+  //     });
+  // };
+
+  //   const handleSortBy = (name, order, products, value) => {
+  //     if (!Array.isArray(products)) {
+  //       console.error("Invalid products data:", products);
+  //       return;
+  //     }
+
+  //     setSelectedSortValue(value);
+
+  //     postData(`/api/product/sortBy`, {
+  //       data: products,
+  //       sortBy: name,
+  //       order: order,
+  //     })
+  //       .then((res) => {
+  //         if (res.success) {
+  //           // ✅ Update Context instead of just productsData
+  //           context.setSearchData((prev) => ({ ...prev, data: res.data })) || context?.setFilteredProductData((prev) => ({ ...prev, data: res.data }));
+
+
+  //           // Still update the product display
+  //           // setProductsData((prev) => ({ ...prev, data: res.data }));
+  //           setAnchorEl(null);
+  //         } else {
+  //           console.error("Failed to sort products:", res.message);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error sorting products:", error);
+  //       });
+  // };
+
+  const handleSortBy = async (name, order, products, value) => {
     if (!Array.isArray(products)) {
       console.error("Invalid products data:", products);
       return;
@@ -324,23 +384,33 @@ const SearchPage = () => {
 
     setSelectedSortValue(value);
 
-    postData(`/api/product/sortBy`, {
-      data: products,
-      sortBy: name,
-      order: order,
-    })
-      .then((res) => {
-        if (res.success) {
-          setProductsData((prev) => ({ ...prev, data: res.data }));
-          setAnchorEl(null);
-        } else {
-          console.error("Failed to sort products:", res.message);
-        }
-      })
-      .catch((error) => {
-        console.error("Error sorting products:", error);
+    try {
+      const res = await postData(`/api/product/sortBy`, {
+        data: products,
+        sortBy: name,
+        order: order,
       });
+
+      if (res.success) {
+        if (context?.searchData?.data) {
+          context.setSearchData((prev) => ({ ...prev, data: res.data }));
+          setPage(1);
+
+        } else if (context?.filteredProductData?.data) {
+          context.setFilteredProductData((prev) => ({ ...prev, data: res.data }));
+          setPage(1);
+
+        }
+        setAnchorEl(null);
+      } else {
+        console.error("Failed to sort products:", res.message);
+      }
+    } catch (error) {
+      console.error("Error sorting products:", error);
+    }
   };
+
+
 
   return (
     <section className="py-0 pb-0">
@@ -405,6 +475,8 @@ const SearchPage = () => {
               setTotal={setTotal}
               setSelectedName={setSelectedName}
               setIndex={setIndex}
+              selectedSortValue={selectedSortValue}
+              setSelectedSortValue={setSelectedSortValue}
             />
           </div>
 
@@ -417,22 +489,20 @@ const SearchPage = () => {
                 <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'list' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}>
                   <TfiLayoutListThumbAlt className={`text-[20px] ${itemView === 'list' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} />
                 </Button>
-                {/* <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]">
-                  <span className='font-bold'>{'Total'}</span> - {total || 0} Product{total > 1 ? 's' : ''}</span> */}
-                {/* <span className='font-bold'>
-                  {`Showing ${index.startIndex} – ${index.endIndex} of ${total} results for "${context?.searchQuery}"`}
-                </span> */}
+
                 <span className='font-semibold'>
                   {total === 0
-                    ? `No results found for ${context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`}`
+                    ? `No results found for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
                     : index.startIndex === index.endIndex
-                      ? `Showing ${index.startIndex} of ${total} results for ${context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`}`
-                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${context?.searchQuery?.trim() ? `"${context?.searchQuery}"` : `"All Products"`}`}
+                      ? `Showing ${index.startIndex} of ${total} results for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
+                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
+                  }
                 </span>
+
 
               </div>
 
-              <div className="col2 ml-auto flex items-center justify-end gap-2">
+              {/* <div className="col2 ml-auto flex items-center justify-end gap-2">
                 <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]">Sort By:</span>
                 <span>
                   <Button
@@ -454,28 +524,111 @@ const SearchPage = () => {
                       'aria-labelledby': 'basic-button',
                     }}
                   >
-                    <MenuItem onClick={() => handleSortBy("name", "asc", productsData.data, "Name: A to Z")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BsSortAlphaDown />Name: A to Z
+                   
+
+                    <MenuItem onClick={() => handleSortBy("name", "asc", sortedData, "Name: A to Z")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BsSortAlphaDown /> Name: A to Z
                     </MenuItem>
-                    <MenuItem onClick={() => handleSortBy("name", "desc", productsData.data, "Name: Z to A")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BsSortAlphaUp />Name: Z to A
+                    <MenuItem onClick={() => handleSortBy("name", "desc", sortedData, "Name: Z to A")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BsSortAlphaUp /> Name: Z to A
                     </MenuItem>
-                    <MenuItem onClick={() => handleSortBy("price", "asc", productsData.data, "Price: low to high")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BiTrendingUp />Price: low to high
+                    <MenuItem onClick={() => handleSortBy("price", "asc", sortedData, "Price: low to high")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BiTrendingDown /> Price: low to high
                     </MenuItem>
-                    <MenuItem onClick={() => handleSortBy("price", "desc", productsData.data, "Price: high to low")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BiTrendingDown />Price: high to low
+                    <MenuItem onClick={() => handleSortBy("price", "desc", sortedData, "Price: high to low")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BiTrendingUp /> Price: high to low
                     </MenuItem>
-                    <MenuItem onClick={() => handleSortBy("rating", "asc", productsData.data, "Rating: low to high")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BiTrendingDown />Rating: low to high
+                    <MenuItem onClick={() => handleSortBy("rating", "asc", sortedData, "Rating: low to high")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BiTrendingDown /> Rating: low to high
                     </MenuItem>
-                    <MenuItem onClick={() => handleSortBy("rating", "desc", productsData.data, "Rating: high to low")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
-                      <BiTrendingDown />Rating: high to low
+                    <MenuItem onClick={() => handleSortBy("rating", "desc", sortedData, "Rating: high to low")} className="!text-[14px] !text-[rgba(0,0,0,0.8)] gap-1">
+                      <BiTrendingUp /> Rating: high to low
                     </MenuItem>
+
                   </Menu>
                 </span>
+              </div> */}
+
+              <div className="flex items-center justify-end gap-3">
+                <span className="text-sm font-medium text-gray-600">Sort By:</span>
+                <div className="relative">
+                  <Button
+                    id="basic-button"
+                    aria-controls={open ? 'basic-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleDropdownClick}
+                    className="!bg-primary !text-white !capitalize !h-9 !text-sm !min-w-[200px] !px-4 flex items-center justify-between hover:!bg-primary-dark transition-colors"
+                    endIcon={<IoIosArrowDown className={`transition-transform ${open ? 'rotate-180' : ''}`} />}
+                  >
+                    {selectedSortValue || 'Default'}
+                  </Button>
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleDropdownClose}
+                    MenuListProps={{
+                      'aria-labelledby': 'basic-button',
+                    }}
+                    className="mt-1"
+                    slotProps={{
+                      paper: {
+                        className: "!min-w-[200px] rounded-lg !shadow-lg" // Optional Tailwind classes
+                      }
+                    }}
+                  >
+
+                    <MenuItem
+                      onClick={() => handleSortBy("name", "asc", sortedData, "Name: A to Z")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BsSortAlphaDown className="text-gray-500" />
+                      Name: A to Z
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleSortBy("name", "desc", sortedData, "Name: Z to A")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BsSortAlphaUp className="text-gray-500" />
+                      Name: Z to A
+                    </MenuItem>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <MenuItem
+                      onClick={() => handleSortBy("price", "asc", sortedData, "Price: low to high")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BiTrendingDown className="text-gray-500" />
+                      Price: low to high
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleSortBy("price", "desc", sortedData, "Price: high to low")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BiTrendingUp className="text-gray-500" />
+                      Price: high to low
+                    </MenuItem>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <MenuItem
+                      onClick={() => handleSortBy("rating", "asc", sortedData, "Rating: low to high")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BiTrendingDown className="text-gray-500" />
+                      Rating: low to high
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleSortBy("rating", "desc", sortedData, "Rating: high to low")}
+                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
+                    >
+                      <BiTrendingUp className="text-gray-500" />
+                      Rating: high to low
+                    </MenuItem>
+                  </Menu>
+                </div>
               </div>
+
             </div>
+
 
             <div className={`grid ${itemView === 'grid' ? "grid-cols-4 md:grid-cols-4" : "grid-cols-1 md:grid-cols-1"} gap-3`}>
               {isLoading ? (
