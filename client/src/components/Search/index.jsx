@@ -19,214 +19,255 @@ const Search = () => {
   const [localSearchData, setLocalSearchData] = useState([]);
   const searchRef = useRef(null);
   const inputRef = useRef(null);
-  const searchTimeoutRef = useRef(null);
 
 
-  const excludedRegex = new RegExp(`\\b(${EXCLUDED_WORDS.join("|")})\\b`, "i");
-  const specialCharsRegex = /[^\w\s-]/g;
-  const abbreviationRegex = /\b([A-Z]\.){1,}[A-Z]?\b/g;
+// Utility functions first
+const normalizeTerm = (text) => {
+  if (!text) return '';
+  if (excludedRegex.test(text)) return '';
+  return text
+    .replace(abbreviationRegex, match => match.replace(/\./g, ''))
+    .replace(specialCharsRegex, '')
+    .toLowerCase()
+    .trim();
+};
 
-  const normalizeTerm = (text) => {
-    if (!text) return '';
-    // Skip normalization if the word is in excluded list
-    if (excludedRegex.test(text)) return '';
-    return String(text)
-      .replace(abbreviationRegex, match => match.replace(/\./g, ''))
-      .replace(specialCharsRegex, '')
-      .toLowerCase()
-      .trim();
+// Constants next
+const excludedRegex = new RegExp(`\\b(${EXCLUDED_WORDS.join("|")})\\b`, "i");
+const specialCharsRegex = /[^\w\s-]/g;
+const abbreviationRegex = /\b([A-Z]\.){1,}[A-Z]?\b/g;
+
+// Enhanced data preprocessing
+const preprocessedData = localSearchData?.data?.map(item => {
+  const terms = [
+    item.brand,
+    item.name,
+    item.categoryName,
+    item.subCategoryName
+  ].filter(Boolean).map(term => normalizeTerm(String(term)));
+  
+  return {
+    ...item,
+    _normalizedTerms: terms,
+    _searchText: terms.join(' ')
   };
+}) || [];
 
-  const getQuickSuggestions = () => {
-    if (!context?.isSearch || !localSearchData?.data) return [];
+// Improved suggestion engine
+const getQuickSuggestions = () => {
+  if (!context?.isSearch || !preprocessedData.length) return [];
+  
+  const searchTerm = normalizeTerm(context.isSearch);
+  if (searchTerm.length < 2 || excludedRegex.test(searchTerm)) return [];
 
-    const searchTerm = context.isSearch.trim().toLowerCase();
-    if (searchTerm.length === 0 || excludedRegex.test(searchTerm)) return [];
+  const suggestions = new Map();
+  const searchWords = searchTerm.split(/\s+/).filter(Boolean);
 
-    const searchWords = searchTerm.split(/\s+/)
-      .filter(Boolean)
-      .filter(word => !excludedRegex.test(word));
+  // Phase 1: Find matching products and extract key phrases
+  preprocessedData.forEach(item => {
+    const matchesSearch = item._normalizedTerms.some(term => 
+      term.includes(searchTerm)
+    );
+    
+    if (matchesSearch) {
+      // Extract clean product phrases
+      const name = normalizeTerm(item.name);
+      const brand = normalizeTerm(item.brand);
+      
+      // Generate suggestion variants
+      const variants = [
+        // Basic category matches
+        ...(item.categoryName ? [normalizeTerm(item.categoryName)] : []),
+        ...(item.subCategoryName ? [normalizeTerm(item.subCategoryName)] : []),
+        
+        // Product name segments
+        ...name.split(/\s+/)
+          .filter(word => word.length >= 3)
+          .map((word, i, words) => {
+            // Create 2-3 word phrases around matching terms
+            if (word.includes(searchTerm)) {
+              const start = Math.max(0, i - 1);
+              const end = Math.min(words.length, i + 2);
+              return words.slice(start, end).join(' ');
+            }
+            return null;
+          })
+          .filter(Boolean),
+          
+        // Brand combinations
+        ...(brand ? [
+          `${searchTerm} ${brand}`,
+          `${brand} ${searchTerm}`
+        ] : [])
+      ];
 
-    if (searchWords.length === 0) return [];
+      // Score and add variants
+      variants.forEach(variant => {
+        if (!variant || variant.length < 3) return;
+        
+        // Calculate score based on:
+        // 1. Match position (earlier is better)
+        // 2. Term length (shorter is better)
+        // 3. Brand presence (higher score)
+        const positionScore = variant.startsWith(searchTerm) ? 2 : 1;
+        const lengthScore = Math.max(0, 10 - variant.length / 3);
+        const brandScore = variant.includes(brand) ? 1.5 : 1;
+        
+        const score = positionScore * lengthScore * brandScore * 100;
+        
+        const displayText = variant.split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+          
+        const current = suggestions.get(displayText) || { score: 0 };
+        suggestions.set(displayText, {
+          text: displayText,
+          score: current.score + score
+        });
+      });
+    }
+  });
 
-    const suggestions = new Map();
-
-    // Special handling for brand matches
-    localSearchData.data.forEach(item => {
-      if (item?.brand) {
-        const brand = String(item.brand).toLowerCase();
-        if (excludedRegex.test(brand)) return;
-
-        const normalizedBrand = normalizeTerm(brand);
-        if (!normalizedBrand) return;
-
-        if (searchWords.every(sw => normalizedBrand.includes(normalizeTerm(sw)))) {
-          if (normalizedBrand.includes('uspoloassn')) {
-            suggestions.set('u.s. polo assn.', {
-              text: 'u.s. polo assn.',
-              score: 1000
-            });
-          }
-          else if (!suggestions.has(brand)) {
-            suggestions.set(brand, {
-              text: brand,
-              score: 100
-            });
-          }
-        }
+  // Phase 2: Generate intelligent combinations
+  if (suggestions.size < 5) {
+    const relatedTerms = new Map();
+    
+    // Find terms commonly appearing with search term
+    preprocessedData.forEach(item => {
+      if (item._searchText.includes(searchTerm)) {
+        item._normalizedTerms.forEach(term => {
+          term.split(/\s+/).forEach(word => {
+            if (word !== searchTerm && word.length >= 3) {
+              relatedTerms.set(word, (relatedTerms.get(word) || 0) + 1);
+            }
+          });
+        });
       }
     });
-
-    // Other field matches with excluded words filtering
-    localSearchData.data.forEach(item => {
-      const fieldsToCheck = [
-        { text: item?.name, score: 50 },
-        { text: item?.categoryName, score: 30 },
-        { text: item?.subCategoryName, score: 20 }
-      ].filter(field => field.text && !excludedRegex.test(field.text));
-
-      fieldsToCheck.forEach(({ text, score }) => {
-        const cleanedText = String(text).toLowerCase();
-        if (excludedRegex.test(cleanedText)) return;
-
-        const words = cleanedText.split(/\s+/)
-          .filter(word => word && !excludedRegex.test(word));
-
-        // Single word matches
-        words.forEach(word => {
-          const normalizedWord = normalizeTerm(word);
-          if (!normalizedWord) return;
-
-          if (searchWords.some(sw => normalizedWord.startsWith(normalizeTerm(sw)))) {
-            if (!suggestions.has(word)) {
-              suggestions.set(word, {
-                text: word,
-                score: score + (word.length <= 3 ? 10 : 0)
-              });
-            }
+    
+    // Create combinations with most frequent terms
+    Array.from(relatedTerms.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .forEach(([term]) => {
+        const variants = [
+          `${searchTerm} ${term}`,
+          `${term} ${searchTerm}`,
+          `${term} for ${searchTerm}`
+        ];
+        
+        variants.forEach(variant => {
+          const displayText = variant.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
+          if (!suggestions.has(displayText)) {
+            suggestions.set(displayText, {
+              text: displayText,
+              score: 80 // Base score for generated combinations
+            });
           }
         });
-
-        // Phrase matches (2-3 words)
-        for (let i = 0; i < words.length - 1; i++) {
-          for (let j = i + 1; j < Math.min(i + 3, words.length); j++) {
-            const phrase = words.slice(i, j + 1).join(' ');
-            const normalizedPhrase = normalizeTerm(phrase);
-            if (!normalizedPhrase) continue;
-
-            if (searchWords.every(sw => normalizedPhrase.includes(normalizeTerm(sw)))) {
-              if (!suggestions.has(phrase)) {
-                suggestions.set(phrase, {
-                  text: phrase,
-                  score: score - (j - i) * 5
-                });
-              }
-            }
-          }
-        }
       });
-    });
+  }
 
-    // Final filtering of excluded words in suggestions
-    const filteredSuggestions = Array.from(suggestions.values())
-      .filter(item => !excludedRegex.test(item.text))
-      .sort((a, b) => b.score - a.score || a.text.localeCompare(b.text))
-      .map(item => item.text)
-      .slice(0, 5);
+  // Final processing
+  return Array.from(suggestions.values())
+    .sort((a, b) => b.score - a.score || a.text.length - b.text.length)
+    .map(item => item.text)
+    .slice(0, 5);
+};
 
-    return filteredSuggestions;
-  };
-
-  const quickSuggestions = getQuickSuggestions();
+const quickSuggestions = getQuickSuggestions();
 
 
 
 
   // Handle input change
-const onChangeInput = (e) => {
-  const value = e.target.value;
-  context?.setIsSearch(value);
-};
+  const onChangeInput = (e) => {
+    const value = e.target.value;
+    context?.setIsSearch(value);
+  };
 
-// Search function
-const search = async (query, type = "typing") => {
-  const trimmedQuery = query?.trim();
-  
-  // Clear results if query is empty
-  if (!trimmedQuery) {
-    setLocalSearchData([]);
-    if (type === "enter") {
-      context?.setSearchData([]);
-      context?.setSearchQuery("");
+  // Search function
+  const search = async (query, type = "typing") => {
+    const trimmedQuery = query?.trim();
+
+    // Clear results if query is empty
+    if (!trimmedQuery) {
+      setLocalSearchData([]);
+      if (type === "enter") {
+        context?.setSearchData([]);
+        context?.setSearchQuery("");
+      }
+      return;
     }
-    return;
-  }
 
-  try {
-    const obj = {
-      page: 1,
-      limit: Number.MAX_SAFE_INTEGER,
-      query: trimmedQuery,
-    };
+    try {
+      const obj = {
+        page: 1,
+        limit: Number.MAX_SAFE_INTEGER,
+        query: trimmedQuery,
+      };
 
-    // Show loading for at least 500ms to prevent flickering
-    const searchStartTime = Date.now();
-    const isLoading = type === "enter" ? setSearchLoading : setLoading;
-    isLoading(true);
+      // Show loading for at least 500ms to prevent flickering
+      const searchStartTime = Date.now();
+      const isLoading = type === "enter" ? setSearchLoading : setLoading;
+      isLoading(true);
 
-    const res = await postData(`/api/product/search/get`, obj);
+      const res = await postData(`/api/product/search/get`, obj);
 
-    // Calculate remaining time to reach 500ms
-    const elapsedTime = Date.now() - searchStartTime;
-    const remainingTime = Math.max(0, 500 - elapsedTime);
-    await new Promise(resolve => setTimeout(resolve, remainingTime));
+      // Calculate remaining time to reach 500ms
+      const elapsedTime = Date.now() - searchStartTime;
+      const remainingTime = Math.max(0, 500 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
 
-    if (type === "enter") {
-      // Only update context on explicit search (Enter/button click)
-      context?.setSearchData(res);
-      context?.setSearchQuery(trimmedQuery);
-      navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
-    } else {
-      // Store typing results locally
-      setLocalSearchData(res);
+      if (type === "enter") {
+        // Only update context on explicit search (Enter/button click)
+        context?.setSearchData(res);
+        context?.setSearchQuery(trimmedQuery);
+        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+      } else {
+        // Store typing results locally
+        setLocalSearchData(res);
+      }
+    } catch (error) {
+      console.error("Search request failed:", error);
+      // Optionally set error state here
+    } finally {
+      const isLoading = type === "enter" ? setSearchLoading : setLoading;
+      isLoading(false);
     }
-  } catch (error) {
-    console.error("Search request failed:", error);
-    // Optionally set error state here
-  } finally {
-    const isLoading = type === "enter" ? setSearchLoading : setLoading;
-    isLoading(false);
-  }
-};
+  };
 
-// Debounced search when input changes
-useEffect(() => {
-  const timer = setTimeout(() => {
-    if (context?.isSearch !== undefined) {
-      search(context.isSearch, "typing");
+  // Debounced search when input changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (context?.isSearch !== undefined) {
+        search(context.isSearch, "typing");
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [context?.isSearch]);
+
+  // Handle Enter key press
+  const onKeyDown = (e) => {
+    if (e.key === "Enter" && !searchLoading) {
+      search(context?.isSearch, "enter");
+      setIsFocused(false);
+      inputRef.current?.blur();
     }
-  }, 500);
+  };
 
-  return () => clearTimeout(timer);
-}, [context?.isSearch]);
-
-// Handle Enter key press
-const onKeyDown = (e) => {
-  if (e.key === "Enter" && !searchLoading) {
-    search(context?.isSearch, "enter");
-    setIsFocused(false);
-    inputRef.current?.blur();
-  }
-};
-
-// Handle search button click
-const handleSearchClick = () => {
-  if (!searchLoading) {
-    search(context?.isSearch, "enter");
-    setIsFocused(false);
-    inputRef.current?.blur();
-  }
-};
+  // Handle search button click
+  const handleSearchClick = () => {
+    if (!searchLoading) {
+      search(context?.isSearch, "enter");
+      setIsFocused(false);
+      inputRef.current?.blur();
+    }
+  };
 
   // Initial load from URL
   useEffect(() => {

@@ -492,12 +492,25 @@ const SearchPage = () => {
 
                 <span className='font-semibold'>
                   {total === 0
-                    ? `No results found for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
+                    ? `No results found for ${context?.searchQuery?.trim()
+                      ? `"${context?.searchQuery}"`
+                      : selectedName?.trim()
+                        ? `"${selectedName}"`
+                        : `"All Products"`}`
                     : index.startIndex === index.endIndex
-                      ? `Showing ${index.startIndex} of ${total} results for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
-                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${context?.searchQuery?.trim() || selectedName?.trim() ? `"${context?.searchQuery || selectedName}"` : `"All Products"`}`
+                      ? `Showing ${index.startIndex} of ${total} results for ${context?.searchQuery?.trim()
+                        ? `"${context?.searchQuery}"`
+                        : selectedName?.trim()
+                          ? `"${selectedName}"`
+                          : `"All Products"`}`
+                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${context?.searchQuery?.trim()
+                        ? `"${context?.searchQuery}"`
+                        : selectedName?.trim()
+                          ? `"${selectedName}"`
+                          : `"All Products"`}`
                   }
                 </span>
+
 
 
               </div>

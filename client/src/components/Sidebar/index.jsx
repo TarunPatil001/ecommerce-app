@@ -123,122 +123,114 @@ const Sidebar = (props) => {
     // }, [location.search]);
 
 
-    // const handleCheckBoxChange = (field, value) => {
-    //     const currentValues = filters[field] || [];
-    //     let updatedValues;
+    const handleCheckBoxChange = (field, value) => {
+        const currentValues = filters[field] || [];
+        let updatedValues;
 
-    //     if (field === "rating") {
-    //         updatedValues = currentValues.includes(value)
-    //             ? currentValues.filter((item) => item !== value)
-    //             : [...currentValues, value];
-    //     } else {
-    //         updatedValues = currentValues.includes(value)
-    //             ? currentValues.filter((item) => item !== value)
-    //             : [...currentValues, value];
+        if (field === "rating") {
+            updatedValues = currentValues.includes(value)
+                ? currentValues.filter((item) => item !== value)
+                : [...currentValues, value];
+        } else {
+            updatedValues = currentValues.includes(value)
+                ? currentValues.filter((item) => item !== value)
+                : [...currentValues, value];
 
-    //         // Clear search data when category filters change
-    //         if (['categoryId', 'subCategoryId', 'thirdSubCategoryId'].includes(field)) {
-    //             context?.setSearchData([]);
-    //             context?.setIsSearch('');
-    //             navigate("/search"); // Update URL to "/search"
-    //         }
-    //     }
-
-    //     setFilters(prevFilters => ({
-    //         ...prevFilters,
-    //         [field]: updatedValues,
-    //         page: 1 // Reset to first page when filters change
-    //     }));
-
-    //     if (field === "categoryId") {
-    //         setFilters(prevFilters => ({
-    //             ...prevFilters,
-    //             subCategoryId: [],
-    //             thirdSubCategoryId: [],
-    //         }));
-    //     }
-    // };
-
-    // Sync selected names for UI display
-    // Sync selected names for UI display
-const handleCheckBoxChange = (field, value) => {
-    const currentValues = filters[field] || [];
-    let updatedValues;
-
-    if (field === "rating") {
-        updatedValues = currentValues.includes(value)
-            ? currentValues.filter((item) => item !== value)
-            : [...currentValues, value];
-    } else {
-        updatedValues = currentValues.includes(value)
-            ? currentValues.filter((item) => item !== value)
-            : [...currentValues, value];
-
-        // Clear search data when category filters change
-        if (['categoryId', 'subCategoryId', 'thirdSubCategoryId'].includes(field)) {
-            context?.setSearchData([]);
-            context?.setIsSearch('');
-            navigate("/search"); // Update URL to "/search"
+            // Clear search data when category filters change
+            if (['categoryId', 'subCategoryId', 'thirdSubCategoryId'].includes(field)) {
+                context?.setSearchData([]);
+                context?.setSearchQuery('');  // <-- Reset search query
+                context?.setIsSearch('');
+    
+                navigate("/search"); // Update URL to "/search"
+            }
         }
-    }
 
-    // Update filters immediately
-    const newFilters = {
-        ...filters,
-        [field]: updatedValues,
-        page: 1, // Reset to first page when filters change
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [field]: updatedValues,
+            page: 1 // Reset to first page when filters change
+        }));
+
+        if (field === "categoryId") {
+            setFilters(prevFilters => ({
+                ...prevFilters,
+                subCategoryId: [],
+                thirdSubCategoryId: [],
+            }));
+        }
     };
 
-    // Reset subcategories if category changes
-    if (field === "categoryId") {
-        newFilters.subCategoryId = [];
-        newFilters.thirdSubCategoryId = [];
-    }
+//     // Sync selected names for UI display
+// const handleCheckBoxChange = (field, value) => {
+//     const currentValues = filters[field] || [];
+//     let updatedValues = currentValues.includes(value)
+//         ? currentValues.filter((item) => item !== value)
+//         : [...currentValues, value];
 
-    setFilters(newFilters);
-};
+//     // Clear search data when category filters change
+//     if (["categoryId", "subCategoryId", "thirdSubCategoryId"].includes(field)) {
+//         context?.setSearchData([]);
+//         context?.setIsSearch('');
+//         context?.setSearchQuery('');  // <-- Reset search query
+//         navigate("/search"); // Update URL to "/search"
+//     }
 
-// Helper function to compute and set the selected names
+//     // Update filters immediately
+//     const newFilters = {
+//         ...filters,
+//         [field]: updatedValues,
+//         page: 1, // Reset to first page when filters change
+//     };
+
+//     // Reset subcategories if category changes
+//     if (field === "categoryId") {
+//         newFilters.subCategoryId = [];
+//         newFilters.thirdSubCategoryId = [];
+//     }
+
+//     setFilters(newFilters);
+// };
+
+// Compute selected names for UI display
 useEffect(() => {
-    // Always start with empty array
     let selectedNames = [];
-    
-    // Check if all filters are empty
-    const allFiltersEmpty = 
-        (!filters.categoryId || filters.categoryId.length === 0) && 
-        (!filters.subCategoryId || filters.subCategoryId.length === 0) && 
-        (!filters.thirdSubCategoryId || filters.thirdSubCategoryId.length === 0);
 
-    if (allFiltersEmpty) {
-        selectedNames = ["All Categories"];
-    } else if (context?.catData?.length > 0) {
-        // Handle multiple category selections
-        if (filters.categoryId?.length > 0) {
-            context.catData.forEach((category) => {
-                if (filters.categoryId.includes(category._id)) {
-                    // Check if any subcategories of this category are selected
-                    const hasSelectedSubcategories = category.children?.some(
-                        subCat => filters.subCategoryId?.includes(subCat._id)
+    // If search is active, set selectedNames based on search results
+    if (context?.isSearch && context?.searchData?.length > 0) {
+        selectedNames = context.searchData.map(item => item.name);
+    } else {
+        // Reset to default if no filters are applied
+        const isFiltersEmpty =
+            (!filters.categoryId || filters.categoryId.length === 0) &&
+            (!filters.subCategoryId || filters.subCategoryId.length === 0) &&
+            (!filters.thirdSubCategoryId || filters.thirdSubCategoryId.length === 0);
+
+        if (isFiltersEmpty) {
+            selectedNames = ["All Categories"];
+        } else if (context?.catData?.length > 0) {
+            filters.categoryId?.forEach(categoryId => {
+                const category = context.catData.find(cat => cat._id === categoryId);
+                if (category) {
+                    const hasSelectedSubcategories = category.children?.some(subCat =>
+                        filters.subCategoryId?.includes(subCat._id)
                     );
 
                     if (!hasSelectedSubcategories) {
                         selectedNames.push(category.name);
                     }
-                    
-                    // Check subcategories
-                    category.children?.forEach((subCat) => {
+
+                    category.children?.forEach(subCat => {
                         if (filters.subCategoryId?.includes(subCat._id)) {
-                            // Check if any third subcategories of this subcategory are selected
-                            const hasSelectedThirdSubcategories = subCat.children?.some(
-                                thirdCat => filters.thirdSubCategoryId?.includes(thirdCat._id)
+                            const hasSelectedThirdSubcategories = subCat.children?.some(thirdCat =>
+                                filters.thirdSubCategoryId?.includes(thirdCat._id)
                             );
 
                             if (!hasSelectedThirdSubcategories) {
                                 selectedNames.push(subCat.name);
                             }
-                            
-                            // Check third subcategories
-                            subCat.children?.forEach((thirdSubCat) => {
+
+                            subCat.children?.forEach(thirdSubCat => {
                                 if (filters.thirdSubCategoryId?.includes(thirdSubCat._id)) {
                                     selectedNames.push(thirdSubCat.name);
                                 }
@@ -250,51 +242,50 @@ useEffect(() => {
         }
     }
 
-    // Fallback if no names were selected
+    // Default to "All Categories" if nothing is selected
     if (selectedNames.length === 0) {
         selectedNames = ["All Categories"];
     }
 
-    console.log('Selected names:', selectedNames); // Debug log
+    console.log("Selected names:", selectedNames); // Debugging
     props?.setSelectedName?.(selectedNames.join(" + "));
-}, [filters.categoryId, filters.subCategoryId, filters.thirdSubCategoryId, context?.catData]);
+}, [filters, context?.catData, context?.isSearch, context?.searchData]);
 
-    // Update only the relevant category filters when URL changes
-    useEffect(() => {
-        const queryParameters = new URLSearchParams(location.search);
 
-        setFilters(prevFilters => {
-            const newFilters = { ...prevFilters };
+// Sync filters with URL changes
+useEffect(() => {
+    const queryParameters = new URLSearchParams(location.search);
 
-            if (location.search.includes("categoryId")) {
-                const categoryId = queryParameters.get("categoryId");
-                newFilters.categoryId = categoryId ? [categoryId] : [];
-                newFilters.subCategoryId = [];
-                newFilters.thirdSubCategoryId = [];
-                context?.setSearchData([]);
-                context?.setIsSearch('');
-            }
+    setFilters(prevFilters => {
+        const newFilters = { ...prevFilters };
 
-            if (location.search.includes("subCategoryId")) {
-                const subCategoryId = queryParameters.get("subCategoryId");
-                newFilters.subCategoryId = subCategoryId ? [subCategoryId] : [];
-                newFilters.thirdSubCategoryId = [];
-                context?.setSearchData([]);
-                context?.setIsSearch('');
-            }
+        if (location.search.includes("categoryId")) {
+            newFilters.categoryId = queryParameters.get("categoryId") ? [queryParameters.get("categoryId")] : [];
+            newFilters.subCategoryId = [];
+            newFilters.thirdSubCategoryId = [];
+            context?.setSearchData([]);
+            context?.setIsSearch('');
+        }
 
-            if (location.search.includes("thirdSubCategoryId")) {
-                const thirdSubCategoryId = queryParameters.get("thirdSubCategoryId");
-                newFilters.thirdSubCategoryId = thirdSubCategoryId ? [thirdSubCategoryId] : [];
-                context?.setSearchData([]);
-                context?.setIsSearch('');
-            }
+        if (location.search.includes("subCategoryId")) {
+            newFilters.subCategoryId = queryParameters.get("subCategoryId") ? [queryParameters.get("subCategoryId")] : [];
+            newFilters.thirdSubCategoryId = [];
+            context?.setSearchData([]);
+            context?.setIsSearch('');
+        }
 
-            return newFilters;
-        });
+        if (location.search.includes("thirdSubCategoryId")) {
+            newFilters.thirdSubCategoryId = queryParameters.get("thirdSubCategoryId") ? [queryParameters.get("thirdSubCategoryId")] : [];
+            context?.setSearchData([]);
+            context?.setIsSearch('');
+        }
 
-        props.setPage(1);
-    }, [location.search]);
+        return newFilters;
+    });
+
+    props.setPage(1);
+}, [location.search]);
+
 
 
     useEffect(() => {
