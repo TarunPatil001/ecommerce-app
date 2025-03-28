@@ -71,10 +71,10 @@ const HomeSliderBanners = () => {
 
 
 
-    const handleChangeCategoryFilterValue = (event) => {
-        setCategoryFilterValue(event.target.value);
-        setPage(0); // Reset to first page on category change
-    };
+    // const handleChangeCategoryFilterValue = (event) => {
+    //     setCategoryFilterValue(event.target.value);
+    //     setPage(0); // Reset to first page on category change
+    // };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);

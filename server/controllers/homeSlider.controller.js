@@ -12,135 +12,152 @@ cloudinary.config({
 
 
 
-let imagesArr = [];
+// let imagesArr = [];
 
-export async function uploadHomeSlideImages(request, response) {
+// export async function uploadHomeSlideImages(request, response) {
+//     try {
+//         // Reset images array to ensure it's fresh for each upload
+//         imagesArr = [];
+
+//         const images = request.files; // Extract images from multer
+
+//         if (!images || images.length === 0) {
+//             return response.status(400).json({
+//                 message: "No image files uploaded.",
+//                 success: false,
+//             });
+//         }
+
+//         const options = {
+//             folder: "ecommerceApp/uploads", // Specify Cloudinary folder
+//             use_filename: true,
+//             unique_filename: false,
+//             overwrite: false,
+//         };
+
+//         // Process each image
+//         for (let i = 0; i < images.length; i++) {
+//             try {
+//                 // Upload image to Cloudinary
+//                 const result = await cloudinary.uploader.upload(images[i].path, options);
+//                 imagesArr.push(result.secure_url);
+
+//                 // Delete local image after successful upload
+//                 await fs.promises.unlink(images[i].path);
+//             } catch (uploadError) {
+//                 console.error("Error uploading image to Cloudinary:", uploadError.message || uploadError);
+//                 // Skip the failed upload but continue with the others
+//             }
+//         }
+
+//         return response.status(200).json({
+//             images: imagesArr,
+//             message: "Images uploaded successfully.",
+//             success: true,
+//         });
+//     } catch (error) {
+//         console.error("Error in uploadHomeSlideImages:", error.message || error);
+//         return response.status(500).json({
+//             message: error.message || "An error occurred during image upload.",
+//             error: true,
+//             success: false,
+//         });
+//     }
+// }
+
+// =====================================================================
+// Upload images to Cloudinary
+async function uploadImagesToCloudinary(files) {
     try {
-        // Reset images array to ensure it's fresh for each upload
-        imagesArr = [];
-
-        const images = request.files; // Extract images from multer
-
-        if (!images || images.length === 0) {
-            return response.status(400).json({
-                message: "No image files uploaded.",
-                success: false,
-            });
+        if (!Array.isArray(files) || files.length === 0) {
+            throw new Error("Invalid or empty file array received");
         }
 
-        const options = {
-            folder: "ecommerceApp/uploads", // Specify Cloudinary folder
+        console.log("🚀 Uploading images to Cloudinary");
+
+        const folderPath = `ecommerceApp/homeSlides_images`;
+        const uploadOptions = {
+            folder: folderPath,
             use_filename: true,
             unique_filename: false,
             overwrite: false,
         };
 
-        // Process each image
-        for (let i = 0; i < images.length; i++) {
+        const uploadPromises = files.map(async (file) => {
             try {
-                // Upload image to Cloudinary
-                const result = await cloudinary.uploader.upload(images[i].path, options);
-                imagesArr.push(result.secure_url);
+                console.log(`📤 Uploading file: ${file.originalname}`);
+                const result = await cloudinary.uploader.upload(file.path, uploadOptions);
 
-                // Delete local image after successful upload
-                await fs.promises.unlink(images[i].path);
-            } catch (uploadError) {
-                console.error("Error uploading image to Cloudinary:", uploadError.message || uploadError);
-                // Skip the failed upload but continue with the others
+                // Clean up local file after upload
+                await fs.promises.unlink(file.path).catch(err => {
+                    console.error(`⚠️ Could not delete local file ${file.path}:`, err);
+                });
+
+                return result.secure_url;
+            } catch (error) {
+                console.error(`❌ Failed to upload ${file.originalname}:`, error);
+                // Attempt to clean up even if upload failed
+                await fs.promises.unlink(file.path).catch(() => { });
+                throw error; // Re-throw to be caught by Promise.all
             }
-        }
+        });
 
-        return response.status(200).json({
-            images: imagesArr,
-            message: "Images uploaded successfully.",
-            success: true,
-        });
+        const uploadedImageUrls = await Promise.all(uploadPromises);
+        console.log("✅ Successfully uploaded images:", uploadedImageUrls);
+        return uploadedImageUrls;
+
     } catch (error) {
-        console.error("Error in uploadHomeSlideImages:", error.message || error);
-        return response.status(500).json({
-            message: error.message || "An error occurred during image upload.",
-            error: true,
-            success: false,
-        });
+        console.error("❌ Image upload function error:", error);
+        throw error; // Re-throw for handling in the calling function
     }
 }
-
-
 
 export async function addHomeSlide(request, response) {
     try {
-        const { homeSlideId } = request.body;
+        console.log("📂 Request files:", request.files);
+        console.log("📝 Request body:", request.body);
 
-        // Step 1: If homeSlideId is provided, validate if it exists
-        if (homeSlideId) {
-            const existingHomeSlide = await HomeSliderModel.findById(homeSlideId);
-
-            // If home slide doesn't exist
-            if (!existingHomeSlide) {
-                return response.status(400).json({
-                    message: "Home Slide does not exist.",
-                    error: true,
-                    success: false,
-                });
-            }
-
-            // Step 2: Create the home slide banner (sub-home-slide)
-            let homeSlideBanner = new HomeSliderModel({
-                images: imagesArr, // Use the global imagesArr with uploaded images
-                homeSlideId: homeSlideId || null, // Parent homeSlideId if applicable
-            });
-
-            // Step 3: Ensure the home slide banner is created
-            if (!homeSlideBanner) {
-                return response.status(500).json({
-                    message: "Failed to create Home Slide Banner.",
-                    error: true,
-                    success: false,
-                });
-            }
-
-            // Step 4: Save the home slide banner to the database
-            homeSlideBanner = await homeSlideBanner.save();
-
-            // Clear the images array after saving to avoid issues with future requests
-            imagesArr = []; // Reset the array to prevent reuse in other requests
-
-            return response.status(200).json({
-                message: "Home Slide Banner created successfully.",
-                error: false,
-                success: true,
-                data: homeSlideBanner,
-            });
-        } else {
-            // Step 5: If no homeSlideId is provided, create a root home slide
-            let homeSlideBanner = new HomeSliderModel({
-                images: imagesArr, // Use the global imagesArr with uploaded images
-                homeSlideId: null, // No parent homeSlideId for root
-            });
-
-            // Step 6: Save the home slide banner to the database
-            homeSlideBanner = await homeSlideBanner.save();
-
-            // Clear the images array after saving to avoid issues with future requests
-            imagesArr = []; // Reset the array to prevent reuse in other requests
-
-            return response.status(200).json({
-                message: "Home Slide created successfully.",
-                error: false,
-                success: true,
-                data: homeSlideBanner,
+        // Validate input
+        if (!request.files?.images || request.files.images.length === 0) {
+            return response.status(400).json({
+                error: true,
+                success: false,
+                message: "At least one homeSlide image is required."
             });
         }
+
+        // Upload images to Cloudinary
+        const uploadedImageUrls = await uploadImagesToCloudinary(request.files.images);
+
+        // Create new home slide document
+        const homeSlideBanner = new HomeSliderModel({
+            images: uploadedImageUrls,
+            homeSlideId: request.body.homeSlideId || null,
+        });
+
+        // Save to database
+        const savedBanner = await homeSlideBanner.save();
+
+        if (!savedBanner) {
+            throw new Error("Failed to save home slide to database");
+        }
+
+        return response.status(201).json({
+            message: "Home Slide created successfully",
+            error: false,
+            success: true,
+            data: savedBanner
+        });
+
     } catch (error) {
-        console.error("Error creating homeSlide:", error.message || error);
+        console.error("❌ Error in addHomeSlide:", error);
         return response.status(500).json({
-            message: error.message || "An error occurred during homeSlide creation.",
+            message: error.message || "Failed to create home slide",
             error: true,
-            success: false,
+            success: false
         });
     }
 }
-
 
 
 
@@ -207,27 +224,72 @@ export async function getHomeSlideByID(request, response) {
 
 
 // Helper function to extract publicId from image URL
-const extractPublicId = (imgUrl) => {
+// const extractPublicId = (imgUrl) => {
+//     try {
+//         const urlArr = imgUrl.split("/");
+//         const imageName = urlArr[urlArr.length - 1].split(".")[0];
+//         return `ecommerceApp/uploads/${imageName}`; // Assuming this is the base format for your Cloudinary public ID
+//     } catch (error) {
+//         console.error("Error extracting public ID:", error);
+//         return null;
+//     }
+// };
+const extractPublicId = (url) => {
     try {
-        const urlArr = imgUrl.split("/");
-        const imageName = urlArr[urlArr.length - 1].split(".")[0];
-        return `ecommerceApp/uploads/${imageName}`; // Assuming this is the base format for your Cloudinary public ID
+        if (!url.includes("res.cloudinary.com")) return null;
+        const parts = url.split("/");
+        const filename = parts.pop().split(".")[0]; // Get filename without extension
+        const folderIndex = parts.indexOf("ecommerceApp"); // Find "ecommerceApp" folder
+        if (folderIndex !== -1) {
+            return `${parts.slice(folderIndex).join("/")}/${filename}`;
+        }
+        return filename;
     } catch (error) {
-        console.error("Error extracting public ID:", error);
+        console.error("❌ Error extracting public ID:", error);
         return null;
     }
 };
 
 // Function to check if an image exists in Cloudinary
-const checkImageExists = async (publicId) => {
-    try {
-        await cloudinary.api.resource(publicId);
-        return true; // Image exists
-    } catch (error) {
-        console.error("Error checking image existence:", error.message || error);
-        return false; // Image not found
-    }
+// const checkImageExists = async (publicId) => {
+//     try {
+//         await cloudinary.api.resource(publicId);
+//         return true; // Image exists
+//     } catch (error) {
+//         console.error("Error checking image existence:", error.message || error);
+//         return false; // Image not found
+//     }
+// };
+
+const deleteCloudinaryImages = async (imageUrls) => {
+    const cloudinaryImages = imageUrls.filter(url => url.startsWith("https://res.cloudinary.com"));
+    if (cloudinaryImages.length === 0) return;
+
+    await Promise.all(
+        cloudinaryImages.map(async (url) => {
+            try {
+                const publicId = extractPublicId(url);
+                if (publicId) {
+                    const result = await cloudinary.uploader.destroy(publicId);
+                    if (result.result === "ok") {
+                        console.log(`Successfully deleted from Cloudinary: ${publicId}`);
+                    } else {
+                        console.error(`Failed to delete from Cloudinary: ${publicId}`);
+                    }
+                } else {
+                    console.error(`Invalid public ID for URL: ${url}`);
+                }
+            } catch (error) {
+                console.error(`Error deleting image from Cloudinary: ${url}`, error);
+            }
+        })
+    );
 };
+
+
+
+
+
 
 // Controller for removing an image from Cloudinary
 export async function removeHomeSlideImageFromCloudinary(request, response) {
@@ -265,12 +327,12 @@ export async function removeHomeSlideImageFromCloudinary(request, response) {
         }
 
         // Delete image from Cloudinary
-        const res = await cloudinary.uploader.destroy(publicId);
-        console.log("Cloudinary Response:", res);
+        const response = await cloudinary.uploader.destroy(publicId);
+        console.log("Cloudinary Response:", response);
 
-        if (res.result !== "ok") {
+        if (response.result !== "ok") {
             return response.status(500).json({
-                message: `Error deleting image from Cloudinary: ${res.result}`,
+                message: `Error deleting image from Cloudinary: ${response.result}`,
                 error: true,
                 success: false,
             });
@@ -290,13 +352,17 @@ export async function removeHomeSlideImageFromCloudinary(request, response) {
     }
 }
 
+
+
+
+
 // Controller to delete a Home Slide
 export async function deleteHomeSlide(request, response) {
     try {
         const homeSlideId = request.params.id;
-
         // Find the home slide by ID
         const homeSlide = await HomeSliderModel.findById(homeSlideId);
+
         if (!homeSlide) {
             return response.status(404).json({
                 message: "Home Slide not found.",
@@ -305,34 +371,18 @@ export async function deleteHomeSlide(request, response) {
             });
         }
 
-        const slideImages = Array.isArray(homeSlide.images) ? homeSlide.images : [];
+        // Delete homeSlide and banner images from Cloudinary
+        await deleteCloudinaryImages([...homeSlide.images]);
 
-        // Delete images from Cloudinary in parallel
-        await Promise.all(slideImages.map(async (imgUrl) => {
-            const publicId = extractPublicId(imgUrl);
-            if (publicId) {
-                const exists = await checkImageExists(publicId);
-                if (exists) {
-                    // Deleting the image from Cloudinary
-                    const cloudinaryResponse = await cloudinary.uploader.destroy(publicId);
-                    console.log("Cloudinary delete response:", cloudinaryResponse);
-                    if (cloudinaryResponse.result !== 'ok') {
-                        console.error(`Failed to delete image with public ID: ${publicId}`);
-                    } else {
-                        console.log(`Successfully deleted image with public ID: ${publicId}`);
-                    }
-                } else {
-                    console.warn(`Image with public ID ${publicId} not found in Cloudinary.`);
-                }
-            }
-        }));
-
-        // Delete the home slide from the database
+        // Delete the homeSlide from the database
         await HomeSliderModel.findByIdAndDelete(homeSlideId);
 
+        console.log(`HomeSlide ${homeSlideId} and its images deleted successfully.`);
+
         return response.status(200).json({
-            message: "Home Slide deleted successfully.",
+            message: "HomeSlide and associated images deleted successfully.",
             success: true,
+            error: false,
         });
 
     } catch (error) {
@@ -375,27 +425,9 @@ export async function deleteMultipleHomeSlides(request, response) {
 
         console.log(`Found ${slides.length} slides for deletion.`); // Log number of slides found
 
-        // Delete images from Cloudinary
-        const deletePromises = slides.flatMap((slide) => {
-            if (!slide.images || slide.images.length === 0) {
-                console.warn(`No images found for slide with ID: ${slide._id}`);
-                return [];
-            }
-
-            // For each image in the slide, delete it from Cloudinary
-            return slide.images.map(async (imgUrl) => {
-                try {
-                    const publicId = imgUrl.split("/").pop().split(".")[0];
-                    console.log(`Deleting image with public ID: ${publicId}`);
-                    await cloudinary.uploader.destroy(`ecommerceApp/uploads/${publicId}`);
-                } catch (err) {
-                    console.error("Error deleting image from Cloudinary:", err);
-                }
-            });
-        });
-
-        // Wait for all image deletion promises to complete
-        await Promise.all(deletePromises);
+        // Extract and delete images using helper function
+        const allImages = slides.flatMap(slides => [...slides.images]);
+        await deleteCloudinaryImages(allImages);
 
         // Delete slides from the database
         await HomeSliderModel.deleteMany({ _id: { $in: slideIds } });
@@ -415,74 +447,174 @@ export async function deleteMultipleHomeSlides(request, response) {
 }
 
 
+// // Update HomeSlide
+// export async function updateHomeSlide(request, response) {
+//     try {
+//         // const { id } = request.params;
+//         // const { removedImages = [] } = request.body;
 
+//         const homeSlideId = request.params.id;
+//         const homeSlide = await ProductModel.findById(homeSlideId);
+
+//         if (!homeSlide) {
+//             return response.status(404).json({ error: true, success: false, message: "HomeSlide not found" });
+//         }
+
+//         let { images, removedFiles } = request.body;
+
+//         console.log("Incoming request body:", request.body); // Log incoming request body
+
+//         // ✅ Ensure `removedFiles` is parsed correctly and only contain valid Cloudinary URLs
+//         if (removedFiles && typeof removedFiles === "string") {
+//             try {
+//                 removedFiles = JSON.parse(removedFiles);
+//                 if (!Array.isArray(removedFiles)) {
+//                     removedFiles = [];
+//                 }
+//                 removedFiles = removedFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"));
+//             } catch (err) {
+//                 console.error("Error parsing removedFiles:", err);
+//                 removedFiles = [];
+//             }
+//         } else if (!Array.isArray(removedFiles)) {
+//             removedFiles = [];
+//         }
+
+
+//         console.log("removedFiles after parsing:", removedFiles); // Log the parsed removed files
+
+//         // ✅ Ensure `images` and `bannerImages` are parsed correctly
+//         try {
+//             images = Array.isArray(images) ? images : images ? JSON.parse(images) : homeSlide.images || [];
+//         } catch (err) {
+//             console.error("Error parsing images or bannerImages:", err);
+//             images = homeSlide.images || [];
+//         }
+
+//         console.log("images after parsing:", images); // Log the parsed images
+
+//         // ✅ Upload new images if provided
+//         const newImages = request.files?.newHomeSlideImages ? await uploadImagesToCloudinary(request.files.newHomeSlideImages) : [];
+
+//         console.log("newImages uploaded:", newImages); // Log new images uploaded
+
+//         // ✅ Remove only Cloudinary product images
+//         await deleteCloudinaryImages(removedFiles);
+//         images = images.filter((img) => !removedFiles.includes(img));
+
+//         console.log("images after removal:", images); // Log images after removal of Cloudinary images
+
+//         // ✅ Append new images and banners in the pattern you provided
+//         const updatedImages = [...images, ...newImages];
+
+//         console.log("updatedImages:", updatedImages); // Log the updated images
+
+//         // Update database
+//         const updatedSlide = await HomeSliderModel.findByIdAndUpdate(
+//             homeSlideId,
+//             {images: updatedImages },
+//             { new: true }
+//         );
+
+//         if (!updatedSlide) {
+//             return response.status(400).json({ error: true, success: false, message: "HomeSlide failed to update!" });
+//           }
+
+//         res.status(200).json({
+//             message: "HomeSlide updated successfully",
+//             success: true,
+//             error: false,
+//             data: updatedSlide
+//         });
+//     } catch (error) {
+//         console.error('Update error:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: error.message || 'Update failed'
+//         });
+//     }
+// };
 
 // Update HomeSlide
 export async function updateHomeSlide(request, response) {
     try {
         const homeSlideId = request.params.id;
-        const homeSlideData = request.body;
-
-        // Find the HomeSlide by ID
         const homeSlide = await HomeSliderModel.findById(homeSlideId);
 
         if (!homeSlide) {
-            return response.status(404).json({
-                message: "Home Slide not found.",
-                success: false
-            });
-
+            return response.status(404).json({ error: true, success: false, message: "HomeSlide not found" });
         }
 
+        let { images, removedFiles } = request.body;
 
-        // If the homeSlide has images, delete the old ones from Cloudinary
-        if (homeSlide.images && homeSlide.images.length > 0) {
-            const imageDeletePromises = homeSlide.images.map((imgUrl) => {
-                const urlArr = imgUrl.split("/");
-                const imageName = urlArr[urlArr.length - 1].split(".")[0];
-                const publicId = `ecommerceApp/uploads/${imageName}`;
-                return cloudinary.uploader.destroy(publicId); // Remove image from Cloudinary
-            });
+        console.log("Incoming request body:", request.body); // Log incoming request body
 
-            await Promise.all(imageDeletePromises);
-        }
-
-        // Now proceed to upload new images if provided
-        const image = request.files; // Assuming images are coming through the request files (Multer)
-        if (image && image.length > 0) {
-            // Upload new images to Cloudinary
-            const options = {
-                folder: "ecommerceApp/uploads", // Specify the folder in Cloudinary
-                use_filename: true,
-                unique_filename: false,
-                overwrite: false,
-            };
-
-            for (let i = 0; i < image.length; i++) {
-                const result = await cloudinary.uploader.upload(image[i].path, options);
-                imagesArr.push(result.secure_url); // Save the uploaded image URL
-                await fs.promises.unlink(image[i].path); // Delete the image from local storage after upload
+        // ✅ Ensure `removedFiles` is parsed correctly and only contain valid Cloudinary URLs
+        if (removedFiles && typeof removedFiles === "string") {
+            try {
+                removedFiles = JSON.parse(removedFiles);
+                if (!Array.isArray(removedFiles)) {
+                    removedFiles = [];
+                }
+                removedFiles = removedFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"));
+            } catch (err) {
+                console.error("Error parsing removedFiles:", err);
+                removedFiles = [];
             }
+        } else if (!Array.isArray(removedFiles)) {
+            removedFiles = [];
         }
 
+        console.log("removedFiles after parsing:", removedFiles); // Log the parsed removed files
 
-        // Update the HomeSlide in DB
-        const updatedHomeSlide = await HomeSliderModel.findByIdAndUpdate(
+        // ✅ Ensure `images` is parsed correctly
+        try {
+            images = Array.isArray(images) ? images : images ? JSON.parse(images) : homeSlide.images || [];
+        } catch (err) {
+            console.error("Error parsing images:", err);
+            images = homeSlide.images || [];
+        }
+
+        console.log("images after parsing:", images); // Log the parsed images
+
+        // ✅ Upload new images if provided
+        const newImages = request.files?.newHomeSlideImages ? await uploadImagesToCloudinary(request.files.newHomeSlideImages) : [];
+
+        console.log("newImages uploaded:", newImages); // Log new images uploaded
+
+        // ✅ Remove only Cloudinary product images
+        await deleteCloudinaryImages(removedFiles);
+        images = images.filter((img) => !removedFiles.includes(img));
+
+        console.log("images after removal:", images); // Log images after removal of Cloudinary images
+
+        // ✅ Append new images
+        const updatedImages = [...images, ...newImages];
+
+        console.log("updatedImages:", updatedImages); // Log the updated images
+
+        // Update database
+        const updatedSlide = await HomeSliderModel.findByIdAndUpdate(
             homeSlideId,
-            { 
-                images: imagesArr.length > 0 ? imagesArr : homeSlide.images, 
-            },
+            { images: updatedImages },
             { new: true }
         );
 
-        return response.status(200).json({
-            message: "Home Slide updated successfully.",
-            success: true,
-            data: updatedHomeSlide,
-        });
+        if (!updatedSlide) {
+            return response.status(400).json({ error: true, success: false, message: "HomeSlide failed to update!" });
+        }
 
+        return response.status(200).json({
+            message: "HomeSlide updated successfully",
+            success: true,
+            error: false,
+            data: updatedSlide
+        });
     } catch (error) {
-        console.error("Error updating Home Slide:", error);
-        return response.status(500).json({ message: "An error occurred.", success: false });
+        console.error('Update error:', error);
+        return response.status(500).json({
+            success: false,
+            message: error.message || 'Update failed'
+        });
     }
-}
+};
