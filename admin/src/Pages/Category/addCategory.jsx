@@ -20,19 +20,20 @@ const AddCategory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
   // const [isLoading3, setIsLoading3] = useState(false);
-  const [previews, setPreviews] = useState([]);
+
+  // Consolidated states for product and banner files
+  const [categoryFiles, setCategoryFiles] = useState({
+    uploadedFiles: [],
+    previews: [],
+    removedFiles: []
+  });
+
+  const [categoryIdNo, setCategoryIdNo] = useState(undefined);
 
   const [formFields, setFormFields] = useState({
     name: '',
     images: [],
   });
-
-  useEffect(() => {
-    setFormFields((prev) => ({
-      ...prev,
-      images: previews, // Sync images with updated previews
-    }));
-  }, [previews]);
 
   useEffect(() => {
     const { categoryId, categoryName } = context.isOpenFullScreenPanel || {};
@@ -41,7 +42,14 @@ const AddCategory = () => {
 
     // Early return for new address (addressId is not present)
     if (!categoryId) {
-      context.setCategoryIdNo(categoryId)
+      // context.setCategoryIdNo(categoryId)
+      setCategoryIdNo(undefined);
+      setCategoryFiles({
+        uploadedFiles: [],
+        previews: [],
+        removedFiles: []
+      });
+
       setFormFields({
         name: "",
         images: [],
@@ -51,7 +59,9 @@ const AddCategory = () => {
 
     // If addressId is available (editing existing address)
     if (categoryId && categoryName) {
-      context.setCategoryIdNo(categoryId)
+      // context.setCategoryIdNo(categoryId);
+      setCategoryIdNo(categoryId);
+
       const fetchCategoryData = async () => {
         try {
           const response = await fetchDataFromApi(
@@ -63,7 +73,13 @@ const AddCategory = () => {
             console.log("Response Data:", category); // Log response to check status
 
             // Populate the form fields with the fetched data
-            setPreviews(category?.images || []); // Update previews state
+            setCategoryFiles({
+              uploadedFiles: category?.images || [],
+              previews: category?.images || [],
+              removedFiles: []
+            });
+
+            // setPreviews(category?.images || []); // Update previews state
             setFormFields((prev) => ({
               ...prev,
               name: category?.name || "",
@@ -82,7 +98,7 @@ const AddCategory = () => {
 
       fetchCategoryData();
     }
-  }, [context, context.isOpenFullScreenPanel, context.setCategoryIdNo]);
+  }, [context, context.isOpenFullScreenPanel, setCategoryIdNo]);
 
 
   const onChangeInput = (e) => {
@@ -94,160 +110,221 @@ const AddCategory = () => {
   };
 
 
-  // Handle image previews update properly
-const setPreviewFun = (previeswArr) => {
-  // Update the previews state, which will trigger re-render
-  setPreviews(previeswArr);
+  // Effect to reset removed files when panel closes
+  useEffect(() => {
+    if (context?.isOpenFullScreenPanel?.open === false) {
+      setCategoryFiles((prev) => ({
+        ...prev,
+        removedFiles: []
+      }));
+    }
+  }, [context?.isOpenFullScreenPanel?.open]);
 
-  // Update formFields.images to reflect the preview updates
-  setFormFields((prev) => ({
-    ...prev,
-    images: previeswArr,
-  }));
-};
 
+  // Cleanup image previews when the component unmounts or images change
+  useEffect(() => {
+    return () => {
+      categoryFiles.previews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [categoryFiles.previews]);
+
+
+  // Handle file selection for product images
+  const handleCategoryFileChange = (newFiles) => {
+    // Ensure newFiles is an array
+    const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+
+    // Filter out duplicate files (check by name & size)
+    const filteredFiles = filesArray.filter((newFile) => {
+      return !categoryFiles.uploadedFiles.some(
+        (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+      );
+    });
+
+    if (filteredFiles.length === 0) {
+      toast.error("Oops! File already exists."); // Optional alert
+      return;
+    }
+
+    setCategoryFiles((prev) => ({
+      ...prev,
+      uploadedFiles: [...prev.uploadedFiles, ...filteredFiles], // Append new images
+    }));
+
+    // Generate previews for new files
+    filteredFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCategoryFiles((prev) => ({
+          ...prev,
+          previews: [...prev.previews, reader.result], // Append preview
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle image removal dynamically
+  const handleRemoveImage = (index) => {
+    setCategoryFiles((prev) => {
+      const updatedFiles = [...prev.uploadedFiles];
+      const updatedPreviews = [...prev.previews];
+      const removedFile = updatedFiles[index]; // Store removed file
+
+      updatedFiles.splice(index, 1);
+      updatedPreviews.splice(index, 1);
+
+      return {
+        ...prev,
+        uploadedFiles: updatedFiles,
+        previews: updatedPreviews,
+        removedFiles: [...prev.removedFiles, removedFile], // Add to removed files
+      };
+    });
+  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    if (formFields.name === "") {
-      context.openAlertBox("error", "Please enter category name.");
-      return;
-    }
-
-    if (previews?.length === 0) {
-      context.openAlertBox("error", "Please select category image.");
-      return;
-    }
-
+  
+    if (!formFields.name.trim()) return toast.error("Please enter category name.");
+    if (categoryFiles.uploadedFiles.length === 0) return toast.error("Please upload at least one category image.");
+  
     setIsLoading(true);
-    // Start a toast.promise for handling loading, success, and error states
+  
     try {
-      const result = await toast.promise(
-        postData(`/api/category/create-category`, formFields), {
-        loading: "Adding category... Please wait.",
-        success: (res) => {
-          if (res?.success) {
-            context?.forceUpdate();
-            return res.message || "Category added successfully!";
-          } else {
-            throw new Error(res?.message || "An unexpected error occurred.");
-          }
-        },
-        error: (err) => {
-          // Check if err.response exists, else fallback to err.message
-          const errorMessage = err?.response?.data?.message || err.message || "Failed to add category. Please try again.";
-          return errorMessage;
-        },
+      const formData = new FormData();
+  
+      // ✅ Append text fields
+      formData.append("name", formFields.name);
+  
+      // ✅ Append each image file
+      categoryFiles.uploadedFiles.forEach((file) => {
+        formData.append("images", file); // Ensure field name matches backend expectation
+      });
+  
+      // ✅ Debugging: Log FormData contents
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
       }
+  
+      // ✅ Submit the request
+      await toast.promise(
+        postData(`/api/category/create-category`, formData, {withCredentials: true}),
+        {
+          loading: "Adding category... Please wait.",
+          success: (res) => {
+            if (res?.success) {
+              context?.forceUpdate();
+              setTimeout(() => {
+                context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
+              }, 500);
+              return res.message || "Category added successfully!";
+            } else {
+              throw new Error(res?.message || "Error occurred.");
+            }
+          },
+          error: (err) => {
+            toast.error(err?.message || "Failed to add category.");
+          },
+        }
       );
-      console.log("Result:", result);
     } catch (err) {
-      console.error("Error:", err);
-      toast.error(err?.message || "An unexpected error occurred.");
+      toast.error(err?.message || "An error occurred.");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-        context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
-      }, 500);
+      setIsLoading(false);
     }
   };
+
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (formFields.name === "") {
-      context.openAlertBox("error", "Please enter category name.");
-      return;
-    }
-
-    if (previews?.length === 0) {
-      context.openAlertBox("error", "Please select category image.");
+    if (!formFields.name.trim()) return toast.error("Please enter category name.");
+    if (formFields.images.length === 0 && categoryFiles.uploadedFiles.length === 0) {
+      context.openAlertBox("error", "Please upload image");
       return;
     }
 
     try {
+      setIsLoading(true);
+
+      const formData = new FormData();
+
+      // Append all form fields
+      Object.keys(formFields).forEach((key) => {
+        if (Array.isArray(formFields[key])) {
+          formFields[key].forEach((item) => formData.append(key, item));
+        } else {
+          formData.append(key, formFields[key]);
+        }
+      });
+
+      console.log("Form fields after appending:", formFields);
+
+      // Append new product images
+      categoryFiles.uploadedFiles.forEach((file) => {
+        formData.append("newCategoryImages", file);
+      });
+
+      console.log("Category image appended:", formData);
+
+      // ✅ Filter removed files (only keep Cloudinary URLs)
+      const cloudinaryFilesToRemove = categoryFiles.removedFiles.filter(
+        (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+      );
+      console.log("cloudinaryFilesToRemove:", cloudinaryFilesToRemove);
+
+      if (cloudinaryFilesToRemove.length > 0) {
+        formData.append("removedFiles", JSON.stringify(cloudinaryFilesToRemove));
+      }
+
+      formData.append("userId", context?.userData?._id);
+      formData.append("categoryId", categoryIdNo);
+
+      console.log("Final FormData before sending:", formData);
+
+      // Call API
       const result = await toast.promise(
-        editData(`/api/category/${context?.categoryIdNo}`, {
-          ...formFields,
-          categoryId: context?.categoryIdNo,
-        }, { withCredentials: true }),
+
+        editData(`/api/category/${categoryIdNo}`, formData),
         {
+          // loading: "Updating product... Please wait.",
           loading: "Updating category... Please wait.",
           success: (res) => {
             if (res?.success) {
               context?.forceUpdate();
+              setTimeout(() => {
+                context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
+              }, 500);
               return res.message || "Category updated successfully!";
             } else {
               throw new Error(res?.message || "An unexpected error occurred.");
             }
           },
+
           error: (err) => {
             const errorMessage = err?.response?.data?.message || err.message || "Failed to update category. Please try again.";
             return errorMessage;
           },
         }
       );
+
       console.log("Update Result:", result);
     } catch (err) {
       console.error("Error in handleUpdate:", err);
       toast.error(err?.message || "An unexpected error occurred.");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-        context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
-      }, 500);
+      setIsLoading(false);
     }
+
   };
 
 
-
-  const handleRemoveImage = async (image, index) => {
-    try {
-      // Confirm image is valid before attempting to delete
-      if (!image) {
-        throw new Error("Invalid image.");
-      }
-
-      // Delete the image from Cloudinary or backend
-      const response = await deleteImages(`/api/category/delete-category-image?img=${image}`);
-
-      if (response.success) {
-        // Update previews after the image is deleted
-        const updatedImages = previews.filter((_, imgIndex) => imgIndex !== index);
-        setPreviews(updatedImages);
-
-        // Update formFields images as well (without mutating directly)
-        setFormFields((prevFields) => ({
-          ...prevFields,
-          images: updatedImages,
-        }));
-        // Display success message
-        toast.success("Image removed successfully.");
-      } else {
-        throw new Error(response.message || "Failed to remove image.");
-      }
-    } catch (error) {
-      // Handle any errors during the removal
-      console.error("Error removing image:", error);
-      toast.error(error.message || "An unexpected error occurred.");
-    }
+  const handleDiscard = async () => {
+    context.setIsOpenFullScreenPanel({ open: false, model: "Category Details" });
   };
-
-  // Refactored handleDiscard to ensure all images are removed properly
-  const handleDiscard = () => {
-    // Loop through the previews and delete each image from the server
-    previews.forEach((image, index) => {
-      handleRemoveImage(image, index);
-    });
-
-    // Reset the form and states
-    setFormFields({ name: '', images: [] });
-    setPreviews([]); // Clear the previews after images are removed
-    console.log("Discard action, file cleared.");
-  };
-
 
 
   return (
@@ -258,7 +335,7 @@ const setPreviewFun = (previeswArr) => {
           ref={formRef}
           onSubmit={handleFormSubmit}
           className='form py-3'>
-          <h3 className='text-[24px] font-bold mb-2'>{!context.categoryIdNo ? "Create New Category" : "Edit Category"}</h3>
+          <h3 className='text-[24px] font-bold mb-2'>{categoryIdNo === undefined ? ("Create ") : ("Update ")}Product</h3>
 
           <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
           <div className="grid grid-cols-1 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
@@ -270,60 +347,47 @@ const setPreviewFun = (previeswArr) => {
 
 
           <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
-          <div className="grid grid-cols-6 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-            <span className='opacity-50 col-span-full text-[14px]'>
-              Choose a category photo or simply drag and drop
+          <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+            <span className='opacity-50 text-[14px]'>
+              {categoryFiles.uploadedFiles.length > 0
+                ? "Category photo uploaded"
+                : "Choose a category photo or simply drag and drop"}
             </span>
 
-            {
-              previews?.length !== 0 && previews.map((image, index) => {
-                return (
-                  <div className="border p-2 rounded-md flex flex-col items-center bg-white h-full relative" key={index}>
-                    <span
-                      className='absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all'
-                      onClick={() => handleRemoveImage(image, index)}
-                    >
-                      <IoClose className='text-[15px] text-red-600 bg' />
-                    </span>
-                    <div className='w-full h-[200px]'>
-                      {
-                        isLoading2 ? (
-                          <CircularProgress color="inherit" />
-                        ) : (
-                          context.categoryIdNo === undefined ? (
-                            <img src={image} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                          ) : (
-                            <img src={formFields.images[0]} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                          )
-                        )
-                      }
-                    </div>
-                  </div>
-                )
-              }
-              )}
+            {categoryFiles.uploadedFiles.length > 0 ? (
+              <div className="mt-2 border p-2 rounded-md flex flex-col items-center bg-white h-[150px] w-full relative">
+                {/* Remove Button */}
+                <span
+                  className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                  onClick={() => handleRemoveImage(0)}
+                  aria-label="Remove Image"
+                >
+                  <IoClose className="text-[15px] text-red-600" />
+                </span>
 
-
-            {previews?.length === 0 && (
-              <div className="col-span-8">
-                <UploadBox
-                  multiple={false}
-                  // categoryId={context.categoryIdNo}
-                  images={previews}
-                  onDrop={(acceptedFiles) => {
-                    const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-                    setPreviewFun(previewUrls);
-                  }}
-                  name="images"
-                  url={"/api/category/upload-category-images"}
-                  setPreviewFun={setPreviewFun}  // Pass function to handle preview in the parent
-                />
+                {/* Image Preview */}
+                <div className="w-full h-full overflow-hidden">
+                  <img
+                    src={categoryFiles.previews[0]}
+                    alt={`Uploaded file: ${categoryFiles.uploadedFiles[0].name}`}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2">
+                <UploadBox multiple={false} onFileChange={handleCategoryFileChange} />
               </div>
             )}
 
+            <p className="text-sm mt-2 text-gray-600">
+              {categoryFiles.uploadedFiles.length > 0
+                ? "Category image uploaded"
+                : "No category image uploaded yet."}
+            </p>
           </div>
 
-          <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+          {/* <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
             {
               context.categoryIdNo === undefined ? (
                 <>
@@ -351,6 +415,32 @@ const setPreviewFun = (previeswArr) => {
               )
             }
 
+          </div> */}
+          <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
+
+            <Button
+              type="reset"
+              onClick={handleDiscard}
+              className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+            >
+              <RiResetLeftFill className='text-[20px]' />Cancel
+            </Button>
+
+            {
+              categoryIdNo === undefined ? (
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                  {
+                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                  }
+                </Button>
+              ) : (
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                  {
+                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
+                  }
+                </Button>
+              )
+            }
           </div>
         </form>
       </section>

@@ -1188,6 +1188,7 @@ export async function deleteMultipleProduct(req, res) {
       success: true,
       error: false,
     });
+    
   } catch (error) {
     console.error("Error deleting products:", error);
     return res.status(500).json({

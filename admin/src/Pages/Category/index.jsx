@@ -159,7 +159,7 @@ const CategoryList = () => {
                         if (response.success) {
                             // Update UI to remove the deleted slides
                             context?.setCatData((prevData) =>
-                                prevData.filter((slide) => !selectedRows.includes(slide._id))
+                                prevData.filter((category) => !selectedRows.includes(category._id))
                             );
                             setSelectedRows([]); // Clear selected rows after successful deletion
                             setSelectAll(false); // Uncheck "Select All" checkbox
