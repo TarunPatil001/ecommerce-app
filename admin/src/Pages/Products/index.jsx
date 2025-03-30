@@ -731,24 +731,30 @@ const Products = () => {
                                                 <span className="text-[12px] text-[var(--off-color)] font-medium">{product?.discount}% off</span>
                                             </div>
                                         </TableCell>
+
                                         <TableCell className="table-cell">
                                             <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
                                                 <span>
                                                     <span className="font-bold">{product?.sale}</span> sold
                                                 </span>
-                                                <ProgressBar value={(product?.sale / product?.countInStock) * 100} type="success" />
+
+                                                <ProgressBar
+                                                    value={product?.sale + product?.countInStock === 0 ? 0 : (product?.sale / (product?.sale + product?.countInStock)) * 100}
+                                                    type="success"
+                                                />
+
                                                 <span>
-                                                    <span className="text-[14px] font-bold">
-                                                        {product?.countInStock}
-                                                    </span> remain
+                                                    <span className="text-[14px] font-bold">{product?.countInStock}</span> remain
                                                 </span>
                                             </p>
                                         </TableCell>
+
                                         <TableCell className="table-cell">
                                             <p className="text-[14px] flex flex-col gap-1 justify-center text-center">
                                                 <Rating name="rating" size='small' defaultValue={product?.rating} max={5} readOnly />
                                             </p>
                                         </TableCell>
+
                                         <TableCell className="table-cell">
                                             <div className="flex items-center gap-2">
                                                 <Tooltip title="Edit Product" arrow placement="top">
@@ -784,7 +790,6 @@ const Products = () => {
                                     </TableCell>
                                 </TableRow>
                             )}
-
 
                         </TableBody>
 
