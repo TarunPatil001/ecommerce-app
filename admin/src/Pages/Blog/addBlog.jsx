@@ -14,12 +14,13 @@ const AddBlog = () => {
 
     const context = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
-    const [previews, setPreviews] = useState([]);
 
     const titleInputRef = useRef(null);
     const descriptionInputRef = useRef(null);
     const [description, setDescription] = useState('');
+    const [multiple, setMultiple] = useState(false);  // Default: Single upload
+    const [blogIdNo, setBlogIdNo] = useState(undefined);  // Default: Single upload
+
 
     const [formFields, setFormFields] = useState({
         title: '',
@@ -27,75 +28,76 @@ const AddBlog = () => {
         description: '',
     });
 
+    // Consolidated states for banner files
+    const [blogFiles, setBlogFiles] = useState({
+        uploadedFiles: [],
+        previews: [],
+        removedFiles: []
+    });
+
 
     useEffect(() => {
-        setFormFields((prev) => ({
-            ...prev,
-            images: previews, // Sync images with updated previews
-        }));
-    }, [previews]);
+        const { blogId } = context.isOpenFullScreenPanel || {};
+        console.log("Add Blog Id - BlogId:", blogId);
 
+        if (!blogId) {
+            console.log("No blogId found, resetting state.");
+            setBlogIdNo(undefined);
+            setBlogFiles({
+                uploadedFiles: [],
+                previews: [],
+                removedFiles: []
+            });
 
-    useEffect(() => {
-        const fetchBlogData = async () => {
-            const blogId = context.isOpenFullScreenPanel?.blogId;
-
-            console.log("Add Blog Id - BlogId:", blogId);
-
-            if (!blogId) {
-                console.log("No blogId found, resetting state.");
-                context.setBlogIdNo(undefined);
-                setPreviews([]);
-                setFormFields({
-                    title: '',
-                    images: [],
-                    description: '',
-                });
-                setDescription('');
-                return;
-            }
-
-            try {
-                console.log("Fetching data for Blog ID:", blogId);
-                context.setBlogIdNo(blogId);
-                const response = await fetchDataFromApi(`/api/blog/${blogId}`);
-                console.log("API Response:", response);
-
-                if (response?.success && response?.data) {
-                    const blog = response.data;
-                    console.log("Blog Data:", blog);
-
-                    setPreviews(blog.images || []);
-                    setDescription(blog.description || "");
-
-                    setFormFields((prev) => ({
-                        ...prev,
-                        title: blog.title || "",
-                        images: blog.images || [],
-                        description: blog.description || "",
-                    }));
-
-                } else {
-                    console.error("Blog data not found or response unsuccessful.");
-                }
-            } catch (error) {
-                console.error("Error fetching blog:", error);
-            }
-        };
-
-        fetchBlogData();
-
-        return () => {
-            console.log("Cleanup: Resetting blog-related states");
-            setPreviews([]);
             setFormFields({
                 title: '',
                 images: [],
                 description: '',
             });
-            setDescription('');
-        };
 
+            setDescription('');
+            return;
+        }
+
+        // If addressId is available (editing existing address)
+        if (blogId) {
+            setBlogIdNo(blogId);
+
+            const fetchBlogData = async () => {
+                try {
+
+                    const response = await fetchDataFromApi(`/api/blog/${blogId}`);
+                    console.log("API Response:", response);
+
+                    if (response?.success && response?.data) {
+                        const blog = response.data;
+                        console.log("Blog Data:", blog);
+
+                        setBlogFiles({
+                            uploadedFiles: blog.images || [],
+                            previews: blog.images || [],
+                            removedFiles: []
+                        });
+
+                        setDescription(blog.description || "");
+                        setFormFields((prev) => ({
+                            ...prev,
+                            title: blog.title || "",
+                            images: blog.images || [],
+                            description: blog.description || "",
+                        }));
+
+                    } else {
+                        console.error("Blog data not found or response unsuccessful.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching blog:", error);
+                }
+            };
+
+            fetchBlogData();
+
+        }
     }, [context.isOpenFullScreenPanel?.blogId]); // Depend only on `blogId`
 
 
@@ -119,17 +121,80 @@ const AddBlog = () => {
     }
 
 
-    const setPreviewFun = (previewArr) => {
-        // Update the previews state to reflect the new image array
-        setPreviews(previewArr);
+    // Effect to reset removed files when panel closes
+    useEffect(() => {
+        if (context?.isOpenFullScreenPanel?.open === false) {
+            setBlogFiles((prev) => ({
+                ...prev,
+                removedFiles: []
+            }));
+        }
+    }, [context?.isOpenFullScreenPanel?.open]);
 
-        // Update formFields.images state properly without direct mutation
-        setFormFields((prevFormFields) => ({
-            ...prevFormFields,
-            images: previewArr, // Assign the previewArr to images
+
+    // Cleanup image previews when the component unmounts or images change
+    useEffect(() => {
+        return () => {
+            blogFiles.previews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [blogFiles.previews]);
+
+
+    // Handle file selection for product images
+    const handleBlogFileChange = (newFiles) => {
+        // Ensure newFiles is an array
+        const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+
+        // Filter out duplicate files (check by name & size)
+        const filteredFiles = filesArray.filter((newFile) => {
+            return !blogFiles.uploadedFiles.some(
+                (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+            );
+        });
+
+        if (filteredFiles.length === 0) {
+            toast.error("Oops! File already exists."); // Optional alert
+            return;
+        }
+
+        setBlogFiles((prev) => ({
+            ...prev,
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles], // Append new images
         }));
+
+        // Generate previews for new files
+        filteredFiles.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setBlogFiles((prev) => ({
+                    ...prev,
+                    previews: [...prev.previews, reader.result], // Append preview
+                }));
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
+
+    // Handle image removal dynamically
+    const handleRemoveImage = (index) => {
+        setBlogFiles((prev) => {
+            const updatedFiles = [...prev.uploadedFiles];
+            const updatedPreviews = [...prev.previews];
+            const removedFile = updatedFiles[index]; // Store removed file
+
+            updatedFiles.splice(index, 1);
+            updatedPreviews.splice(index, 1);
+
+            return {
+                ...prev,
+                uploadedFiles: updatedFiles,
+                previews: updatedPreviews,
+                removedFiles: [...prev.removedFiles, removedFile], // Add to removed files
+            };
+        });
+    };
 
 
     const handleFormSubmit = async (e) => {
@@ -148,7 +213,7 @@ const AddBlog = () => {
         }
 
 
-        if (formFields.images.length === 0) {
+        if (blogFiles.uploadedFiles.length === 0) {
             context.openAlertBox("error", "Please upload images");
             return;
         }
@@ -156,12 +221,32 @@ const AddBlog = () => {
         setIsLoading(true);
         // Start a toast.promise for handling loading, success, and error states
         try {
+
+            const formData = new FormData();
+
+            // Append all form fields
+            formData.append("title", formFields.title);
+            formData.append("description", formFields.description);
+
+            // Append each image file
+            blogFiles.uploadedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
+
+            // Debugging: Log FormData contents
+            for (let pair of formData.entries()) {
+                console.log(pair[0], pair[1]);
+            }
+
             const result = await toast.promise(
-                postData(`/api/blog/add`, formFields), {
+                postData(`/api/blog/add`, formData), {
                 loading: "Adding banners... Please wait.",
                 success: (res) => {
                     if (res?.success) {
                         context?.forceUpdate();
+                        setTimeout(() => {
+                            context.setIsOpenFullScreenPanel({ open: false, model: "Blog Details" });
+                        }, 500);
                         return res.message || "Blog added successfully!";
                     } else {
                         throw new Error(res?.message || "An unexpected error occurred.");
@@ -179,10 +264,7 @@ const AddBlog = () => {
             console.error("Error:", err);
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "Blog Details" });
-            }, 500);
+            setIsLoading(false);
         }
     }
 
@@ -202,24 +284,60 @@ const AddBlog = () => {
         }
 
 
-        if (formFields.images.length === 0) {
+        if (blogFiles.uploadedFiles.length === 0) {
             context.openAlertBox("error", "Please upload images");
             return;
         }
 
+        setIsLoading(true);
 
         try {
+
+            const formData = new FormData();
+
+            // Append all form fields
+            Object.keys(formFields).forEach((key) => {
+                if (Array.isArray(formFields[key])) {
+                    formFields[key].forEach((item) => formData.append(key, item));
+                } else {
+                    formData.append(key, formFields[key]);
+                }
+            });
+
+            console.log("Form fields after appending:", formFields);
+
+            // Append new product images
+            blogFiles.uploadedFiles.forEach((file) => {
+                formData.append("newBlogImages", file);
+            });
+
+            console.log("Blog image appended:", formData);
+
+            // ✅ Filter removed files (only keep Cloudinary URLs)
+            const cloudinaryFilesToRemove = blogFiles.removedFiles.filter(
+                (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+            );
+            console.log("cloudinaryFilesToRemove:", cloudinaryFilesToRemove);
+
+            if (cloudinaryFilesToRemove.length > 0) {
+                formData.append("removedFiles", JSON.stringify(cloudinaryFilesToRemove));
+            }
+
+            formData.append("userId", context?.userData?._id);
+            formData.append("blogId", blogIdNo);
+
+            console.log("Final FormData before sending:", formData);
+
             const result = await toast.promise(
-                editData(`/api/blog/${context.blogIdNo}`, {
-                    ...formFields,
-                    userId: context?.userData?._id,
-                    blogId: context.blogIdNo,
-                }),
+                editData(`/api/blog/${blogIdNo}`, formData),
                 {
                     loading: "Updating blog... Please wait.",
                     success: (res) => {
                         if (res?.success) {
                             context?.forceUpdate();
+                            setTimeout(() => {
+                                context.setIsOpenFullScreenPanel({ open: false, model: "Blog Details" });
+                            }, 500);
                             return res.message || "Blog updated successfully!";
                         } else {
                             throw new Error(res?.message || "An unexpected error occurred.");
@@ -237,60 +355,15 @@ const AddBlog = () => {
             console.error("Error in handleUpdate:", err);
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "Blog Details" });
-            }, 500);
+            setIsLoading(false);
         }
     }
 
-    // Blog Image Deletion Handling
-    const handleRemoveImage = async (blogImage, index) => {
-        try {
-            if (!blogImage) {
-                throw new Error("Invalid blog image.");
-            }
 
-            const blogId = context.blogIdNo; // Get blog ID properly
-            let url = `/api/blog/deleteImage?imgUrl=${encodeURIComponent(blogImage)}`;
-
-            if (blogId) {
-                // If updating, include blogId in the API request
-                url += `&blogId=${blogId}`;
-                console.log("Removing blog image with blogId:", blogImage, "for blog:", blogId);
-            } else {
-                console.log("Removing blog image without blogId:", blogImage);
-            }
-
-            const response = await deleteImages(url);
-
-            if (response?.success) {
-                // Remove the deleted image from the previews array
-                setPreviews((prevPreviews) => {
-                    const updatedPreviews = prevPreviews?.filter((_, i) => i !== index) || [];
-                    return updatedPreviews;
-                });
-
-                // Update formFields state for blog image
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    blogImage: null,
-                }));
-
-                console.log("Updated formFields after blog deletion:", formFields);
-                toast.success("Blog image removed successfully.");
-            } else {
-                throw new Error(response?.message || "Failed to remove blog image.");
-            }
-        } catch (error) {
-            console.error("Error removing blog image:", error);
-            toast.error(error?.message || "An unexpected error occurred.");
-        }
+    const handleDiscard = async () => {
+        context.setIsOpenFullScreenPanel({ open: false, model: "Blog Details" });
     };
 
-
-
-    const handleDiscard = () => { }
 
 
     return (
@@ -300,7 +373,7 @@ const AddBlog = () => {
                     action="#"
                     onSubmit={handleFormSubmit}
                     className='form py-3'>
-                    <h3 className='text-[24px] font-bold mb-2'>{!context.blogIdNo ? "Create New Blog" : "Edit Blog"}</h3>
+                    <h3 className='text-[24px] font-bold mb-2'>{!blogIdNo ? "Create " : "Update "}Blog</h3>
 
                     <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
                     <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
@@ -331,78 +404,62 @@ const AddBlog = () => {
 
 
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
-                    <div className="grid grid-cols-6 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-                        <span className='opacity-50 col-span-full text-[14px]'>
-                            Choose a blog photo or simply drag and drop
+                    <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                        <span className='opacity-50 text-[14px]'>
+                            {blogFiles.uploadedFiles.length > 0 ? "Blog photo uploaded" : "Choose a blog photo or simply drag and drop"}
                         </span>
 
-                        {
-                            previews?.length !== 0 && previews.map((image, index) => {
-                                return (
-                                    <div className="border p-2 rounded-md flex flex-col items-center bg-white h-full relative" key={index}>
+                        <div className="mt-2 grid grid-cols-5 gap-2 items-center">
+                            {/* Uploaded Images */}
+                            {blogFiles.uploadedFiles.length > 0 &&
+                                blogFiles.previews.map((image, index) => (
+                                    <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                                        {/* Remove Button */}
                                         <span
-                                            className='absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all'
-                                            onClick={() => handleRemoveImage(image, index)}
+                                            className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                            onClick={() => handleRemoveImage(index)}
+                                            aria-label="Remove Image"
                                         >
-                                            <IoClose className='text-[15px] text-red-600 bg' />
+                                            <IoClose className="text-[15px] text-red-600" />
                                         </span>
-                                        <div className='w-full h-[200px]'>
-                                            {
-                                                isLoading2 ? (
-                                                    <CircularProgress color="inherit" />
-                                                ) : (
-                                                    context.blogIdNo === undefined ? (
-                                                        <img src={image} alt="BlogImage" className="w-full h-full object-cover rounded-md" />
-                                                    ) : (
-                                                        <img src={formFields.images[0]} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                                                    )
-                                                )
-                                            }
+
+                                        {/* Image Preview */}
+                                        <div className="h-full overflow-hidden">
+                                            <img src={image} alt={`Uploaded file ${index}`} className="w-full h-full object-cover rounded-md" />
                                         </div>
                                     </div>
-                                )
-                            }
-                            )
-                        }
+                                ))}
 
+                            {(multiple || blogFiles.uploadedFiles.length === 0) && (
+                                <div className={`h-[150px] w-full ${blogFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                                    <UploadBox multiple={multiple} onFileChange={handleBlogFileChange} />
+                                </div>
+                            )}
+                        </div>
 
-                        {previews?.length === 0 && (
-                            <div className="col-span-8">
-                                <UploadBox
-                                    multiple={false}
-                                    images={previews}
-                                    onDrop={(acceptedFiles) => {
-                                        const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-                                        setPreviewFun(previewUrls);
-                                    }}
-                                    name="images"
-                                    url={"/api/blog/uploadBlogImages"}
-                                    setPreviewFun={setPreviewFun}
-                                />
-                            </div>
-                        )}
-
+                        <p className="text-sm mt-2 text-gray-600">
+                            {blogFiles.uploadedFiles.length > 0 ? `${blogFiles.uploadedFiles.length} blog photo${blogFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload` : "No blog photo uploaded yet."}
+                        </p>
                     </div>
 
+
                     <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+
+                        <Button
+                            type="reset"
+                            onClick={handleDiscard}
+                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                        >
+                            <RiResetLeftFill className='text-[20px]' />Cancel
+                        </Button>
+
                         {
-                            context.blogIdNo === undefined ? (
-                                <>
-                                    <Button
-                                        type="reset"
-                                        onClick={handleDiscard}
-                                        className={`${isLoading2 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading2}
-                                    >
-                                        {
-                                            isLoading2 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
-                                        }
-                                    </Button>
-                                    <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
-                                        {
-                                            isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
-                                        }
-                                    </Button>
-                                </>
+                            blogIdNo === undefined ? (
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                                    {
+                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                                    }
+                                </Button>
                             ) : (
                                 <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                     {
