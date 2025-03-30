@@ -87,7 +87,7 @@ const AddHomeSlide = () => {
 
       fetchHomeSlideData();
     }
-  }, [context, context.isOpenFullScreenPanel, setHomeSlideIdNo]);
+  }, [context.isOpenFullScreenPanel?.homeSlideId]);
 
   useEffect(() => {
     fetchDataFromApi("/api/homeSlides").then((res) => {
