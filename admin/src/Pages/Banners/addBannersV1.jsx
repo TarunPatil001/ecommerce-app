@@ -17,6 +17,15 @@ const AddBannersV1 = () => {
     // const [isLoading3, setIsLoading3] = useState(false);
     const [previews, setPreviews] = useState([]);
 
+    // Consolidated states for banner files
+    const [bannerFiles, setBannerFiles] = useState({
+        uploadedFiles: [],
+        previews: [],
+        removedFiles: []
+    });
+
+    const [bannerIdNo, setBannerIdNo] = useState(undefined);
+
     const nameInputRef = useRef(null);
     const priceInputRef = useRef(null);
     const categorySelectRef = useRef(null);
@@ -31,6 +40,8 @@ const AddBannersV1 = () => {
     const [isLoadingSave1, setIsLoadingSave1] = useState(false);
     const [filteredCategories, setFilteredCategories] = useState([]);
     const [filteredSubCategories, setFilteredSubCategories] = useState([]); // ✅ Ensures default is an empty array
+    const [multiple, setMultiple] = useState(false);  // Default: Single upload
+
 
     const [formFields, setFormFields] = useState({
         bannerTitle: '',
@@ -44,90 +55,21 @@ const AddBannersV1 = () => {
 
 
     useEffect(() => {
-        setFormFields((prev) => ({
-            ...prev,
-            images: previews, // Sync images with updated previews
-        }));
-    }, [previews]);
+        const { bannerId } = context.isOpenFullScreenPanel || {};
+        console.log("AddNewBannerPage - Banner ID :", bannerId);
 
+        // Early return for new address (addressId is not present)
+        if (!bannerId) {
+            console.log("No bannerId found, resetting state.");
+            // context.setBannerIdNo(undefined);
+            setBannerIdNo(undefined);
+            // setPreviews([]);
+            setBannerFiles({
+                uploadedFiles: [],
+                previews: [],
+                removedFiles: []
+            });
 
-    useEffect(() => {
-        const fetchBannerData = async () => {
-            const bannerId = context.isOpenFullScreenPanel?.bannerId;
-
-            console.log("Add Banner Id - BannerId:", bannerId);
-
-            if (!bannerId) {
-                console.log("No bannerId found, resetting state.");
-                context.setBannerIdNo(undefined);
-                setPreviews([]);
-                setFormFields({
-                    bannerTitle: '',
-                    images: [],
-                    parentCategoryId: '',
-                    subCategoryId: '',
-                    thirdSubCategoryId: '',
-                    price: '',
-                    alignInfo: '',
-                });
-                setProductCategory('');
-                setProductCategory2('');
-                setProductCategory3('');
-                setFilteredCategories([]);
-                setFilteredSubCategories([]);
-                setAlignInfo('');
-                return;
-            }
-
-            try {
-                console.log("Fetching data for Banner ID:", bannerId);
-                context.setBannerIdNo(bannerId);
-                const response = await fetchDataFromApi(`/api/bannersV1/${bannerId}`);
-                console.log("API Response:", response);
-
-                if (response?.success && response?.data) {
-                    const banner = response.data;
-                    console.log("Banner Data:", banner);
-
-                    setPreviews(banner.images || []);
-                    setAlignInfo(banner.alignInfo || []);
-
-                    setFormFields((prev) => ({
-                        ...prev,
-                        bannerTitle: banner.bannerTitle || "",
-                        images: banner.images || [],
-                        parentCategoryId: banner.parentCategoryId || "",
-                        subCategoryId: banner.subCategoryId || "",
-                        thirdSubCategoryId: banner.thirdSubCategoryId || "",
-                        price: banner.price || "",
-                        alignInfo: banner.alignInfo || "",
-                    }));
-
-                    // Automatically populate categories
-                    setProductCategory(banner?.parentCategoryId || "");
-                    setProductCategory2(banner?.subCategoryId || "");
-                    setProductCategory3(banner?.thirdSubCategoryId || "");
-
-                    // Set filtered categories based on existing selections
-                    const selectedCategory = context?.catData?.find(cat => cat._id === banner?.parentCategoryId);
-                    setFilteredCategories(selectedCategory?.children || []);
-
-                    const selectedSubCategory = selectedCategory?.children?.find(cat => cat._id === banner?.subCategoryId);
-                    setFilteredSubCategories(selectedSubCategory?.children || []);
-
-                } else {
-                    console.error("Banner data not found or response unsuccessful.");
-                }
-            } catch (error) {
-                console.error("Error fetching banner:", error);
-            }
-        };
-
-        fetchBannerData();
-
-        return () => {
-            console.log("Cleanup: Resetting banner-related states");
-            setPreviews([]);
             setFormFields({
                 bannerTitle: '',
                 images: [],
@@ -135,16 +77,77 @@ const AddBannersV1 = () => {
                 subCategoryId: '',
                 thirdSubCategoryId: '',
                 price: '',
+                alignInfo: '',
             });
             setProductCategory('');
             setProductCategory2('');
             setProductCategory3('');
             setFilteredCategories([]);
             setFilteredSubCategories([]);
-        };
+            setAlignInfo('');
+            return;
+        }
+
+        // If addressId is available (editing existing address)
+        if (bannerId) {
+            // context.setCategoryIdNo(categoryId);
+            // setCategoryIdNo(categoryId);
+            setBannerIdNo(bannerId);
+
+            const fetchCategoryData = async () => {
+                try {
+
+                    const response = await fetchDataFromApi(`/api/bannersV1/${bannerId}`);
+                    console.log("API Response:", response);
+
+                    // Check if the response was successful
+                    if (response.success && response.data) {
+                        const banner = response.data;
+                        console.log("Banner Data:", banner);
+
+                        // setPreviews(banner.images || []);
+                        setAlignInfo(banner.alignInfo || []);
+
+                        setBannerFiles({
+                            uploadedFiles: banner.images || [],
+                            previews: banner.images || [],
+                            removedFiles: []
+                        });
+
+                        setFormFields((prev) => ({
+                            ...prev,
+                            bannerTitle: banner.bannerTitle || "",
+                            images: banner.images || [],
+                            parentCategoryId: banner.parentCategoryId || "",
+                            subCategoryId: banner.subCategoryId || "",
+                            thirdSubCategoryId: banner.thirdSubCategoryId || "",
+                            price: banner.price || "",
+                            alignInfo: banner.alignInfo || "",
+                        }));
+
+                        // Automatically populate categories
+                        setProductCategory(banner?.parentCategoryId || "");
+                        setProductCategory2(banner?.subCategoryId || "");
+                        setProductCategory3(banner?.thirdSubCategoryId || "");
+
+                        // Set filtered categories based on existing selections
+                        const selectedCategory = context?.catData?.find(cat => cat._id === banner?.parentCategoryId);
+                        setFilteredCategories(selectedCategory?.children || []);
+
+                        const selectedSubCategory = selectedCategory?.children?.find(cat => cat._id === banner?.subCategoryId);
+                        setFilteredSubCategories(selectedSubCategory?.children || []);
+                    } else {
+                        console.error("Banner data not found or response unsuccessful.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching banner:", error);
+                }
+            };
+
+            fetchCategoryData();
+        }
 
     }, [context.isOpenFullScreenPanel?.bannerId]); // Depend only on `bannerId`
-
 
 
     const onChangeInput = (e) => {
@@ -154,6 +157,25 @@ const AddBannersV1 = () => {
             [name]: value,
         }));
     };
+
+
+    // Effect to reset removed files when panel closes
+    useEffect(() => {
+        if (context?.isOpenFullScreenPanel?.open === false) {
+            setBannerFiles((prev) => ({
+                ...prev,
+                removedFiles: []
+            }));
+        }
+    }, [context?.isOpenFullScreenPanel?.open]);
+
+
+    // Cleanup image previews when the component unmounts or images change
+    useEffect(() => {
+        return () => {
+            bannerFiles.previews.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [bannerFiles.previews]);
 
 
     const selectedCatFun = (categoryId, categoryName) => {
@@ -243,16 +265,16 @@ const AddBannersV1 = () => {
     }, [productCategory, productCategory2, productCategory3]);
 
 
-    const setPreviewFun = (previewArr) => {
-        // Update the previews state to reflect the new image array
-        setPreviews(previewArr);
+    // const setPreviewFun = (previewArr) => {
+    //     // Update the previews state to reflect the new image array
+    //     setPreviews(previewArr);
 
-        // Update formFields.images state properly without direct mutation
-        setFormFields((prevFormFields) => ({
-            ...prevFormFields,
-            images: previewArr, // Assign the previewArr to images
-        }));
-    };
+    //     // Update formFields.images state properly without direct mutation
+    //     setFormFields((prevFormFields) => ({
+    //         ...prevFormFields,
+    //         images: previewArr, // Assign the previewArr to images
+    //     }));
+    // };
 
 
     const handleAlignInfoChange = (event) => {
@@ -264,6 +286,151 @@ const AddBannersV1 = () => {
         }));
     };
 
+    // Handle file selection for product images
+    const handleBannerFileChange = (newFiles) => {
+        // Ensure newFiles is an array
+        const filesArray = Array.isArray(newFiles) ? newFiles : Array.from(newFiles);
+
+
+        // Filter out duplicate files (check by name & size)
+        const filteredFiles = filesArray.filter((newFile) => {
+            return !bannerFiles.uploadedFiles.some(
+                (existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size
+            );
+        });
+
+        if (filteredFiles.length === 0) {
+            toast.error("Oops! File already exists."); // Optional alert
+            return;
+        }
+
+        setBannerFiles((prev) => ({
+            ...prev,
+            uploadedFiles: [...prev.uploadedFiles, ...filteredFiles], // Append new images
+        }));
+
+        // Generate previews for new files
+        filteredFiles.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setBannerFiles((prev) => ({
+                    ...prev,
+                    previews: [...prev.previews, reader.result], // Append preview
+                }));
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    // Handle image removal dynamically
+    const handleRemoveImage = (index) => {
+        setBannerFiles((prev) => {
+            const updatedFiles = [...prev.uploadedFiles];
+            const updatedPreviews = [...prev.previews];
+            const removedFile = updatedFiles[index]; // Store removed file
+
+            updatedFiles.splice(index, 1);
+            updatedPreviews.splice(index, 1);
+
+            return {
+                ...prev,
+                uploadedFiles: updatedFiles,
+                previews: updatedPreviews,
+                removedFiles: [...prev.removedFiles, removedFile], // Add to removed files
+            };
+        });
+    };
+
+
+    // const handleFormSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     if (formFields.bannerTitle === "") {
+    //         context.openAlertBox("error", "Please enter Banner Title");
+    //         nameInputRef.current?.focus();
+    //         return;
+    //     }
+
+    //     if (formFields.price === "") {
+    //         context.openAlertBox("error", "Please enter price");
+    //         priceInputRef.current?.focus();
+    //         return;
+    //     }
+
+    //     if (!productCategory) {
+    //         context.openAlertBox("error", "Please select a parent category.");
+    //         categorySelectRef.current?.focus();
+    //         return;
+    //     }
+
+    //     if (!productCategory2) {
+    //         context.openAlertBox("error", "Please select a 2nd-sub-category.");
+    //         categorySelectRef2.current?.focus();
+    //         return;
+    //     }
+
+    //     if (!productCategory3) {
+    //         context.openAlertBox("error", "Please select a third-child-category.");
+    //         categorySelectRef3.current?.focus();
+    //         return;
+    //     }
+
+    //     if (formFields.images.length === 0) {
+    //         context.openAlertBox("error", "Please upload images");
+    //         return;
+    //     }
+
+    //     setIsLoading(true);
+    //     // Start a toast.promise for handling loading, success, and error states
+    //     try {
+    //         const formData = new FormData();
+
+    //         // ✅ Append text fields
+    //         formData.append("bannerTitle", formFields.bannerTitle);
+    //         formData.append("price", formFields.price);
+    //         formData.append("productCategory", formFields.productCategory);
+    //         formData.append("name", formFields.name);
+    //         formData.append("name", formFields.name);
+
+    //         // ✅ Append each image file
+    //         bannerFiles.uploadedFiles.forEach((file) => {
+    //             formData.append("images", file); // Ensure field name matches backend expectation
+    //         });
+
+    //         // ✅ Debugging: Log FormData contents
+    //         for (let pair of formData.entries()) {
+    //             console.log(pair[0], pair[1]);
+    //         }
+
+    //         const result = await toast.promise(
+    //             postData(`/api/bannersV1/add`, formFields), {
+    //             loading: "Adding banners... Please wait.",
+    //             success: (res) => {
+    //                 if (res?.success) {
+    //                     context?.forceUpdate();
+    //                     return res.message || "Banner added successfully!";
+    //                 } else {
+    //                     throw new Error(res?.message || "An unexpected error occurred.");
+    //                 }
+    //             },
+    //             error: (err) => {
+    //                 // Check if err.response exists, else fallback to err.message
+    //                 const errorMessage = err?.response?.data?.message || err.message || "Failed to add banner. Please try again.";
+    //                 return errorMessage;
+    //             },
+    //         }
+    //         );
+    //         console.log("Result:", result);
+    //     } catch (err) {
+    //         console.error("Error:", err);
+    //         toast.error(err?.message || "An unexpected error occurred.");
+    //     } finally {
+    //         setTimeout(() => {
+    //             setIsLoading(false);
+    //             context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
+    //         }, 500);
+    //     }
+    // }
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -298,41 +465,60 @@ const AddBannersV1 = () => {
             return;
         }
 
-        if (formFields.images.length === 0) {
+        if (bannerFiles.uploadedFiles.length === 0) {
             context.openAlertBox("error", "Please upload images");
             return;
         }
 
         setIsLoading(true);
-        // Start a toast.promise for handling loading, success, and error states
+
         try {
+            const formData = new FormData();
+
+            // Append all form fields
+            formData.append("bannerTitle", formFields.bannerTitle);
+            formData.append("price", formFields.price);
+            formData.append("parentCategoryId", productCategory);
+            formData.append("subCategoryId", productCategory2);
+            formData.append("thirdSubCategoryId", productCategory3);
+            formData.append("alignInfo", formFields.alignInfo);
+
+            // Append each image file
+            bannerFiles.uploadedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
+
+            // Debugging: Log FormData contents
+            for (let pair of formData.entries()) {
+                console.log(pair[0], pair[1]);
+            }
+
             const result = await toast.promise(
-                postData(`/api/bannersV1/add`, formFields), {
+                postData(`/api/bannersV1/add`, formData), {
                 loading: "Adding banners... Please wait.",
                 success: (res) => {
                     if (res?.success) {
                         context?.forceUpdate();
+                        setTimeout(() => {
+                            context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
+                        }, 500);
                         return res.message || "Banner added successfully!";
                     } else {
                         throw new Error(res?.message || "An unexpected error occurred.");
                     }
                 },
                 error: (err) => {
-                    // Check if err.response exists, else fallback to err.message
                     const errorMessage = err?.response?.data?.message || err.message || "Failed to add banner. Please try again.";
                     return errorMessage;
                 },
-            }
-            );
+            });
+
             console.log("Result:", result);
         } catch (err) {
             console.error("Error:", err);
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
-            }, 500);
+            setIsLoading(false);
         }
     }
 
@@ -374,19 +560,55 @@ const AddBannersV1 = () => {
             return;
         }
 
+        setIsLoading(true);
 
         try {
+            const formData = new FormData();
+
+            // Append all form fields
+            Object.keys(formFields).forEach((key) => {
+                if (Array.isArray(formFields[key])) {
+                    formFields[key].forEach((item) => formData.append(key, item));
+                } else {
+                    formData.append(key, formFields[key]);
+                }
+            });
+
+            console.log("Form fields after appending:", formFields);
+
+            // Append new product images
+            bannerFiles.uploadedFiles.forEach((file) => {
+                formData.append("newBannerImages", file);
+            });
+
+            console.log("Category image appended:", formData);
+
+            // ✅ Filter removed files (only keep Cloudinary URLs)
+            const cloudinaryFilesToRemove = bannerFiles.removedFiles.filter(
+                (file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com")
+            );
+            console.log("cloudinaryFilesToRemove:", cloudinaryFilesToRemove);
+
+            if (cloudinaryFilesToRemove.length > 0) {
+                formData.append("removedFiles", JSON.stringify(cloudinaryFilesToRemove));
+            }
+
+            formData.append("userId", context?.userData?._id);
+            formData.append("categoryId", bannerIdNo);
+
+            console.log("Final FormData before sending:", formData);
+
+            // Call API
             const result = await toast.promise(
-                editData(`/api/bannersV1/${context.bannerIdNo}`, {
-                    ...formFields,
-                    userId: context?.userData?._id,
-                    bannerId: context.bannerIdNo,
-                }),
+                editData(`/api/bannersV1/${bannerIdNo}`, formData),
                 {
                     loading: "Updating banner... Please wait.",
                     success: (res) => {
                         if (res?.success) {
                             context?.forceUpdate();
+                            setTimeout(() => {
+                                context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
+                            }, 500);
                             return res.message || "Banner updated successfully!";
                         } else {
                             throw new Error(res?.message || "An unexpected error occurred.");
@@ -404,60 +626,14 @@ const AddBannersV1 = () => {
             console.error("Error in handleUpdate:", err);
             toast.error(err?.message || "An unexpected error occurred.");
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
-            }, 500);
+            setIsLoading(false);
         }
     }
 
-    // Banner Image Deletion Handling
-    const handleRemoveImage = async (bannerImage, index) => {
-        try {
-            if (!bannerImage) {
-                throw new Error("Invalid banner image.");
-            }
 
-            const bannerId = context.bannerIdNo; // Get banner ID properly
-            let url = `/api/bannersV1/deleteImage?imgUrl=${encodeURIComponent(bannerImage)}`;
-
-            if (bannerId) {
-                // If updating, include bannerId in the API request
-                url += `&bannerId=${bannerId}`;
-                console.log("Removing banner image with bannerId:", bannerImage, "for banner:", bannerId);
-            } else {
-                console.log("Removing banner image without bannerId:", bannerImage);
-            }
-
-            const response = await deleteImages(url);
-
-            if (response?.success) {
-                // Remove the deleted image from the previews array
-                setPreviews((prevPreviews) => {
-                    const updatedPreviews = prevPreviews?.filter((_, i) => i !== index) || [];
-                    return updatedPreviews;
-                });
-
-                // Update formFields state for banner image
-                setFormFields((prevFields) => ({
-                    ...prevFields,
-                    bannerImage: null,
-                }));
-
-                console.log("Updated formFields after banner deletion:", formFields);
-                toast.success("Banner image removed successfully.");
-            } else {
-                throw new Error(response?.message || "Failed to remove banner image.");
-            }
-        } catch (error) {
-            console.error("Error removing banner image:", error);
-            toast.error(error?.message || "An unexpected error occurred.");
-        }
+    const handleDiscard = async () => {
+        context.setIsOpenFullScreenPanel({ open: false, model: "BannerV1 Details" });
     };
-
-
-
-    const handleDiscard = () => { }
 
 
     return (
@@ -467,7 +643,8 @@ const AddBannersV1 = () => {
                     action="#"
                     onSubmit={handleFormSubmit}
                     className='form py-3'>
-                    <h3 className='text-[24px] font-bold mb-2'>{!context.bannerIdNo ? "Create New Banner" : "Edit Banner"}</h3>
+                    {/* <h3 className='text-[24px] font-bold mb-2'>{!bannerIdNo ? "Create New Banner" : "Edit"}</h3> */}
+                    <h3 className='text-[24px] font-bold mb-2'>{bannerIdNo === undefined ? ("Create ") : ("Update ")}Banner</h3>
 
                     <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
                     <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
@@ -602,78 +779,119 @@ const AddBannersV1 = () => {
 
 
                     <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
-                    <div className="grid grid-cols-6 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-                        <span className='opacity-50 col-span-full text-[14px]'>
-                            Choose a banner photo or simply drag and drop
+
+
+                    {/* <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                        <span className='opacity-50 text-[14px]'>
+                            {bannerFiles.uploadedFiles.length > 0
+                                ? "Banner image uploaded"
+                                : "Choose a banner image or simply drag and drop"}
                         </span>
 
-                        {
-                            previews?.length !== 0 && previews.map((image, index) => {
-                                return (
-                                    <div className="border p-2 rounded-md flex flex-col items-center bg-white h-full relative" key={index}>
-                                        <span
-                                            className='absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all'
-                                            onClick={() => handleRemoveImage(image, index)}
-                                        >
-                                            <IoClose className='text-[15px] text-red-600 bg' />
-                                        </span>
-                                        <div className='w-full h-[200px]'>
-                                            {
-                                                isLoading2 ? (
-                                                    <CircularProgress color="inherit" />
-                                                ) : (
-                                                    context.bannerIdNo === undefined ? (
-                                                        <img src={image} alt="BannerImage" className="w-full h-full object-cover rounded-md" />
-                                                    ) : (
-                                                        <img src={formFields.images[0]} alt="CategoryImage" className="w-full h-full object-cover rounded-md" />
-                                                    )
-                                                )
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            }
-                            )
-                        }
+                        {bannerFiles.uploadedFiles.length > 0 ? (
+                            <div className="mt-2 border p-2 rounded-md flex flex-col items-center bg-white h-[150px] w-full relative"> */}
+                    {/* Remove Button */}
+                    {/* <span
+                                    className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                    onClick={() => handleRemoveImage(0)}
+                                    aria-label="Remove Image"
+                                >
+                                    <IoClose className="text-[15px] text-red-600" />
+                                </span> */}
 
-
-                        {previews?.length === 0 && (
-                            <div className="col-span-8">
-                                <UploadBox
-                                    multiple={false}
-                                    images={previews}
-                                    onDrop={(acceptedFiles) => {
-                                        const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-                                        setPreviewFun(previewUrls);
-                                    }}
-                                    name="images"
-                                    url={"/api/bannersV1/uploadBannerImages"}
-                                    setPreviewFun={setPreviewFun}
-                                />
+                    {/* Image Preview */}
+                    {/* <div className=" h-full overflow-hidden">
+                                    <img
+                                        src={bannerFiles.previews[0]}
+                                        alt={`Uploaded file: ${bannerFiles.uploadedFiles[0].name}`}
+                                        className="w-full h-full object-cover rounded-md"
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="mt-2">
+                                <UploadBox multiple={false} onFileChange={handleBannerFileChange} />
                             </div>
                         )}
 
+                        <p className="text-sm mt-2 text-gray-600">
+                            {bannerFiles.uploadedFiles.length > 0
+                                ? "Category image uploaded"
+                                : "No category image uploaded yet."}
+                        </p>
+                    </div> */}
+
+                    <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                        <span className='opacity-50 text-[14px]'>
+                            {bannerFiles.uploadedFiles.length > 0
+                                ? "Banner image uploaded"
+                                : "Choose a banner image or simply drag and drop"}
+                        </span>
+
+                        <div className="mt-2 grid grid-cols-5 gap-2 items-center">
+                            {/* Uploaded Images */}
+                            {bannerFiles.uploadedFiles.length > 0 &&
+                                bannerFiles.previews.map((preview, index) => (
+                                    <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                                        {/* Remove Button */}
+                                        <span
+                                            className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                            onClick={() => handleRemoveImage(index)}
+                                            aria-label="Remove Image"
+                                        >
+                                            <IoClose className="text-[15px] text-red-600" />
+                                        </span>
+
+                                        {/* Image Preview */}
+                                        <div className="h-full overflow-hidden">
+                                            <img
+                                                src={preview}
+                                                alt={`Uploaded file ${index}`}
+                                                className="w-full h-full object-cover rounded-md"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+
+                            {/* Upload Box should be in the same row */}
+                            {/* <div className={`h-[150px] w-full ${bannerFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                                <UploadBox multiple={false} onFileChange={handleBannerFileChange} />
+                            </div> */}
+                            {(multiple || bannerFiles.uploadedFiles.length === 0) && (
+                                <div className={`h-[150px] w-full ${bannerFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                                    <UploadBox multiple={multiple} onFileChange={handleBannerFileChange} />
+                                </div>
+                            )}
+
+                        </div>
+
+
+                        <p className="text-sm mt-2 text-gray-600">
+                            {bannerFiles.uploadedFiles.length > 0
+                                ? `${bannerFiles.uploadedFiles.length} banner image${bannerFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload`
+                                : "No banner image uploaded yet."}
+                        </p>
                     </div>
 
-                    <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+
+
+                    <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
+
+                        <Button
+                            type="reset"
+                            onClick={handleDiscard}
+                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                        >
+                            <RiResetLeftFill className='text-[20px]' />Cancel
+                        </Button>
+
                         {
-                            context.bannerIdNo === undefined ? (
-                                <>
-                                    <Button
-                                        type="reset"
-                                        onClick={handleDiscard}
-                                        className={`${isLoading2 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading2}
-                                    >
-                                        {
-                                            isLoading2 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
-                                        }
-                                    </Button>
-                                    <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
-                                        {
-                                            isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
-                                        }
-                                    </Button>
-                                </>
+                            bannerIdNo === undefined ? (
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                                    {
+                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                                    }
+                                </Button>
                             ) : (
                                 <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                     {
@@ -682,8 +900,8 @@ const AddBannersV1 = () => {
                                 </Button>
                             )
                         }
-
                     </div>
+
                 </form>
             </section>
         </div>
