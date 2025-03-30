@@ -452,76 +452,62 @@ export async function deleteMultipleCategories(request, response) {
 }
 
 
-// update Category
+// Update Category
 export async function updateCategory(request, response) {
   try {
     const categoryId = request.params.id;
-    const { name, parentCategoryId, parentCategoryName } = request.body; // Extract updatable fields
+    const { name, parentCategoryId, parentCategoryName, images: imagesRaw, removedFiles: removedFilesRaw } = request.body;
 
     // Find the category to be updated
     const category = await CategoryModel.findById(categoryId);
-
     if (!category) {
-      return response.status(404).json({
-        message: "Category not found.",
-        success: false,
-      });
+      return response.status(404).json({ message: "Category not found.", success: false });
     }
 
-    let { images, removedFiles } = request.body;
-    // console.log("Incoming request body:", request.body); // Log incoming request body
-
-    // ✅ Ensure `removedFiles` is parsed correctly and only contains valid Cloudinary URLs
-    if (removedFiles && typeof removedFiles === "string") {
+    // ✅ Parse removedFiles correctly
+    let removedFiles = [];
+    if (typeof removedFilesRaw === "string") {
       try {
-        removedFiles = JSON.parse(removedFiles);
-        if (!Array.isArray(removedFiles)) {
-          removedFiles = [];
-        }
-        removedFiles = removedFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"));
-      } catch (err) {
-        console.error("Error parsing removedFiles:", err);
+        removedFiles = JSON.parse(removedFilesRaw);
+        removedFiles = Array.isArray(removedFiles)
+          ? removedFiles.filter((file) => typeof file === "string" && file.startsWith("https://res.cloudinary.com"))
+          : [];
+      } catch {
         removedFiles = [];
       }
-    } else if (!Array.isArray(removedFiles)) {
-      removedFiles = [];
     }
 
-    // console.log("removedFiles after parsing:", removedFiles);
-
-    // ✅ Ensure `images` is parsed correctly
-    try {
-      images = Array.isArray(images) ? images : images ? JSON.parse(images) : category.images || [];
-    } catch (err) {
-      console.error("Error parsing images:", err);
-      images = category.images || [];
+    // ✅ Parse images correctly
+    let images = category.images || [];
+    if (typeof imagesRaw === "string") {
+      try {
+        images = JSON.parse(imagesRaw);
+        if (!Array.isArray(images)) images = category.images || [];
+      } catch {
+        images = category.images || [];
+      }
     }
 
-    // console.log("images after parsing:", images);
+    // ✅ Upload new images if provided (Parallel Execution)
+    const [newImages] = await Promise.all([
+      request.files?.newCategoryImages ? uploadImagesToCloudinary(request.files.newCategoryImages) : [],
+      deleteCloudinaryImages(removedFiles), // Remove Cloudinary images concurrently
+    ]);
 
-    // ✅ Upload new images if provided
-    const newImages = request.files?.newCategoryImages ? await uploadImagesToCloudinary(request.files.newCategoryImages) : [];
-    // console.log("newImages uploaded:", newImages);
-
-    // ✅ Remove only Cloudinary product images
-    await deleteCloudinaryImages(removedFiles);
+    // ✅ Update images list
     images = images.filter((img) => !removedFiles.includes(img));
-    // console.log("images after removal:", images);
-
-    // ✅ Append new images
     const updatedImages = [...images, ...newImages];
-    // console.log("updatedImages:", updatedImages);
 
-    // Update the category with new data
+    // ✅ Update the category with new data
     const updatedCategory = await CategoryModel.findByIdAndUpdate(
       categoryId,
       {
-        name: name || category.name, // ✅ Use new name if provided, else keep old name
+        name: name?.trim() || category.name,
         images: updatedImages,
-        parentCategoryId: parentCategoryId || category.parentCategoryId, // ✅ Update if provided
-        parentCategoryName: parentCategoryName || category.parentCategoryName, // ✅ Update if provided
+        parentCategoryId: parentCategoryId || category.parentCategoryId,
+        parentCategoryName: parentCategoryName || category.parentCategoryName,
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     return response.status(200).json({
@@ -530,7 +516,7 @@ export async function updateCategory(request, response) {
       data: updatedCategory,
     });
   } catch (error) {
-    console.error("Error in updateCategory:", error.message || error);
+    console.error("Error in updateCategory:", error);
     return response.status(500).json({
       message: error.message || "An error occurred while updating the category.",
       error: true,

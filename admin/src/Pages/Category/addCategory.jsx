@@ -21,7 +21,7 @@ const AddCategory = () => {
   const [isLoading2, setIsLoading2] = useState(false);
   // const [isLoading3, setIsLoading3] = useState(false);
 
-  // Consolidated states for product and banner files
+  // Consolidated states for category files
   const [categoryFiles, setCategoryFiles] = useState({
     uploadedFiles: [],
     previews: [],
