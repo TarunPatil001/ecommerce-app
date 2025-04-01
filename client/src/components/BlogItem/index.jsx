@@ -8,11 +8,11 @@ import { Link } from "react-router-dom";
 const BlogItem = (props) => {
   return (
     <div className="blogItem group">
-      <div className="imgWrapper w-full overflow-hidden rounded-md relative">
+      <div className="imgWrapper w-full h-[200px] overflow-hidden rounded-md relative">
         <img
           src={props?.item?.images[0]}
           alt="blog image"
-          className="w-full transition-all duration-1000 group-hover:scale-125 group-hover:rotate-3 cursor-pointer"
+          className="w-full h-auto transition-all duration-1000 group-hover:scale-125 group-hover:rotate-3 cursor-pointer"
         />
 
         <span className="flex items-center justify-center text-white absolute bottom-[15px] right-[15px] z-50 bg-[var(--bg-primary)] rounded-md p-1 text-[11px] font-medium gap-1">

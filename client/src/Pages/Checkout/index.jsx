@@ -70,27 +70,6 @@ const Checkout = () => {
         selected: false,
     });
 
-    // const calculateTotal = () => {
-    //     let totalMRP = 0;
-    //     let discount = 0;
-    //     // let couponDiscount = 0;
-    //     // let platformFee = 49; // If applicable
-    //     // let shippingFee = 79; // If applicable
-
-    //     context?.cartData?.forEach(item => {
-    //         totalMRP += item?.subTotalOldPrice || 0;
-    //         discount += item?.subTotalOldPrice - item?.subTotal || 0;
-    //     });
-
-    //     setTotalAmount(totalMRP - discount); // Final payable amount
-
-    //     return { totalMRP, discount, setTotalAmount };
-    // };
-
-    // const { totalMRP, discount, setTotalAmount } = calculateTotal(); // Destructuring values
-
-
-
 
     useEffect(() => {
         // Ensure cartData is always an array
@@ -110,10 +89,6 @@ const Checkout = () => {
             setTotalAmount(0);
         }
     }, [context?.cartData]);
-
-
-
-
 
 
     useEffect(() => {
@@ -143,8 +118,8 @@ const Checkout = () => {
             }));
         }
 
-
     }, [context?.userData]);
+
 
     const fetchAddress = useCallback(() => {
         if (!context?.userData?._id) return;
@@ -156,9 +131,11 @@ const Checkout = () => {
             .finally(() => setIsLoading(false));
     }, [context?.userData]);  // ✅ Stable function that updates only when userData changes
 
+
     useEffect(() => {
         fetchAddress();
     }, [fetchAddress]);  // ✅ Triggers only when fetchAddress reference changes
+
 
     useEffect(() => {
         setIsOpen(null); // Reset popover when addresses update
@@ -182,8 +159,6 @@ const Checkout = () => {
                 });
         }
     }, [context?.userData?._id]);
-
-
 
 
     // Effect for handling address edits and populating form fields
@@ -255,23 +230,6 @@ const Checkout = () => {
             fetchAddressData();
         }
     }, [userIdForEdit, addressIdForEdit, context?.userData?._id, context?.isReducer]);
-
-    // // Effect to manage selected address
-    // useEffect(() => {
-    //     const safeAddress = address || [];  // Ensure address is an array (in case it's null or undefined)
-
-    //     // Find the address that is selected
-    //     const selectedAddress = safeAddress.find(addr => addr.selected === true);
-
-    //     if (selectedAddress) {
-    //         // Set the selected address ID
-    //         setSelectedValue(selectedAddress._id);
-    //         setDeliverTo(selectedAddress.name);
-    //     } else {
-    //         // No address is selected, set a default value or handle as needed
-    //         setSelectedValue(null);  // Example: Set selectedValue to null if no address is selected
-    //     }
-    // }, [address]); // This effect runs whenever the address list changes
 
 
     const onChangeInput = (e) => {
@@ -1038,39 +996,7 @@ const Checkout = () => {
                                         <span className="text-[14px]">Discount on MRP</span>
                                         <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(discount)}</span>
                                     </div>
-                                    {/* <div className="flex items-center justify-between px-4 py-1">
-                                                    <span className="text-[14px]">Coupon Discount</span>
-                                                    <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(102)}</span>
-                                                    </div>
-                                                    <div className="flex items-center justify-between px-4 py-1">
-                                                    <span className="text-[14px]">Platform Fee</span>
-                                                    {
-                                                        context.platformFee === 0 ? (
-                                                            <span className="price text-green-600 text-[14px] flex items-center">Free</span>
-                                                            ) : (
-                                                                <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(49)}</span>
-                                                                )
-                                                                }
-                                                                </div>
-                                                                <div className="flex items-center justify-between px-4">
-                                                                <span className="text-[14px]">Shipping Fee</span>
-                                                                {
-                                                                    context.shippingFee === 0 ? (
-                                                                        <span className="price text-green-600 text-[14px] flex items-center gap-1"><span className="line-through !text-[var(--text-dark)]"> ₹{new Intl.NumberFormat('en-IN').format(79)}</span>Free</span>
-                                                                        ) : (
-                                                                            <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(79)}</span>
-                                                                            )
-                                                                            }
-                                                                            </div>
-                                                                            <div className="flex items-center justify-between px-4 py-0 pb-5">
-                                                                            {
-                                                                                context.shippingFee === 0 ? (
-                                                                                    <span className="text-[12px]">Free Shipping for you</span>
-                                                                                    ) : (""
-                                                                                    )
-                                                                                    }
-                                                                                    
-                                                                                    </div> */}
+                                    
                                     <Divider />
                                     <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                                         <span>Total Amount:</span>
