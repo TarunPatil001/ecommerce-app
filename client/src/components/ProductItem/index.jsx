@@ -1,4 +1,4 @@
-import  { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -23,16 +23,16 @@ const ProductItem = (props) => {
 
   useEffect(() => {
     if (context?.userData !== null && Array.isArray(context?.wishlistData)) {
-      const isWishlistItem = context.wishlistData.filter((item) => 
+      const isWishlistItem = context.wishlistData.filter((item) =>
         item?.productId?.includes(props?.product._id)
       );
-  
+
       setIsAddedWishlist(isWishlistItem.length > 0); // Set to true if the item exists in the wishlist
     } else {
-      setIsAddedWishlist(false); 
+      setIsAddedWishlist(false);
     }
   }, [context?.wishlistData, props.product._id, context?.userData]);
-  
+
 
   const handleAddToMyList = async (item) => {
     if (!context?.userData) {
@@ -111,15 +111,25 @@ const ProductItem = (props) => {
   return (
     <div className="transition-all duration-300 hover:shadow-xl rounded-md">
       <div className="productItem rounded-md overflow-hidden  border border-[rgba(80,80,80,0.07)]">
-        <div className="group imgWrapper w-[100%] h-[250px] overflow-hidden  relative bg-gray-100">
-
+        <div className="group imgWrapper !w-full !h-[250px] overflow-hidden relative bg-gray-100 flex items-center justify-center">
           <Link to={props?.product?._id ? `/product/${props.product._id}` : '#'} className="cursor-default">
-
-
-            {/* <ProductImageFlipChange firstImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/320-large_default/hummingbird-printed-t-shirt.jpg"} SecondImg={"https://prestashop.coderplace.com/PRS02/PRS02042/demo/318-large_default/hummingbird-printed-t-shirt.jpg"} /> */}
-            <ProductImageOpacityChange firstImg={props?.product?.images?.[0]} SecondImg={props?.product?.images?.[1]} />
-
+            <div className="h-auto w-full flex items-center justify-center overflow-hidden relative">
+              <img
+                src={props?.product?.images?.[0]}
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+              <img
+                src={props?.product?.images?.[1]}
+                className="w-full h-full object-cover absolute top-0 left-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"
+              />
+            </div>
           </Link>
+
+
+
+
+
+
           {/* -{props?.product?.discount}% */}
 
           <span className="flex items-center absolute top-[0px] left-[0px] z-50 rounded-md">
@@ -128,23 +138,23 @@ const ProductItem = (props) => {
               placement="right"
               arrow
             > */}
-              <Checkbox
-                icon={
-                  <div className="relative">
-                    <IoMdHeart className="text-[35px] text-[rgba(0,0,0,0.3)]" />
-                    <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
-                  </div>
-                }
-                checkedIcon={
-                  <div className="relative">
-                    <IoMdHeart className="text-[35px] text-red-500" />
-                    <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
-                  </div>
-                }
-                checked={isAddedWishlist}
-                onChange={() => handleAddToMyList(props?.product)}
-                disableRipple
-              />
+            <Checkbox
+              icon={
+                <div className="relative">
+                  <IoMdHeart className="text-[35px] text-[rgba(0,0,0,0.3)]" />
+                  <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
+                </div>
+              }
+              checkedIcon={
+                <div className="relative">
+                  <IoMdHeart className="text-[35px] text-red-500" />
+                  <IoMdHeartEmpty className="text-[35px] text-white absolute inset-0 transition-opacity duration-300" />
+                </div>
+              }
+              checked={isAddedWishlist}
+              onChange={() => handleAddToMyList(props?.product)}
+              disableRipple
+            />
 
             {/* </Tooltip> */}
 
@@ -157,28 +167,28 @@ const ProductItem = (props) => {
           </span>
 
           {!props?.fromWishlist && (
-          <div className="actions absolute top-[-200px] right-[0px] z-50 flex items-center gap-2 flex-col w-[80px] transition-all duration-500 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
+            <div className="actions absolute top-[-200px] right-[0px] z-50 flex items-center gap-2 flex-col w-[80px] transition-all duration-500 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
 
-            <Tooltip
-              title="View Product details"
-              placement="right"
-              arrow
-            >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.product)}>
-                <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
-              </Button>
-            </Tooltip>
+              <Tooltip
+                title="View Product details"
+                placement="right"
+                arrow
+              >
+                <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.product)}>
+                  <BsArrowsFullscreen className="text-[18px] !text-gray-700 group-hover:text-white" />
+                </Button>
+              </Tooltip>
 
-            <Tooltip
-              title="Add to Compare"
-              placement="right"
-              arrow
-            >
-              <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" >
-                <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
-              </Button>
-            </Tooltip>
-          </div>
+              <Tooltip
+                title="Add to Compare"
+                placement="right"
+                arrow
+              >
+                <Button className="!w-[38px] !h-[38px] !min-w-[38px] !rounded-full !bg-[rgba(255,255,255,0.9)] !text-gray-700 hover:!bg-[var(--bg-primary)] hover:!text-white group" >
+                  <IoGitCompareOutline className="text-[35px] !text-gray-700 group-hover:text-white " />
+                </Button>
+              </Tooltip>
+            </div>
           )}
         </div>
 

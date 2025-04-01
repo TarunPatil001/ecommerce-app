@@ -1316,7 +1316,7 @@ const AddProduct = () => {
                                     exit={{ opacity: 0, scale: 0.8 }} // Shrink on exit
                                     transition={{ duration: 0.3, ease: "easeInOut" }} // Smooth transition
                                 >
-                                    {/* Remove Button */}
+
                                     <span
                                         className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
                                         onClick={() => handleRemoveImage(index)}
@@ -1325,7 +1325,7 @@ const AddProduct = () => {
                                         <IoClose className="text-[15px] text-red-600" />
                                     </span>
 
-                                    {/* Image Preview */}
+                                    
                                     <div className="w-full h-[150px] overflow-hidden">
                                         <img
                                             src={productFiles.previews[index]}
@@ -1334,11 +1334,6 @@ const AddProduct = () => {
                                             draggable={false}
                                         />
                                     </div>
-
-                                    {/* File Name */}
-                                    {/* <p className="text-[14px] text-center mt-2 truncate">
-                                        {file?.name?.length > 5 ? `${file?.name?.slice(0, 5)}...` : file?.name}   
-                                    </p> */}
                                 </motion.div>
                             ))}
                         </AnimatePresence>
