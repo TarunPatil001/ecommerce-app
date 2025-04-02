@@ -17,12 +17,26 @@ const DashboardBoxes = (props) => {
         <>
             <div className="relative">
                 {/* Custom Navigation Buttons */}
-                <div className="swiper-button-next !flex !items-center !justify-center absolute right-0 z-10"></div>
-                <div className="swiper-button-prev !flex !items-center !justify-center absolute left-0 z-10"></div>
+                {/* <div className="swiper-button-next !flex !items-center !justify-center absolute right-0 z-10"></div>
+                <div className="swiper-button-prev !flex !items-center !justify-center absolute left-0 z-10"></div> */}
 
                 <Swiper
-                    slidesPerView={4}
+                    slidesPerView={1}
                     spaceBetween={10}
+                    breakpoints={{
+                        400: {
+                            slidesPerView: 1,
+                            spaceBetween: 10,
+                        },
+                        650: {
+                            slidesPerView: 2,
+                            spaceBetween: 10,
+                        },
+                        768: {
+                            slidesPerView: 4,
+                            spaceBetween: 10,
+                        },
+                    }}
                     navigation={{
                         nextEl: ".swiper-button-next",
                         prevEl: ".swiper-button-prev",
@@ -33,76 +47,76 @@ const DashboardBoxes = (props) => {
 
 
                     <SwiperSlide>
-                        <div className="box bg-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-[var(--bg-hover-primary)] flex flex-col items-center gap-4">
+                        <div className="box bg-pink-600 text-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-pink-500 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-5 w-full">
-                                <BiSolidCategoryAlt className="text-[40px] text-[#db27ff]" />
-                                <div className="info w-[70%]">
+                                <BiSolidCategoryAlt className="text-[40px] text-white" />
+                                <div className="info w-[70%] flex flex-col items-center justify-center">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
                                         Total Categories
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.category}</h2>
                                 </div>
-                                <IoStatsChart className="text-[60px] text-[#db27ff]" />
+                                <IoStatsChart className="text-[60px] text-white" />
                             </div>
                         </div>
                     </SwiperSlide>
 
                     <SwiperSlide>
-                        <div className="box bg-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-[var(--bg-hover-primary)] flex flex-col items-center gap-4">
+                        <div className="box bg-green-600 text-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-green-500 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-5 w-full">
-                                <GiShoppingBag className="text-[40px] text-[#2670d8]" />
-                                <div className="info w-[70%]">
+                                <GiShoppingBag className="text-[40px] text-white" />
+                                <div className="info w-[70%] flex flex-col items-center justify-center">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
                                         Total Products
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.products}</h2>
                                 </div>
-                                <IoStatsChart className="text-[60px] text-[#28c9a3]" />
+                                <IoStatsChart className="text-[60px] text-white" />
                             </div>
                         </div>
                     </SwiperSlide>
 
                     <SwiperSlide>
-                        <div className="box bg-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-[var(--bg-hover-primary)] flex flex-col items-center gap-4">
+                        <div className="box bg-yellow-600 text-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-yellow-500 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-5 w-full">
-                                <ImGift className="text-[40px] text-[var(--text-active)]" />
-                                <div className="info w-[70%]">
+                                <ImGift className="text-[40px] text-white" />
+                                <div className="info w-[70%] flex flex-col items-center justify-center">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
                                         Total Orders
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.orders}</h2>
                                 </div>
-                                <IoStatsChart className="text-[60px] text-[var(--text-active)]" />
+                                <IoStatsChart className="text-[60px] text-white" />
                             </div>
                         </div>
                     </SwiperSlide>
 
                     <SwiperSlide>
-                        <div className="box bg-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-[var(--bg-hover-primary)] flex flex-col items-center gap-4">
+                        <div className="box bg-gray-600 text-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-gray-500 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-5 w-full">
-                                <FaUserLarge className="text-[40px] text-[#7928c9]" />
-                                <div className="info w-[70%]">
+                                <FaUserLarge className="text-[40px] text-white" />
+                                <div className="info w-[70%] flex flex-col items-center justify-center">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
                                         Total Users
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.users}</h2>
                                 </div>
-                                <IoStatsChart className="text-[60px] text-[#7928c9]" />
+                                <IoStatsChart className="text-[60px] text-white" />
                             </div>
                         </div>
                     </SwiperSlide>
 
                     <SwiperSlide>
-                        <div className="box bg-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-[var(--bg-hover-primary)] flex flex-col items-center gap-4">
+                        <div className="box bg-teal-600 text-white p-4 rounded-md border border-[rgba(0,0,0,0.1)] hover:bg-teal-500 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-5 w-full">
-                                <AiOutlineStock className="text-[40px] text-[#ff3195]" />
-                                <div className="info w-[70%]">
+                                <AiOutlineStock className="text-[40px] text-white" />
+                                <div className="info w-[70%] flex flex-col items-center justify-center">
                                     <h3 className="font-medium text-[14px] text-[rgba(0,0,0,0.5)]">
                                         Total Sales
                                     </h3>
                                     <h2 className="font-bold text-[24px]">{props?.sales}</h2>
                                 </div>
-                                <IoStatsChart className="text-[60px] text-[#ff3195]" />
+                                <IoStatsChart className="text-[60px] text-white" />
                             </div>
                         </div>
                     </SwiperSlide>

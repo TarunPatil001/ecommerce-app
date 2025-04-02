@@ -65,7 +65,7 @@ const Header = () => {
   const navigateToSignIn = () => {
     navigate("/sign-in");
   };
-  
+
   const navigateToProfile = () => {
     navigate("/profile");
   };
@@ -73,11 +73,11 @@ const Header = () => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token !== undefined && token !== null && token !== '') {
-        context?.setIsLogin(true);
+      context?.setIsLogin(true);
     } else {
-        navigate("/");
+      navigate("/");
     }
-}, [context, navigate]);
+  }, [context, navigate]);
 
   useEffect(() => {
     if (context.isLogin) {
@@ -104,12 +104,12 @@ const Header = () => {
 
 
   return (
-    <header className={`w-full h-auto py-2 shadow-md ${context.isSidebarOpen === true ? 'pl-72' : 'pl-5'} bg-[#fff] pr-7 flex items-center justify-between z-[50] transition-all duration-300 ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
+    <header className={`w-full h-auto py-2 shadow-md transition-all duration-300 bg-[#fff] pr-7 flex items-center justify-between z-[50] ${context.isSidebarOpen ? (context.windowWidth < 992 ? 'pl-5' : 'pl-72') : 'pl-5'} ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
       <div className="part1">
         <Button className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !text-[rgba(0,0,0,0.8)] shadow-md hover:bg-gray-200" onClick={() => context.setIsSidebarOpen(!context.isSidebarOpen)}><MdOutlineDoubleArrow className={`text-[18px] ${context.isSidebarOpen === true ? '-rotate-180' : 'rotate-0'} transition-all duration-300`} /></Button>
       </div>
 
-      <div className="part2 w-[40%] flex items-center justify-end gap-5">
+      <div className="part2 w-auto flex items-center justify-center gap-5">
         <IconButton aria-label="notification">
           <StyledBadge badgeContent={4} color="secondary">
             <FaRegBell />
@@ -121,8 +121,8 @@ const Header = () => {
 
             <div className="relative">
               <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer" onClick={handleClickMyAcc}>
-              {/* <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" /> */}
-              <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
+                {/* <img src={loginData?.avatar !== "" ? `${loginData?.avatar}` : `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user image" className="h-full w-full object-cover" /> */}
+                <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
               </div>
 
               <Menu
@@ -165,7 +165,7 @@ const Header = () => {
                 <MenuItem onClick={handleCloseMyAcc}>
                   <div className="flex items-center justify-center gap-3 h-[40px]">
                     <div className="rounded-full w-[35px] h-[35px] overflow-hidden cursor-pointer">
-                    <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
+                      <img src={loginData?.avatar || `https://ui-avatars.com/api/?name=${loginData?.name?.replace(/ /g, "+")}`} alt="user avatar" className="h-full w-full object-cover" />
                     </div>
                     <div className="info">
                       <h3 className='text-[14px] font-bold leading-5'>{loginData?.name}</h3>
@@ -174,11 +174,11 @@ const Header = () => {
                   </div>
                 </MenuItem>
                 <hr />
-                <MenuItem onClick={()=>{handleCloseMyAcc();navigateToProfile();}} className='flex items-center justify-center gap-3 h-[40px]'>
+                <MenuItem onClick={() => { handleCloseMyAcc(); navigateToProfile(); }} className='flex items-center justify-center gap-3 h-[40px]'>
                   <FaRegUser className='text-[14px]' /> <span className='flex items-center justify-center text-[14px]'>Profile</span>
                 </MenuItem>
                 <hr />
-                <MenuItem onClick={()=>{handleCloseMyAcc();logout();}} className='flex items-center justify-center gap-3 h-[40px]'>
+                <MenuItem onClick={() => { handleCloseMyAcc(); logout(); }} className='flex items-center justify-center gap-3 h-[40px]'>
                   <MdOutlineLogout className='text-[15px]' /> <span className='flex items-center justify-center text-[14px]'>Sign out</span>
                 </MenuItem>
               </Menu>
@@ -193,6 +193,7 @@ const Header = () => {
 
       </div>
     </header>
+   
   )
 }
 

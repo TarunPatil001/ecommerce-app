@@ -14,6 +14,7 @@ import { BiSolidUserDetail } from "react-icons/bi";
 import { MyContext } from '../../App';
 import { fetchDataFromApi } from '../../utils/api';
 import { PiSlideshowLight } from 'react-icons/pi';
+import { RxCross2 } from 'react-icons/rx';
 
 const Sidebar = () => {
 
@@ -76,14 +77,14 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className={`sidebar fixed overflow-y-scroll customScroll top-0 left-0 bg-[#fff] ${context.isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%]'} h-full border-r p-2`}>
-        <div className="py-2 w-full px-5">
-          <Link to="/">
-            <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="logo" className='w-[200px]' />
-          </Link>
-        </div>
+      <div className={`sidebar fixed top-0 left-0 bg-[#fff] w-[${context.isSidebarOpen === true ? `${(context?.sidebarWidth / 2)+15}%` : '0px'}] z-[52] h-full border border-r p-2`}>
+      <div className="py-2 w-full px-5">
+        <Link to="/">
+          <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="logo" className='w-[200px]' />
+        </Link>
+      </div>
 
-        <ul className='mt-4'>
+        <ul className='mt-4 overflow-y-scroll customScroll max-h-[85vh]'>
 
           <li>
             <Link to="/">
@@ -169,7 +170,7 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
-                
+
                 <li className='w-full'>
                   <Link to="/products/addProductWeight">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Weight' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Weight')}>
@@ -178,7 +179,7 @@ const Sidebar = () => {
                     </Button>
                   </Link>
                 </li>
-                
+
                 <li className='w-full'>
                   <Link to="/products/addProductSize">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Add Product Size' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Add Product Size')}>
@@ -251,7 +252,7 @@ const Sidebar = () => {
 
             <Collapse isOpened={subMenuIndex4}>
               <ul className='w-full'>
-                
+
                 <li className='w-full'>
                   <Link to="/bannersV1/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'BannerV1 List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('BannerV1 List')}>
@@ -274,7 +275,7 @@ const Sidebar = () => {
                     <span>Add Banner V2</span>
                   </Button>
                 </li> */}
-                
+
                 {/* <li className='w-full'>
                   <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Home Banner Details" })}>
                     <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
@@ -286,9 +287,9 @@ const Sidebar = () => {
             </Collapse>
 
           </li>
-          
-          
-          
+
+
+
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex5(!subMenuIndex5) }}><RiBloggerLine className='text-[25px]' />
               <span>Blogs</span>
@@ -297,7 +298,7 @@ const Sidebar = () => {
 
             <Collapse isOpened={subMenuIndex5}>
               <ul className='w-full'>
-                
+
                 <li className='w-full'>
                   <Link to="/blog/list">
                     <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => setSelectedMenu('Blog List')}>
@@ -324,13 +325,16 @@ const Sidebar = () => {
 
 
           <li>
-            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Logout'); logout(); }}><MdOutlineLogout className='text-[25px]' />
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""} pointer-events-none sm:pointer-events-auto`} onClick={() => { setSelectedMenu('Logout'); logout(); }}><MdOutlineLogout className='text-[25px]' />
               <span>Logout</span>
             </Button>
           </li>
 
         </ul>
       </div >
+
+
+
     </>
   )
 }

@@ -42,6 +42,8 @@ import AddBannersV1 from './Pages/Banners/addBannersV1';
 import BannersV1List from './Pages/Banners';
 import BlogList from './Pages/Blog';
 import AddBlog from './Pages/Blog/addBlog';
+import { Button } from '@mui/material';
+import { RxCross2 } from 'react-icons/rx';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -66,6 +68,9 @@ function App() {
   const [blogData, setBlogData] = useState([]);
   const [blogIdNo, setBlogIdNo] = useState([]);
   const [productIdNo, setProductIdNo] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [sidebarWidth, setSidebarWidth] = useState(18);
+
 
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -80,16 +85,20 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className="main overflow-x-hidden">
             <Header />
             <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+              <div className={`overflow-hidden sidebarWrapper transition-all duration-300  ${isSidebarOpen ? windowWidth < 992 ? `w-[${sidebarWidth / 2}%]` : `w-[${sidebarWidth}%]` : 'w-[0%] opacity-0'}`}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+              <div
+                className={`contentRight p-5 transition-all duration-300  ${isSidebarOpen && windowWidth < 992 ? 'opacity-0' : ''}  ${isSidebarOpen ? `w-[${100 - sidebarWidth}%]` : 'w-[100%]'}`} >
                 <Dashboard />
               </div>
             </div>
+            <div
+              className={`sidebarOverlay w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]  overflow-hidden z-[51]  ${isSidebarOpen && windowWidth < 992 ? "block" : "hidden"}`} onClick={() => setIsSidebarOpen(false)} ></div>
           </section>
         </>
       ),
@@ -147,7 +156,7 @@ function App() {
           <section className="main">
             <Header />
             <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}>
                 <Sidebar />
               </div>
               <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
@@ -406,18 +415,35 @@ function App() {
     } else {
       setIsLogin(false);
     }
+
   }, [isLogin]);
-  
+
 
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
-        console.log(res?.data);
-        setCatData(res?.data);
+      console.log(res?.data);
+      setCatData(res?.data);
     })
-}, [setCatData, isReducer]);
+
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
 
-
+  useEffect(() => {
+    if (windowWidth < 992) {
+      setIsSidebarOpen(false);
+      setSidebarWidth(100);
+    } else {
+      setSidebarWidth(18);
+    }
+  }, [windowWidth])
 
 
   const openAlertBox = (status, msg) => {
@@ -480,6 +506,10 @@ function App() {
 
     isReducer,
     forceUpdate,
+
+    windowWidth,
+    sidebarWidth,
+    setSidebarWidth,
   };
 
   return (
@@ -520,7 +550,7 @@ function App() {
             {isOpenFullScreenPanel?.model === "Address Details" && <AddAddress />}
 
             {isOpenFullScreenPanel?.model === "BannerV1 Details" && <AddBannersV1 />}
-            
+
             {isOpenFullScreenPanel?.model === "Blog Details" && <AddBlog />}
 
 

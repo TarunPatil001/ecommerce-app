@@ -1,3 +1,18 @@
 @media only screen and (min-width:320px) and (max-width:992px){
+    html,body{
+        /* overflow-x: hidden; */
+    }
     
+    .dashBoardFilters{
+        display: block !important;
+        white-space: nowrap;
+        overflow-x: scroll;
+    }
+
+    .dashBoardFilters .col{
+        display: inline-block;
+        vertical-align: bottom;
+        width: 300px;
+        padding-right: 25px;
+    }
 }

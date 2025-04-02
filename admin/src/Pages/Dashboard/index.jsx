@@ -662,13 +662,13 @@ const Dashboard = () => {
       {
         console.log("sale: ", overallTotalSales)
       }
-      <div className={'w-full px-5 py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md'}>
+      <div className={'w-full px-5 py-5 lg:py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md'}>
         <div className="info">
-          <h1 className='text-[30px] font-bold leading-9 mb-2'>Good Morning, <br /> Cameron &#128075;</h1>
-          <p className='text-[16px] mb-10'>Here’s What happening on your store today. See the statistics at once.</p>
-          <Button className='flex items-center gap-1 !capitalize !text-[14px] !font-medium !text-white !bg-[var(--text-active)] !p-2 !px-4' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><FiPlus className='text-[18px]' />Add Product</Button>
+          <h1 className='text-[28px] leading-10 sm:text-[35px] sm:leading-10 font-bold mb-2'>Hello &#128075;, <br /> <span className='text-[var(--bg-primary)]'> {context?.userData?.name} </span></h1>
+          <p className='text-[16px]'>Here’s What happening on your store today. See the statistics at once.</p>
+          <Button className='!mt-4 lg:!mt-10 flex items-center gap-1 !capitalize !text-[14px] !font-medium !text-white !bg-[var(--text-active)] !p-2 !px-4' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><FiPlus className='text-[18px]' />Add Product</Button>
         </div>
-        <img src="/shop-illustration.webp" alt="image" className='w-[250px] object-cover' />
+        <img src="/shop-illustration.webp" alt="image" className='w-[250px] hidden lg:block' />
       </div>
 
       {
@@ -678,21 +678,35 @@ const Dashboard = () => {
 
       <div className="card my-4 bg-white border rounded-md px-1">
 
-        <div className='sticky top-0 left-0 z-10 mt-0 pt-16 flex w-full items-end justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
-          <div className='flex items-center justify-between px-5 absolute left-2 top-2'>
-            <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">Material UI</span></h2>
-          </div>
-          <div className='col ml-auto flex items-center justify-end gap-3 absolute right-2 top-2'>
+        <div className='col flex items-center justify-between gap-3 p-2'>
+          <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">MUI</span></h2>
+          {/* <div className='flex items-center justify-center gap-5'>
             <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize' onClick={resetFilters}><MdOutlineFilterListOff className='text-[18px]' />Reset Filters</Button>
             <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><GoPlus className='text-[20px]' />Add Product</Button>
+          </div> */}
+          <div className="flex items-center justify-center gap-5">
+            {/* Reset Filters Button */}
+            <Button className="!bg-green-600 !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={resetFilters}>
+              <MdOutlineFilterListOff className="text-[18px]" />
+              <span className="hidden sm:inline">Reset Filters</span>
+            </Button>
+
+            {/* Add Product Button */}
+            <Button className="!bg-[var(--bg-primary)] !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}>
+              <GoPlus className="text-[20px]" />
+              <span className="hidden sm:inline">Add Product</span>
+            </Button>
           </div>
 
+        </div>
+
+        <div className='dashBoardFilters sticky top-0 left-0 z-10 mt-0 flex w-full items-end justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
           <div className='col w-[35%]'>
             <SearchBox searchName="products" />
           </div>
 
           {/* Category Dropdown */}
-          <div className='col w-[20%] ml-auto'>
+          <div className='col w-[20%]'>
             <h4 className='font-bold text-[14px] mb-2'>Broad Category By</h4>
             <FormControl fullWidth size="small">
               <Select
@@ -1015,9 +1029,6 @@ const Dashboard = () => {
 
 
 
-
-
-
         {
           selectedRows.length > 0 &&
 
@@ -1052,9 +1063,9 @@ const Dashboard = () => {
       </div>
 
       <div className="card my-4 bg-white border rounded-md px-1">
-        <div className='flex items-center justify-between p-5'>
-          <h2 className='text-[20px] font-bold'>Recent Orders</h2>
-          <div className='w-[40%]'>
+        <div className='flex items-center justify-between p-5 gap-2 flex-col sm:flex-row'>
+          <h2 className='text-[20px] font-bold w-full text-left'>Recent Orders</h2>
+          <div className='w-[100%] sm:w-[100%] md:w-[100%] lg:w-[50%]'>
             <SearchBox
               searchName="orders"
               searchQuery={searchQuery}
@@ -1242,52 +1253,65 @@ const Dashboard = () => {
           </span>
         </div>
 
-        <div style={{ width: "100%", height: "500px" }}>
-          <ResponsiveContainer>
-            <AreaChart
-              data={chartData}
-              margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
-            >
-              {/* Define gradients */}
-              <defs>
-                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                </linearGradient>
+        <div className="overflow-x-auto">
+          <div className="h-[500px] min-w-[1200px]"> {/* Increased width */}
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={chartData}
+                margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+              >
+                {/* Define gradients */}
+                <defs>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                  </linearGradient>
 
-                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-                </linearGradient>
-              </defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="#ddd" opacity={0.7} />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <RechartTooltip contentStyle={{ fontSize: 12 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ddd" opacity={0.7} />
 
-              {/* Apply gradient fills */}
-              <Area
-                type="monotone"
-                dataKey="Total_Sales" // Fixed Key
-                stroke="#8884d8"
-                fill="url(#colorSales)"
-                strokeWidth={2}
-                activeDot={{ r: 6 }}
-              />
-              <Area
-                type="monotone"
-                dataKey="Total_Users" // Fixed Key
-                stroke="#82ca9d"
-                fill="url(#colorUsers)"
-                strokeWidth={2}
-                activeDot={{ r: 6 }}
-              />
+                {/* Scrollable X-Axis */}
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12 }}
+                  interval={0}
+                  minTickGap={10}
+                />
 
-            </AreaChart>
-          </ResponsiveContainer>
+                {/* Fixed Y-Axis */}
+                <YAxis tick={{ fontSize: 12 }} />
+
+                <RechartTooltip contentStyle={{ fontSize: 12 }} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+
+                {/* Apply gradient fills */}
+                <Area
+                  type="monotone"
+                  dataKey="Total_Sales"
+                  stroke="#8884d8"
+                  fill="url(#colorSales)"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="Total_Users"
+                  stroke="#82ca9d"
+                  fill="url(#colorUsers)"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+
+
       </div>
 
 
