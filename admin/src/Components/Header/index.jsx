@@ -8,6 +8,7 @@ import { MdOutlineDoubleArrow, MdOutlineLogout } from "react-icons/md";
 import { MyContext } from "../../App";
 import { useNavigate } from 'react-router-dom';
 import { fetchDataFromApi } from '../../utils/api';
+import { AiOutlineMenuUnfold } from 'react-icons/ai';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -104,9 +105,9 @@ const Header = () => {
 
 
   return (
-    <header className={`w-full h-auto py-2 shadow-md transition-all duration-300 bg-[#fff] pr-7 flex items-center justify-between z-[50] ${context.isSidebarOpen ? (context.windowWidth < 992 ? 'pl-5' : 'pl-72') : 'pl-5'} ${isSticky ? "sticky top-0" : "-top-[100px]"}`}>
+    <header className={`w-full h-auto py-2 shadow-md transition-all duration-700 bg-[#fff] pr-7 flex items-center justify-between z-[50] ${context.isSidebarOpen ? (context.windowWidth < 992 ? 'pl-5' : 'pl-72') : 'pl-5'} ${isSticky ? "fixed top-0" : "-top-[100px]"}`}>
       <div className="part1">
-        <Button className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !text-[rgba(0,0,0,0.8)] shadow-md hover:bg-gray-200" onClick={() => context.setIsSidebarOpen(!context.isSidebarOpen)}><MdOutlineDoubleArrow className={`text-[18px] ${context.isSidebarOpen === true ? '-rotate-180' : 'rotate-0'} transition-all duration-300`} /></Button>
+        <Button className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !text-[rgba(0,0,0,0.8)] shadow hover:bg-gray-200" onClick={() => context.setIsSidebarOpen(!context.isSidebarOpen)}><AiOutlineMenuUnfold className={`text-[18px] ${context.isSidebarOpen === true ? '-rotate-180' : 'rotate-0'} transition-all duration-300`} /></Button>
       </div>
 
       <div className="part2 w-auto flex items-center justify-center gap-5">

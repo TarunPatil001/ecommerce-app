@@ -97,8 +97,6 @@ function App() {
                 <Dashboard />
               </div>
             </div>
-            <div
-              className={`sidebarOverlay w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]  overflow-hidden z-[51]  ${isSidebarOpen && windowWidth < 992 ? "block" : "hidden"}`} onClick={() => setIsSidebarOpen(false)} ></div>
           </section>
         </>
       ),

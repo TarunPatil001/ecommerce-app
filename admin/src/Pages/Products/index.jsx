@@ -461,138 +461,157 @@ const Products = () => {
     return (
         <>
 
-            <div className="card my-4 bg-white border rounded-md px-1">
+            <div className="card my-4 mt-14 bg-white border rounded-md px-1">
 
-                <div className='sticky top-0 left-0 z-10 mt-0 pt-16 flex w-full items-end justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
-                    <div className='flex items-center justify-between px-5 absolute left-2 top-2'>
-                        <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">Material UI</span></h2>
+                <div className='col flex items-center justify-between gap-3 p-2'>
+                    <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">MUI</span></h2>
+                    <div className="flex items-center justify-center gap-5">
+                        {/* Reset Filters Button */}
+                        <Button className="!bg-green-600 !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={resetFilters}>
+                            <MdOutlineFilterListOff className="text-[18px]" />
+                            <span className="hidden sm:inline">Reset Filters</span>
+                        </Button>
+
+                        {/* Add Product Button */}
+                        <Button className="!bg-[var(--bg-primary)] !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}>
+                            <GoPlus className="text-[20px]" />
+                            <span className="hidden sm:inline">Add Product</span>
+                        </Button>
                     </div>
-                    <div className='col ml-auto flex items-center justify-end gap-3 absolute right-2 top-2'>
+                </div>
+
+                <div className='z-10 mt-0 flex flex-col md:flex-row w-full items-end justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 bg-white gap-4'>
+                    {/* <div className='flex items-center justify-between px-5 absolute left-2 top-2'>
+                        <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">MUI</span></h2>
+                    </div> */}
+                    {/* <div className='col ml-auto flex items-center justify-end gap-3 absolute right-2 top-2'>
                         <Button className='!bg-green-600 !px-3 !text-white flex items-center gap-1 !capitalize' onClick={resetFilters}><MdOutlineFilterListOff className='text-[18px]' />Reset Filters</Button>
                         <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}><GoPlus className='text-[20px]' />Add Product</Button>
-                    </div>
+                    </div> */}
 
-                    <div className='col w-[35%]'>
+                    <div className='col w-[100%] md:w-[35%] pb-2'>
                         <SearchBox searchName="products" />
                     </div>
 
-                    {/* Category Dropdown */}
-                    <div className='col w-[20%] ml-auto'>
-                        <h4 className='font-bold text-[14px] mb-2'>Broad Category By</h4>
-                        <FormControl fullWidth size="small">
-                            <Select
-                                multiple
-                                labelId="productCategoryDropDownLabel"
-                                id="productCategoryDropDown"
-                                value={Array.isArray(productCategory) ? productCategory : []}
-                                onChange={handleChangeProductCategory}
-                                displayEmpty
-                                MenuProps={MenuProps}
-                                renderValue={(selected) => {
-                                    if (selected.length === 0) {
-                                        return <em>Sort by broad category</em>;
-                                    }
-                                    return selected
-                                        .map((id) => {
-                                            const item = context.catData.find((cat) => cat._id === id);
-                                            return item ? item.name : "";
-                                        })
-                                        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
-                                        .join(", ");
-                                }}
-                            >
-                                {context?.catData && context.catData.length > 0 ? (
-                                    context.catData
-                                        .sort((a, b) => a.name.localeCompare(b.name))
-                                        .map((item) => (
+                    <div className='grid grid-cols-1 md:grid-cols-3 col w-[100%] md:w-[65%] gap-2 pb-2'>
+                        {/* Category Dropdown */}
+                        <div className='col w-[100%]'>
+                            <h4 className='font-bold text-[14px] mb-2'>Broad Category By</h4>
+                            <FormControl fullWidth size="small">
+                                <Select
+                                    multiple
+                                    labelId="productCategoryDropDownLabel"
+                                    id="productCategoryDropDown"
+                                    value={Array.isArray(productCategory) ? productCategory : []}
+                                    onChange={handleChangeProductCategory}
+                                    displayEmpty
+                                    MenuProps={MenuProps}
+                                    renderValue={(selected) => {
+                                        if (selected.length === 0) {
+                                            return <em>Sort by broad category</em>;
+                                        }
+                                        return selected
+                                            .map((id) => {
+                                                const item = context.catData.find((cat) => cat._id === id);
+                                                return item ? item.name : "";
+                                            })
+                                            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                                            .join(", ");
+                                    }}
+                                >
+                                    {context?.catData && context.catData.length > 0 ? (
+                                        context.catData
+                                            .sort((a, b) => a.name.localeCompare(b.name))
+                                            .map((item) => (
+                                                <MenuItem key={item._id} value={item._id}>
+                                                    <Checkbox checked={productCategory.includes(item._id)} />
+                                                    <ListItemText primary={item.name} />
+                                                </MenuItem>
+                                            ))
+                                    ) : (
+                                        <MenuItem disabled>No Data Available!</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </div>
+
+                        {/* Subcategory Dropdown */}
+                        <div className='col w-[100%]'>
+                            <h4 className='font-bold text-[14px] mb-2'>Sub-Category By</h4>
+                            <FormControl fullWidth size="small">
+                                <Select
+                                    multiple
+                                    labelId="productSubCategoryDropDownLabel"
+                                    id="productSubCategoryDropDown"
+                                    value={Array.isArray(productCategory2) ? productCategory2 : []}
+                                    onChange={handleChangeProductCategory2}
+                                    displayEmpty
+                                    MenuProps={MenuProps}
+                                    renderValue={(selected) => {
+                                        if (selected.length === 0) {
+                                            return <em>Sort by subcategory</em>;
+                                        }
+                                        const selectedNames = selected
+                                            .map((id) => {
+                                                const item = subCategories.find((subCat) => subCat._id === id);
+                                                return item ? item.name : null;
+                                            })
+                                            .filter((name) => name !== null);
+                                        return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by subcategory</em>;
+                                    }}
+                                >
+                                    {subCategories.length > 0 ? (
+                                        subCategories.map((item) => (
                                             <MenuItem key={item._id} value={item._id}>
-                                                <Checkbox checked={productCategory.includes(item._id)} />
+                                                <Checkbox checked={productCategory2.includes(item._id)} />
                                                 <ListItemText primary={item.name} />
                                             </MenuItem>
                                         ))
-                                ) : (
-                                    <MenuItem disabled>No Data Available!</MenuItem>
-                                )}
-                            </Select>
-                        </FormControl>
-                    </div>
+                                    ) : (
+                                        <MenuItem disabled>No Data Available!</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </div>
 
-                    {/* Subcategory Dropdown */}
-                    <div className='col w-[20%]'>
-                        <h4 className='font-bold text-[14px] mb-2'>Sub-Category By</h4>
-                        <FormControl fullWidth size="small">
-                            <Select
-                                multiple
-                                labelId="productSubCategoryDropDownLabel"
-                                id="productSubCategoryDropDown"
-                                value={Array.isArray(productCategory2) ? productCategory2 : []}
-                                onChange={handleChangeProductCategory2}
-                                displayEmpty
-                                MenuProps={MenuProps}
-                                renderValue={(selected) => {
-                                    if (selected.length === 0) {
-                                        return <em>Sort by subcategory</em>;
-                                    }
-                                    const selectedNames = selected
-                                        .map((id) => {
-                                            const item = subCategories.find((subCat) => subCat._id === id);
-                                            return item ? item.name : null;
-                                        })
-                                        .filter((name) => name !== null);
-                                    return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by subcategory</em>;
-                                }}
-                            >
-                                {subCategories.length > 0 ? (
-                                    subCategories.map((item) => (
-                                        <MenuItem key={item._id} value={item._id}>
-                                            <Checkbox checked={productCategory2.includes(item._id)} />
-                                            <ListItemText primary={item.name} />
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No Data Available!</MenuItem>
-                                )}
-                            </Select>
-                        </FormControl>
-                    </div>
-
-                    {/* Third-level Category Dropdown */}
-                    <div className='col w-[20%]'>
-                        <h4 className='font-bold text-[14px] mb-2'>Specific Category By</h4>
-                        <FormControl fullWidth size="small">
-                            <Select
-                                multiple
-                                labelId="productThirdCategoryDropDownLabel"
-                                id="productThirdCategoryDropDown"
-                                value={Array.isArray(productCategory3) ? productCategory3 : []}
-                                onChange={handleChangeProductCategory3}
-                                displayEmpty
-                                MenuProps={MenuProps}
-                                renderValue={(selected) => {
-                                    if (selected.length === 0) {
-                                        return <em>Sort by third-level category</em>;
-                                    }
-                                    const selectedNames = selected
-                                        .map((id) => {
-                                            const item = thirdLevelCategories.find((thirdLevel) => thirdLevel._id === id);
-                                            return item ? item.name : null;
-                                        })
-                                        .filter((name) => name !== null);
-                                    return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by third-level category</em>;
-                                }}
-                            >
-                                {thirdLevelCategories.length > 0 ? (
-                                    thirdLevelCategories.map((item) => (
-                                        <MenuItem key={item._id} value={item._id}>
-                                            <Checkbox checked={productCategory3.includes(item._id)} />
-                                            <ListItemText primary={item.name} />
-                                        </MenuItem>
-                                    ))
-                                ) : (
-                                    <MenuItem disabled>No Data Available!</MenuItem>
-                                )}
-                            </Select>
-                        </FormControl>
+                        {/* Third-level Category Dropdown */}
+                        <div className='col w-[100%]'>
+                            <h4 className='font-bold text-[14px] mb-2'>Specific Category By</h4>
+                            <FormControl fullWidth size="small">
+                                <Select
+                                    multiple
+                                    labelId="productThirdCategoryDropDownLabel"
+                                    id="productThirdCategoryDropDown"
+                                    value={Array.isArray(productCategory3) ? productCategory3 : []}
+                                    onChange={handleChangeProductCategory3}
+                                    displayEmpty
+                                    MenuProps={MenuProps}
+                                    renderValue={(selected) => {
+                                        if (selected.length === 0) {
+                                            return <em>Sort by third-level category</em>;
+                                        }
+                                        const selectedNames = selected
+                                            .map((id) => {
+                                                const item = thirdLevelCategories.find((thirdLevel) => thirdLevel._id === id);
+                                                return item ? item.name : null;
+                                            })
+                                            .filter((name) => name !== null);
+                                        return selectedNames.length > 0 ? selectedNames.sort().join(", ") : <em>Sort by third-level category</em>;
+                                    }}
+                                >
+                                    {thirdLevelCategories.length > 0 ? (
+                                        thirdLevelCategories.map((item) => (
+                                            <MenuItem key={item._id} value={item._id}>
+                                                <Checkbox checked={productCategory3.includes(item._id)} />
+                                                <ListItemText primary={item.name} />
+                                            </MenuItem>
+                                        ))
+                                    ) : (
+                                        <MenuItem disabled>No Data Available!</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </div>
                     </div>
 
 
@@ -826,6 +845,7 @@ const Products = () => {
                     MenuProps={MenuProps}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    className='customScroll'
                 />
 
 
