@@ -20,6 +20,7 @@ const AddCategory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
   // const [isLoading3, setIsLoading3] = useState(false);
+  const [multiple, setMultiple] = useState(false);
 
   // Consolidated states for category files
   const [categoryFiles, setCategoryFiles] = useState({
@@ -186,31 +187,31 @@ const AddCategory = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!formFields.name.trim()) return toast.error("Please enter category name.");
     if (categoryFiles.uploadedFiles.length === 0) return toast.error("Please upload at least one category image.");
-  
+
     setIsLoading(true);
-  
+
     try {
       const formData = new FormData();
-  
+
       // ✅ Append text fields
       formData.append("name", formFields.name);
-  
+
       // ✅ Append each image file
       categoryFiles.uploadedFiles.forEach((file) => {
         formData.append("images", file); // Ensure field name matches backend expectation
       });
-  
+
       // ✅ Debugging: Log FormData contents
       for (let pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
-  
+
       // ✅ Submit the request
       await toast.promise(
-        postData(`/api/category/create-category`, formData, {withCredentials: true}),
+        postData(`/api/category/create-category`, formData, { withCredentials: true }),
         {
           loading: "Adding category... Please wait.",
           success: (res) => {
@@ -339,7 +340,7 @@ const AddCategory = () => {
 
           <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
           <div className="grid grid-cols-1 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-            <div className='col w-[50%]'>
+            <div className='col'>
               <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Category Name</h3>
               <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Category title' name="name" value={formFields?.name || ''} onChange={onChangeInput} />
             </div>
@@ -348,44 +349,50 @@ const AddCategory = () => {
 
           <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
           <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-            <span className='opacity-50 text-[14px]'>
-              {categoryFiles.uploadedFiles.length > 0
-                ? "Category photo uploaded"
-                : "Choose a category photo or simply drag and drop"}
+            <span className="opacity-50 col-span-full text-[14px]">
+              Choose category photos or simply drag and drop
             </span>
 
-            {categoryFiles.uploadedFiles.length > 0 ? (
-              <div className="mt-2 border p-2 rounded-md flex flex-col items-center bg-white h-[150px] w-full relative">
-                {/* Remove Button */}
-                <span
-                  className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                  onClick={() => handleRemoveImage(0)}
-                  aria-label="Remove Image"
-                >
-                  <IoClose className="text-[15px] text-red-600" />
-                </span>
+            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+              {/* Uploaded Image Previews */}
+              {categoryFiles.uploadedFiles.length > 0 &&
+                categoryFiles.previews.map((preview, index) => (
+                  <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                    {/* Remove Button */}
+                    <span
+                      className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                      onClick={() => handleRemoveImage(index)}
+                      aria-label="Remove Image"
+                    >
+                      <IoClose className="text-[15px] text-red-600" />
+                    </span>
 
-                {/* Image Preview */}
-                <div className="w-full h-full overflow-hidden">
-                  <img
-                    src={categoryFiles.previews[0]}
-                    alt={`Uploaded file: ${categoryFiles.uploadedFiles[0].name}`}
-                    className="w-full h-full object-cover rounded-md"
-                  />
+                    {/* Image Preview */}
+                    <div className="h-full overflow-hidden">
+                      <img
+                        src={preview}
+                        alt={`Uploaded file ${index}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                  </div>
+                ))}
+
+              {/* Upload Box – visible always if multiple is allowed */}
+              {(multiple || categoryFiles.uploadedFiles.length === 0) && (
+                <div className={`h-[150px] w-full ${categoryFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                  <UploadBox multiple={multiple} onFileChange={handleCategoryFileChange} />
                 </div>
-              </div>
-            ) : (
-              <div className="mt-2">
-                <UploadBox multiple={false} onFileChange={handleCategoryFileChange} />
-              </div>
-            )}
+              )}
+            </div>
 
-            <p className="text-sm mt-2 text-gray-600">
+            <p className="text-sm mt-2 text-gray-600 col-span-full">
               {categoryFiles.uploadedFiles.length > 0
-                ? "Category image uploaded"
+                ? `${categoryFiles.uploadedFiles.length} category photo${categoryFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload`
                 : "No category image uploaded yet."}
             </p>
           </div>
+
 
           {/* <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
             {
@@ -421,22 +428,22 @@ const AddCategory = () => {
             <Button
               type="reset"
               onClick={handleDiscard}
-              className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+              className='!bg-red-500 !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
             >
-              <RiResetLeftFill className='text-[20px]' />Cancel
+              <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
             </Button>
 
             {
               categoryIdNo === undefined ? (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                   {
-                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                   }
                 </Button>
               ) : (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                   {
-                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
+                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                   }
                 </Button>
               )

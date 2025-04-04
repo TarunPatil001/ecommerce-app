@@ -16,8 +16,8 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
     { id: 'image', label: 'IMAGE', minWidth: 150, align: 'left' },
-    { id: 'categoryName', label: 'CATEGORY NAME', minWidth: 150, align: 'left' },
-    { id: 'action', label: 'Action', minWidth: 100, align: 'left' },
+    { id: 'categoryName', label: 'CATEGORY NAME', minWidth: 250, align: 'left' },
+    { id: 'action', label: 'ACTION', minWidth: 100, align: 'left' },
 ];
 
 const CategoryList = () => {
@@ -186,22 +186,22 @@ const CategoryList = () => {
 
     return (
         <>
-            <div className='flex items-center justify-between px-5 pt-3'>
-                <h2 className='text-[20px] font-bold'>Category List<span className="font-normal text-[12px]">Material UI</span></h2>
-                <div className='col w-[30%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px]' />Add Category</Button>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-3 mt-14'>
+                <h2 className='text-[20px] font-bold'>Category List<span className="font-normal text-[12px]">MUI</span></h2>
+                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
+                    <Button className='!bg-[var(--bg-primary)] w-full h-auto sm:w-auto !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Category</Button>
                 </div>
             </div>
 
             <div className="card my-4 bg-white border rounded-md px-1 pt-1">
 
-                <TableContainer className='customScroll max-h-[500px]'>
+                <TableContainer className='customScroll overflow-x-scroll max-h-[500px]'>
                     <Table stickyHeader aria-label="sticky table">
 
                         <TableHead>
                             <TableRow>
                                 <TableCell className="px-6 py-2 text-left w-[60px]">
-                                <Checkbox
+                                    <Checkbox
                                         checked={selectAll}
                                         onChange={handleSelectAll}
                                     />
@@ -225,7 +225,7 @@ const CategoryList = () => {
                                     return (
                                         <TableRow key={index}>
                                             <TableCell>
-                                            <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
+                                                <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
                                             </TableCell>
 
                                             <TableCell width={100}>
@@ -307,6 +307,7 @@ const CategoryList = () => {
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    className='customScroll'
                 />
 
             </div>

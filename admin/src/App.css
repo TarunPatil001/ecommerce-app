@@ -43,7 +43,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.3) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
 }
 
 
@@ -59,35 +59,37 @@ body {
 }
 
 .customScroll::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.3) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
   cursor: pointer;
   border-radius: 15px;
 }
 
-.custom-btn{
+.custom-btn {
   background-color: var(--bg-primary) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
 }
-.custom-btn-disabled{
+
+.custom-btn-disabled {
   background-color: var(--bg-primary-light) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
 }
 
-.custom-btn-update{
+.custom-btn-update {
   background-color: var(--bg-primary-update) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
 }
-.custom-btn-update-disabled{
+
+.custom-btn-update-disabled {
   background-color: var(--bg-primary-update-light) !important;
   color: #ffffff !important;
   padding: 5px 20px !important;
 }
 
 /* ---------------Button Circular  ---------------------- */
-.MuiCircularProgress-root{
+.MuiCircularProgress-root {
   width: 26px !important;
   height: 26px !important;
 }
@@ -114,13 +116,14 @@ body {
   justify-content: center;
 }
 
-.iiz div .iiz__img { /* Use the correct class */
+.iiz div .iiz__img {
+  /* Use the correct class */
   height: inherit !important;
   width: auto;
   object-fit: contain !important;
 }
 
-.iiz__zoom-img--visible{
+.iiz__zoom-img--visible {
   cursor: crosshair !important;
 }
 
@@ -162,13 +165,13 @@ body {
   right: inherit !important;
 }
 
-.productDetailImageOptions .swiper-button-prev::after{
+.productDetailImageOptions .swiper-button-prev::after {
   transform: rotate(90deg);
   color: #fff !important;
   font-size: 18px !important;
 }
 
-.productDetailImageOptions .swiper-button-next::after{
+.productDetailImageOptions .swiper-button-next::after {
   transform: rotate(90deg);
   color: #fff !important;
   font-size: 18px !important;
@@ -183,54 +186,57 @@ body {
   transition: height 500ms;
 }
 
-.MuiPaginationItem-root.Mui-selected{
+.MuiPaginationItem-root.Mui-selected {
   background: var(--bg-primary) !important;
   color: #ffffff;
 }
 
-th.MuiTableCell-root{@apply bg-gray-100 font-bold py-1}
+th.MuiTableCell-root {
+  @apply bg-gray-100 font-bold py-1
+}
 
-a.active button{
+a.active button {
   /* background: rgba(56, 114, 250, 0.1) !important; */
   background: var(--bg-primary) !important;
 }
 
-.custom-credential-btn{
+.custom-credential-btn {
   background: #ffffff !important;
   border: 2px solid rgba(0, 0, 0, 0.4) !important;
 }
 
-.css-rizt0-MuiTypography-root{
+.css-rizt0-MuiTypography-root {
   font-size: 14px !important;
   font-weight: 500 !important;
 }
 
-.MuiAppBar-colorPrimary{
+.MuiAppBar-colorPrimary {
   background: #f1f1f1 !important;
   color: black !important;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
 }
 
-.MuiSelect-select{
+.MuiSelect-select {
   background: #fff !important;
 }
 
-.custom-shadow{
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; 
+.custom-shadow {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+
 .lazy-load-image-background.blur.lazy-load-image-loaded {
   height: 100%;
   width: 100%;
 }
 
-.css-1ygil4i-MuiToolbar-root{
+.css-1ygil4i-MuiToolbar-root {
   min-height: 56px !important;
 }
 
@@ -245,20 +251,21 @@ input[type=number]::-webkit-outer-spin-button {
   overflow-x: hidden;
 }
 
-.css-16yb58i-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon{
+.css-16yb58i-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon {
   color: #ffffff !important;
 }
 
-.otpBox input{
+.otpBox input {
   border: 1px solid rgba(0, 0, 0, 0.3) !important;
   outline: none !important;
   border-radius: 4px;
 }
-.otpBox input:focus{
+
+.otpBox input:focus {
   border: 1px solid rgba(0, 0, 0, 0.7) !important;
 }
 
-.MuiTableBody-root tr:nth-child(even){
+.MuiTableBody-root tr:nth-child(even) {
   background: #f1f1f1 !important;
 }
 
@@ -335,4 +342,28 @@ input[type=number]::-webkit-outer-spin-button {
 .swiper-button-prev.swiper-button-disabled,
 .swiper-button-next.swiper-button-disabled {
   display: none !important;
+}
+
+.rsw-toolbar {
+  width: 100%;
+  overflow-x: auto;
+  padding: 0px 10px;
+  gap: 15px;
+}
+
+.rsw-toolbar::-webkit-scrollbar {
+  width: 3px !important;
+  height: 3px !important;
+  border-radius: 6px;
+}
+
+.rsw-toolbar::-webkit-scrollbar-track {
+  box-shadow: rgba(96, 96, 96, 0.1) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.1) 0px 18px 36px -18px inset;
+  border-radius: 15px;
+}
+
+.rsw-toolbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3) !important;
+  cursor: pointer;
+  border-radius: 15px;
 }

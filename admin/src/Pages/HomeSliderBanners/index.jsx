@@ -15,7 +15,7 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
     { id: 'image', label: 'IMAGE', minWidth: 250, align: 'left' },
-    { id: 'action', label: 'Action', minWidth: 100, align: 'left' },
+    { id: 'action', label: 'ACTION', minWidth: 100, align: 'left' },
 ];
 
 const HomeSliderBanners = () => {
@@ -192,10 +192,10 @@ const HomeSliderBanners = () => {
 
     return (
         <>
-            <div className='flex items-center justify-between px-5 pt-3'>
-                <h2 className='text-[20px] font-bold'>Home Slider Banners <span className="font-normal text-[12px]">Material UI</span></h2>
-                <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Home Banner Details' })}><GoPlus className='text-[20px]' />Add Home Banner</Button>
+            <div className='grid grid-cols-1 sm:grid-cols-2 items-center px-5 my-4 mt-14'>
+                <h2 className='text-[20px] font-bold'>Home Slider Banners <span className="font-normal text-[12px]">MUI</span></h2>
+                <div className='col w-full sm:w-auto  ml-auto flex items-center justify-end gap-3'>
+                    <Button className='!bg-[var(--bg-primary)] !w-full !h-auto !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Home Banner Details' })}><GoPlus className='text-[20px]' /><span className="block">Add Home Banner</span></Button>
                 </div>
             </div>
 
@@ -234,7 +234,7 @@ const HomeSliderBanners = () => {
                                                 <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>
                                             <TableCell width={300}>
-                                                <div className="flex items-start gap-4 w-[340px] h-[100px]">
+                                                <div className="flex items-start gap-4 w-[206px] h-[60px] sm:w-[340px] sm:h-[100px]">
                                                     <div className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
                                                         <LazyLoadImage
                                                             alt="homeSlide_img"
@@ -288,9 +288,9 @@ const HomeSliderBanners = () => {
                         <Button
                             type="reset"
                             onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                            className='!capitalize !bg-red-500 !text-white !px-5 w-auto h-[40px] flex items-center justify-center gap-2'
                         >
-                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                            <RiDeleteBin6Line className='text-[18px] hidden sm:block' />Delete
                         </Button>
                     </div>
 
@@ -304,6 +304,7 @@ const HomeSliderBanners = () => {
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    className='customScroll'
                 />
 
             </div>

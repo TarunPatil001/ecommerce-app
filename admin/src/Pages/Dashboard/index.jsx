@@ -27,6 +27,7 @@ import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/ap
 import SearchBox from '../../Components/SearchBox'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import Products from '../Products'
+import Orders from '../Orders'
 
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
@@ -660,9 +661,9 @@ const Dashboard = () => {
 
   return (
     <>
-      {
+      {/* {
         console.log("sale: ", overallTotalSales)
-      }
+      } */}
       <div className={`w-full px-5 py-5 my-4 mt-14 lg:py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md`}>
         <div className="info">
           <h1 className='text-[28px] leading-10 sm:text-[35px] sm:leading-10 font-bold mb-2'>Hello &#128075;, <br /> <span className='text-[var(--bg-primary)]'> {context?.userData?.name} </span></h1>
@@ -679,7 +680,8 @@ const Dashboard = () => {
 
       <Products />
 
-      <div className="card my-4 bg-white border rounded-md px-1">
+      <Orders />
+      {/* <div className="card my-4 bg-white border rounded-md px-1">
         <div className='flex items-center justify-between p-5 gap-2 flex-col sm:flex-row'>
           <h2 className='text-[20px] font-bold w-full text-left'>Recent Orders</h2>
           <div className='w-[100%] sm:w-[100%] md:w-[100%] lg:w-[50%]'>
@@ -860,7 +862,7 @@ const Dashboard = () => {
 
 
 
-      </div>
+      </div> */}
 
       <div className="card my-4 bg-white border rounded-md px-1">
         <div className="flex items-center justify-between px-5 pb-2 pt-5">

@@ -2,7 +2,7 @@ import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemTe
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line, RiResetLeftFill } from 'react-icons/ri'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import ProgressBar from '../../Components/ProgressBar'
 import { MdOutlineEdit, MdOutlineFilterListOff } from 'react-icons/md'
 import { IoEyeOutline } from 'react-icons/io5'
@@ -451,6 +451,10 @@ const Products = () => {
     };
 
 
+    const location = useLocation();
+    const isHome = location.pathname === "/";
+
+
 
 
 
@@ -461,21 +465,21 @@ const Products = () => {
     return (
         <>
 
-            <div className="card my-4 mt-14 bg-white border rounded-md px-1">
+            <div className={`card my-4 ${isHome ? "" : "mt-14"} bg-white border rounded-md px-1`}>
 
-                <div className='col flex items-center justify-between gap-3 p-2'>
-                    <h2 className='text-[20px] font-bold'>Products <span className="font-normal text-[12px]">MUI</span></h2>
-                    <div className="flex items-center justify-center gap-5">
+                <div className='col flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-2'>
+                    <h2 className='text-[20px] font-bold w-auto'>Products <span className="font-normal text-[12px]">MUI</span></h2>
+                    <div className="flex items-center justify-end gap-5 w-full sm:w-auto">
                         {/* Reset Filters Button */}
-                        <Button className="!bg-green-600 !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={resetFilters}>
-                            <MdOutlineFilterListOff className="text-[18px]" />
-                            <span className="hidden sm:inline">Reset Filters</span>
+                        <Button className="!bg-green-600 !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center rounded-md sm:gap-1 !text-white" onClick={resetFilters}>
+                            <MdOutlineFilterListOff className="text-[18px] hidden sm:block" />
+                            Reset Filters
                         </Button>
 
                         {/* Add Product Button */}
-                        <Button className="!bg-[var(--bg-primary)] !w-10 !h-10 flex items-center justify-center rounded-md sm:!px-3 sm:!w-auto sm:!h-auto sm:gap-1 sm:!capitalize !text-white" onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}>
-                            <GoPlus className="text-[20px]" />
-                            <span className="hidden sm:inline">Add Product</span>
+                        <Button className="!bg-[var(--bg-primary)] !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center rounded-md sm:gap-1 !text-white" onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Product Details' })}>
+                            <GoPlus className="text-[20px] hidden sm:block" />
+                            Add Product
                         </Button>
                     </div>
                 </div>
@@ -828,9 +832,9 @@ const Products = () => {
                         <Button
                             type="reset"
                             onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                            className='!bg-red-500 !text-white !capitalize w-auto !px-5 h-[40px] flex items-center justify-center gap-2'
                         >
-                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                            <RiDeleteBin6Line className='text-[18px] hidden sm:block' />Delete
                         </Button>
                     </div>
 

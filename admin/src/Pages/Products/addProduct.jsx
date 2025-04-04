@@ -111,6 +111,8 @@ const AddProduct = () => {
 
     const [productRating, setProductRating] = useState(0);
     const [productIdNo, setProductIdNo] = useState(undefined);
+    const [multiple, setMultiple] = useState(true);
+    const [multiple2, setMultiple2] = useState(false);
 
 
     // Consolidated states for product and banner files
@@ -953,11 +955,11 @@ const AddProduct = () => {
 
 
     return (
-        <section className='p-8 bg-gray-100'>
+        <section className='p-8 bg-white'>
 
             <form action="#" ref={formRef} onSubmit={handleFormSubmit} className='form py-3'>
-                <h3 className='text-[24px] font-bold mb-2'>{productIdNo === undefined ? ("Create ") : ("Update ")}Product</h3>
-                <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Basic Information</h3>
+                <h3 className='text-[20px] sm:text-[24px] font-bold mb-2'>{productIdNo === undefined ? ("Create ") : ("Update ")}Product</h3>
+                <h3 className='text-[16px] sm:text-[18px] font-bold mb-1 text-gray-700'>Basic Information</h3>
                 <div className='flex flex-col gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 mb-5'>
 
                     <div className="grid grid-cols-1">
@@ -974,7 +976,7 @@ const AddProduct = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-4 mb-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-3 gap-4">
 
 
                         <div className='col'>
@@ -1087,8 +1089,8 @@ const AddProduct = () => {
 
 
                 {/* <div className='flex flex-col gap-4  mb-2'></div> */}
-                <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Pricing & Stock</h3>
-                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
+                <h3 className='text-[16px] sm:text-[18px] font-bold mb-1 text-gray-700'>Pricing & Stock</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
 
                     <div className='col'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product Price</h3>
@@ -1157,8 +1159,8 @@ const AddProduct = () => {
                     </div>
                 </div>
 
-                <h3 className='text-[18px] font-bold mb-1 text-gray-700'>Size & Rating</h3>
-                <div className="grid grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
+                <h3 className='text-[16px] sm:text-[18px] font-bold mb-1 text-gray-700'>Size & Rating</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5">
                     <div className='col position-relative overflow-hidden'>
                         <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Product RAMS</h3>
                         <FormControl fullWidth size='small'>
@@ -1292,31 +1294,17 @@ const AddProduct = () => {
                 </div>
 
                 {/* Component rendering images with smooth drag and drop */}
-                <div className="col w-full px-0">
-                    <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
-                    <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                        <span className="opacity-50 col-span-full text-[14px]">Choose a product photo or simply drag and drop</span>
+                <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                    <span className="opacity-50 col-span-full text-[14px]">
+                        Choose a product photo or simply drag and drop
+                    </span>
 
-                        <AnimatePresence>
-                            {productFiles.uploadedFiles.map((file, index) => (
-                                <motion.div
-                                    key={file.name}
-                                    className="border p-2 rounded-md flex flex-col items-center bg-white h-[150px] relative cursor-grab"
-                                    draggable
-                                    onDragStart={(e) => e.dataTransfer.setData("index", index.toString())}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={(e) => {
-                                        const dragIndex = parseInt(e.dataTransfer.getData("index"), 10);
-                                        if (!isNaN(dragIndex) && dragIndex !== index) {
-                                            handleRearrangeImages(dragIndex, index);
-                                        }
-                                    }}
-                                    initial={{ opacity: 0, y: 20 }} // Animates in from below
-                                    animate={{ opacity: 1, y: 0 }} // Normal position
-                                    exit={{ opacity: 0, scale: 0.8 }} // Shrink on exit
-                                    transition={{ duration: 0.3, ease: "easeInOut" }} // Smooth transition
-                                >
-
+                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-2 items-center">
+                        {/* Uploaded Images */}
+                        {productFiles.uploadedFiles.length > 0 &&
+                            productFiles.previews.map((preview, index) => (
+                                <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                                    {/* Remove Button */}
                                     <span
                                         className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
                                         onClick={() => handleRemoveImage(index)}
@@ -1325,131 +1313,129 @@ const AddProduct = () => {
                                         <IoClose className="text-[15px] text-red-600" />
                                     </span>
 
-                                    
-                                    <div className="w-full h-[150px] overflow-hidden">
+                                    {/* Image Preview */}
+                                    <div className="h-full overflow-hidden">
                                         <img
-                                            src={productFiles.previews[index]}
-                                            alt={`Uploaded file: ${file.name}`}
-                                            className="w-full h-full object-cover rounded-md cursor-grab transition-transform duration-300 ease-in-out"
-                                            draggable={false}
+                                            src={preview}
+                                            alt={`Uploaded file ${index}`}
+                                            className="w-full h-full object-cover rounded-md"
                                         />
                                     </div>
-                                </motion.div>
+                                </div>
                             ))}
-                        </AnimatePresence>
 
-
-                        <div className={productFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
-                            <UploadBox multiple={true} onFileChange={handleProductFileChange} />
-                        </div>
-
-                        <p className="text-sm mt-2 text-gray-600 col-span-full">
-                            {productFiles.uploadedFiles.length > 0 ? `Files uploaded: ${productFiles.uploadedFiles.length}` : "No files uploaded yet."}
-                        </p>
+                        {/* Upload Box should be in the same row */}
+                        {(multiple || productFiles.uploadedFiles.length === 0) && (
+                            <div className={`h-[150px] w-full ${productFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                                <UploadBox multiple={multiple} onFileChange={handleProductFileChange} />
+                            </div>
+                        )}
                     </div>
+
+                    <p className="text-sm mt-2 text-gray-600 col-span-full">
+                        {productFiles.uploadedFiles.length > 0
+                            ? `${productFiles.uploadedFiles.length} product photo${productFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload`
+                            : "No product photo uploaded yet."}
+                    </p>
                 </div>
+
 
 
                 {/* BANNER IMAGES */}
-                <div className="col w-full px-0">
-                    <div className="flex items-center gap-4 mb-2">
-                        <h3 className="text-[18px] font-bold">Product Banner</h3>
-                        <FormControlLabel
-                            control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
-                            label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
-                        />
-                    </div>
+                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4 mb-2">
+                    <h3 className="text-[18px] font-bold">Product Banner</h3>
+                    <FormControlLabel
+                        control={<IOSSwitch checked={isBannerVisible} sx={{ m: 1 }} onChange={handleToggle} />}
+                        label={`Banner Visibility: ${isBannerVisible ? "On" : "Off"}`}
+                    />
+                </div>
 
-                    {isBannerVisible && (
-                        <div className="flex flex-col">
-                            {/* Banner Title Input */}
-                            <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                                <div className="col col-span-full mt-3">
-                                    <h3 className="text-[14px] font-medium mb-1 text-gray-700">Banner Name</h3>
-                                    <input
-                                        type="text"
-                                        className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
-                                        placeholder="Banner title"
-                                        name="bannerTitleName"
-                                        value={formFields.bannerTitleName}
-                                        onChange={onChangeInput}
-                                    />
-                                </div>
-                            </div>
+                {isBannerVisible && (
+                    <>
+                        {/* Banner Title Input */}
+                        <div className="mt-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 mb-4">
+                            <h3 className="text-[14px] font-medium mb-1 text-gray-700">Banner Name</h3>
+                            <input
+                                type="text"
+                                className="w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm"
+                                placeholder="Banner title"
+                                name="bannerTitleName"
+                                value={formFields.bannerTitleName}
+                                onChange={onChangeInput}
+                            />
+                        </div>
 
-                            {/* Banner File Upload */}
-                            <div className="grid grid-cols-8 gap-2 border-2 border-dashed border-[rgba(0,0,0,0.1)] bg-white rounded-md p-5 pt-1 mb-4">
-                                <span className="opacity-50 col-span-full text-[14px]">
-                                    Choose a banner photo or simply drag and drop
-                                </span>
+                        {/* Banner File Upload */}
+                        <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                            <div className="flex flex-col">
+                                <div className="mt-2 grid grid-cols-2 lg:grid-cols-4 gap-2 items-center">
+                                    <span className="opacity-50 col-span-full text-[14px]">Choose a banner photo or simply drag and drop</span>
 
-                                {bannerFiles.uploadedFiles.length > 0 &&
-                                    bannerFiles.uploadedFiles.map((image, index) => (
-                                        <div
-                                            className="border p-2 h-[150px] rounded-md flex flex-col items-center bg-white relative"
-                                            key={index}
-                                        >
-                                            <span
-                                                className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                                                onClick={() => handleRemoveBannerImage(index)} // Pass index directly to remove
-                                            >
-                                                <IoClose className="text-[15px] text-red-600" />
-                                            </span>
-                                            <div className="w-full h-full">
-                                                {isLoading3 ? (
-                                                    <CircularProgress color="inherit" />
-                                                ) : (
-                                                    <img
-                                                        src={bannerFiles.previews[index]}
-                                                        alt="Banner Image"
-                                                        className="w-full h-full object-cover rounded-md"
-                                                    />
-                                                )}
+                                    {bannerFiles.uploadedFiles.length > 0 &&
+                                        bannerFiles.uploadedFiles.map((image, index) => (
+                                            <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                                                {/* Remove Button */}
+                                                <span
+                                                    className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                                                    onClick={() => handleRemoveBannerImage(index)}
+                                                    aria-label="Remove Image"
+                                                >
+                                                    <IoClose className="text-[15px] text-red-600" />
+                                                </span>
+
+                                                {/* Image Preview */}
+                                                <div className="h-full overflow-hidden">
+                                                    {isLoading3 ? (
+                                                        <CircularProgress color="inherit" />
+                                                    ) : (
+                                                        <img
+                                                            src={bannerFiles.previews[index]}
+                                                            alt="Banner Image"
+                                                            className="w-full h-full object-cover rounded-md"
+                                                        />
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
 
-                                {/* Upload Box */}
-                                <div className={bannerFiles.uploadedFiles.length > 0 ? "col-span-1" : "col-span-8"}>
-                                    <UploadBox
-                                        multiple={false}
-                                        onFileChange={handleBannerFileChange} // Pass the banner file handler
-                                    />
+                                    {/* Upload Box should be in the same row */}
+                                    {(multiple2 || bannerFiles.uploadedFiles.length === 0) && (
+                                        <div className={`h-[150px] w-full ${bannerFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                                            <UploadBox multiple={multiple2} onFileChange={handleBannerFileChange} />
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* File Status */}
                                 <p className="text-sm mt-2 text-gray-600 col-span-full">
                                     {bannerFiles.uploadedFiles.length > 0
-                                        ? `Files uploaded: ${bannerFiles.uploadedFiles.length}`
-                                        : "No files uploaded yet."}
+                                        ? `${bannerFiles.uploadedFiles.length} product banner photo${bannerFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload`
+                                        : "No product banner photo uploaded yet."}
                                 </p>
                             </div>
                         </div>
-                    )}
-                </div>
-
-
+                    </>
+                )}
 
 
                 <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
                     <Button
                         type="reset"
                         onClick={handleDiscard}
-                        className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                        className='!bg-red-500 !capitalize !text-white !p-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2 '
                     >
-                        <RiResetLeftFill className='text-[20px]' />Cancel
+                        <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
                     </Button>
                     {
                         productIdNo === undefined ? (
-                            <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                            <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} !capitalize !p-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                                 {
-                                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                                 }
                             </Button>
                         ) : (
-                            <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                            <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !p-5 w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                 {
-                                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
+                                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                                 }
                             </Button>
                         )

@@ -19,6 +19,7 @@ const AddHomeSlide = () => {
   const [isLoading2, setIsLoading2] = useState(false);
   // const [homeSlideIdNo, setHomeSlideIdNo] = useState(null);
   const [homeSlideIdNo, setHomeSlideIdNo] = useState(undefined);
+  const [multiple, setMultiple] = useState(false);  // Default: Single upload
 
   // Consolidated states for product and banner files
   const [homeSlideFiles, setHomeSlideFiles] = useState({
@@ -91,10 +92,10 @@ const AddHomeSlide = () => {
 
   useEffect(() => {
     fetchDataFromApi("/api/homeSlides").then((res) => {
-        console.log(res?.data);
-        context?.setHomeSlideData(res?.data);
+      console.log(res?.data);
+      context?.setHomeSlideData(res?.data);
     })
-}, [context?.setHomeSlideData, context?.isReducer]);
+  }, [context?.setHomeSlideData, context?.isReducer]);
 
   // Effect to reset removed files when panel closes
   useEffect(() => {
@@ -173,33 +174,33 @@ const AddHomeSlide = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (homeSlideFiles.uploadedFiles.length === 0) {
       return toast.error("Please upload at least one banner image.");
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const formData = new FormData();
-  
+
       // Append all uploaded files
       homeSlideFiles.uploadedFiles.forEach((file) => {
         formData.append("images", file); // Match this to your backend expectation
       });
-  
+
       // Append any other form fields if needed
       Object.keys(formFields).forEach((key) => {
         if (key !== "images") { // Skip images since we're handling them separately
           formData.append(key, formFields[key]);
         }
       });
-  
+
       // Debug FormData contents
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-      
+
       // ✅ Submit the request WITH FORMDATA
       await toast.promise(
         postData(`/api/homeSlides/add-homeSlide`, formData), // Send formData instead of formFields
@@ -325,9 +326,9 @@ const AddHomeSlide = () => {
         <form action="#"
           onSubmit={handleFormSubmit}
           className='form py-3'>
-          <h3 className='text-[24px] font-bold mb-2'>Create Home Slide Banner</h3>
+          <h3 className='text-[20px] sm:text-[24px] font-bold mb-2'>{homeSlideIdNo === undefined ? ("Create ") : ("Update ")}Home Slide Banner</h3>
 
-          <h3 className="text-[18px] font-bold mb-2">Media & Images</h3>
+          <h3 className="text-[16px] sm:text-[18px] font-bold mb-2">Media & Images</h3>
 
           {/* <div className="grid grid-cols-8 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
             <span className='opacity-50 col-span-full text-[14px]'>Choose a banner photo or simply drag and drop</span>
@@ -379,70 +380,63 @@ const AddHomeSlide = () => {
           </div> */}
 
           <div className="border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
-            <span className='opacity-50 text-[14px]'>
-              {homeSlideFiles.uploadedFiles.length > 0
-                ? "Banner photo uploaded"
-                : "Choose a banner photo or simply drag and drop"}
+            <span className="opacity-50 col-span-full text-[14px]">
+              Choose a banner photo or simply drag and drop
             </span>
 
-            {homeSlideFiles.uploadedFiles.length > 0 ? (
-              <div className="mt-2 border p-2 rounded-md flex flex-col items-center bg-white h-[150px] w-full relative">
-                {/* Remove Button */}
-                <span
-                  className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
-                  onClick={() => handleRemoveImage(0)}
-                  aria-label="Remove Image"
-                >
-                  <IoClose className="text-[15px] text-red-600" />
-                </span>
+            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+              {/* Uploaded Images */}
+              {homeSlideFiles.uploadedFiles.length > 0 &&
+                homeSlideFiles.previews.map((preview, index) => (
+                  <div key={index} className="relative border p-2 rounded-md bg-white h-[150px] w-full">
+                    {/* Remove Button */}
+                    <span
+                      className="absolute -top-[5px] -right-[5px] bg-white w-[15px] h-[15px] rounded-full border border-red-600 flex items-center justify-center cursor-pointer hover:scale-125 transition-all"
+                      onClick={() => handleRemoveImage(index)}
+                      aria-label="Remove Image"
+                    >
+                      <IoClose className="text-[15px] text-red-600" />
+                    </span>
 
-                {/* Image Preview */}
-                <div className="w-full h-full overflow-hidden">
-                  <img
-                    src={homeSlideFiles.previews[0]}
-                    alt={`Uploaded file: ${homeSlideFiles.uploadedFiles[0].name}`}
-                    className="w-full h-full object-cover rounded-md"
-                  />
+                    {/* Image Preview */}
+                    <div className="h-full overflow-hidden">
+                      <img
+                        src={preview}
+                        alt={`Uploaded file ${index}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                  </div>
+                ))}
+
+              {/* Upload Box should be in the same row */}
+              {(multiple || homeSlideFiles.uploadedFiles.length === 0) && (
+                <div className={`h-[150px] w-full ${homeSlideFiles.uploadedFiles.length > 0 ? "" : "col-span-8"}`}>
+                  <UploadBox multiple={multiple} onFileChange={handleHomeSlideFileChange} />
                 </div>
-              </div>
-            ) : (
-              <div className="mt-2">
-                <UploadBox multiple={false} onFileChange={handleHomeSlideFileChange} />
-              </div>
-            )}
+              )}
+            </div>
 
-            <p className="text-sm mt-2 text-gray-600">
+            <p className="text-sm mt-2 text-gray-600 col-span-full">
               {homeSlideFiles.uploadedFiles.length > 0
-                ? "Banner photo uploaded"
+                ? `${homeSlideFiles.uploadedFiles.length} banner photo${homeSlideFiles.uploadedFiles.length > 1 ? "s" : ""} ready for upload`
                 : "No banner photo uploaded yet."}
             </p>
           </div>
 
           <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
 
-            <Button
-              type="reset"
-              onClick={handleDiscard}
-              className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
-            >
-              <RiResetLeftFill className='text-[20px]' />Cancel
-            </Button>
+            <Button type="reset" onClick={handleDiscard} className='!capitalize !bg-red-500 !text-white !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2 '><RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel</Button>
+            {homeSlideIdNo === undefined ? (
+              <Button type='submit' className={`${isLoading ? "custom-btn-disabled" : "custom-btn"} !capitalize !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                {isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>}
+              </Button>
+            ) : (
+              <Button type='submit' className={`${isLoading ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                {isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>}
+              </Button>
+            )}
 
-            {
-              homeSlideIdNo === undefined ? (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
-                  {
-                    isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
-                  }
-                </Button>
-              ) : (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
-                  {
-                    isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
-                  }
-                </Button>
-              )
-            }
           </div>
         </form>
       </section>

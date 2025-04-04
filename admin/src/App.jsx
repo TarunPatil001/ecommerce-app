@@ -535,7 +535,7 @@ function App() {
               </Typography>
             </Toolbar>
           </AppBar>
-          <div className='mt-5 p-4'>
+          <div className='mt-5 pt-4 md:p-4'>
 
             {isOpenFullScreenPanel?.model === "Product Details" && <AddProduct />}
 

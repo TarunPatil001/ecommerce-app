@@ -150,6 +150,7 @@ const AddSubCategory = () => {
       parentCategoryName: null,
       parentCategoryId: null,
     });
+    context.setIsOpenFullScreenPanel({ open: false, model: 'Sub-Category Details' })
   };
 
   const handleResetCategory2 = () => {
@@ -168,13 +169,13 @@ const AddSubCategory = () => {
           action="#"
           onSubmit={handleFormSubmit}
           className='form py-3'>
-          <h3 className='text-[24px] font-bold mb-2'>Create New Sub-Category</h3>
+          <h3 className='text-[20px] sm:text-[24px] font-bold mb-2'>Create New Sub-Category</h3>
 
-          <div className="flex flex-row items-center gap-5 mb-2">
-            <h3 className='text-[18px] font-bold'>Basic Information(Sub-Category)</h3>
-            <span className='text-gray-400'><b>Note: </b>Categories Levels (Parent Level / 2<sup>nd</sup> Level / 3<sup>rd</sup> Level)</span>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mb-2">
+            <h3 className='text-[16px] sm:text-[18px] font-bold'>Basic Information(Sub-Category)</h3>
+            <span className='text-gray-400 text-[16px] sm:text-[18px]'><b>Note: </b>Categories Levels (Parent Level / 2<sup>nd</sup> Level / 3<sup>rd</sup> Level)</span>
           </div>
-          <div className="grid grid-cols-2 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
             <div className='col col-span-full'>
               <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Sub-Category Name</h3>
 
@@ -214,7 +215,7 @@ const AddSubCategory = () => {
             <div className='col'>
               <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Parent Category(2<sup>nd</sup> Level Sub-Category)</h3>
 
-              <div className='flex gap-2'>
+              <div className='flex flex-wrap sm:flex-nowrap gap-2'>
 
                 <Select
                   labelId="productCategoryDropDownLabel2"
@@ -252,16 +253,16 @@ const AddSubCategory = () => {
               <Button
                 type="reset"
                 onClick={handleDiscard}
-                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
+                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
               >
                 {
-                  isLoadingReset1 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[20px]' />Discard</>
+                  isLoadingReset1 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel</>
                 }
               </Button>
 
-              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
+              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
                 {
-                  isLoadingSave1 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                  isLoadingSave1 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                 }
               </Button>
             </div>

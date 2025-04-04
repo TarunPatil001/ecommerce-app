@@ -373,10 +373,10 @@ const AddBlog = () => {
                     action="#"
                     onSubmit={handleFormSubmit}
                     className='form py-3'>
-                    <h3 className='text-[24px] font-bold mb-2'>{!blogIdNo ? "Create " : "Update "}Blog</h3>
+                    <h3 className='text-[20px] sm:text-[24px] font-bold mb-2'>{!blogIdNo ? "Create " : "Update "}Blog</h3>
 
-                    <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
-                    <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                    <h3 className='text-[16px] sm:text-[18px] font-bold mb-2'>Basic Information</h3>
+                    <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 mb-4">
                         <div className='col col-span-full'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Blog Title</h3>
                             <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Blog heading' name="title" ref={titleInputRef} value={formFields?.title || ''} onChange={onChangeInput} />
@@ -409,7 +409,7 @@ const AddBlog = () => {
                             {blogFiles.uploadedFiles.length > 0 ? "Blog photo uploaded" : "Choose a blog photo or simply drag and drop"}
                         </span>
 
-                        <div className="mt-2 grid grid-cols-5 gap-2 items-center">
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 items-center">
                             {/* Uploaded Images */}
                             {blogFiles.uploadedFiles.length > 0 &&
                                 blogFiles.previews.map((image, index) => (
@@ -443,27 +443,27 @@ const AddBlog = () => {
                     </div>
 
 
-                    <div className='!overflow-x-hidden w-full h-[70px] fixed bottom-0 right-0 bg-white flex items-center justify-end px-10 gap-4 z-[49] border-t border-[rgba(0,0,0,0.1)] custom-shadow'>
+                    <div className="!sticky !bottom-0 !left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4">
 
                         <Button
                             type="reset"
                             onClick={handleDiscard}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                            className='!bg-red-500 !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
                         >
-                            <RiResetLeftFill className='text-[20px]' />Cancel
+                            <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
                         </Button>
 
                         {
                             blogIdNo === undefined ? (
-                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                                     {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                                     }
                                 </Button>
                             ) : (
-                                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                     {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
+                                        isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                                     }
                                 </Button>
                             )

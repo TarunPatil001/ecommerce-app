@@ -186,16 +186,16 @@ const BannersV1List = () => {
 
     return (
         <>
-            <div className='flex items-center justify-between px-5 pt-3'>
-                <h2 className='text-[20px] font-bold'>Banners List <span className="font-normal text-[12px]">Material UI</span></h2>
-                <div className='col w-[25%] ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'BannerV1 Details' })}><GoPlus className='text-[20px]' />Add Banner V1</Button>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2 justify-between pt-3 mt-14'>
+                <h2 className='text-[20px] font-bold'>Banners List <span className="font-normal text-[12px]">MUI</span></h2>
+                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
+                    <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize w-full' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'BannerV1 Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Banner V1</Button>
                 </div>
             </div>
 
             <div className="card my-4 bg-white border rounded-md px-1 pt-1">
 
-                <TableContainer className='max-h-[440px] customScroll'>
+                <TableContainer className='max-h-[600px] sm:max-h-[440px] customScroll'>
                     <Table stickyHeader aria-label="sticky table">
 
                         <TableHead>
@@ -228,7 +228,7 @@ const BannersV1List = () => {
                                                 <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>
                                             <TableCell width={300}>
-                                                <div className="flex items-start gap-4 w-[250px] h-[132px]">
+                                                <div className="flex items-start gap-4 w-[200px] h-[105px] sm:w-[250px] sm:h-[132px]">
                                                     <div className='img w-full h-full overflow-hidden rounded-md shadow-md group'>
                                                         <LazyLoadImage
                                                             alt="homeSlide_img"
@@ -284,9 +284,9 @@ const BannersV1List = () => {
                         <Button
                             type="reset"
                             onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                            className='!bg-red-500 !text-white !capitalize w-auto !px-5 h-[40px] flex items-center justify-center gap-2'
                         >
-                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                            <RiDeleteBin6Line className='text-[18px] hidden sm:block' />Delete
                         </Button>
                     </div>
 
@@ -300,6 +300,7 @@ const BannersV1List = () => {
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    className='customScroll'
                 />
 
             </div>

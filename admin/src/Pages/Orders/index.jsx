@@ -9,6 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { MyContext } from '../../App';
+import { useLocation } from 'react-router-dom';
 
 const Orders = () => {
 
@@ -160,6 +161,9 @@ const Orders = () => {
     const [rowsPerPage, setRowsPerPage] = useState(4);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const location = useLocation();
+    const isHome = location.pathname === "/";
+
     const handleChange = (event, itemId) => {
         const newStatus = event.target.value;
 
@@ -258,10 +262,10 @@ const Orders = () => {
 
 
     return (
-        <div className="card my-4 bg-white border rounded-md px-1 min-h-[600px] h-full w-auto relative">
-            <div className='flex items-center justify-between p-5'>
+        <div className={`card my-4 ${isHome ? "" : "mt-14"} bg-white border rounded-md px-1 h-auto w-auto relative`}>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 gap-2'>
                 <h2 className='text-[20px] font-bold'>Recent Orders</h2>
-                <div className='w-[40%]'>
+                <div className='w-full sm:w-[60%] md:w-[50%]'>
                     <SearchBox
                         searchName="orders"
                         searchQuery={searchQuery}
@@ -674,27 +678,18 @@ const Orders = () => {
         </table> */}
             </div >
 
-            {/* <div className="mt-4 p-4 flex items-center justify-center">
-                <Pagination
-                    count={Math.ceil(totalOrders / rowsPerPage)} // Updates dynamically with search results
-                    page={pageOrder}
-                    onChange={(event, value) => setPageOrder(value)} // Change page properly
-                    showFirstButton
-                    showLastButton
-                />
-            </div> */}
-
-
-
-            < div className="mt-4 p-4 flex items-center justify-center " >
-                <Pagination
-                    count={Math.ceil(filteredOrders.length / rowsPerPage)}
-                    page={pageOrder}
-                    onChange={(event, value) => setPageOrder(value)}
-                    showFirstButton
-                    showLastButton
-                />
-            </div >
+            <div className="p-4 flex items-center justify-center overflow-x-auto w-full">
+                <div className="customScroll flex overflow-x-auto w-max py-5">
+                    <Pagination
+                        count={Math.ceil(filteredOrders.length / rowsPerPage)}
+                        page={pageOrder}
+                        onChange={(event, value) => setPageOrder(value)}
+                        showFirstButton
+                        showLastButton
+                        className="min-w-max"
+                    />
+                </div>
+            </div>
 
         </div >
     )

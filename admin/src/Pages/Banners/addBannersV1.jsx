@@ -644,10 +644,10 @@ const AddBannersV1 = () => {
                     onSubmit={handleFormSubmit}
                     className='form py-3'>
                     {/* <h3 className='text-[24px] font-bold mb-2'>{!bannerIdNo ? "Create New Banner" : "Edit"}</h3> */}
-                    <h3 className='text-[24px] font-bold mb-2'>{bannerIdNo === undefined ? ("Create ") : ("Update ")}Banner</h3>
+                    <h3 className='text-[20px] sm:text-[24px] font-bold mb-2'>{bannerIdNo === undefined ? ("Create ") : ("Update ")}Banner</h3>
 
-                    <h3 className='text-[18px] font-bold mb-2'>Basic Information</h3>
-                    <div className="grid grid-cols-3 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 pt-1 mb-4">
+                    <h3 className='text-[16px] sm:text-[18px] font-bold mb-2'>Basic Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 border-2 border-dashed border-[rgba(0,0,0,0.1)] rounded-md p-5 mb-4">
                         <div className='col'>
                             <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Banner Title</h3>
                             <input type="text" className='w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-sm' placeholder='Content to display on banner...' name="bannerTitle" ref={nameInputRef} value={formFields?.bannerTitle || ''} onChange={onChangeInput} />
@@ -828,7 +828,7 @@ const AddBannersV1 = () => {
                                 : "Choose a banner image or simply drag and drop"}
                         </span>
 
-                        <div className="mt-2 grid grid-cols-5 gap-2 items-center">
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 items-center">
                             {/* Uploaded Images */}
                             {bannerFiles.uploadedFiles.length > 0 &&
                                 bannerFiles.previews.map((preview, index) => (
@@ -880,22 +880,22 @@ const AddBannersV1 = () => {
                         <Button
                             type="reset"
                             onClick={handleDiscard}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                            className='!bg-red-500 !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
                         >
-                            <RiResetLeftFill className='text-[20px]' />Cancel
+                            <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
                         </Button>
 
                         {
                             bannerIdNo === undefined ? (
-                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                                     {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
+                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                                     }
                                 </Button>
                             ) : (
-                                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                     {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
+                                        isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                                     }
                                 </Button>
                             )

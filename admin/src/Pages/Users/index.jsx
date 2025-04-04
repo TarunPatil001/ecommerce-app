@@ -218,14 +218,14 @@ const Users = () => {
 
     return (
         <>
-            <div className="card my-4 bg-white border rounded-md px-1 pt-5">
+            <div className="card my-4 mt-14 bg-white border rounded-md px-1 pt-5">
 
-                <div className='flex items-center w-full px-5 justify-between'>
-                    <div className='col w-[40%]'>
-                        <h2 className='text-[20px] font-bold'>Users List <span className="font-normal text-[12px]">Material UI</span></h2>
+                <div className='flex flex-col sm:flex-row items-center gap-2 w-full px-5 justify-between'>
+                    <div className='col w-[100%] sm:w-[40%]'>
+                        <h2 className='text-[20px] font-bold w-full'>Users List <span className="font-normal text-[12px]">MUI</span></h2>
                     </div>
 
-                    <div className='w-[40%]'>
+                    <div className='w-[100%] sm:w-[40%]'>
                         <SearchBox
                             searchName="orders"
                             searchQuery={searchQuery}
@@ -330,9 +330,9 @@ const Users = () => {
                         <Button
                             type="reset"
                             onClick={(e) => handleDeleteSelectedUsers(e, selectedRows)}
-                            className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                            className='!bg-red-500 !text-white !capitalize w-auto !px-5 h-[40px] flex items-center justify-center gap-2'
                         >
-                            <RiDeleteBin6Line className='text-[20px]' />Delete
+                            <RiDeleteBin6Line className='text-[18px] hidden sm:block' />Delete
                         </Button>
                     </div>
 
@@ -350,6 +350,7 @@ const Users = () => {
                             setRowsPerPage(parseInt(event.target.value, 10));
                             setPageOrder(1);
                         }}
+                        className='customScroll'
                     />
                 )}
 

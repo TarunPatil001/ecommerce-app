@@ -48,35 +48,35 @@ const Sidebar = () => {
     "/logout": "Logout",
   };
 
-// Sync the selected menu based on the current path
-useEffect(() => {
-  const currentPath = location.pathname;
-  const currentMenu = menuMapping[currentPath] || "Dashboard";
-  setSelectedMenu(currentMenu);
+  // Sync the selected menu based on the current path
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentMenu = menuMapping[currentPath] || "Dashboard";
+    setSelectedMenu(currentMenu);
 
-  if (context?.windowWidth < 992 && context?.isSidebarOpen === false) {
-    
-    // Close all submenus first
-    setSubMenuIndex1(false);
-    setSubMenuIndex2(false);
-    setSubMenuIndex3(false);
-    setSubMenuIndex4(false);
-    setSubMenuIndex5(false);
-  }
-    
-  // Open only the relevant submenu
-  if (currentMenu.includes("Home Banners")) {
-    setSubMenuIndex1(true);
-  } else if (currentMenu.includes("Product")) {
-    setSubMenuIndex2(true);
-  } else if (currentMenu.includes("Categories")) {
-    setSubMenuIndex3(true);
-  } else if (currentMenu.includes("Banners")) {
-    setSubMenuIndex4(true);
-  } else if (currentMenu.includes("Blogs")) {
-    setSubMenuIndex5(true);
-  }
-}, [location.pathname, context?.windowWidth, context?.isSidebarOpen]);
+    if (context?.windowWidth < 992 && context?.isSidebarOpen === false) {
+
+      // Close all submenus first
+      setSubMenuIndex1(false);
+      setSubMenuIndex2(false);
+      setSubMenuIndex3(false);
+      setSubMenuIndex4(false);
+      setSubMenuIndex5(false);
+    }
+
+    // Open only the relevant submenu
+    if (currentMenu.includes("Home Banners")) {
+      setSubMenuIndex1(true);
+    } else if (currentMenu.includes("Product")) {
+      setSubMenuIndex2(true);
+    } else if (currentMenu.includes("Categories")) {
+      setSubMenuIndex3(true);
+    } else if (currentMenu.includes("Banners")) {
+      setSubMenuIndex4(true);
+    } else if (currentMenu.includes("Blogs")) {
+      setSubMenuIndex5(true);
+    }
+  }, [location.pathname, context?.windowWidth, context?.isSidebarOpen]);
 
 
   const logout = () => {
@@ -110,11 +110,18 @@ useEffect(() => {
           </li>
 
           <li>
+            <Link to="/profile">
+              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Profile' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Profile'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><BiSolidUserDetail className='text-[25px]' />
+                <span>Profile</span>
+              </Button>
+            </Link>
+          </li>
+
+          <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Home Banners List' || selectedMenu === 'Add Home Banners' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex1(!subMenuIndex1) }}><TbSlideshow className='text-[25px]' />
               <span>Home Slides</span>
               <span className={`ml-auto w-[30px] h-[30px] flex !items-center !justify-center transform transition-transform duration-300 ${subMenuIndex1 ? "-rotate-180" : "rotate-0"}`}><FaAngleDown /></span>
             </Button>
-
 
             <Collapse isOpened={subMenuIndex1}>
               <ul className='w-full'>
@@ -134,24 +141,53 @@ useEffect(() => {
                 </li>
               </ul>
             </Collapse>
-
           </li>
 
-          <li>
-            <Link to="/users">
-              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Users' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Users'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><LuUsers className='text-[25px]' />
-                <span>Users</span>
-              </Button>
-            </Link>
-          </li>
 
           <li>
-            <Link to="/profile">
-              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Profile' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Profile'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><BiSolidUserDetail className='text-[25px]' />
-                <span>Profile</span>
-              </Button>
-            </Link>
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Categories List' || selectedMenu === 'Add a Category' || selectedMenu === 'Sub-Categories List' || selectedMenu === 'Add a Sub-Category' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex3(!subMenuIndex3) }}><TbCategory className='text-[25px]' />
+              <span>Categories</span>
+              <span className={`ml-auto w-[30px] h-[30px] flex items-center justify-center transform transition-transform duration-300 ${subMenuIndex3 ? "-rotate-180" : "rotate-0"}`}><FaAngleDown /></span>
+            </Button>
+
+            <Collapse isOpened={subMenuIndex3}>
+              <ul className='w-full'>
+                <li className='w-full'>
+                  <Link to="/category/list">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Categories List'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
+                      <GoDotFill className={`${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Categories List</span>
+                    </Button>
+                  </Link>
+                </li>
+                <li className='w-full'>
+                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => { context.setIsOpenFullScreenPanel({ open: true, model: "Category Details" }); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add a Category</span>
+                  </Button>
+                </li>
+                <li className='w-full'>
+                  <Link to="/subCategory/list">
+                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Sub-Categories List'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
+                      <GoDotFill className={`${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
+                      <span>Sub-Categories List</span>
+                    </Button>
+                  </Link>
+                </li>
+                <li className='w-full'>
+                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => { context.setIsOpenFullScreenPanel({ open: true, model: "Sub-Category Details" }); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
+                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
+                    <span>Add a Sub-Category</span>
+                  </Button>
+                </li>
+              </ul>
+            </Collapse>
           </li>
+
+
+
+
+
 
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Product List' || selectedMenu === 'Product Upload' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex2(!subMenuIndex2) }}><RiProductHuntLine className='text-[25px]' />
@@ -208,55 +244,6 @@ useEffect(() => {
             </Collapse>
           </li>
 
-          <li>
-            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Categories List' || selectedMenu === 'Add a Category' || selectedMenu === 'Sub-Categories List' || selectedMenu === 'Add a Sub-Category' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex3(!subMenuIndex3) }}><TbCategory className='text-[25px]' />
-              <span>Categories</span>
-              <span className={`ml-auto w-[30px] h-[30px] flex items-center justify-center transform transition-transform duration-300 ${subMenuIndex3 ? "-rotate-180" : "rotate-0"}`}><FaAngleDown /></span>
-            </Button>
-
-            <Collapse isOpened={subMenuIndex3}>
-              <ul className='w-full'>
-                <li className='w-full'>
-                  <Link to="/category/list">
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Categories List'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
-                      <GoDotFill className={`${selectedMenu === 'Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
-                      <span>Categories List</span>
-                    </Button>
-                  </Link>
-                </li>
-                <li className='w-full'>
-                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => { context.setIsOpenFullScreenPanel({ open: true, model: "Category Details" }); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
-                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                    <span>Add a Category</span>
-                  </Button>
-                </li>
-                <li className='w-full'>
-                  <Link to="/subCategory/list">
-                    <Button className={`!w-full !capitalize !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Sub-Categories List'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
-                      <GoDotFill className={`${selectedMenu === 'Sub-Categories List' ? "!text-[var(--text-active)]" : "text-[rgba(0,0,0,0.3)]"}`} />
-                      <span>Sub-Categories List</span>
-                    </Button>
-                  </Link>
-                </li>
-                <li className='w-full'>
-                  <Button className={`!w-full !normal-case !pl-10 flex !justify-start !items-center gap-3 !text-[13px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)]`} onClick={() => { context.setIsOpenFullScreenPanel({ open: true, model: "Sub-Category Details" }); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}>
-                    <GoDotFill className={`text-[rgba(0,0,0,0.3)]`} />
-                    <span>Add a Sub-Category</span>
-                  </Button>
-                </li>
-              </ul>
-            </Collapse>
-
-          </li>
-
-          <li>
-            <Link to="/orders">
-              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Orders' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Orders'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><IoBagCheckOutline className='text-[25px]' />
-                <span>Orders</span>
-              </Button>
-            </Link>
-          </li>
-
 
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'BannerV1 List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex4(!subMenuIndex4) }}><PiSlideshowLight className='text-[25px]' />
@@ -300,8 +287,9 @@ useEffect(() => {
 
               </ul>
             </Collapse>
-
           </li>
+
+
 
 
 
@@ -334,8 +322,27 @@ useEffect(() => {
             </Collapse>
           </li>
 
+
           <li>
-            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""} pointer-events-none sm:pointer-events-auto`} onClick={() => { setSelectedMenu('Logout'); logout(); }}><MdOutlineLogout className='text-[25px]' />
+            <Link to="/users">
+              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Users' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Users'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><LuUsers className='text-[25px]' />
+                <span>Users</span>
+              </Button>
+            </Link>
+          </li>
+
+
+          <li>
+            <Link to="/orders">
+              <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Orders' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Orders'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><IoBagCheckOutline className='text-[25px]' />
+                <span>Orders</span>
+              </Button>
+            </Link>
+          </li>
+
+
+          <li>
+            <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Logout' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""} pointer-events-auto`} onClick={() => { setSelectedMenu('Logout'); logout(); }}><MdOutlineLogout className='text-[25px]' />
               <span>Logout</span>
             </Button>
           </li>

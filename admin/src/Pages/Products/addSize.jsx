@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
-    { id: 'productSize', label: 'PRODUCT Size', minWidth: 100, align: 'left' },
+    { id: 'productSize', label: 'PRODUCT SIZE', minWidth: 150, align: 'left' },
     { id: 'action', label: 'ACTION', minWidth: 130, align: 'left' },
 ];
 
@@ -292,16 +292,16 @@ const AddSize = () => {
                                     <Button
                                         type="reset"
                                         onClick={handleDiscard}
-                                        className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                                        className='!bg-red-500 !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
                                     >
-                                        <RiResetLeftFill className='text-[20px]' />Discard
+                                        <RiResetLeftFill className='text-[18px] hidden sm:block' />Discard
                                     </Button>
                                     <Button
                                         type='submit'
-                                        className={`w-[150px] h-[40px] flex items-center justify-center gap-2 ${sizeId ? (isLoading ? "custom-btn-update-disabled" : "custom-btn-update") : (isLoading ? "custom-btn-disabled" : "custom-btn")}`}
+                                        className={`!capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 ${sizeId ? (isLoading ? "custom-btn-update-disabled" : "custom-btn-update") : (isLoading ? "custom-btn-disabled" : "custom-btn")}`}
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? <CircularProgress color='inherit' /> : sizeId ? <><FiEdit className='text-[18px]' /> Update</> : <><IoIosSave className='text-[18px]' /> Create</>}
+                                        {isLoading ? <CircularProgress color='inherit' /> : sizeId ? <><FiEdit className='text-[18px] hidden sm:block' /> Update</> : <><IoIosSave className='text-[18px] hidden sm:block' /> Create</>}
                                     </Button>
                                 </div>
                             </div>
@@ -312,7 +312,7 @@ const AddSize = () => {
 
             <div className='card my-4 bg-white border rounded-md px-1 pt-1'>
                 <div className='customScroll relative rounded-md mt-5 pb-5'>
-                    <TableContainer className='customScroll mt-5'>
+                    <TableContainer className='customScroll overflow-x-scroll mt-5'>
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
                                 <TableRow>
@@ -391,9 +391,9 @@ const AddSize = () => {
                             <Button
                                 type="reset"
                                 onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
-                                className='!bg-red-500 !text-white w-[150px] h-[40px] flex items-center justify-center gap-2'
+                                className='!bg-red-500 !text-white !capitalize w-auto !px-5 h-[40px] flex items-center justify-center gap-2'
                             >
-                                <RiDeleteBin6Line className='text-[20px]' />Delete
+                                <RiDeleteBin6Line className='text-[18px] hidden sm:block' />Delete
                             </Button>
                         </div>
 
@@ -409,6 +409,7 @@ const AddSize = () => {
                         MenuProps={MenuProps}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
+                        className='customScroll'
                     />
 
                 </div>
