@@ -83,47 +83,135 @@ const ChangePassword = () => {
     };
 
     return (
-        <section className="bg-white w-full h-[100vh]">
-            <header className="w-full py-2 px-10 fixed top-5 left-0 flex items-center justify-between">
+        // <section className="bg-white w-full h-[100vh]">
+        //     <header className="w-full py-2 px-10 fixed top-5 left-0 flex items-center justify-between">
+        //         <Link to="/">
+        //             <img
+        //                 src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg"
+        //                 alt="Logo"
+        //                 className="w-[200px]"
+        //             />
+        //         </Link>
+        //         <div className="flex items-center gap-2">
+        //             <NavLink to="/sign-in">
+        //                 <Button className="!rounded-full flex items-center gap-1 !px-4 !py-1">
+        //                     <HiLogin className="rotate-180 text-[16px]" />
+        //                     Login
+        //                 </Button>
+        //             </NavLink>
+        //             <NavLink to="/sign-up">
+        //                 <Button className="!rounded-full flex items-center gap-1 !px-4 !py-1">
+        //                     <PiUserCirclePlusLight className="text-[16px]" />
+        //                     Sign Up
+        //                 </Button>
+        //             </NavLink>
+        //         </div>
+        //     </header>
+
+        //     <div className="loginBox card w-[600px] mx-auto pt-20 pb-20">
+        //         <h1 className="mt-10 text-[44px] font-bold text-center">
+        //             Welcome Back! <br />
+        //             Set Your New Password for Enhanced Security
+        //         </h1>
+
+        //         <form className="w-full px-8 mt-3" onSubmit={handleSubmit}>
+        //             {/* New Password Field */}
+        //             <div className="form-group mb-4">
+        //                 <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]">New Password</h4>
+        //                 <div className="relative w-full">
+        //                     <input
+        //                         type={isPasswordShow ? 'text' : 'password'}
+        //                         name="newPassword"
+        //                         placeholder="Enter your new password"
+        //                         className="mt-2 w-full h-[50px] px-4 text-[16px] border-2 rounded-md focus:outline-none"
+        //                         value={formFields.newPassword}
+        //                         ref={newPasswordRef}
+        //                         onChange={onChangeInput}
+        //                         disabled={isLoading}
+        //                     />
+        //                     <Button
+        //                         type="button"
+        //                         // className="!absolute top-[15px] right-[10px] z-50"
+        //                         className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+        //                         onClick={() => setIsPasswordShow(!isPasswordShow)}
+        //                         disabled={isLoading}
+        //                     >
+        //                         {isPasswordShow ? <FaRegEye /> : <FaRegEyeSlash />}
+        //                     </Button>
+        //                 </div>
+        //             </div>
+
+        //             {/* Confirm Password Field */}
+        //             <div className="form-group mb-4">
+        //                 <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]">Confirm Password</h4>
+        //                 <div className="relative w-full">
+        //                     <input
+        //                         type={isConfirmPasswordShow ? 'text' : 'password'}
+        //                         name="confirmPassword"
+        //                         placeholder="Enter your confirm password"
+        //                         className="mt-2 w-full h-[50px] px-4 text-[16px] border-2 rounded-md focus:outline-none"
+        //                         value={formFields.confirmPassword}
+        //                         ref={confirmPasswordRef}
+        //                         onChange={onChangeInput}
+        //                         disabled={isLoading}
+        //                     />
+        //                     <Button
+        //                         type="button"
+        //                         className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+        //                         onClick={() => setIsConfirmPasswordShow(!isConfirmPasswordShow)}
+        //                         disabled={isLoading}
+        //                     >
+        //                         {isConfirmPasswordShow ? <FaRegEye /> : <FaRegEyeSlash />}
+        //                     </Button>
+        //                 </div>
+        //             </div>
+
+        //             {/* Submit Button */}
+        //             <Button
+        //                 type="submit"
+        //                 className={`${isLoading ? 'custom-btn-disabled' : 'custom-btn'
+        //                     } !w-full !text-[15px] !mb-4`}
+        //                 disabled={isLoading}
+        //             >
+        //                 {isLoading ? <CircularProgress color="inherit" size={24} /> : 'Reset Password'}
+        //             </Button>
+        //         </form>
+
+        //     </div>
+        // </section>
+
+        <section className='bg-white w-full min-h-screen'>
+            <img src="/pattern.webp" alt="bg_img" className='w-full h-full fixed top-0 left-0 opacity-5' />
+            <header className='w-full py-2 px-10 fixed top-0 left-0 !bg-blue-200 flex items-center justify-center sm:justify-between !z-[99]'>
                 <Link to="/">
-                    <img
-                        src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg"
-                        alt="Logo"
-                        className="w-[200px]"
-                    />
+                    <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="" className='w-[150px] sm:w-[200px]' />
                 </Link>
-                <div className="flex items-center gap-2">
-                    <NavLink to="/sign-in">
-                        <Button className="!rounded-full flex items-center gap-1 !px-4 !py-1">
-                            <HiLogin className="rotate-180 text-[16px]" />
-                            Login
-                        </Button>
+                <div className='hidden sm:flex items-center gap-2'>
+                    <NavLink to="/sign-in" exact={true} activeClassName="isActive">
+                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] shadow flex items-center gap-1 !capitalize !px-4 !py-1'><HiLogin className='rotate-180 text-[16px]' />Sign In</Button>
                     </NavLink>
-                    <NavLink to="/sign-up">
-                        <Button className="!rounded-full flex items-center gap-1 !px-4 !py-1">
-                            <PiUserCirclePlusLight className="text-[16px]" />
-                            Sign Up
-                        </Button>
+                    <NavLink to="/sign-up" exact={true} activeClassName="isActive">
+                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] shadow flex items-center gap-1 !capitalize !px-4 !py-1 '><PiUserCirclePlusLight className='text-[16px]' />Sign Up</Button>
                     </NavLink>
                 </div>
             </header>
 
-            <div className="loginBox card w-[600px] mx-auto pt-20 pb-20">
-                <h1 className="mt-10 text-[44px] font-bold text-center">
+            <div className="loginBox card w-full sm:w-[600px] h-auto mx-auto pt-24 relative z-50 pb-20 px-4">
+                <h1 className="mt-10 text-[24px] sm:text-[34px] md:text-[44px] font-bold text-center leading-[34px] sm:leading-[44px] md:leading-[54px]">
                     Welcome Back! <br />
                     Set Your New Password for Enhanced Security
                 </h1>
 
-                <form className="w-full px-8 mt-3" onSubmit={handleSubmit}>
+                <form className="w-full mt-6" onSubmit={handleSubmit}>
                     {/* New Password Field */}
                     <div className="form-group mb-4">
-                        <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]">New Password</h4>
+                        <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium sm:text-[16px] text-sm">New Password</h4>
                         <div className="relative w-full">
                             <input
                                 type={isPasswordShow ? 'text' : 'password'}
                                 name="newPassword"
                                 placeholder="Enter your new password"
-                                className="mt-2 w-full h-[50px] px-4 text-[16px] border-2 rounded-md focus:outline-none"
+                                className="mt-2 w-full h-[50px] px-4 sm:text-[16px] text-sm border-2 rounded-md focus:outline-none"
                                 value={formFields.newPassword}
                                 ref={newPasswordRef}
                                 onChange={onChangeInput}
@@ -131,8 +219,7 @@ const ChangePassword = () => {
                             />
                             <Button
                                 type="button"
-                                // className="!absolute top-[15px] right-[10px] z-50"
-                                className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+                                className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[20px] !text-[rgba(0,0,0,0.7)]"
                                 onClick={() => setIsPasswordShow(!isPasswordShow)}
                                 disabled={isLoading}
                             >
@@ -143,13 +230,13 @@ const ChangePassword = () => {
 
                     {/* Confirm Password Field */}
                     <div className="form-group mb-4">
-                        <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium text-[16px]">Confirm Password</h4>
+                        <h4 className="mt-5 text-[rgba(0,0,0,0.7)] font-medium sm:text-[16px] text-sm">Confirm Password</h4>
                         <div className="relative w-full">
                             <input
                                 type={isConfirmPasswordShow ? 'text' : 'password'}
                                 name="confirmPassword"
                                 placeholder="Enter your confirm password"
-                                className="mt-2 w-full h-[50px] px-4 text-[16px] border-2 rounded-md focus:outline-none"
+                                className="mt-2 w-full h-[50px] px-4 sm:text-[16px] text-sm border-2 rounded-md focus:outline-none"
                                 value={formFields.confirmPassword}
                                 ref={confirmPasswordRef}
                                 onChange={onChangeInput}
@@ -157,7 +244,7 @@ const ChangePassword = () => {
                             />
                             <Button
                                 type="button"
-                                className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+                                className="!absolute top-[15px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[20px] !text-[rgba(0,0,0,0.7)]"
                                 onClick={() => setIsConfirmPasswordShow(!isConfirmPasswordShow)}
                                 disabled={isLoading}
                             >
@@ -169,16 +256,15 @@ const ChangePassword = () => {
                     {/* Submit Button */}
                     <Button
                         type="submit"
-                        className={`${isLoading ? 'custom-btn-disabled' : 'custom-btn'
-                            } !w-full !text-[15px] !mb-4`}
+                        className={`${isLoading ? 'custom-btn-disabled' : 'custom-btn'} !w-full !text-[15px] !mb-4 mt-6`}
                         disabled={isLoading}
                     >
                         {isLoading ? <CircularProgress color="inherit" size={24} /> : 'Reset Password'}
                     </Button>
                 </form>
-
             </div>
         </section>
+
     );
 };
 
