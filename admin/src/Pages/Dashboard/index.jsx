@@ -603,49 +603,52 @@ const Dashboard = () => {
   const getTotalUsersByYear = async () => {
     try {
       const res = await fetchDataFromApi(`/api/order/users`);
-      if (!res?.monthlyUsers) return;
-
+      if (!res?.monthlyUsers) return [];
+  
       const users = res.monthlyUsers.map(item => ({
-        name: item?.name,
-        Total_Users: (parseInt(item?.TotalUsers) || 0),
+        name: item?.name || 'Unknown',
+        Total_Users: parseInt(item?.TotalUsers) || 0,
       }));
-
+  
       setChartData(prevData => mergeChartData(prevData, users));
+      return users;
     } catch (error) {
       console.error("Error fetching users:", error);
+      return [];
     }
   };
-
+  
   const getTotalSalesByYear = async () => {
     try {
       const res = await fetchDataFromApi(`/api/order/sales`);
-      if (!res?.monthlySales) return;
-
+      if (!res?.monthlySales) return [];
+  
       const sales = res.monthlySales.map(item => ({
-        name: item?.name,
+        name: item?.name || 'Unknown',
         Total_Sales: parseInt(item?.TotalSales) || 0,
       }));
-
+  
       setChartData(prevData => mergeChartData(prevData, sales));
+      return sales;
     } catch (error) {
       console.error("Error fetching sales:", error);
+      return [];
     }
   };
-
-
+  
   // Merge sales and user data to prevent overriding existing values
-  const mergeChartData = (prevData, newData) => {
-    const dataMap = new Map(prevData.map(item => [item.name, item]));
-
+  const mergeChartData = (prevData = [], newData = []) => {
+    const dataMap = new Map(prevData.map(item => [item.name, { ...item }]));
+  
     newData.forEach(newItem => {
-      if (dataMap.has(newItem.name)) {
-        Object.assign(dataMap.get(newItem.name), newItem);
-      } else {
-        dataMap.set(newItem.name, newItem);
-      }
+      const existingItem = dataMap.get(newItem.name) || {};
+      dataMap.set(newItem.name, { ...existingItem, ...newItem });
     });
-
-    return Array.from(dataMap.values());
+  
+    return Array.from(dataMap.values()).sort((a, b) => {
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEPT', 'OCT', 'NOV', 'DEC'];
+      return months.indexOf(a.name) - months.indexOf(b.name);
+    });
   };
 
   // const handleAddStock = (productId, amount) => {

@@ -466,7 +466,12 @@ export const totalUsersController = async (request, response) => {
         });
 
     } catch (error) {
-        return response.status(500).json({ error: error.message });
+        return response.status(500).json({
+            message: error.message || "Internal Server Error",
+            error: true,
+            success: false,
+          });
+          
     }
 };
 
