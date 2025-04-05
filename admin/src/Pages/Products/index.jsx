@@ -1,5 +1,5 @@
 import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Rating, Select, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
 import { RiDeleteBin6Line, RiDownloadCloud2Line, RiResetLeftFill } from 'react-icons/ri'
 import { Link, useLocation, useNavigate, useNavigation, useParams } from 'react-router-dom'
@@ -331,19 +331,19 @@ const Products = () => {
 
 
 
-    const handleChangeCategoryFilterValue = (event) => {
-        setCategoryFilterValue(event.target.value);
-        setPage(0); // Reset to first page on category change
-    };
+    // const handleChangeCategoryFilterValue = (event) => {
+    //     setCategoryFilterValue(event.target.value);
+    //     setPage(0); // Reset to first page on category change
+    // };
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    // const handleChangePage = (event, newPage) => {
+    //     setPage(newPage);
+    // };
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
+    // const handleChangeRowsPerPage = (event) => {
+    //     setRowsPerPage(+event.target.value);
+    //     setPage(0);
+    // };
 
     const filteredProductData = categoryFilterValue
         ? productData.filter((product) => product.categoryName === categoryFilterValue)
@@ -467,6 +467,162 @@ const Products = () => {
     //     }
     // }, []);
 
+    const location = useLocation();
+    // const navigate = useNavigate();
+
+    const params = new URLSearchParams(location.search);
+    const initialSearch = params.get('search') || '';
+
+    const [searchQuery, setSearchQuery] = useState(initialSearch);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+
+    // 1. URL Synchronization Effect
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            const newParams = new URLSearchParams();
+            if (searchQuery.trim()) {
+                newParams.set('search', searchQuery.trim());
+            }
+            navigate({ search: newParams.toString() }, { replace: true });
+        }, 300);
+
+        return () => clearTimeout(delay);
+    }, [searchQuery, navigate]);
+
+    // 2. Enhanced Filtering Effect
+    useEffect(() => {
+        if (!productData?.length) return;
+      
+        const query = searchQuery.toLowerCase().trim();
+        
+        // Initialize filters
+        let minPrice = 0;
+        let maxPrice = Infinity;
+        let minRating = 0;
+        let maxRating = 5; // Assuming rating scale is 0-5
+        let searchTerm = query;
+      
+        // Enhanced pattern matching for all filter types
+        const filterPatterns = [
+          // Price filters
+          { 
+            regex: /(under|below|less than)\s*(\d+)/i, 
+            handler: (match) => { maxPrice = Number(match[2]); }
+          },
+          { 
+            regex: /(above|over|more than)\s*(\d+)/i, 
+            handler: (match) => { minPrice = Number(match[2]); }
+          },
+          { 
+            regex: /between\s*(\d+)\s*and\s*(\d+)/i, 
+            handler: (match) => { 
+              minPrice = Number(match[1]); 
+              maxPrice = Number(match[2]); 
+            }
+          },
+          
+          // Rating filters
+          { 
+            regex: /rating\s*(under|below|less than)\s*(\d*\.?\d+)/i, 
+            handler: (match) => { maxRating = Number(match[2]); }
+          },
+          { 
+            regex: /rating\s*(above|over|more than)\s*(\d*\.?\d+)/i, 
+            handler: (match) => { minRating = Number(match[2]); }
+          },
+          { 
+            regex: /rating\s*between\s*(\d*\.?\d+)\s*and\s*(\d*\.?\d+)/i, 
+            handler: (match) => { 
+              minRating = Number(match[1]); 
+              maxRating = Number(match[2]); 
+            }
+          },
+          { 
+            regex: /rating\s*(\d*\.?\d+)\s*to\s*(\d*\.?\d+)/i, 
+            handler: (match) => { 
+              minRating = Number(match[1]); 
+              maxRating = Number(match[2]); 
+            }
+          }
+        ];
+      
+        // Apply all filter patterns
+        filterPatterns.forEach(({ regex, handler }) => {
+          const match = query.match(regex);
+          if (match) {
+            handler(match);
+            searchTerm = searchTerm.replace(match[0], '').trim();
+          }
+        });
+      
+        // Filter products
+        const filtered = productData.filter(product => {
+          // Convert price to number safely
+          const productPrice = parseFloat(String(product.price).replace(/[^\d.]/g, '')) || 0;
+          const productRating = Number(product.rating) || 0;
+          
+          // Check all filters
+          const priceMatch = productPrice >= minPrice && productPrice <= maxPrice;
+          const ratingMatch = productRating >= minRating && productRating <= maxRating;
+      
+          // Check text search against all relevant fields
+          let textMatch = true;
+          if (searchTerm) {
+            const searchContent = [
+              product.name,
+              product.brand,
+              product.categoryName,
+              product.subCategoryName,
+              product.thirdSubCategoryName,
+              product.description
+            ]
+              .filter(Boolean)
+              .join(' ')
+              .toLowerCase();
+      
+            textMatch = searchContent.includes(searchTerm);
+          }
+      
+          return priceMatch && ratingMatch && textMatch;
+        });
+      
+        setFilteredProducts(filtered);
+          // Only reset page if search query changed meaningfully
+    if (searchQuery !== initialSearch) {
+        setPage(0);
+      }
+    }, [searchQuery, productData, initialSearch]);
+  
+    // Ensure page stays within valid bounds
+    useEffect(() => {
+      const maxPage = Math.max(0, Math.ceil(filteredProducts.length / rowsPerPage) - 1);
+      if (page > maxPage) {
+        setPage(maxPage);
+      }
+    }, [filteredProducts, rowsPerPage, page]);
+  
+    // Pagination handlers
+    const handleChangePage = (event, newPage) => {
+      setPage(newPage);
+    };
+  
+    const handleChangeRowsPerPage = (event) => {
+      const newRows = parseInt(event.target.value, 10);
+      setRowsPerPage(newRows);
+      setPage(0); // Reset to first page when page size changes
+    };
+  
+    // Get current page items
+    const paginatedProducts = useMemo(() => {
+      return filteredProducts.slice(
+        page * rowsPerPage,
+        (page + 1) * rowsPerPage
+      );
+    }, [filteredProducts, page, rowsPerPage]);
+
+
+
+
 
     return (
         <>
@@ -500,7 +656,13 @@ const Products = () => {
                     </div> */}
 
                     <div className='col w-[100%] md:w-[35%] pb-2'>
-                        <SearchBox searchName="products" />
+                        {/* <SearchBox searchName="products" /> */}
+                        <SearchBox
+                            searchName="products"
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                        // setPage={setPage}
+                        />
                     </div>
 
                     <div className='grid grid-cols-1 md:grid-cols-3 col w-[100%] md:w-[65%] gap-2 pb-2'>
@@ -628,7 +790,7 @@ const Products = () => {
                 </div>
 
 
-                <div className="flex flex-col h-[calc(100vh-200px)] mt-5"> {/* Adjust height as needed */}
+                <div className="flex flex-col h-[calc(100vh-200px)] lg:h-[calc(100vh-300px)] mt-5"> {/* Adjust height as needed */}
                     <TableContainer className="flex-1 overflow-auto customScroll">
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
@@ -705,16 +867,16 @@ const Products = () => {
                                             </TableRow>
                                         ))}
                                     </>
-                                ) : productData?.length === 0 ? (
+                                ) : paginatedProducts?.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={8} align="center" style={{ height: 300 }}>
+                                        <TableCell colSpan={10} align="center" style={{ height: '400px', borderBottom: 'none' }}>
                                             <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
                                                 &#128193; No Records Available
                                             </span>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    productData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((product, index) => (
+                                    paginatedProducts?.map((product, index) => (
                                         <TableRow key={index} className={`${isRowSelected(product) ? "!bg-blue-100" : ""}`}>
                                             <TableCell className="table-cell">
                                                 <Checkbox checked={isRowSelected(product)} onChange={() => handleRowCheckboxChange(product)} />
@@ -838,9 +1000,9 @@ const Products = () => {
                     <div className="sticky bottom-0 bg-white border-t pt-2 pb-2 px-4">
                         {/* Your pagination component goes here */}
                         <TablePagination
-                            rowsPerPageOptions={[10, 25, 100]}
+                            rowsPerPageOptions={[2, 10, 25, 100]}
                             component="div"
-                            count={productData?.length || 0}
+                            count={filteredProducts?.length || 0}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             onPageChange={handleChangePage}
