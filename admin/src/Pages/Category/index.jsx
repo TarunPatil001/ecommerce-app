@@ -188,8 +188,8 @@ const CategoryList = () => {
         <>
             <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-3 mt-14'>
                 <h2 className='text-[20px] font-bold'>Category List<span className="font-normal text-[12px]">MUI</span></h2>
-                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
-                    <Button className='!bg-[var(--bg-primary)] w-full h-auto sm:w-auto !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Category</Button>
+                <div className='col w-full sm:w-[150px] ml-auto flex items-center justify-end gap-3'>
+                    <Button className='!bg-[var(--bg-primary)] w-full h-auto sm:w-[150px] !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Category Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Category</Button>
                 </div>
             </div>
 
@@ -223,7 +223,7 @@ const CategoryList = () => {
                             {
                                 context?.catData?.length !== 0 && context?.catData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
                                     return (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(item) ? "!bg-blue-100" : ""}`}>
                                             <TableCell>
                                                 <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
                                             </TableCell>

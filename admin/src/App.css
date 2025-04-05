@@ -266,7 +266,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .MuiTableBody-root tr:nth-child(even) {
-  background: #f1f1f1 !important;
+  background: #f1f1f1;
 }
 
 .react-international-phone-input-container .react-international-phone-input {

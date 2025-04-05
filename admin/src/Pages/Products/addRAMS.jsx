@@ -292,13 +292,13 @@ const AddRAMS = () => {
                                     <Button
                                         type="reset"
                                         onClick={handleDiscard}
-                                        className='!capitalize !bg-red-500 !text-white w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
+                                        className='!capitalize !bg-red-500 !text-white w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2 '
                                     >
                                         <RiResetLeftFill className='text-[18px] hidden sm:block' />Discard
                                     </Button>
                                     <Button
                                         type='submit'
-                                        className={`!capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 ${ramId ? (isLoading ? "custom-btn-update-disabled" : "custom-btn-update") : (isLoading ? "custom-btn-disabled" : "custom-btn")}`}
+                                        className={`!capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2 ${ramId ? (isLoading ? "custom-btn-update-disabled" : "custom-btn-update") : (isLoading ? "custom-btn-disabled" : "custom-btn")}`}
                                         disabled={isLoading}
                                     >
                                         {isLoading ? <CircularProgress color='inherit' /> : ramId ? <><FiEdit className='text-[18px] hidden sm:block' /> Update</> : <><IoIosSave className='text-[18px] hidden sm:block' /> Create</>}
@@ -337,7 +337,7 @@ const AddRAMS = () => {
                             <TableBody>
                                 {
                                     data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(item) ? "!bg-blue-100" : ""}`}>
                                             <TableCell scope="row" className="px-6 pr-0 py-3 text-left">
                                                 <div className='w-[0px]'>
                                                     <Checkbox

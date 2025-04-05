@@ -65,6 +65,9 @@ const Profile = () => {
         }
     }, [context, navigate]);
 
+    useEffect(()=>{
+        window.scrollTo(0, 0);
+    },[])
 
     useEffect(() => {
         // Directly set the avatar URL from context if available
@@ -414,95 +417,6 @@ const Profile = () => {
 
     return (
         <>
-            {/* <div className="card my-4 mt-14 bg-white border rounded-md p-5">
-
-                <div className="grid grid-cols-8 mb-3 gap-4">
-                    <div className='col col-span-1'></div>
-                    <div className='col col-span-7 flex items-center justify-between'>
-                        <div className='col'>
-                            <h2 className="pb-0 font-bold text-[18px] text-gray-700 ">User Profile</h2>
-                        </div>
-                        <div className='col'>
-                            <Button className='!ml-auto w-auto !px-2 !normal-case !bg-slate-50 shadow !text-black flex items-center justify-center gap-2' onClick={() => setIsChangePasswordFormShow(!isChangePasswordFormShow)}><MdLockReset className='text-[20px] hidden sm:block' />Change password?</Button>
-                        </div>
-                    </div>
-                </div>
-
-                <hr />
-                <br />
-
-                <div className="grid grid-cols-8 mb-3 gap-4">
-                    <div className='col col-span-1 flex items-start justify-center'>
-                        <div className='w-[110px] h-[110px] border p-1 relative rounded-full overflow-hidden shadow-xl flex items-center justify-center '>
-                            <div className="w-full h-full overflow-hidden group rounded-full relative shadow flex items-center justify-center border bg-gray-300">
-
-                                {uploading === true ? (
-                                    <CircularProgress color="inherit" />
-                                ) : (
-                                    <img
-                                        src={preview || avatar || `https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png`}
-                                        alt="profile"
-                                        className="w-full h-full object-cover"
-                                    />
-                                )}
-                                <div className="overlay w-full h-full absolute top-0 left-0 z-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center opacity-0 rounded-full group-hover:opacity-100 duration-300 transition-all">
-                                    <FiUpload className="text-white text-[22px] group-hover:scale-125 duration-300 transition-all" />
-                                    <input
-                                        type="file"
-                                        id="avatar-upload"
-                                        className="absolute top-0 left-0 w-full h-full opacity-0 rounded-full cursor-pointer border-2"
-                                        name="avatar"
-                                        accept="image/jpeg, image/png, image/jpg, image/webp"
-                                        onChange={(e) => onChangeFile(e, "/api/user/user-avatar")}
-                                    />
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='col col-span-7'>
-                        <form action="" className="mt-0" onSubmit={handleSubmit}>
-
-                            <div className="grid grid-cols-2 mb-3 gap-4">
-                                <div className='col'>
-                                    <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Full Name</h3>
-                                    <input type="text" className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Product title' ref={nameRef} name="name" value={formFields?.name} disabled={isLoading} onChange={onChangeInput} />
-                                </div>
-                                <div className='col'>
-                                    <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Email</h3>
-                                    <input type="email" className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Product title' ref={emailRef} name="email" value={formFields?.email} disabled onChange={onChangeInput} />
-                                </div>
-                                <div className='col'>
-                                    <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Mobile No.</h3>
-                                    <PhoneInput defaultCountry="in" preferredCountries={["in"]} name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields((prevState) => ({ ...prevState, mobile: phone })); }} className={`!w-full h-[40px] flex items-center ${isLoading === true ? "!cursor-not-allowed" : ""}`} disabled={isLoading} />
-                                </div>
-                                <div className='col'>
-                                    <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Seller Name</h3>
-                                    <input type="text" className={`w-full h-[40px] border border-[rgba(0,0,0,0.1)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} placeholder='Seller Name' ref={sellerNameRef} name="sellerName" value={formFields?.sellerName} disabled={isLoading} onChange={onChangeInput} />
-                                </div>
-
-                            </div>
-
-                            <div className="grid grid-cols-4 mt-5 gap-4">
-                                <div className='col'>
-                                    <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  w-full`} disabled={isLoading}>
-                                        {
-                                            isLoading ? <CircularProgress color="inherit" /> : "Save"
-                                        }
-                                    </Button>
-                                </div>
-                                <div className='col'>
-                                    <Button type='reset' className="custom-btn w-full" disabled={isLoading}>Cancel</Button>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
-
-                </div>
-            </div > */}
-
             <div className="card my-4 mt-14 bg-white border rounded-md p-5">
 
                 <div className="grid grid-cols-1 sm:grid-cols-8 mb-3 gap-4">
@@ -575,91 +489,6 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* <div className="card my-4 bg-white border rounded-md p-5">
-                <div className="grid grid-cols-8 mb-3 gap-4">
-                    <div className='col col-span-1'></div>
-                    <div className='col col-span-7 flex items-center justify-between'>
-                        <div className='col'>
-                            <h2 className="pb-0 font-bold text-[18px] text-gray-700">Address Details</h2>
-                        </div>
-                    </div>
-                </div>
-                <hr />
-                <br />
-
-                <div className="grid grid-cols-8 mb-3 gap-4">
-                    <div className='col col-span-1'>
-                    </div>
-                    <div className='col col-span-7'>
-                        <div className='col'>
-                            <h3 className='text-[14px] font-medium mb-1 text-gray-700'>Address</h3>
-                            <div className={`w-full h-[40px] bg-blue-50 flex items-center justify-center border-2 border-dashed ${isLoading === true ? "" : "hover:border-blue-300 hover:bg-blue-50 cursor-pointer"} rounded-md p-3 text-md ${isLoading === true ? "cursor-not-allowed" : ""}`} onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: "Address Details" })} disabled={isLoading}>
-                                <span className='text-gray-700 text-center'>
-                                    {
-                                        isLoading3 ? <CircularProgress color="inherit" /> : "Add Address"
-                                    }
-
-                                </span>
-                            </div>
-                        </div>
-
-
-                        <div className="col">
-                            <div
-                                className={`w-full h-full flex flex-col items-center justify-center gap-4 mt-4 text-md ${isLoading ? 'cursor-not-allowed' : ''}`}
-                            >
-                                {Array.isArray(address) && address.length > 0 ? (
-                                    address.map((address, index) => {
-                                        const fullAddress =
-                                            address?.address_line1 +
-                                            ', ' +
-                                            address?.city +
-                                            ', ' +
-                                            address?.state +
-                                            ', ' +
-                                            address?.pincode +
-                                            ', ' +
-                                            address?.country +
-                                            ', ' +
-                                            address?.mobile;
-
-                                        return (
-                                            <label
-                                                key={index}
-                                                className="border-2 border-dashed addressBox w-full flex items-center justify-between rounded-md cursor-pointer p-2"
-                                            >
-                                                <div className="flex items-center">
-                                                    <Radio
-                                                        name="address"
-                                                        checked={selectedValue === address?._id}
-                                                        value={address?._id}
-                                                        onChange={handleSelectAddress}
-                                                    />
-                                                    <span className="ml-2">{fullAddress}</span>
-                                                </div>
-                                                <div className='flex items-start'>
-                                                    <Button className='!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[50px]' onClick={() => handleEditAddress(address?.userId, address?._id)}>
-                                                        <FiEdit />
-                                                    </Button>
-                                                    <Button className='!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[50px]' onClick={(e) => handleDeleteAddress(e, address?._id)}>
-                                                        <RiDeleteBin6Line />
-                                                    </Button>
-                                                </div>
-                                            </label>
-                                        );
-                                    })
-                                ) : (
-                                    <p>No addresses found.</p>
-                                )}
-                            </div>
-                        </div>
-
-
-
-
-                    </div>
-                </div>
-            </div> */}
 
             <div className="card my-4 bg-white border rounded-md p-5">
                 {/* Header */}
@@ -697,9 +526,9 @@ const Profile = () => {
                                     return (
                                         <label
                                             key={index}
-                                            className="border-2 border-dashed addressBox w-full flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-md cursor-pointer p-3 gap-2 sm:gap-4"
+                                            className="border-2 border-dashed addressBox w-full flex flex-col  sm:flex-row items-start sm:items-center justify-between rounded-md cursor-pointer p-3 gap-2 sm:gap-4"
                                         >
-                                            <div className="flex items-center w-full sm:w-auto">
+                                            <div className="flex items-center w-full">
                                                 <Radio
                                                     name="address"
                                                     checked={selectedValue === address?._id}
@@ -812,112 +641,6 @@ const Profile = () => {
                     </div>
                 </div>
             </Collapse >
-
-            {/* <Collapse isOpened={isChangePasswordFormShow}>
-                <div className="card bg-white p-5 shadow-md rounded-md">
-                    <div className="grid grid-cols-1 sm:grid-cols-8 mb-3 gap-4">
-                        <div className="hidden sm:block sm:col-span-1"></div>
-                        <div className="col-span-1 sm:col-span-7">
-                            <h2 className="pb-0 font-bold text-lg text-gray-700 text-center sm:text-left">
-                                Edit Password
-                            </h2>
-                        </div>
-                    </div>
-                    <hr />
-                    <br />
-                    <div className="grid grid-cols-1 sm:grid-cols-8 mb-3 gap-4">
-                        <div className="hidden sm:block sm:col-span-1"></div>
-                        <div className="col-span-1 sm:col-span-7">
-                            <form onSubmit={handleSubmitChangePassword}>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {context?.userData?.signUpWithGoogle === false && (
-                                        <div className="relative">
-                                            <label className="text-sm font-medium mb-1 text-gray-700">Old Password</label>
-                                            <input
-                                                type={isLoading2 ? "password" : isShowPassword1 ? "text" : "password"}
-                                                className={`w-full h-10 border border-gray-300 focus:outline-none focus:border-gray-600 rounded-md p-3 text-md ${isLoading ? "cursor-not-allowed" : ""
-                                                    }`}
-                                                placeholder="Old Password"
-                                                ref={oldPasswordRef}
-                                                name="oldPassword"
-                                                value={changePassword?.oldPassword}
-                                                disabled={isLoading2}
-                                                onChange={onChangeInput}
-                                            />
-                                            <Button
-                                                className="!absolute bottom-1 right-3 z-50 w-9 h-9 min-w-9 rounded-full text-gray-700"
-                                                onClick={() => setIsShowPassword1(!isShowPassword1)}
-                                                disabled={isLoading}
-                                            >
-                                                {isShowPassword1 ? <FaRegEye className="text-lg" /> : <FaRegEyeSlash className="text-lg" />}
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    <div className="relative">
-                                        <label className="text-sm font-medium mb-1 text-gray-700">New Password</label>
-                                        <input
-                                            type={isLoading2 ? "password" : isShowPassword2 ? "text" : "password"}
-                                            className={`w-full h-10 border border-gray-300 focus:outline-none focus:border-gray-600 rounded-md p-3 text-md ${isLoading ? "cursor-not-allowed" : ""
-                                                }`}
-                                            placeholder="New Password"
-                                            ref={newPasswordRef}
-                                            name="newPassword"
-                                            value={changePassword?.newPassword}
-                                            disabled={isLoading2}
-                                            onChange={onChangeInput}
-                                        />
-                                        <Button
-                                            className="absolute bottom-1 right-3 z-50 w-9 h-9 min-w-9 rounded-full text-gray-700"
-                                            onClick={() => setIsShowPassword2(!isShowPassword2)}
-                                            disabled={isLoading}
-                                        >
-                                            {isShowPassword2 ? <FaRegEye className="text-lg" /> : <FaRegEyeSlash className="text-lg" />}
-                                        </Button>
-                                    </div>
-
-                                    <div className="relative">
-                                        <label className="text-sm font-medium mb-1 text-gray-700">Confirm Password</label>
-                                        <input
-                                            type={isLoading2 ? "password" : isShowPassword3 ? "text" : "password"}
-                                            className={`w-full h-10 border border-gray-300 focus:outline-none focus:border-gray-600 rounded-md p-3 text-md ${isLoading ? "cursor-not-allowed" : ""
-                                                }`}
-                                            placeholder="Confirm Password"
-                                            ref={confirmPasswordRef}
-                                            name="confirmPassword"
-                                            value={changePassword?.confirmPassword}
-                                            disabled={isLoading2}
-                                            onChange={onChangeInput}
-                                        />
-                                        <Button
-                                            className="absolute bottom-1 right-3 z-50 w-9 h-9 min-w-9 rounded-full text-gray-700"
-                                            onClick={() => setIsShowPassword3(!isShowPassword3)}
-                                            disabled={isLoading}
-                                        >
-                                            {isShowPassword3 ? <FaRegEye className="text-lg" /> : <FaRegEyeSlash className="text-lg" />}
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 sm:grid-cols-4 mt-5 gap-4">
-                                    <Button
-                                        type="submit"
-                                        className={`w-full ${isLoading2 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"
-                                            } p-2 rounded-md`}
-                                        disabled={isLoading2}
-                                    >
-                                        {isLoading2 ? <CircularProgress color="inherit" /> : "Change Password"}
-                                    </Button>
-                                    <Button type="reset" className="w-full bg-gray-200 text-black p-2 rounded-md hover:bg-gray-300" disabled={isLoading2}>
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </Collapse> */}
-
 
         </>
     )

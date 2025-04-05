@@ -74,6 +74,8 @@ const Users = () => {
             setFilteredUsers(res.data); // Ensure filteredUsers is updated
             setIsLoading(false);
         });
+
+        window.scrollTo(0,0);
     }, []);
 
 
@@ -267,7 +269,7 @@ const Users = () => {
                             {
                                 isLoading === false ? paginatedUsers?.length !== 0 && paginatedUsers?.map((user, index) => {
                                     return (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(user) ? "!bg-blue-100" : ""}`}>
                                             {/* <TableCell style={{ minWidth: columns.minWidth }}>
                                                 <Checkbox {...label} size='small' />
                                             </TableCell> */}

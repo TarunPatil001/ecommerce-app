@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo } from 'react'
+import { useState, useContext, useMemo, useRef } from 'react'
 import { MyContext } from '../../App'
 import DashboardBoxes from '../../Components/DashboardBoxes'
 import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Pagination, Rating, Skeleton } from '@mui/material'
@@ -6,7 +6,7 @@ import { Tooltip } from '@mui/material'
 import { FiPlus } from "react-icons/fi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Badge from '../../Components/Badge';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProgressBar from '../../Components/ProgressBar';
 import { MdOutlineEdit, MdOutlineFilterListOff } from 'react-icons/md';
 import { IoEyeOutline } from 'react-icons/io5';
@@ -134,6 +134,7 @@ const Dashboard = () => {
 
   const [chartData, setChartData] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear());
+  const location = useLocation();
 
 
   useEffect(() => {
@@ -143,11 +144,11 @@ const Dashboard = () => {
     } else {
       navigate("/sign-in");
     }
+  }, [context?.setIsLogin, navigate]);
 
+  useEffect(()=>{
     window.scrollTo(0, 0);
-  }, [context, navigate]);
-
-
+  },[])
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -552,6 +553,7 @@ const Dashboard = () => {
   // Fetch all orders on component mount
   useEffect(() => {
     getOrderDetails();
+    
   }, []);
 
   // Handle search functionality
@@ -657,14 +659,12 @@ const Dashboard = () => {
   // };
 
 
-
-
   return (
     <>
       {/* {
         console.log("sale: ", overallTotalSales)
       } */}
-      <div className={`w-full px-5 py-5 my-4 mt-14 lg:py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md`}>
+      <div className={`w-full px-5 py-5 my-4 mt-14 lg:py-2 bg-white hover:bg-[var(--bg-hover-primary)] border border-[rgba(0,0,0,0.1)] flex items-center justify-between gap-8 mb-5 rounded-md `}>
         <div className="info">
           <h1 className='text-[28px] leading-10 sm:text-[35px] sm:leading-10 font-bold mb-2'>Hello &#128075;, <br /> <span className='text-[var(--bg-primary)]'> {context?.userData?.name} </span></h1>
           <p className='text-[16px]'>Here’s What happening on your store today. See the statistics at once.</p>
@@ -678,9 +678,13 @@ const Dashboard = () => {
         <DashboardBoxes orders={allOrders?.length} products={productData?.length} users={users?.length - 1 || 0} reviews={allReviews?.length} category={context?.catData?.length} sales={overallTotalSales} />
       }
 
+      <div className='-mt-9'>
       <Products />
+      </div>
 
+      <div className='-mt-9'>
       <Orders />
+      </div>
       {/* <div className="card my-4 bg-white border rounded-md px-1">
         <div className='flex items-center justify-between p-5 gap-2 flex-col sm:flex-row'>
           <h2 className='text-[20px] font-bold w-full text-left'>Recent Orders</h2>

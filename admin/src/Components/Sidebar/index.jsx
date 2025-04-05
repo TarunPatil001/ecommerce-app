@@ -89,10 +89,18 @@ const Sidebar = () => {
     })
   }
 
+  // useEffect(() => {
+  //   if (context?.isSidebarOpen && context?.windowWidth < 992) {
+  //     document.body.classList.add('no-scroll');
+  //   } else {
+  //     document.body.classList.remove('no-scroll');
+  //   }
+  // }, [context?.isSidebarOpen, context?.windowWidth]);
+
 
   return (
     <>
-      <div className={`sidebar fixed top-0 left-0 bg-[#fff] w-[${context.isSidebarOpen === true ? `${(context?.sidebarWidth / 2) + 15}%` : '0px'}] z-[52] h-full border border-r pl-2`}>
+      <div className={`sidebar fixed top-0 left-0 bg-[#fff] w-[${context.isSidebarOpen === true ? `${(context?.sidebarWidth / 2) + 15}%` : '0px'}] z-[99] h-full border border-r pl-2`}>
         <div className="py-2 w-full px-8">
           <Link to="/" onClick={() => context?.windowWidth < 992 && context?.setIsSidebarOpen(false)}>
             <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="logo" className='w-[200px]' />
@@ -109,6 +117,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
+
           <li>
             <Link to="/profile">
               <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Profile' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSelectedMenu('Profile'); context?.windowWidth < 992 && context?.setIsSidebarOpen(false); }}><BiSolidUserDetail className='text-[25px]' />
@@ -116,6 +125,7 @@ const Sidebar = () => {
               </Button>
             </Link>
           </li>
+
 
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Home Banners List' || selectedMenu === 'Add Home Banners' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex1(!subMenuIndex1) }}><TbSlideshow className='text-[25px]' />
@@ -183,10 +193,6 @@ const Sidebar = () => {
               </ul>
             </Collapse>
           </li>
-
-
-
-
 
 
           <li>
@@ -290,9 +296,6 @@ const Sidebar = () => {
           </li>
 
 
-
-
-
           <li>
             <Button className={`!w-full !capitalize flex !justify-start !items-center gap-3 text-[14px] !text-[rgba(0,0,0,0.7)] !font-bold !py-2 hover:!bg-[var(--bg-light-hover)] ${selectedMenu === 'Blog List' ? "!bg-[var(--bg-active)] !text-[var(--text-active)]" : ""}`} onClick={() => { setSubMenuIndex5(!subMenuIndex5) }}><RiBloggerLine className='text-[25px]' />
               <span>Blogs</span>
@@ -350,7 +353,12 @@ const Sidebar = () => {
         </ul>
       </div >
 
-      <div className={`sidebarOverlay w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]  overflow-hidden z-[51]  ${context?.isSidebarOpen && context?.windowWidth < 992 ? "block" : "hidden"}`} onClick={() => context?.setIsSidebarOpen(false)} ></div>
+      {/* <div className={`sidebarOverlay w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]  overflow-hidden !z-[51]  ${context?.isSidebarOpen && context?.windowWidth < 992 ? "block" : "hidden"}`} onClick={() => context?.setIsSidebarOpen(false)} ></div> */}
+      <div
+        className={`sidebarOverlay w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-hidden !z-[51] ${context?.isSidebarOpen && context?.windowWidth < 992 ? "block" : "hidden"
+          }`}
+        onClick={() => context?.setIsSidebarOpen(false)}
+      ></div>
 
     </>
   )

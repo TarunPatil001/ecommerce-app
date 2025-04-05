@@ -428,20 +428,20 @@ const AddCategory = () => {
             <Button
               type="reset"
               onClick={handleDiscard}
-              className='!bg-red-500 !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2 '
+              className='!bg-red-500 !text-white !capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2 '
             >
               <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
             </Button>
 
             {
               categoryIdNo === undefined ? (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                   {
                     isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                   }
                 </Button>
               ) : (
-                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"}  !capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                   {
                     isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                   }

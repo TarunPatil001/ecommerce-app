@@ -189,12 +189,12 @@ const BlogList = () => {
         <>
             <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-3 mt-14'>
                 <h2 className='text-[20px] font-bold'>Blog List <span className="font-normal text-[12px]">MUI</span></h2>
-                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
+                <div className='col w-full sm:w-[150px] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-[var(--bg-primary)] !text-white flex items-center gap-1 !capitalize w-full !px-5' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Blog Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Blog</Button>
                 </div>
             </div>
 
-            <div className="card my-4 bg-white border rounded-md px-1 pt-1 w-full">
+            {/* <div className="card my-4 bg-white border rounded-md px-1 pt-1 w-full">
                 <TableContainer className="customScroll overflow-x-auto">
                     <Table sx={{ minWidth: 800 }} stickyHeader aria-label="sticky table">
                         <TableHead>
@@ -218,7 +218,7 @@ const BlogList = () => {
                             {context?.blogData?.length !== 0 &&
                                 context?.blogData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
                                     return (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(item) ? "!bg-blue-100" : ""}`}>
                                             <TableCell>
                                                 <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
                                             </TableCell>
@@ -313,8 +313,130 @@ const BlogList = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     className='customScroll'
                 />
-            </div>
+            </div> */}
 
+            <div className="card my-4 bg-white border rounded-md px-1 pt-1 w-full flex flex-col" style={{ maxHeight: 'calc(100vh - 200px)', minHeight: 'calc(100vh - 200px)' }}>
+                <TableContainer className="customScroll overflow-x-auto flex-grow">
+                    <Table sx={{ minWidth: 800 }} stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell className="px-6 py-2 text-left w-[60px]">
+                                    <Checkbox checked={selectAll} onChange={handleSelectAll} />
+                                </TableCell>
+                                {columns.map((column) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{ minWidth: column.minWidth, whiteSpace: 'nowrap' }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+
+                        <TableBody>
+                            {context?.blogData?.length !== 0 &&
+                                context?.blogData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((item, index) => {
+                                    return (
+                                        <TableRow key={index} className={`${isRowSelected(item) ? "!bg-blue-100" : ""}`}>
+                                            <TableCell>
+                                                <Checkbox checked={isRowSelected(item)} onChange={() => handleRowCheckboxChange(item)} />
+                                            </TableCell>
+                                            <TableCell style={{ minWidth: 250 }}>
+                                                <div className="flex items-start gap-4 w-[176px] h-[100px] sm:w-[250px] sm:h-[142px]">
+                                                    <div className="img w-full h-full overflow-hidden rounded-md shadow-md group">
+                                                        <LazyLoadImage
+                                                            alt="homeSlide_img"
+                                                            effect="blur"
+                                                            src={item.images[0]}
+                                                            className="w-full h-full object-contain hover:scale-110 transition-all duration-300"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+
+                                            <TableCell style={{ minWidth: 300 }}>
+                                                <span className="text-[15px] font-medium">{item?.title}</span>
+                                            </TableCell>
+
+                                            <TableCell style={{ minWidth: 400 }}>
+                                                <span className="text-[15px] font-medium text-justify">
+                                                    {item?.description?.replace(/<[^>]+>/g, '').substr(0, 150) +
+                                                        (item?.description?.length > 150 ? '...' : '')}
+                                                </span>
+                                            </TableCell>
+
+                                            <TableCell style={{ minWidth: 100 }}>
+                                                <div className="flex items-center gap-2">
+                                                    <Tooltip title="Edit Product" arrow placement="top">
+                                                        <Button
+                                                            className="!h-[35px] !w-[35px] !min-w-[35px] !bg-blue-500 !text-white shadow"
+                                                            onClick={() => {
+                                                                handleEditBlog(item?._id);
+                                                            }}
+                                                        >
+                                                            <MdOutlineEdit className="text-[35px]" />
+                                                        </Button>
+                                                    </Tooltip>
+                                                    <Tooltip title="Delete Product" arrow placement="top">
+                                                        <Button
+                                                            className="!h-[35px] !w-[35px] !min-w-[35px] !bg-red-500 !text-white shadow"
+                                                            onClick={(e) => {
+                                                                handleDeleteBlog(e, item?._id);
+                                                            }}
+                                                        >
+                                                            <RiDeleteBin6Line className="text-[35px]" />
+                                                        </Button>
+                                                    </Tooltip>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+
+                            {(context?.blogData?.length === 0 || !context?.blogData) && (
+                                <TableRow>
+                                    <TableCell colSpan={8} align="center" style={{ height: 300 }}>
+                                        <span className="text-[var(--text-light)] text-[14px] font-regular flex items-center justify-center gap-2">
+                                            &#128193; No Records Available
+                                        </span>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                <div className="sticky bottom-0 bg-white border-t z-10">
+                    {selectedRows.length > 0 && (
+                        <div className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4">
+                            <span>
+                                <span className="font-bold">{selectedRows.length}</span> blog{selectedRows.length > 1 ? 's' : ''} selected
+                            </span>
+                            <Button
+                                type="reset"
+                                onClick={(e) => handleDeleteSelectedRow(e, selectedRows)}
+                                className="!bg-red-500 !text-white !capitalize w-auto !px-5 h-[40px] flex items-center justify-center gap-2"
+                            >
+                                <RiDeleteBin6Line className="text-[18px] hidden sm:block" />
+                                Delete
+                            </Button>
+                        </div>
+                    )}
+
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25, 100]}
+                        component="div"
+                        count={context?.blogData?.length || 0}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        className='customScroll'
+                    />
+                </div>
+            </div>
         </>
     )
 }

@@ -253,14 +253,14 @@ const AddSubCategory = () => {
               <Button
                 type="reset"
                 onClick={handleDiscard}
-                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
+                className={`${isLoadingReset1 === true ? "!bg-red-300" : "!bg-red-500"} !text-white !capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingReset1}
               >
                 {
                   isLoadingReset1 ? <CircularProgress color="inherit" /> : <><RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel</>
                 }
               </Button>
 
-              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-auto !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
+              <Button type='submit' className={`${isLoadingSave1 === true ? "custom-btn-disabled" : "custom-btn"}  !capitalize w-full sm:w-[150px] !px-5 h-[40px] flex items-center justify-center gap-2`} disabled={isLoadingSave1}>
                 {
                   isLoadingSave1 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                 }

@@ -1421,19 +1421,19 @@ const AddProduct = () => {
                     <Button
                         type="reset"
                         onClick={handleDiscard}
-                        className='!bg-red-500 !capitalize !text-white !p-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2 '
+                        className='!bg-red-500 !capitalize !text-white !p-5 w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2 '
                     >
                         <RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel
                     </Button>
                     {
                         productIdNo === undefined ? (
-                            <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} !capitalize !p-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+                            <Button type='submit' className={`${isLoading === true ? "custom-btn-disabled" : "custom-btn"} !capitalize !p-5 w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                                 {
                                     isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>
                                 }
                             </Button>
                         ) : (
-                            <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !p-5 w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+                            <Button type='submit' className={`${isLoading === true ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !p-5  w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                                 {
                                     isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>
                                 }

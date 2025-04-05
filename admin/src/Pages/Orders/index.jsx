@@ -161,8 +161,11 @@ const Orders = () => {
     const [rowsPerPage, setRowsPerPage] = useState(4);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const location = useLocation();
-    const isHome = location.pathname === "/";
+    // const location = useLocation();
+    // const isHome = location.pathname === "/";
+    useEffect(()=>{
+            window.scrollTo(0, 0);
+        },[])
 
     const handleChange = (event, itemId) => {
         const newStatus = event.target.value;
@@ -262,7 +265,7 @@ const Orders = () => {
 
 
     return (
-        <div className={`card my-4 ${isHome ? "" : "mt-14"} bg-white border rounded-md px-1 h-auto w-auto relative`}>
+        <div className={`card my-4 mt-14 bg-white border rounded-md px-1 h-auto w-auto relative`}>
             <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 gap-2'>
                 <h2 className='text-[20px] font-bold'>Recent Orders</h2>
                 <div className='w-full sm:w-[60%] md:w-[50%]'>
@@ -277,8 +280,8 @@ const Orders = () => {
 
                 </div>
             </div>
-            <div className="customScroll relative overflow-x-auto rounded-md pb-5">
 
+            <div className="customScroll relative overflow-x-auto rounded-md pb-5">
                 <table className="w-full text-[14px] text-left rtl:text-right text-[var(--text-light)] rounded-md over">
                     <thead className="text-[14px] text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
                         <tr>

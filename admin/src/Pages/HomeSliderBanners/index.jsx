@@ -192,9 +192,9 @@ const HomeSliderBanners = () => {
 
     return (
         <>
-            <div className='grid grid-cols-1 sm:grid-cols-2 items-center px-5 my-4 mt-14'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 items-center my-4 mt-14 gap-2'>
                 <h2 className='text-[20px] font-bold'>Home Slider Banners <span className="font-normal text-[12px]">MUI</span></h2>
-                <div className='col w-full sm:w-auto  ml-auto flex items-center justify-end gap-3'>
+                <div className='col w-full sm:w-[200px]  ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-[var(--bg-primary)] !w-full !h-auto !px-3 !text-white flex items-center gap-1 !capitalize' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Home Banner Details' })}><GoPlus className='text-[20px]' /><span className="block">Add Home Banner</span></Button>
                 </div>
             </div>
@@ -229,7 +229,7 @@ const HomeSliderBanners = () => {
                             {
                                 context?.homeSlideData?.length !== 0 && context?.homeSlideData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((image, index) => {
                                     return (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(image) ? "!bg-blue-100" : ""}`}>
                                             <TableCell>
                                                 <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>

@@ -426,13 +426,13 @@ const AddHomeSlide = () => {
 
           <div className='sticky bottom-0 left-0 z-10 mt-2.5 flex w-full items-center justify-end rounded-md border border-gray-200 bg-gray-0 px-5 py-3.5 text-gray-900 shadow bg-white gap-4'>
 
-            <Button type="reset" onClick={handleDiscard} className='!capitalize !bg-red-500 !text-white !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2 '><RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel</Button>
+            <Button type="reset" onClick={handleDiscard} className='!capitalize !bg-red-500 !text-white !px-5 w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2 '><RiResetLeftFill className='text-[18px] hidden sm:block' />Cancel</Button>
             {homeSlideIdNo === undefined ? (
-              <Button type='submit' className={`${isLoading ? "custom-btn-disabled" : "custom-btn"} !capitalize !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
+              <Button type='submit' className={`${isLoading ? "custom-btn-disabled" : "custom-btn"} !capitalize !px-5 w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
                 {isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px] hidden sm:block' />Create</>}
               </Button>
             ) : (
-              <Button type='submit' className={`${isLoading ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !px-5 w-full sm:w-auto h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
+              <Button type='submit' className={`${isLoading ? "custom-btn-update-disabled" : "custom-btn-update"} !capitalize !px-5 w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
                 {isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px] hidden sm:block' />Update</>}
               </Button>
             )}

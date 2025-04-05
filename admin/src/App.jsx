@@ -79,21 +79,97 @@ function App() {
     model: '',
   });
 
+  // {
+  //   isSidebarOpen && windowWidth < 992 && (
+  //     <div
+  //       className="sidebarOverlay fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[51]"
+  //       onClick={() => setIsSidebarOpen(false)}
+  //     />
+  //   )
+  // }
+
+  // useEffect(() => {
+  //   if (isSidebarOpen && windowWidth < 992) {
+  //     document.body.style.overflow = 'hidden';
+  //   } else {
+  //     document.body.style.overflow = '';
+  //   }
+
+  //   // optional cleanup (especially helpful during fast navigation)
+  //   return () => {
+  //     document.body.style.overflow = '';
+  //   };
+  // }, [isSidebarOpen, windowWidth]);
+
+  useEffect(() => {
+    const body = document.body;
+
+    // On mobile: lock body scroll when sidebar is open
+    if (isSidebarOpen && windowWidth < 992) {
+      body.style.overflow = 'hidden';
+      body.style.touchAction = 'none'; // for smoother mobile lock
+    }
+    // On desktop: do NOT lock body, but prevent scroll when hovering sidebar
+    else {
+      body.style.overflow = '';
+      body.style.touchAction = '';
+    }
+
+    return () => {
+      body.style.overflow = '';
+      body.style.touchAction = '';
+    };
+  }, [isSidebarOpen, windowWidth]);
+
+  const lockScroll = () => {
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollBarWidth}px`;
+  };
+
+  const unlockScroll = () => {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  };
+
+
+
+
   const router = createBrowserRouter([
     {
       path: "/",
       exact: true,
       element: (
         <>
-          <section className="main overflow-x-hidden">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper transition-all duration-300  ${isSidebarOpen ? windowWidth < 992 ? `w-[${sidebarWidth / 2}%]` : `w-[${sidebarWidth}%]` : 'w-[0%] opacity-0'}`}
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
               >
                 <Sidebar />
               </div>
-              <div
-                className={`contentRight p-5 transition-all duration-300  ${isSidebarOpen && windowWidth < 992 ? 'opacity-0' : ''}  ${isSidebarOpen ? `w-[${100 - sidebarWidth}%]` : 'w-[100%]'}`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <Dashboard />
               </div>
             </div>
@@ -151,13 +227,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <Products />
               </div>
             </div>
@@ -170,13 +268,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <AddRAMS />
               </div>
             </div>
@@ -189,13 +309,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <AddWeight />
               </div>
             </div>
@@ -208,13 +350,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <AddSize />
               </div>
             </div>
@@ -227,13 +391,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <ProductDetails />
               </div>
             </div>
@@ -246,13 +432,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <HomeSliderBanners />
               </div>
             </div>
@@ -265,13 +473,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <CategoryList />
               </div>
             </div>
@@ -284,13 +514,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <SubCategoryList />
               </div>
             </div>
@@ -303,13 +555,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+                   <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <Users />
               </div>
             </div>
@@ -322,13 +596,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <Orders />
               </div>
             </div>
@@ -341,13 +637,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${0}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <Profile />
               </div>
             </div>
@@ -360,13 +678,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <BannersV1List />
               </div>
             </div>
@@ -379,13 +719,35 @@ function App() {
       exact: true,
       element: (
         <>
-          <section className="main">
+          <section className={`main overflow-x-hidden`}>
             <Header />
-            <div className='contentMain flex'>
-              <div className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? 'w-[18%] z-50' : 'w-[0%] opacity-0'} transition-all duration-300`}>
+            <div className='contentMain flex h-full'>
+              <div
+                // className="sidebarWrapper overflow-y-auto transition-all duration-300"
+                className={`overflow-hidden sidebarWrapper ${isSidebarOpen === true ? `w-[${sidebarWidth}%] z-50` : 'w-[0%] opacity-0'} transition-all duration-300`}
+                style={{
+                  width: isSidebarOpen
+                    ? windowWidth < 992
+                      ? `${sidebarWidth / 2}%`
+                      : `${sidebarWidth}%`
+                    : '0%',
+                  height: '100vh',
+                }}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 992) {
+                    lockScroll();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (window.innerWidth > 992) {
+                    unlockScroll();
+                  }
+                }}
+              >
                 <Sidebar />
               </div>
-              <div className={`contentRight p-5 ${isSidebarOpen === true ? 'w-[82%]' : 'w-[100%]'} transition-all duration-300`} >
+
+              <div className={`contentRight p-5 ${isSidebarOpen === true ? (windowWidth < 992 ? 'w-[100%]' : 'w-[82%]') : 'w-[100%]'} transition-all duration-300`} >
                 <BlogList />
               </div>
             </div>

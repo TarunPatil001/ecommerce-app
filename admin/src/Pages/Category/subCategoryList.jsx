@@ -22,7 +22,7 @@ const SubCategoryList = () => {
         <>
             <div className='flex flex-col items-start sm:flex-row justify-between gap-2 pt-3 mt-14'>
                 <h2 className='text-[20px] font-bold'>Sub Category List <span className="font-normal text-[12px]">MUI</span></h2>
-                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
+                <div className='col w-full sm:w-[200px] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-[var(--bg-primary)] !px-5 !text-white flex items-center gap-1 !capitalize w-full' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'Sub-Category Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Sub-Category</Button>
                 </div>
             </div>

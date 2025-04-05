@@ -188,7 +188,7 @@ const BannersV1List = () => {
         <>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2 justify-between pt-3 mt-14'>
                 <h2 className='text-[20px] font-bold'>Banners List <span className="font-normal text-[12px]">MUI</span></h2>
-                <div className='col w-full sm:w-auto ml-auto flex items-center justify-end gap-3'>
+                <div className='col w-full sm:w-[200px] ml-auto flex items-center justify-end gap-3'>
                     <Button className='!bg-[var(--bg-primary)] !px-3 !text-white flex items-center gap-1 !capitalize w-full' onClick={() => context.setIsOpenFullScreenPanel({ open: true, model: 'BannerV1 Details' })}><GoPlus className='text-[20px] hidden sm:block' />Add Banner V1</Button>
                 </div>
             </div>
@@ -223,7 +223,7 @@ const BannersV1List = () => {
                             {
                                 context?.bannerV1Data?.length !== 0 && context?.bannerV1Data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((image, index) => {
                                     return (
-                                        <TableRow key={index}>
+                                        <TableRow key={index} className={`${isRowSelected(image) ? "!bg-blue-100" : ""}`}>
                                             <TableCell>
                                                 <Checkbox checked={isRowSelected(image)} onChange={() => handleRowCheckboxChange(image)} />
                                             </TableCell>

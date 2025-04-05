@@ -205,31 +205,32 @@ const VerifyAccount = () => {
 
     return (
 
-        <section className='bg-white w-full h-[100vh]'>
-            <header className='w-full py-2 px-10 fixed top-5 left-0 flex items-center justify-between !z-50'>
+        <section className='bg-white w-full min-h-screen'>
+            <img src="/pattern.webp" alt="bg_img" className='w-full h-full fixed top-0 left-0 opacity-5' />
+            <header className='w-full py-2 px-10 fixed top-0 left-0 !bg-blue-200 flex items-center justify-center sm:justify-between !z-[99]'>
                 <Link to="/">
-                    <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="" className='w-[200px]' />
+                    <img src="https://isomorphic-furyroad.vercel.app/_next/static/media/logo.a795e14a.svg" alt="" className='w-[150px] sm:w-[200px]' />
                 </Link>
-                <div className='flex items-center gap-2'>
+                <div className='hidden sm:flex items-center gap-2'>
                     <NavLink to="/sign-in" exact={true} activeClassName="isActive">
-                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] flex items-center gap-1 !capitalize !px-4 !py-1'><HiLogin className='rotate-180 text-[16px]' />Login</Button>
+                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] shadow flex items-center gap-1 !capitalize !px-4 !py-1'><HiLogin className='rotate-180 text-[16px]' />Sign In</Button>
                     </NavLink>
                     <NavLink to="/sign-up" exact={true} activeClassName="isActive">
-                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] flex items-center gap-1 !capitalize !px-4 !py-1 '><PiUserCirclePlusLight className='text-[16px]' />Sign Up</Button>
+                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] shadow flex items-center gap-1 !capitalize !px-4 !py-1 '><PiUserCirclePlusLight className='text-[16px]' />Sign Up</Button>
                     </NavLink>
                 </div>
             </header>
-            <img src="/pattern.webp" alt="bg_img" className='w-full fixed top-0 left-0 opacity-5' />
 
-            <div className='loginBox card w-[600px] h-auto mx-auto pt-20 relative !z-50 pb-20'>
+            {/* <div className='loginBox card w-full sm:w-[600px] h-auto mx-auto pt-0 lg:pt-20 relative !z-50 pb-20'> */}
+            <div className='loginBox card w-full sm:w-[600px] h-auto mx-auto pt-20 relative !z-50 pb-20'>
                 <div className='text-center'>
                     <img src="http://localhost:5173/securityLogo.png" alt="" className='m-auto' />
                 </div>
-                <h1 className='mt-10 text-[44px] font-bold leading-[54px] text-center'>OTP Verification <br />
+                <h1 className='mt-10 text-[24px] sm:text-[34px] md:text-[44px] font-bold leading-[34px] sm:leading-[44px] md:leading-[54px] text-center'>OTP Verification <br />
                     Please verify your email
                 </h1>
                 <br />
-                <p className='text-center'>OTP has been sent to <span className='font-semibold text-[var(--text-active)]'>{maskedEmail}</span></p>
+                <p className='text-center flex flex-col sm:flex-row items-center justify-center'>OTP has been sent to&nbsp;<span className='font-semibold text-[var(--text-active)]'>{maskedEmail}</span></p>
                 <br />
                 <form action="" onSubmit={verifyOTP}>
                     <div className="py-4">

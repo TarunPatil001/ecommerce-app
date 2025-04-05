@@ -210,7 +210,7 @@ const SignUp = () => {
                 </Link>
                 <div className='hidden sm:flex items-center gap-2'>
                     <NavLink to="/sign-in" exact={true} activeClassName="isActive">
-                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] flex items-center gap-1 !capitalize !px-4 !py-1'><HiLogin className='rotate-180 text-[16px]' />Sign In</Button>
+                        <Button className='!rounded-full !text-[rgba(0,0,0,0.8)] shadow flex items-center gap-1 !capitalize !px-4 !py-1'><HiLogin className='rotate-180 text-[16px]' />Sign In</Button>
                     </NavLink>
                     <NavLink to="/sign-up" exact={true} activeClassName="isActive">
                         <Button className='!rounded-full !text-white flex items-center gap-1 !capitalize !px-4 !py-1'><PiUserCirclePlusLight className='text-[16px]' />Sign Up</Button>
