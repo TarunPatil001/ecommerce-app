@@ -387,7 +387,7 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <header className="bg-white w-full sticky top-0 left-0 z-[99] shadow-sm">
+      <header className="bg-white w-full sticky top-0 left-0 z-[100] shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
@@ -398,18 +398,18 @@ const Header = () => {
             </div>
 
             {/* Search */}
-            <div className="hidden md:block w-2/5 px-4">
+            <div className="md:block w-3/5 px-4">
               <Search />
             </div>
 
             {/* User Actions */}
-            <div className="w-3/4 md:w-2/5 flex justify-end">
-              <ul className="flex items-center gap-2 md:gap-4">
+            <div className="w-2/4 md:w-2/6 h-10 md:h-12 flex justify-end">
+              <ul className="flex items-center gap-2">
                 <li className="flex items-center">
                   {context.isLogin ? (
                     <>
                       <div 
-                        className="flex items-center gap-2 p-1 rounded-md hover:bg-gray-100 cursor-pointer transition"
+                        className="flex items-center w-[200px] gap-2 p-1 rounded-md hover:bg-gray-100 cursor-pointer transition"
                         onClick={handleClick}
                         aria-controls="account-menu"
                         aria-haspopup="true"
@@ -422,10 +422,10 @@ const Header = () => {
                           />
                         </div>
                         <div className="hidden md:flex flex-col">
-                          <span className="text-xs font-bold uppercase truncate max-w-[120px]">
+                          <span className="text-xs font-bold uppercase truncate max-w-[150px]">
                             {loginData?.name}
                           </span>
-                          <span className="text-xs truncate max-w-[120px]">
+                          <span className="text-xs truncate max-w-[150px]">
                             {loginData?.email}
                           </span>
                         </div>
@@ -518,7 +518,7 @@ const Header = () => {
                     <IconButton 
                       aria-label="compare" 
                       className="text-gray-700 hover:text-primary"
-                      size="small"
+                      size="medium"
                     >
                       <StyledBadge badgeContent={4} color="secondary">
                         <IoGitCompareOutline className="text-lg" />
@@ -534,7 +534,7 @@ const Header = () => {
                       to="/my-wishlist" 
                       aria-label="wishlist" 
                       className="text-gray-700 hover:text-primary"
-                      size="small"
+                      size="medium"
                     >
                       <StyledBadge badgeContent={context?.wishlistData?.length || 0} color="secondary">
                         <FaRegHeart className="text-lg" />
@@ -549,7 +549,7 @@ const Header = () => {
                       aria-label="cart" 
                       className="text-gray-700 hover:text-primary"
                       onClick={() => context.setOpenCartPanel(true)}
-                      size="small"
+                      size="medium"
                     >
                       <StyledBadge 
                         badgeContent={context?.cartData?.length || 0} 

@@ -24,6 +24,8 @@
   font-family: var(--font-family) !important;
 }
 
+
+
 body {
   /* font-family: var(--font-family) !important; */
   /* Apply letter spacing */
@@ -730,4 +732,42 @@ input[type=number]::-webkit-outer-spin-button {
   color: var(--bg-primary) !important;
   width: 20px !important;
   height: 20px !important;
+}
+
+.placeholder-wrapper {
+  position: relative;
+}
+
+.placeholder-text {
+  position: absolute;
+  top: 0;
+  left: 78px;
+  height: 35px;
+  padding: 8px;
+  font-size: 15px;
+  /* color: #fb5455; */
+  pointer-events: none;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.placeholder-text.animate {
+  opacity: 1;
+  animation: swipeDown 0.4s ease-in-out forwards;
+}
+
+@keyframes swipeDown {
+  0% {
+    transform: translateY(-50%);
+    opacity: 0;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+}
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

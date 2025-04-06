@@ -20,165 +20,178 @@ const Search = () => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
 
+  const [placeholder, setPlaceholder] = useState("products");
+  const [animate, setAnimate] = useState(true);
 
-// Utility functions first
-const normalizeTerm = (text) => {
-  if (!text) return '';
-  if (excludedRegex.test(text)) return '';
-  return text
-    .replace(abbreviationRegex, match => match.replace(/\./g, ''))
-    .replace(specialCharsRegex, '')
-    .toLowerCase()
-    .trim();
-};
+  // const placeholders = [
+  //   "shirts",
+  //   "shoes",
+  //   "electronics",
+  //   "books",
+  //   "something amazing",
+  // ];
 
-// Constants next
-const excludedRegex = new RegExp(`\\b(${EXCLUDED_WORDS.join("|")})\\b`, "i");
-const specialCharsRegex = /[^\w\s-]/g;
-const abbreviationRegex = /\b([A-Z]\.){1,}[A-Z]?\b/g;
+ 
 
-// Enhanced data preprocessing
-const preprocessedData = localSearchData?.data?.map(item => {
-  const terms = [
-    item.brand,
-    item.name,
-    item.categoryName,
-    item.subCategoryName
-  ].filter(Boolean).map(term => normalizeTerm(String(term)));
-  
-  return {
-    ...item,
-    _normalizedTerms: terms,
-    _searchText: terms.join(' ')
+
+  // Utility functions first
+  const normalizeTerm = (text) => {
+    if (!text) return '';
+    if (excludedRegex.test(text)) return '';
+    return text
+      .replace(abbreviationRegex, match => match.replace(/\./g, ''))
+      .replace(specialCharsRegex, '')
+      .toLowerCase()
+      .trim();
   };
-}) || [];
 
-// Improved suggestion engine
-const getQuickSuggestions = () => {
-  if (!context?.isSearch || !preprocessedData.length) return [];
-  
-  const searchTerm = normalizeTerm(context.isSearch);
-  if (searchTerm.length < 2 || excludedRegex.test(searchTerm)) return [];
+  // Constants next
+  const excludedRegex = new RegExp(`\\b(${EXCLUDED_WORDS.join("|")})\\b`, "i");
+  const specialCharsRegex = /[^\w\s-]/g;
+  const abbreviationRegex = /\b([A-Z]\.){1,}[A-Z]?\b/g;
 
-  const suggestions = new Map();
-  const searchWords = searchTerm.split(/\s+/).filter(Boolean);
+  // Enhanced data preprocessing
+  const preprocessedData = localSearchData?.data?.map(item => {
+    const terms = [
+      item.brand,
+      item.name,
+      item.categoryName,
+      item.subCategoryName
+    ].filter(Boolean).map(term => normalizeTerm(String(term)));
 
-  // Phase 1: Find matching products and extract key phrases
-  preprocessedData.forEach(item => {
-    const matchesSearch = item._normalizedTerms.some(term => 
-      term.includes(searchTerm)
-    );
-    
-    if (matchesSearch) {
-      // Extract clean product phrases
-      const name = normalizeTerm(item.name);
-      const brand = normalizeTerm(item.brand);
-      
-      // Generate suggestion variants
-      const variants = [
-        // Basic category matches
-        ...(item.categoryName ? [normalizeTerm(item.categoryName)] : []),
-        ...(item.subCategoryName ? [normalizeTerm(item.subCategoryName)] : []),
-        
-        // Product name segments
-        ...name.split(/\s+/)
-          .filter(word => word.length >= 3)
-          .map((word, i, words) => {
-            // Create 2-3 word phrases around matching terms
-            if (word.includes(searchTerm)) {
-              const start = Math.max(0, i - 1);
-              const end = Math.min(words.length, i + 2);
-              return words.slice(start, end).join(' ');
-            }
-            return null;
-          })
-          .filter(Boolean),
-          
-        // Brand combinations
-        ...(brand ? [
-          `${searchTerm} ${brand}`,
-          `${brand} ${searchTerm}`
-        ] : [])
-      ];
+    return {
+      ...item,
+      _normalizedTerms: terms,
+      _searchText: terms.join(' ')
+    };
+  }) || [];
 
-      // Score and add variants
-      variants.forEach(variant => {
-        if (!variant || variant.length < 3) return;
-        
-        // Calculate score based on:
-        // 1. Match position (earlier is better)
-        // 2. Term length (shorter is better)
-        // 3. Brand presence (higher score)
-        const positionScore = variant.startsWith(searchTerm) ? 2 : 1;
-        const lengthScore = Math.max(0, 10 - variant.length / 3);
-        const brandScore = variant.includes(brand) ? 1.5 : 1;
-        
-        const score = positionScore * lengthScore * brandScore * 100;
-        
-        const displayText = variant.split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-          
-        const current = suggestions.get(displayText) || { score: 0 };
-        suggestions.set(displayText, {
-          text: displayText,
-          score: current.score + score
-        });
-      });
-    }
-  });
+  // Improved suggestion engine
+  const getQuickSuggestions = () => {
+    if (!context?.isSearch || !preprocessedData.length) return [];
 
-  // Phase 2: Generate intelligent combinations
-  if (suggestions.size < 5) {
-    const relatedTerms = new Map();
-    
-    // Find terms commonly appearing with search term
+    const searchTerm = normalizeTerm(context.isSearch);
+    if (searchTerm.length < 2 || excludedRegex.test(searchTerm)) return [];
+
+    const suggestions = new Map();
+    const searchWords = searchTerm.split(/\s+/).filter(Boolean);
+
+    // Phase 1: Find matching products and extract key phrases
     preprocessedData.forEach(item => {
-      if (item._searchText.includes(searchTerm)) {
-        item._normalizedTerms.forEach(term => {
-          term.split(/\s+/).forEach(word => {
-            if (word !== searchTerm && word.length >= 3) {
-              relatedTerms.set(word, (relatedTerms.get(word) || 0) + 1);
-            }
+      const matchesSearch = item._normalizedTerms.some(term =>
+        term.includes(searchTerm)
+      );
+
+      if (matchesSearch) {
+        // Extract clean product phrases
+        const name = normalizeTerm(item.name);
+        const brand = normalizeTerm(item.brand);
+
+        // Generate suggestion variants
+        const variants = [
+          // Basic category matches
+          ...(item.categoryName ? [normalizeTerm(item.categoryName)] : []),
+          ...(item.subCategoryName ? [normalizeTerm(item.subCategoryName)] : []),
+
+          // Product name segments
+          ...name.split(/\s+/)
+            .filter(word => word.length >= 3)
+            .map((word, i, words) => {
+              // Create 2-3 word phrases around matching terms
+              if (word.includes(searchTerm)) {
+                const start = Math.max(0, i - 1);
+                const end = Math.min(words.length, i + 2);
+                return words.slice(start, end).join(' ');
+              }
+              return null;
+            })
+            .filter(Boolean),
+
+          // Brand combinations
+          ...(brand ? [
+            `${searchTerm} ${brand}`,
+            `${brand} ${searchTerm}`
+          ] : [])
+        ];
+
+        // Score and add variants
+        variants.forEach(variant => {
+          if (!variant || variant.length < 3) return;
+
+          // Calculate score based on:
+          // 1. Match position (earlier is better)
+          // 2. Term length (shorter is better)
+          // 3. Brand presence (higher score)
+          const positionScore = variant.startsWith(searchTerm) ? 2 : 1;
+          const lengthScore = Math.max(0, 10 - variant.length / 3);
+          const brandScore = variant.includes(brand) ? 1.5 : 1;
+
+          const score = positionScore * lengthScore * brandScore * 100;
+
+          const displayText = variant.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          const current = suggestions.get(displayText) || { score: 0 };
+          suggestions.set(displayText, {
+            text: displayText,
+            score: current.score + score
           });
         });
       }
     });
-    
-    // Create combinations with most frequent terms
-    Array.from(relatedTerms.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .forEach(([term]) => {
-        const variants = [
-          `${searchTerm} ${term}`,
-          `${term} ${searchTerm}`,
-          `${term} for ${searchTerm}`
-        ];
-        
-        variants.forEach(variant => {
-          const displayText = variant.split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-            
-          if (!suggestions.has(displayText)) {
-            suggestions.set(displayText, {
-              text: displayText,
-              score: 80 // Base score for generated combinations
+
+    // Phase 2: Generate intelligent combinations
+    if (suggestions.size < 5) {
+      const relatedTerms = new Map();
+
+      // Find terms commonly appearing with search term
+      preprocessedData.forEach(item => {
+        if (item._searchText.includes(searchTerm)) {
+          item._normalizedTerms.forEach(term => {
+            term.split(/\s+/).forEach(word => {
+              if (word !== searchTerm && word.length >= 3) {
+                relatedTerms.set(word, (relatedTerms.get(word) || 0) + 1);
+              }
             });
-          }
-        });
+          });
+        }
       });
-  }
 
-  // Final processing
-  return Array.from(suggestions.values())
-    .sort((a, b) => b.score - a.score || a.text.length - b.text.length)
-    .map(item => item.text)
-    .slice(0, 5);
-};
+      // Create combinations with most frequent terms
+      Array.from(relatedTerms.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .forEach(([term]) => {
+          const variants = [
+            `${searchTerm} ${term}`,
+            `${term} ${searchTerm}`,
+            `${term} for ${searchTerm}`
+          ];
 
-const quickSuggestions = getQuickSuggestions();
+          variants.forEach(variant => {
+            const displayText = variant.split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+
+            if (!suggestions.has(displayText)) {
+              suggestions.set(displayText, {
+                text: displayText,
+                score: 80 // Base score for generated combinations
+              });
+            }
+          });
+        });
+    }
+
+    // Final processing
+    return Array.from(suggestions.values())
+      .sort((a, b) => b.score - a.score || a.text.length - b.text.length)
+      .map(item => item.text)
+      .slice(0, 5);
+  };
+
+  const quickSuggestions = getQuickSuggestions();
 
 
 
@@ -293,20 +306,80 @@ const quickSuggestions = getQuickSuggestions();
     };
   }, []);
 
+  const getRandomPlaceholder = () => {
+    const productData = context?.productData || [];
+  
+    const suggestions = productData.flatMap(product =>
+      [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
+    );
+  
+    const random = suggestions[Math.floor(Math.random() * suggestions.length)];
+    return random || "products";
+  };
+  
+  useEffect(() => {
+    if (!context?.productData?.length) return;
+  
+    let index = 0;
+    const suggestions = context.productData.flatMap(product =>
+      [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
+    );
+  
+    if (!suggestions.length) return;
+  
+    const interval = setInterval(() => {
+      setAnimate(false); // reset animation
+      setTimeout(() => {
+        setPlaceholder(suggestions[index] || "products");
+        setAnimate(true); // trigger animation
+        index = (index + 1) % suggestions.length;
+      }, 50); // small delay for smoother animation restart
+    }, 3000);
+  
+    return () => clearInterval(interval);
+  }, [context?.productData]);
+  
+
+
   return (
     <div className="relative" ref={searchRef}>
-      <div className="searchBox w-[100%] h-[50px] bg-[#e5e5e5] rounded-md relative p-2">
-        <input
+      <div className="searchBox w-[100%] h-10 md:h-12 bg-[#e5e5e5] rounded-md relative p-2">
+        {/* <input
           ref={inputRef}
           type="text"
-          placeholder="Search for products..."
+          placeholder={`Search for ${placeholder}...`}
           className="w-full h-[35px] focus:outline-none bg-inherit p-2 text-[15px]"
           value={context?.isSearch || ""}
           onChange={onChangeInput}
           onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onClick={() => setIsFocused(true)}
-        />
+        /> */}
+        <div className="relative w-full">
+          {/* Animated Placeholder Layer */}
+          {!context?.isSearch && (
+            <div className="absolute top-0 left-0 h-[35px] w-full p-2 text-[15px] text-gray-400 pointer-events-none">
+              {`Search for `}
+              <span className={`lowercase font-medium text-red-300 placeholder-text transition-opacity duration-300 ease-in-out ${animate ? "animate" : ""}`}>
+                {`${placeholder}`}
+              </span>
+            </div>
+          )}
+
+
+          {/* Actual input */}
+          <input
+            ref={inputRef}
+            type="text"
+            className="w-full h-[35px] focus:outline-none bg-inherit p-2 text-[15px] text-gray-800"
+            value={context?.isSearch || ""}
+            onChange={onChangeInput}
+            onKeyDown={onKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onClick={() => setIsFocused(true)}
+          />
+        </div>
+
         <Button
           className="!absolute top-[8px] right-[5px] z-50 w-[37px] !min-w-[37px] h-[37px] !rounded-full !text-black"
           onClick={handleSearchClick}
