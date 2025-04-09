@@ -79,27 +79,6 @@ function App() {
     model: '',
   });
 
-  // {
-  //   isSidebarOpen && windowWidth < 992 && (
-  //     <div
-  //       className="sidebarOverlay fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[51]"
-  //       onClick={() => setIsSidebarOpen(false)}
-  //     />
-  //   )
-  // }
-
-  // useEffect(() => {
-  //   if (isSidebarOpen && windowWidth < 992) {
-  //     document.body.style.overflow = 'hidden';
-  //   } else {
-  //     document.body.style.overflow = '';
-  //   }
-
-  //   // optional cleanup (especially helpful during fast navigation)
-  //   return () => {
-  //     document.body.style.overflow = '';
-  //   };
-  // }, [isSidebarOpen, windowWidth]);
 
   useEffect(() => {
     const body = document.body;

@@ -35,7 +35,7 @@ const Sidebar = (props) => {
         size: "",
         rating: [],
         page: props.page || 1, // Start with props.page
-        limit: 2,
+        limit: 30,
         searchData: context?.searchData || [],
     });
 

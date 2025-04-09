@@ -342,19 +342,8 @@ const Search = () => {
 
 
   return (
-    <div className="relative" ref={searchRef}>
-      <div className="searchBox w-[100%] h-10 md:h-12 bg-[#e5e5e5] rounded-md relative p-2">
-        {/* <input
-          ref={inputRef}
-          type="text"
-          placeholder={`Search for ${placeholder}...`}
-          className="w-full h-[35px] focus:outline-none bg-inherit p-2 text-[15px]"
-          value={context?.isSearch || ""}
-          onChange={onChangeInput}
-          onKeyDown={onKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onClick={() => setIsFocused(true)}
-        /> */}
+    <div className="relative flex items-center justify-center" ref={searchRef}>
+      <div className="searchBox w-[100%] h-10 md:h-12 bg-[#e5e5e5] rounded-md relative p-2 flex items-center justify-center">
         <div className="relative w-full">
           {/* Animated Placeholder Layer */}
           {!context?.isSearch && (
@@ -381,7 +370,7 @@ const Search = () => {
         </div>
 
         <Button
-          className="!absolute top-[8px] right-[5px] z-50 w-[37px] !min-w-[37px] h-[37px] !rounded-full !text-black"
+          className="!absolute top-[1px] lg:top-[8px] right-[5px] z-50 w-[37px] !min-w-[37px] h-[37px] !rounded-full !text-black"
           onClick={handleSearchClick}
           aria-label="Search"
           disabled={searchLoading}

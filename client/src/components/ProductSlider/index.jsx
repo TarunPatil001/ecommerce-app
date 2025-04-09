@@ -11,15 +11,19 @@ import "swiper/css/pagination";
 import { Navigation } from "swiper/modules";
 import PropTypes from "prop-types";
 import ProductItem from "../ProductItem";
+import { useContext } from "react";
+import { MyContext } from "../../App";
 
 const ProductSlider = (props) => {
+  const context = useContext(MyContext);
+
   return (
-    <section className="productSlider py-3">
+    <section className="productSlider py-3 pt-1">
       {/* <div className="container"> */}
       <Swiper
         slidesPerView={props.items}
-        spaceBetween={10}
-        navigation={true}
+        spaceBetween={5}
+        navigation={context?.windowWidth > 768}
         modules={[Navigation]}
         className="mySwiper h-full w-full"
       >

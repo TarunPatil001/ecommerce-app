@@ -290,7 +290,7 @@ import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaMapMarkerAlt, FaRegHeart, FaUserCircle } from "react-icons/fa";
-import { IoBagCheck, IoGitCompareOutline } from "react-icons/io5";
+import { IoBagCheck, IoGitCompareOutline, IoMenu } from "react-icons/io5";
 import Tooltip from '@mui/material/Tooltip';
 import { MyContext } from "../../App";
 import Menu from '@mui/material/Menu';
@@ -301,6 +301,8 @@ import { TbLogout } from "react-icons/tb";
 import { IoMdHeart } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
 import Navigation from "./Navigation";
+import { LuHeart } from "react-icons/lu";
+import { Button } from "@mui/material";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -316,6 +318,7 @@ const Header = () => {
   const [loginData, setLoginData] = useState({ avatar: '', name: '', email: '' });
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -323,6 +326,10 @@ const Header = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const openCategoryPanel = () => {
+    setIsOpenCatPanel(prev => !prev);
   };
 
   useEffect(() => {
@@ -350,19 +357,240 @@ const Header = () => {
   };
 
   return (
-    <>
+    // <>
+    //   {/* Top Strip */}
+    //   <div className="top-strip py-2 border-t border-b border-gray-250 bg-white">
+    //     <div className="container mx-auto px-4">
+    //       <div className="flex items-center justify-between">
+    //         <div className="w-full md:w-1/2">
+    //           <p className="text-xs md:text-sm font-medium">
+    //             Get up to 50% off new season styles, limited time only.
+    //           </p>
+    //         </div>
+
+    //         <div className="hidden md:flex items-center justify-end">
+    //           <ul className="flex items-center gap-3">
+    //             <li>
+    //               <Link
+    //                 to="/help-center"
+    //                 className="text-xs md:text-sm font-medium link transition hover:text-primary"
+    //               >
+    //                 Help Center
+    //               </Link>
+    //             </li>
+    //             <span className="h-4 w-px bg-gray-300 mx-1"></span>
+    //             <li>
+    //               <Link
+    //                 to="/order-tracking"
+    //                 className="text-xs md:text-sm font-medium link transition hover:text-primary"
+    //               >
+    //                 Order Tracking
+    //               </Link>
+    //             </li>
+    //           </ul>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+
+    //   {/* Main Header */}
+    //   <header className="bg-white w-full sticky top-0 left-0 z-[100] shadow-sm">
+    //     <div className="container mx-auto px-4">
+    //       <div className="flex items-center justify-between py-4">
+    //         {/* Logo */}
+    //         <div className="w-1/4">
+    //           <Link to="/">
+    //             <img src="/logo.jpg" alt="Logo" className="h-10 md:h-12" />
+    //           </Link>
+    //         </div>
+
+    //         {/* Search */}
+    //         <div className="md:block w-3/5 px-4">
+    //           <Search />
+    //         </div>
+
+    //         {/* User Actions */}
+    //         <div className="w-2/4 md:w-2/6 h-10 md:h-12 flex justify-end">
+    //           <ul className="flex items-center gap-2">
+    //             <li className="flex items-center">
+    //               {context.isLogin ? (
+    //                 <>
+    //                   <div 
+    //                     className="flex items-center w-[200px] gap-2 p-1 rounded-md hover:bg-gray-100 cursor-pointer transition"
+    //                     onClick={handleClick}
+    //                     aria-controls="account-menu"
+    //                     aria-haspopup="true"
+    //                   >
+    //                     <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center">
+    //                       <img 
+    //                         src={loginData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(loginData?.name || '')}`} 
+    //                         alt="User" 
+    //                         className="w-full h-full object-cover"
+    //                       />
+    //                     </div>
+    //                     <div className="hidden md:flex flex-col">
+    //                       <span className="text-xs font-bold uppercase truncate max-w-[150px]">
+    //                         {loginData?.name}
+    //                       </span>
+    //                       <span className="text-xs truncate max-w-[150px]">
+    //                         {loginData?.email}
+    //                       </span>
+    //                     </div>
+    //                   </div>
+
+    //                   <Menu
+    //                     anchorEl={anchorEl}
+    //                     open={open}
+    //                     onClose={handleClose}
+    //                     onClick={handleClose}
+    //                     PaperProps={{
+    //                       elevation: 3,
+    //                       sx: {
+    //                         mt: 1.5,
+    //                         minWidth: 200,
+    //                         overflow: 'visible',
+    //                         '&:before': {
+    //                           content: '""',
+    //                           display: 'block',
+    //                           position: 'absolute',
+    //                           top: 0,
+    //                           right: 14,
+    //                           width: 10,
+    //                           height: 10,
+    //                           bgcolor: 'background.paper',
+    //                           transform: 'translateY(-50%) rotate(45deg)',
+    //                           zIndex: 0,
+    //                         },
+    //                       },
+    //                     }}
+    //                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+    //                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+    //                   >
+    //                     <MenuItem component={Link} to="/my-account" onClick={handleClose}>
+    //                       <ListItemIcon>
+    //                         <FaUserCircle className="text-gray-500" />
+    //                       </ListItemIcon>
+    //                       My Account
+    //                     </MenuItem>
+    //                     <MenuItem component={Link} to="/my-addresses" onClick={handleClose}>
+    //                       <ListItemIcon>
+    //                         <FaMapMarkerAlt className="text-gray-500" />
+    //                       </ListItemIcon>
+    //                       Addresses
+    //                     </MenuItem>
+    //                     <MenuItem component={Link} to="/my-orders" onClick={handleClose}>
+    //                       <ListItemIcon>
+    //                         <IoBagCheck className="text-gray-500" />
+    //                       </ListItemIcon>
+    //                       Orders
+    //                     </MenuItem>
+    //                     <MenuItem component={Link} to="/my-wishlist" onClick={handleClose}>
+    //                       <ListItemIcon>
+    //                         <IoMdHeart className="text-gray-500" />
+    //                       </ListItemIcon>
+    //                       Wishlist
+    //                     </MenuItem>
+    //                     <Divider />
+    //                     <MenuItem onClick={logout}>
+    //                       <ListItemIcon>
+    //                         <TbLogout className="text-gray-500" />
+    //                       </ListItemIcon>
+    //                       Logout
+    //                     </MenuItem>
+    //                   </Menu>
+    //                 </>
+    //               ) : (
+    //                 <div className="flex items-center">
+    //                   <Link 
+    //                     to="/login" 
+    //                     className="text-sm font-medium px-2 link transition hover:text-primary"
+    //                   >
+    //                     Login
+    //                   </Link>
+    //                   <span className="h-5 w-px bg-gray-300 mx-1"></span>
+    //                   <Link 
+    //                     to="/register" 
+    //                     className="text-sm font-medium px-2 link transition hover:text-primary"
+    //                   >
+    //                     Register
+    //                   </Link>
+    //                 </div>
+    //               )}
+    //             </li>
+
+    //             <span className="h-8 w-px bg-gray-300 mx-1 hidden md:block"></span>
+
+    //             <li>
+    //               <Tooltip title="Compare" arrow>
+    //                 <IconButton 
+    //                   aria-label="compare" 
+    //                   className="text-gray-700 hover:text-primary"
+    //                   size="medium"
+    //                 >
+    //                   <StyledBadge badgeContent={4} color="secondary">
+    //                     <IoGitCompareOutline className="text-lg" />
+    //                   </StyledBadge>
+    //                 </IconButton>
+    //               </Tooltip>
+    //             </li>
+
+    //             <li>
+    //               <Tooltip title="Wishlist" arrow>
+    //                 <IconButton 
+    //                   component={Link} 
+    //                   to="/my-wishlist" 
+    //                   aria-label="wishlist" 
+    //                   className="text-gray-700 hover:text-primary"
+    //                   size="medium"
+    //                 >
+    //                   <StyledBadge badgeContent={context?.wishlistData?.length || 0} color="secondary">
+    //                     <FaRegHeart className="text-lg" />
+    //                   </StyledBadge>
+    //                 </IconButton>
+    //               </Tooltip>
+    //             </li>
+
+    //             <li>
+    //               <Tooltip title="Cart" arrow>
+    //                 <IconButton 
+    //                   aria-label="cart" 
+    //                   className="text-gray-700 hover:text-primary"
+    //                   onClick={() => context.setOpenCartPanel(true)}
+    //                   size="medium"
+    //                 >
+    //                   <StyledBadge 
+    //                     badgeContent={context?.cartData?.length || 0} 
+    //                     color="secondary"
+    //                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    //                   >
+    //                     <MdOutlineShoppingCart className="text-lg" />
+    //                   </StyledBadge>
+    //                 </IconButton>
+    //               </Tooltip>
+    //             </li>
+    //           </ul>
+    //         </div>
+    //       </div>
+    //     </div>
+
+    //     <Navigation />
+    //   </header>
+
+    // </>
+
+    <header className="bg-white sticky -top-[47px] left-0 z-[100] shadow-sm">
       {/* Top Strip */}
       <div className="top-strip py-2 border-t border-b border-gray-250 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container">
           <div className="flex items-center justify-between">
-            <div className="w-full md:w-1/2">
-              <p className="text-xs md:text-sm font-medium">
+            <div className="col1 w-[50%] hidden lg:block">
+              <p className="text-[12px] font-medium mt-0 mb-0">
                 Get up to 50% off new season styles, limited time only.
               </p>
             </div>
 
-            <div className="hidden md:flex items-center justify-end">
-              <ul className="flex items-center gap-3">
+            <div className="col2 w-full lg:w-[50%] flex items-center justify-between lg:justify-end">
+              <ul className="flex items-center justify-between lg:justify-end w-full lg:w-[50%] gap-3">
                 <li>
                   <Link
                     to="/help-center"
@@ -371,7 +599,7 @@ const Header = () => {
                     Help Center
                   </Link>
                 </li>
-                <span className="h-4 w-px bg-gray-300 mx-1"></span>
+                <span className="h-4 w-px bg-gray-300 mx-1 hidden lg:block"></span>
                 <li>
                   <Link
                     to="/order-tracking"
@@ -387,41 +615,51 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <header className="bg-white w-full sticky top-0 left-0 z-[100] shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
-            {/* Logo */}
-            <div className="w-1/4">
-              <Link to="/">
-                <img src="/logo.jpg" alt="Logo" className="h-10 md:h-12" />
-              </Link>
+      <div className="header border-b-[1px] border-gray-50">
+        <div className="container flex items-center justify-between py-2 lg:py-4">
+          {/* <div className="flex items-center justify-between py-4"> */}
+          {
+            context?.windowWidth < 992 &&
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Button className="!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !text-gray-800" onClick={() => openCategoryPanel(true)}>
+                <IoMenu className="text-[22px]" />
+              </Button>
             </div>
+          }
+          {/* Logo */}
+          <div className="col1 w-[40%] lg:w-[25%]">
+            <Link to="/">
+              <img src="/logo.jpg" alt="Logo" />
+            </Link>
+          </div>
 
-            {/* Search */}
-            <div className="md:block w-3/5 px-4">
-              <Search />
-            </div>
+          {/* Search */}
+          <div className="col2 fixed top-0 left-0 w-full h-full z-[1000] lg:w-[45%] lg:static p-2 lg:p-0 bg-white hidden lg:block">
+            <Search />
+          </div>
 
-            {/* User Actions */}
-            <div className="w-2/4 md:w-2/6 h-10 md:h-12 flex justify-end">
-              <ul className="flex items-center gap-2">
-                <li className="flex items-center">
+          {/* User Actions */}
+          <div className="col3 w-auto lg:w-[25%] flex justify-end">
+            <ul className="flex items-center gap-2">
+              {
+                context?.windowWidth > 992 &&
+                <li className="flex items-center justify-end">
                   {context.isLogin ? (
                     <>
-                      <div 
-                        className="flex items-center w-[200px] gap-2 p-1 rounded-md hover:bg-gray-100 cursor-pointer transition"
+                      <div
+                        className="flex items-center justify-end  w-full gap-2 p-1 rounded-md hover:bg-gray-100 cursor-pointer transition"
                         onClick={handleClick}
                         aria-controls="account-menu"
                         aria-haspopup="true"
                       >
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center">
-                          <img 
-                            src={loginData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(loginData?.name || '')}`} 
-                            alt="User" 
+                        <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center">
+                          <img
+                            src={loginData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(loginData?.name || '')}`}
+                            alt="User"
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="hidden md:flex flex-col">
+                        <div className="hidden lg:flex flex-col">
                           <span className="text-xs font-bold uppercase truncate max-w-[150px]">
                             {loginData?.name}
                           </span>
@@ -494,15 +732,15 @@ const Header = () => {
                     </>
                   ) : (
                     <div className="flex items-center">
-                      <Link 
-                        to="/login" 
+                      <Link
+                        to="/login"
                         className="text-sm font-medium px-2 link transition hover:text-primary"
                       >
                         Login
                       </Link>
                       <span className="h-5 w-px bg-gray-300 mx-1"></span>
-                      <Link 
-                        to="/register" 
+                      <Link
+                        to="/register"
                         className="text-sm font-medium px-2 link transition hover:text-primary"
                       >
                         Register
@@ -510,65 +748,68 @@ const Header = () => {
                     </div>
                   )}
                 </li>
+              }
+              <span className="h-8 w-px bg-gray-300 mx-1 hidden lg:block"></span>
 
-                <span className="h-8 w-px bg-gray-300 mx-1 hidden md:block"></span>
+              {/* <li>
+                <Tooltip title="Compare" arrow>
+                  <IconButton
+                    aria-label="compare"
+                    className="text-gray-700 hover:text-primary"
+                    size="medium"
+                  >
+                    <StyledBadge badgeContent={4} color="secondary">
+                      <IoGitCompareOutline className="text-[22px]" />
+                    </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </li> */}
 
-                <li>
-                  <Tooltip title="Compare" arrow>
-                    <IconButton 
-                      aria-label="compare" 
-                      className="text-gray-700 hover:text-primary"
-                      size="medium"
-                    >
-                      <StyledBadge badgeContent={4} color="secondary">
-                        <IoGitCompareOutline className="text-lg" />
-                      </StyledBadge>
-                    </IconButton>
-                  </Tooltip>
-                </li>
-
+              {
+                context?.windowWidth > 992 &&
                 <li>
                   <Tooltip title="Wishlist" arrow>
-                    <IconButton 
-                      component={Link} 
-                      to="/my-wishlist" 
-                      aria-label="wishlist" 
+                    <IconButton
+                      component={Link}
+                      to="/my-wishlist"
+                      aria-label="wishlist"
                       className="text-gray-700 hover:text-primary"
                       size="medium"
                     >
                       <StyledBadge badgeContent={context?.wishlistData?.length || 0} color="secondary">
-                        <FaRegHeart className="text-lg" />
+                        <LuHeart className="text-[22px]" />
                       </StyledBadge>
                     </IconButton>
                   </Tooltip>
                 </li>
+              }
 
-                <li>
-                  <Tooltip title="Cart" arrow>
-                    <IconButton 
-                      aria-label="cart" 
-                      className="text-gray-700 hover:text-primary"
-                      onClick={() => context.setOpenCartPanel(true)}
-                      size="medium"
+              <li>
+                <Tooltip title="Cart" arrow>
+                  <IconButton
+                    aria-label="cart"
+                    className="text-gray-700 hover:text-primary"
+                    onClick={() => context.setOpenCartPanel(true)}
+                    size="medium"
+                  >
+                    <StyledBadge
+                      badgeContent={context?.cartData?.length || 0}
+                      color="secondary"
+                      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     >
-                      <StyledBadge 
-                        badgeContent={context?.cartData?.length || 0} 
-                        color="secondary"
-                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                      >
-                        <MdOutlineShoppingCart className="text-lg" />
-                      </StyledBadge>
-                    </IconButton>
-                  </Tooltip>
-                </li>
-              </ul>
-            </div>
+                      <MdOutlineShoppingCart className="text-[22px]" />
+                    </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </li>
+            </ul>
           </div>
+          {/* </div> */}
         </div>
+      </div>
 
-        <Navigation />
-      </header>
-    </>
+      <Navigation isOpenCatPanel={isOpenCatPanel} setIsOpenCatPanel={setIsOpenCatPanel} />
+    </header>
   );
 };
 

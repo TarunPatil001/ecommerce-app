@@ -101,9 +101,9 @@ nav ul button:hover {
 
 
 /* ---------- Big Banner Slider ---------- */
-.sliderHome {
+/* .sliderHome {
   overflow: inherit !important;
-}
+} */
 
 .swiper-button-prev,
 .swiper-button-next {
@@ -337,7 +337,7 @@ nav ul button:hover {
   background-color: var(--bg-primary) !important;
 }
 
-.css-1usuzwp-MuiButtonBase-root-MuiTab-root.Mui-selected {
+.css-1ogu3w6-MuiButtonBase-root-MuiTab-root.Mui-selected  {
   color: var(--bg-primary) !important;
 }
 

@@ -1,0 +1,26 @@
+@media only screen and (min-width:320px) and (max-width:992px) {
+    /* html, body{ overflow: hidden; } */
+
+    .mobileNav a.active button{@apply !text-primary }
+    .navigation ul{ white-space: nowrap; overflow-x: scroll; overflow-y: hidden; display: block !important; }
+    .navigation ul li{ display: inline-block !important; vertical-align: top !important;}
+    .navigation ul::-webkit-scrollbar{display: none;}
+    .nav ul {white-space: nowrap;}
+
+    .swiper-pagination-bullet {
+        /* Increase width */
+        width: 8px !important;
+        /* Increase height */
+        height: 8px !important;
+      }
+      
+      .swiper-pagination-bullet-active-main {
+        background: var(--bg-primary) !important;
+        width: 8px !important;
+        /* Slightly larger for the active bullet */
+        height: 8px !important;
+      }
+      
+
+      
+}

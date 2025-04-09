@@ -193,7 +193,7 @@ const ProductItem = (props) => {
         </div>
 
 
-        <div className="info px-3 py-1 border-t h-[100px]">
+        <div className="info px-3 py-1 border-t h-[150px] lg:h-[100px]">
           <h6 className="text-[16px] font-bold text-[var(--text-dark)]">
             <Link to="#" className="link transition-all line-clamp-1">
               {props?.product?.brand}
@@ -206,7 +206,7 @@ const ProductItem = (props) => {
           </h3>
 
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-wrap gap-2">
             <span className="price text-black text-[14px] font-bold flex items-center">
               ₹<span>{new Intl.NumberFormat('en-IN').format(`${props?.product?.price}`)}</span>
             </span>

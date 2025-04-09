@@ -1,6 +1,7 @@
 import  { useState, createContext, useEffect, useReducer } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
+import "./responsive.css"
 import Header from "./components/Header";
 import Home from "./Pages/Home";
 import ProductListing from "./Pages/ProductListing";
@@ -53,6 +54,8 @@ function App() {
   const [isSearch, setIsSearch] = useState('');
   const [filteredProductData, setFilteredProductData] = useState([]);
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
 
 
   const handleOpenProductDetailsModal = (status, product) => {
@@ -110,6 +113,16 @@ function App() {
   
   useEffect(()=>{
     getProductData();
+
+    const handleSize = () => {
+      setWindowWidth(window.innerWidth);
+    }
+
+    window.addEventListener('resize', handleSize);
+
+    return()=>{
+      window.removeEventListener('resize', handleSize);
+    }
   },[]);
 
   const getProductData = () => {
@@ -315,6 +328,11 @@ function App() {
     setSearchQuery,
     isSearch, 
     setIsSearch,
+
+    windowWidth,
+
+    isOpenCatPanel, 
+    setIsOpenCatPanel,
 
 
   };
