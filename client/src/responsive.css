@@ -99,5 +99,5 @@
     display: none !important;
   }
 
-  .css-y7ab46-MuiPaper-root-MuiDrawer-paper{ width: 100% !important; }
+  .css-y7ab46-MuiPaper-root-MuiDrawer-paper, .css-y50yd7{ width: 100% !important; min-width: 100% !important; }
 }

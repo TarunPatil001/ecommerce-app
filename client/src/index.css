@@ -518,7 +518,7 @@ nav ul button:hover {
 
 
 /* ------ Pagination hover color --------- */
-.css-1l5xwdx-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+.css-1l5xwdx-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected, .css-1ba5ub6.Mui-selected {
   background-color: var(--bg-primary) !important;
   color: #fff;
 }
@@ -779,4 +779,4 @@ input[type=number]::-webkit-outer-spin-button {
   }
 }
 
-.css-y7ab46-MuiPaper-root-MuiDrawer-paper{ width: 400px !important; }
+.css-y7ab46-MuiPaper-root-MuiDrawer-paper, .css-y50yd7 { width: 400px !important; }

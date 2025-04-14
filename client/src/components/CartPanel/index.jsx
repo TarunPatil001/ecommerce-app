@@ -56,7 +56,7 @@ const CartPanel = (props) => {
                 </div> */}
 
 
-                {/* <div className="flex items-center justify-between px-4 py-1">
+            {/* <div className="flex items-center justify-between px-4 py-1">
                     <span className="text-[14px]">Coupon Discount</span>
                     <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(couponDiscount)}</span>
                 </div>
@@ -90,12 +90,12 @@ const CartPanel = (props) => {
                     }
                 </div> */}
 
-                
-                {/* <Divider />
+
+            {/* <Divider />
                 <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                     <span>Total Amount:</span>
                     <span>₹{new Intl.NumberFormat('en-IN').format(totalAmount)}</span> Displaying the total amount after all discounts */}
-                {/* </div>
+            {/* </div>
                 <Divider />
                 <div className="w-[100%] flex items-center justify-between bg-gray-100 p-4">
                     <Link to="/cart" className="w-[45%]"><Button className="buttonPrimaryBlack w-full" onClick={context?.toggleCartPanel(false)}>View Cart</Button></Link>
@@ -103,49 +103,49 @@ const CartPanel = (props) => {
                 </div>
             </div> */}
 
-<div className="scroll w-full h-full max-h-full overflow-y-scroll customScroll overflow-x-hidden">
-    {Array.isArray(props?.data) && props?.data?.length > 0 ? (
-        props?.data?.map((item, index) => (
-            <CartPanelItems key={index} item={item} />
-        ))
-    ) : (
-        <p className="text-center text-gray-500">No items in cart</p>
-    )}
-</div>
+            <div className="scroll w-full h-full max-h-full overflow-y-scroll customScroll overflow-x-hidden">
+                {Array.isArray(props?.data) && props?.data?.length > 0 ? (
+                    props?.data?.map((item, index) => (
+                        <CartPanelItems key={index} item={item} />
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">No items in cart</p>
+                )}
+            </div>
 
-<div className="bottomInfo w-full border-t border pt-4">
-    <h3 className="uppercase px-4 py-1 text-[12px] font-bold text-[var(--text-light)] pb-2">
-        Price Details <span className="capitalize">
-            ({context?.cartData?.length} Item{context?.cartData?.length >= 2 ? "s" : ""})
-        </span>
-    </h3>
-    <Divider />
-    <div className="flex items-center justify-between px-4 py-1 mt-1">
-        <span className="text-[14px]">Total MRP</span>
-        <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(totalMRP)}</span>
-    </div>
-    <div className="flex items-center justify-between px-4 py-1">
-        <span className="text-[14px]">Discount on MRP</span>
-        <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(discount)}</span>
-    </div>
-    
-    <Divider />
-    <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
-        <span>Total Amount:</span>
-        <span>₹{new Intl.NumberFormat('en-IN').format(totalAmount)}</span>
-    </div>
-    <Divider />
-    <div className="w-full flex flex-col sm:flex-row items-center justify-between bg-gray-100 p-4 gap-2">
-        <Link to="/cart" className="w-full sm:w-[45%]">
-            <Button className="buttonPrimaryBlack w-full" onClick={context?.toggleCartPanel(false)}>View Cart</Button>
-        </Link>
-        <Link to="/checkout" className="w-full sm:w-[45%]">
-            <Button className="buttonPrimaryWhite w-full flex items-center justify-center gap-1" onClick={context.toggleCartPanel(false)}>
-                <IoBagCheck />Checkout
-            </Button>
-        </Link>
-    </div>
-</div>
+            <div className="bottomInfo w-full border-t border pt-4">
+                <h3 className="uppercase px-4 py-1 text-[12px] font-bold text-[var(--text-light)] pb-2">
+                    Price Details <span className="capitalize">
+                        ({context?.cartData?.length} Item{context?.cartData?.length >= 2 ? "s" : ""})
+                    </span>
+                </h3>
+                <Divider />
+                <div className="flex items-center justify-between px-4 py-1 mt-1">
+                    <span className="text-[14px]">Total MRP</span>
+                    <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(totalMRP)}</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-1">
+                    <span className="text-[14px]">Discount on MRP</span>
+                    <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(discount)}</span>
+                </div>
+
+                <Divider />
+                <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
+                    <span>Total Amount:</span>
+                    <span>₹{new Intl.NumberFormat('en-IN').format(totalAmount)}</span>
+                </div>
+                <Divider />
+                <div className="w-full flex flex-col sm:flex-row items-center justify-between bg-gray-100 p-4 gap-2">
+                    <Link to="/cart" className="w-full sm:w-[45%]">
+                        <Button className="buttonPrimaryBlack w-full" onClick={context?.toggleCartPanel(false)}>View Cart</Button>
+                    </Link>
+                    <Link to="/checkout" className="w-full sm:w-[45%]">
+                        <Button className="buttonPrimaryWhite w-full flex items-center justify-center gap-1" onClick={context.toggleCartPanel(false)}>
+                            <IoBagCheck />Checkout
+                        </Button>
+                    </Link>
+                </div>
+            </div>
 
         </>
     );

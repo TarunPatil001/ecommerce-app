@@ -8,6 +8,8 @@ const OrderFailed = () => {
     const [countdown, setCountdown] = useState(7); // Initial countdown value
 
     useEffect(() => {
+        window.scrollTo(0,0);
+        
         const timer = setInterval(() => {
             setCountdown((prev) => prev - 1);
         }, 1000);
