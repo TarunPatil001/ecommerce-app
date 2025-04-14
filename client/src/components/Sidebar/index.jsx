@@ -12,6 +12,7 @@ import { MyContext } from '../../App';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { postData } from '../../utils/api';
 import PropTypes from 'prop-types';
+import { LuFilterX } from 'react-icons/lu';
 
 
 
@@ -39,6 +40,7 @@ const Sidebar = (props) => {
         searchData: context?.searchData || [],
     });
 
+    const sidebar = useRef(null);
 
     const ratings = [5, 4, 3, 2, 1];
 
@@ -131,6 +133,7 @@ const Sidebar = (props) => {
             updatedValues = currentValues.includes(value)
                 ? currentValues.filter((item) => item !== value)
                 : [...currentValues, value];
+
         } else {
             updatedValues = currentValues.includes(value)
                 ? currentValues.filter((item) => item !== value)
@@ -141,7 +144,8 @@ const Sidebar = (props) => {
                 context?.setSearchData([]);
                 context?.setSearchQuery('');  // <-- Reset search query
                 context?.setIsSearch('');
-    
+                context?.setIsFilterApplied(false);
+
                 navigate("/search"); // Update URL to "/search"
             }
         }
@@ -159,132 +163,133 @@ const Sidebar = (props) => {
                 thirdSubCategoryId: [],
             }));
         }
+
     };
 
-//     // Sync selected names for UI display
-// const handleCheckBoxChange = (field, value) => {
-//     const currentValues = filters[field] || [];
-//     let updatedValues = currentValues.includes(value)
-//         ? currentValues.filter((item) => item !== value)
-//         : [...currentValues, value];
+    //     // Sync selected names for UI display
+    // const handleCheckBoxChange = (field, value) => {
+    //     const currentValues = filters[field] || [];
+    //     let updatedValues = currentValues.includes(value)
+    //         ? currentValues.filter((item) => item !== value)
+    //         : [...currentValues, value];
 
-//     // Clear search data when category filters change
-//     if (["categoryId", "subCategoryId", "thirdSubCategoryId"].includes(field)) {
-//         context?.setSearchData([]);
-//         context?.setIsSearch('');
-//         context?.setSearchQuery('');  // <-- Reset search query
-//         navigate("/search"); // Update URL to "/search"
-//     }
+    //     // Clear search data when category filters change
+    //     if (["categoryId", "subCategoryId", "thirdSubCategoryId"].includes(field)) {
+    //         context?.setSearchData([]);
+    //         context?.setIsSearch('');
+    //         context?.setSearchQuery('');  // <-- Reset search query
+    //         navigate("/search"); // Update URL to "/search"
+    //     }
 
-//     // Update filters immediately
-//     const newFilters = {
-//         ...filters,
-//         [field]: updatedValues,
-//         page: 1, // Reset to first page when filters change
-//     };
+    //     // Update filters immediately
+    //     const newFilters = {
+    //         ...filters,
+    //         [field]: updatedValues,
+    //         page: 1, // Reset to first page when filters change
+    //     };
 
-//     // Reset subcategories if category changes
-//     if (field === "categoryId") {
-//         newFilters.subCategoryId = [];
-//         newFilters.thirdSubCategoryId = [];
-//     }
+    //     // Reset subcategories if category changes
+    //     if (field === "categoryId") {
+    //         newFilters.subCategoryId = [];
+    //         newFilters.thirdSubCategoryId = [];
+    //     }
 
-//     setFilters(newFilters);
-// };
+    //     setFilters(newFilters);
+    // };
 
-// Compute selected names for UI display
-useEffect(() => {
-    let selectedNames = [];
+    // Compute selected names for UI display
+    useEffect(() => {
+        let selectedNames = [];
 
-    // If search is active, set selectedNames based on search results
-    if (context?.isSearch && context?.searchData?.length > 0) {
-        selectedNames = context.searchData.map(item => item.name);
-    } else {
-        // Reset to default if no filters are applied
-        const isFiltersEmpty =
-            (!filters.categoryId || filters.categoryId.length === 0) &&
-            (!filters.subCategoryId || filters.subCategoryId.length === 0) &&
-            (!filters.thirdSubCategoryId || filters.thirdSubCategoryId.length === 0);
+        // If search is active, set selectedNames based on search results
+        if (context?.isSearch && context?.searchData?.length > 0) {
+            selectedNames = context.searchData.map(item => item.name);
+        } else {
+            // Reset to default if no filters are applied
+            const isFiltersEmpty =
+                (!filters.categoryId || filters.categoryId.length === 0) &&
+                (!filters.subCategoryId || filters.subCategoryId.length === 0) &&
+                (!filters.thirdSubCategoryId || filters.thirdSubCategoryId.length === 0);
 
-        if (isFiltersEmpty) {
-            selectedNames = ["All Categories"];
-        } else if (context?.catData?.length > 0) {
-            filters.categoryId?.forEach(categoryId => {
-                const category = context.catData.find(cat => cat._id === categoryId);
-                if (category) {
-                    const hasSelectedSubcategories = category.children?.some(subCat =>
-                        filters.subCategoryId?.includes(subCat._id)
-                    );
+            if (isFiltersEmpty) {
+                selectedNames = ["All Categories"];
+            } else if (context?.catData?.length > 0) {
+                filters.categoryId?.forEach(categoryId => {
+                    const category = context.catData.find(cat => cat._id === categoryId);
+                    if (category) {
+                        const hasSelectedSubcategories = category.children?.some(subCat =>
+                            filters.subCategoryId?.includes(subCat._id)
+                        );
 
-                    if (!hasSelectedSubcategories) {
-                        selectedNames.push(category.name);
-                    }
-
-                    category.children?.forEach(subCat => {
-                        if (filters.subCategoryId?.includes(subCat._id)) {
-                            const hasSelectedThirdSubcategories = subCat.children?.some(thirdCat =>
-                                filters.thirdSubCategoryId?.includes(thirdCat._id)
-                            );
-
-                            if (!hasSelectedThirdSubcategories) {
-                                selectedNames.push(subCat.name);
-                            }
-
-                            subCat.children?.forEach(thirdSubCat => {
-                                if (filters.thirdSubCategoryId?.includes(thirdSubCat._id)) {
-                                    selectedNames.push(thirdSubCat.name);
-                                }
-                            });
+                        if (!hasSelectedSubcategories) {
+                            selectedNames.push(category.name);
                         }
-                    });
-                }
-            });
-        }
-    }
 
-    // Default to "All Categories" if nothing is selected
-    if (selectedNames.length === 0) {
-        selectedNames = ["All Categories"];
-    }
+                        category.children?.forEach(subCat => {
+                            if (filters.subCategoryId?.includes(subCat._id)) {
+                                const hasSelectedThirdSubcategories = subCat.children?.some(thirdCat =>
+                                    filters.thirdSubCategoryId?.includes(thirdCat._id)
+                                );
 
-    console.log("Selected names:", selectedNames); // Debugging
-    props?.setSelectedName?.(selectedNames.join(" + "));
-}, [filters, context?.catData, context?.isSearch, context?.searchData]);
+                                if (!hasSelectedThirdSubcategories) {
+                                    selectedNames.push(subCat.name);
+                                }
 
-
-// Sync filters with URL changes
-useEffect(() => {
-    const queryParameters = new URLSearchParams(location.search);
-
-    setFilters(prevFilters => {
-        const newFilters = { ...prevFilters };
-
-        if (location.search.includes("categoryId")) {
-            newFilters.categoryId = queryParameters.get("categoryId") ? [queryParameters.get("categoryId")] : [];
-            newFilters.subCategoryId = [];
-            newFilters.thirdSubCategoryId = [];
-            context?.setSearchData([]);
-            context?.setIsSearch('');
+                                subCat.children?.forEach(thirdSubCat => {
+                                    if (filters.thirdSubCategoryId?.includes(thirdSubCat._id)) {
+                                        selectedNames.push(thirdSubCat.name);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
         }
 
-        if (location.search.includes("subCategoryId")) {
-            newFilters.subCategoryId = queryParameters.get("subCategoryId") ? [queryParameters.get("subCategoryId")] : [];
-            newFilters.thirdSubCategoryId = [];
-            context?.setSearchData([]);
-            context?.setIsSearch('');
+        // Default to "All Categories" if nothing is selected
+        if (selectedNames.length === 0) {
+            selectedNames = ["All Categories"];
         }
 
-        if (location.search.includes("thirdSubCategoryId")) {
-            newFilters.thirdSubCategoryId = queryParameters.get("thirdSubCategoryId") ? [queryParameters.get("thirdSubCategoryId")] : [];
-            context?.setSearchData([]);
-            context?.setIsSearch('');
-        }
+        console.log("Selected names:", selectedNames); // Debugging
+        props?.setSelectedName?.(selectedNames.join(" + "));
+    }, [filters, context?.catData, context?.isSearch, context?.searchData]);
 
-        return newFilters;
-    });
 
-    props.setPage(1);
-}, [location.search]);
+    // Sync filters with URL changes
+    useEffect(() => {
+        const queryParameters = new URLSearchParams(location.search);
+
+        setFilters(prevFilters => {
+            const newFilters = { ...prevFilters };
+
+            if (location.search.includes("categoryId")) {
+                newFilters.categoryId = queryParameters.get("categoryId") ? [queryParameters.get("categoryId")] : [];
+                newFilters.subCategoryId = [];
+                newFilters.thirdSubCategoryId = [];
+                context?.setSearchData([]);
+                context?.setIsSearch('');
+            }
+
+            if (location.search.includes("subCategoryId")) {
+                newFilters.subCategoryId = queryParameters.get("subCategoryId") ? [queryParameters.get("subCategoryId")] : [];
+                newFilters.thirdSubCategoryId = [];
+                context?.setSearchData([]);
+                context?.setIsSearch('');
+            }
+
+            if (location.search.includes("thirdSubCategoryId")) {
+                newFilters.thirdSubCategoryId = queryParameters.get("thirdSubCategoryId") ? [queryParameters.get("thirdSubCategoryId")] : [];
+                context?.setSearchData([]);
+                context?.setIsSearch('');
+            }
+
+            return newFilters;
+        });
+
+        props.setPage(1);
+    }, [location.search]);
 
 
 
@@ -485,13 +490,23 @@ useEffect(() => {
                     }));
                 }
 
-                const filteredData = context.searchData.data.filter(product => {
-                    return (
-                        product.price >= filters.minPrice &&
-                        product.price <= filters.maxPrice &&
-                        (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
-                    );
-                });
+                // const filteredData = context.searchData.data.filter(product => {
+                //     return (
+                //         product.price >= filters.minPrice &&
+                //         product.price <= filters.maxPrice &&
+                //         (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
+                //     );
+                // });
+
+                const filteredData = Array.isArray(context.searchData.data)
+                    ? context.searchData.data.filter(product => {
+                        return (
+                            (filters.minPrice === null || product.price >= filters.minPrice) &&
+                            (filters.maxPrice === null || product.price <= filters.maxPrice) &&
+                            (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
+                        );
+                    })
+                    : [];
 
                 totalItems = filteredData.length;
                 totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
@@ -510,14 +525,26 @@ useEffect(() => {
             } else {
                 console.log("Using filtered data for filtering...");
 
+                // context?.setIsFilterApplied(true);
+
                 // Apply filters to product data
-                const filteredData = context.filteredProductData.data.filter(product => {
-                    return (
-                        (filters.minPrice === null || product.price >= filters.minPrice) &&
-                        (filters.maxPrice === null || product.price <= filters.maxPrice) &&
-                        (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
-                    );
-                });
+                // const filteredData = context.filteredProductData.data.filter(product => {
+                //     return (
+                //         (filters.minPrice === null || product.price >= filters.minPrice) &&
+                //         (filters.maxPrice === null || product.price <= filters.maxPrice) &&
+                //         (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
+                //     );
+                // });
+
+                const filteredData = Array.isArray(context?.filteredProductData?.data)
+                    ? context.filteredProductData.data.filter(product => {
+                        return (
+                            (filters.minPrice === null || product.price >= filters.minPrice) &&
+                            (filters.maxPrice === null || product.price <= filters.maxPrice) &&
+                            (filters.rating.length === 0 || filters.rating.some(rating => Math.floor(product.rating) >= rating))
+                        );
+                    })
+                    : [];
 
                 totalItems = filteredData.length;
                 totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
@@ -574,7 +601,7 @@ useEffect(() => {
                         limit: Number.MAX_SAFE_INTEGER // Use the actual limit
                     });
                     context?.setFilteredProductData(res);
-                    props.setSelectedSortValue('');
+                    // props.setSelectedSortValue('');
                 } catch (error) {
                     console.error("Error fetching filtered data:", error);
                 }
@@ -596,72 +623,223 @@ useEffect(() => {
         return () => clearTimeout(timer);
     }, [filters, context?.searchData, context?.filteredProductData, filters.page]);
 
+    // Step 1: Fetch filtered data when filters change
+// useEffect(() => {
+//     const fetchFilteredData = async () => {
+//         console.warn("Fetching from API due to filter change...");
+//         try {
+//             const res = await postData(`/api/product/filters`, {
+//                 ...filters,
+//                 page: 1,
+//                 limit: Number.MAX_SAFE_INTEGER,
+//             });
+//             context?.setFilteredProductData(res);
+//         } catch (error) {
+//             console.error("Error fetching filtered data:", error);
+//         }
+//     };
+
+//     fetchFilteredData();
+// }, [filters.minPrice, filters.maxPrice, filters.rating, filters.searchData, filters.categoryId, filters.subCategoryId, filters.thirdSubCategoryId]);
+
+
+// // Step 2: Apply filtering only when filteredProductData is updated
+// useEffect(() => {
+//     props.setIsLoading(true);
+//     const timer = setTimeout(() => {
+//         filtersData();
+//     }, 300);
+
+//     return () => clearTimeout(timer);
+// }, [context.filteredProductData, filters.page]);
+
+    
+    
+
 
     return (
-        <aside className="sidebar">
-            <div className="p-1 border-x border-t rounded-t-md">
-                <h3 className="p-2 px-4 text-[18px] font-semibold uppercase">Filters</h3>
+        // <aside className="sidebar">
+        //     <div className="p-1 border-x border-t rounded-t-md">
+        //         <h3 className="p-2 px-4 text-[18px] font-semibold uppercase">Filters</h3>
+        //     </div>
+
+        //     <div className="box border">
+        //         <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
+        //             Categories
+        //             <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter1(!isOpenCategoryFilter1) }}> {isOpenCategoryFilter1 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
+        //         </h3>
+        //         <Collapse isOpened={isOpenCategoryFilter1}>
+        //             <div className="relative flex flex-col w-full mb-1">
+        //                 <div className="px-4 flex flex-col w-full mb-2 capitalize">
+        //                     {context?.catData?.length !== 0 &&
+        //                         context?.catData.map((item, index) => (
+        //                             <FormControlLabel
+        //                                 key={index}
+        //                                 value={item?._id}
+        //                                 control={<Checkbox size="small" />}
+        //                                 checked={filters?.categoryId?.includes(item?._id)} // Ensures correct checked state
+        //                                 label={item?.name}
+        //                                 onChange={() => handleCheckBoxChange("categoryId", item?._id)}
+        //                                 className="link w-full"
+        //                             />
+        //                         ))}
+        //                 </div>
+        //             </div>
+        //         </Collapse>
+        //     </div>
+
+        //     <div className="box border-x border-b">
+        //         <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
+        //             Price
+        //             <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter4(!isOpenCategoryFilter4) }}> {isOpenCategoryFilter4 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
+        //         </h3>
+        //         <Collapse isOpened={isOpenCategoryFilter4}>
+        //             <div className="p-5  flex flex-col w-full capitalize">
+        //                 <RangeSlider
+        //                     value={price}
+        //                     onInput={setPrice}
+        //                     min={100}
+        //                     max={400000}
+        //                     step={10}
+        //                 />
+
+        //                 <div className="py-4 px-0 text-[12px] flex items-center justify-between priceRange">
+        //                     <span>low: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(price[0])}</span></span>
+        //                     <span>high: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(price[1])}</span></span>
+        //                 </div>
+        //             </div>
+        //         </Collapse>
+        //     </div>
+
+        //     <div className="box border-x border-b rounded-b-md ">
+        //         <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
+        //             Rating
+        //             <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter5(!isOpenCategoryFilter5) }}> {isOpenCategoryFilter5 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
+        //         </h3>
+        //         <Collapse isOpened={isOpenCategoryFilter5}>
+        //             <div className="p-5 pt-0  flex flex-col w-full lowercase">
+        //                 {ratings.map((rating) => (
+        //                     <FormControlLabel
+        //                         key={rating}
+        //                         className="link w-full"
+        //                         control={
+        //                             <Checkbox
+        //                                 size="small"
+        //                                 checked={filters?.rating?.includes(rating)}
+        //                                 onChange={() => handleCheckBoxChange("rating", rating)}
+        //                             />
+        //                         }
+        //                         label={
+        //                             <div className="flex items-center gap-2">
+        //                                 <Rating
+        //                                     name={`rating-${rating}`}
+        //                                     defaultValue={rating}
+        //                                     precision={0.5}
+        //                                     size="small"
+        //                                     readOnly
+        //                                 />
+        //                                 <span>& above</span>
+        //                             </div>
+        //                         }
+        //                         labelPlacement="end" // Ensure the label is placed after the checkbox
+        //                     />
+        //                 ))}
+        //             </div>
+        //         </Collapse>
+        //     </div>
+        // </aside>
+
+        <aside className="sidebar relative bg-white">
+            {/* Filters Header */}
+            <div className="sticky -top-3 z-10 w-full p-1 border-x border-t shadow bg-white rounded-t-md flex justify-between items-center pr-2">
+                {/* <div className="sticky top-0 z-[50] w-full p-1 border-x border-t rounded-t-md"> */}
+                <h3 className="p-2 px-4 text-lg font-semibold uppercase">Filters</h3>
+                {
+                    context?.isFilterApplied &&
+                    <Button className='!bg-primary !text-white !text-[18px] !w-[35px] !min-w-[35px] !h-[35px] !rounded-full' ><LuFilterX /></Button>
+                }
             </div>
 
-            <div className="box border">
-                <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
-                    Categories
-                    <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter1(!isOpenCategoryFilter1) }}> {isOpenCategoryFilter1 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
-                </h3>
+            {/* Categories Filter */}
+            <div className="border-x border-t">
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <h3 className="text-base font-semibold uppercase">Categories</h3>
+                    <button
+                        className="w-7 h-7 min-w-[28px] rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsOpenCategoryFilter1(!isOpenCategoryFilter1)}
+                    >
+                        {isOpenCategoryFilter1 ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                    </button>
+                </div>
                 <Collapse isOpened={isOpenCategoryFilter1}>
-                    <div className="relative flex flex-col w-full mb-1">
-                        <div className="px-4 flex flex-col w-full mb-2 capitalize">
-                            {context?.catData?.length !== 0 &&
-                                context?.catData.map((item, index) => (
-                                    <FormControlLabel
-                                        key={index}
-                                        value={item?._id}
-                                        control={<Checkbox size="small" />}
-                                        checked={filters?.categoryId?.includes(item?._id)} // Ensures correct checked state
-                                        label={item?.name}
+                    <div className="px-4 py-2 space-y-2">
+                        {context?.catData?.length > 0 && context.catData.map((item, index) => (
+                            <FormControlLabel
+                                key={index}
+                                control={
+                                    <Checkbox
+                                        size="small"
+                                        checked={filters?.categoryId?.includes(item?._id)}
                                         onChange={() => handleCheckBoxChange("categoryId", item?._id)}
-                                        className="link w-full"
                                     />
-                                ))}
-                        </div>
+                                }
+                                label={item?.name}
+                                className="w-full m-0 capitalize"
+                            />
+                        ))}
                     </div>
                 </Collapse>
             </div>
 
-            <div className="box border-x border-b">
-                <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
-                    Price
-                    <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter4(!isOpenCategoryFilter4) }}> {isOpenCategoryFilter4 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
-                </h3>
+            {/* Price Filter */}
+            <div className="border-x  border-t">
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <h3 className="text-base font-semibold uppercase">Price</h3>
+                    <button
+                        className="w-7 h-7 min-w-[28px] rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsOpenCategoryFilter4(!isOpenCategoryFilter4)}
+                    >
+                        {isOpenCategoryFilter4 ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                    </button>
+                </div>
                 <Collapse isOpened={isOpenCategoryFilter4}>
-                    <div className="p-5  flex flex-col w-full capitalize">
+                    <div className="p-4 space-y-4">
                         <RangeSlider
                             value={price}
                             onInput={setPrice}
                             min={100}
                             max={400000}
                             step={10}
+                            className="w-full"
                         />
-
-                        <div className="py-4 px-0 text-[12px] flex items-center justify-between priceRange">
-                            <span>low: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(price[0])}</span></span>
-                            <span>high: <span className="rupee">₹</span><span className="font-semibold text-[13px]">{new Intl.NumberFormat('en-IN').format(price[1])}</span></span>
+                        <div className="flex justify-between text-sm">
+                            <span className="font-medium">
+                                Low: ₹{new Intl.NumberFormat('en-IN').format(price[0])}
+                            </span>
+                            <span className="font-medium">
+                                High: ₹{new Intl.NumberFormat('en-IN').format(price[1])}
+                            </span>
                         </div>
                     </div>
                 </Collapse>
             </div>
 
-            <div className="box border-x border-b rounded-b-md ">
-                <h3 className=" text-[16px] font-semibold uppercase px-4 py-3 flex items-center">
-                    Rating
-                    <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[rgba(0,0,0,0.8)]" onClick={() => { setIsOpenCategoryFilter5(!isOpenCategoryFilter5) }}> {isOpenCategoryFilter5 ? (<><IoIosArrowUp /></>) : (<><IoIosArrowDown /></>)}</Button>
-                </h3>
+            {/* Rating Filter */}
+            <div className="border-x  border-t border-b rounded-b-md">
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <h3 className="text-base font-semibold uppercase">Rating</h3>
+                    <button
+                        className="w-7 h-7 min-w-[28px] rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsOpenCategoryFilter5(!isOpenCategoryFilter5)}
+                    >
+                        {isOpenCategoryFilter5 ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                    </button>
+                </div>
                 <Collapse isOpened={isOpenCategoryFilter5}>
-                    <div className="p-5 pt-0  flex flex-col w-full lowercase">
+                    <div className="px-4 py-2 space-y-2">
                         {ratings.map((rating) => (
                             <FormControlLabel
                                 key={rating}
-                                className="link w-full"
                                 control={
                                     <Checkbox
                                         size="small"
@@ -672,16 +850,15 @@ useEffect(() => {
                                 label={
                                     <div className="flex items-center gap-2">
                                         <Rating
-                                            name={`rating-${rating}`}
-                                            defaultValue={rating}
+                                            value={rating}
                                             precision={0.5}
                                             size="small"
                                             readOnly
                                         />
-                                        <span>& above</span>
+                                        <span className="text-sm lowercase">& above</span>
                                     </div>
                                 }
-                                labelPlacement="end" // Ensure the label is placed after the checkbox
+                                className="w-full m-0"
                             />
                         ))}
                     </div>

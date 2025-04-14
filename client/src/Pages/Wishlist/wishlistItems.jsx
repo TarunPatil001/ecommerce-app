@@ -63,12 +63,12 @@ const WishlistItems = (props) => {
         <>
             <div className="cartItem w-full p-3 flex items-start gap-4 border rounded-md relative">
                 <Link to={`/product/${props?.item?.productId}`} className="w-full flex items-start gap-4 group" onClick={context.toggleCartPanel(false)} >
-                    <div className="cartItemImg w-[15%] flex items-center justify-center">
+                    <div className="cartItemImg w-[150px] flex items-center justify-center">
                         <div className="w-full h-[150px] rounded-md overflow-hidden">
                             <img src={props?.item?.image} alt="ProductImg" className="w-full h-full object-cover rounded-md hover:scale-105 transition-all" />
                         </div>
                     </div>
-                    <div className="cartInfo w-[85%] pr-5">
+                    <div className="cartInfo w-full pr-5">
                         <div className='flex items-center text-[12px] gap-1'>
                             <span className="font-semibold flex items-center justify-center gap-0.5 bg-[var(--rating-star-color)] !text-white rounded-sm px-1">
                                 {props?.item?.rating}
@@ -77,13 +77,13 @@ const WishlistItems = (props) => {
                             <span className="font-bold text-[14px]">{props?.item?.brand?.length > 40 ? `${props?.item?.brand?.substr(0, 40)}...` : props?.item?.brand}</span>
                         </div>
                         {/* Add group-hover:text-blue-600 on h4, not the inner Link */}
-                        <h4 className="text-[15px] mr-10 line-clamp-2 leading-6 flex items-center gap-1 group-hover:text-[var(--bg-primary)] transition-all">
+                        <h4 className="text-[15px] mr-10 line-clamp-1 sm:line-clamp-2 leading-6 flex items-center gap-1 group-hover:text-[var(--bg-primary)] transition-all">
                             <span>
-                                {/* {props?.item?.productTitle?.length > 50 ? `${props?.item?.productTitle?.substr(0, 50)}...` : props?.item?.productTitle} */}
-                                {props?.item?.productTitle}
+                                {props?.item?.productTitle?.length > 50 ? `${props?.item?.productTitle?.substr(0, 50)}...` : props?.item?.productTitle}
+                                {/* {props?.item?.productTitle} */}
                             </span>
                         </h4>
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
                             <span className="price text-black text-[22px] font-semibold flex items-center">
                                 ₹{new Intl.NumberFormat('en-IN').format(`${props?.item?.price}`)}
                             </span>

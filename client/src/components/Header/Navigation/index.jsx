@@ -41,7 +41,7 @@ const Navigation = (props) => {
       <nav className="navigation bg-white border-t shadow-md w-full transition-all duration-500 sticky top-[82px] left-0 z-[999] lg:px-0">
         <div className="container flex items-center justify-center lg:justify-end gap-8">
 
-          {
+          {/* {
             context?.windowWidth > 992 &&
             <>
               <div className="col_1 w-[20%]">
@@ -57,10 +57,10 @@ const Navigation = (props) => {
               </div>
               <span className="line !h-[20px]"></span>
             </>
-          }
+          } */}
 
 
-          <div className="col_2 w-full lg:w-[60%]">
+          <div className="col_2 w-full lg:w-[100%]">
             <ul className="flex items-center gap-3 nav">
               <li className="list-none mr-3">
                 <Link to="/" className="link transition">

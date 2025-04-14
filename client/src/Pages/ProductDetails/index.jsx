@@ -77,7 +77,7 @@ const ProductDetails = () => {
     return (
 
         <>
-            <div className="bg-white  pb-2 py-5">
+            {/* <div className="bg-white  pb-2 py-5">
                 <div className="container px-5 flex items-center bg-white">
                     <Breadcrumbs separator={"/"} aria-label="breadcrumb" className="!text-[var(--text-dark)]">
                         <Link
@@ -121,10 +121,10 @@ const ProductDetails = () => {
 
                     </Breadcrumbs>
                 </div>
-            </div>
+            </div> */}
 
 
-            <section className="bg-white py-5">
+            {/* <section className="bg-white py-5">
                 <div className="container flex gap-4">
 
                     {
@@ -142,7 +142,7 @@ const ProductDetails = () => {
                                     <ProductDetailsContent product={productData} reviewsCount={reviewsCount} gotoReviews={gotoReviews} />
                                     <div className="tabPanel pt-6">
                                         
-                                        {/* Seller Details */}
+                                        
                                         <div className="shadow-sm w-full px-8 py-5 border rounded-md mb-5">
                                             <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Seller Details</h2>
                                             <p className="text-[16px]">
@@ -150,7 +150,7 @@ const ProductDetails = () => {
                                             </p>
                                         </div>
 
-                                        {/* Reviews */}
+                                       
                                         <div className="shadow-sm w-full px-8 py-5 border rounded-md" ref={reviewsRef}>
                                             <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">
                                                 Review{reviewsCount >= 2 ? "s" : ""} ({reviewsCount})
@@ -181,7 +181,114 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 }
-            </section >
+            </section > */}
+
+<div className="bg-white pb-2 py-5">
+    <div className="container px-4 sm:px-5 flex items-center bg-white">
+        <Breadcrumbs separator="/" aria-label="breadcrumb" className="!text-[var(--text-dark)] text-sm">
+            <Link
+                underline="hover"
+                key="1"
+                color="inherit"
+                href="/"
+                onClick={handleClick}
+                className="link transition capitalize text-sm hover:underline underline-offset-4"
+            >
+                Home
+            </Link>
+            <Link
+                underline="hover"
+                key="2"
+                color="inherit"
+                href="/material-ui/getting-started/installation/"
+                onClick={handleClick}
+                className="link transition capitalize text-sm hover:underline underline-offset-4"
+            >
+                Fashion
+            </Link>
+            <Link
+                underline="hover"
+                key="3"
+                color="inherit"
+                href="/material-ui/getting-started/installation/"
+                onClick={handleClick}
+                className="link transition capitalize text-sm hover:underline underline-offset-4"
+            >
+                Men
+            </Link>
+            <Link
+                underline="hover"
+                key="4"
+                color="inherit"
+                href="/material-ui/getting-started/installation/"
+                onClick={handleClick}
+                className="link transition capitalize text-sm font-bold text-[var(--text-dark)] hover:underline underline-offset-4"
+            >
+                T-Shirt
+            </Link>
+        </Breadcrumbs>
+    </div>
+</div>
+
+<section className="bg-white py-5">
+    <div className="container flex flex-col lg:flex-row gap-6">
+        {isLoading ? (
+            <div className="flex items-center justify-center w-full h-[50vh]">
+                <CircularProgress sx={{ color: 'var(--bg-primary)' }} />
+            </div>
+        ) : (
+            <>
+                {/* Product Image Section */}
+                <div className="productZoomContainer w-full lg:w-[40%] p-3">
+                    <ProductZoom images={productData?.images} />
+                </div>
+
+                {/* Product Details Section */}
+                <div className="productContent w-full lg:w-[60%] p-3">
+                    <ProductDetailsContent
+                        product={productData}
+                        reviewsCount={reviewsCount}
+                        gotoReviews={gotoReviews}
+                    />
+
+                    <div className="tabPanel pt-6 space-y-5">
+                        {/* Seller Details */}
+                        <div className="shadow-sm w-full px-4 md:px-8 py-4 md:py-5 border rounded-md">
+                            <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Seller Details</h2>
+                            <p className="text-[16px]">
+                                Seller: {productData?.seller?.sellerName || "No description available."}
+                            </p>
+                        </div>
+
+                        {/* Reviews */}
+                        <div className="shadow-sm w-full px-4 md:px-8 py-4 md:py-5 border rounded-md" ref={reviewsRef}>
+                            <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">
+                                Review{reviewsCount >= 2 ? "s" : ""} ({reviewsCount})
+                            </h2>
+
+                            {productData && productData.length !== 0 ? (
+                                <Reviews productId={productData?._id} setReviewsCount={setReviewsCount} />
+                            ) : (
+                                <p className="text-[16px]">No reviews available.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </>
+        )}
+    </div>
+
+    {/* Related Products */}
+    {relatedProductData.length !== 0 && (
+        <div className="container px-4 sm:px-5">
+            <div className="py-5">
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Related Products</h2>
+                <ProductSlider items={window.innerWidth < 640 ? 2 : window.innerWidth < 768 ? 3 : window.innerWidth < 1024 ? 4 : window.innerWidth < 1280 ? 5 : 6} data={relatedProductData} />
+            </div>
+        </div>
+    )}
+</section>
+
         </>
     )
 }

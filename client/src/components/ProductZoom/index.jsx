@@ -14,6 +14,10 @@ const ProductZoom = (props) => {
     const zoomSlideSml = useRef(null);
     const [bgColor, setBgColor] = useState("#ffffff"); // Default background
 
+    const [swiperInstance, setSwiperInstance] = useState(null);
+    const [isBeginning, setIsBeginning] = useState(true);
+    const [isEnd, setIsEnd] = useState(false);
+
     // Function to manually set the slide index when clicking on thumbnails
     const goto = (index) => {
         setSlideIndex(index);
@@ -69,51 +73,76 @@ const ProductZoom = (props) => {
         }
     }, [slideIndex, props.images]);
 
+    const handleSlideChange = (swiper) => {
+        setIsBeginning(swiper.isBeginning);
+        setIsEnd(swiper.isEnd);
+    };
+
+    useEffect(() => {
+        if (swiperInstance) {
+            setIsBeginning(swiperInstance.isBeginning);
+            setIsEnd(swiperInstance.isEnd);
+        }
+    }, [swiperInstance]);
+    
+    useEffect(() => {
+        if (zoomSlideSml.current?.swiper && props?.images?.length > 0) {
+            zoomSlideSml.current.swiper.slideTo(0, 0); // move thumbnail swiper to first slide
+        }
+    }, [props.images]);
+    
 
     return (
         <>
-            <div className="flex gap-3 sticky top-[170px] z-[99] stickyZoom max-h-[495px] max-w-[550px]">
-                {/* Thumbnail Slider */}
-                <div className="slider h-auto w-[10%] min-w-[40px] max-w-[80px] productDetailImageOptions flex flex-col items-center justify-center relative py-10">
+            {/* <div className="flex flex-col-reverse lg:flex-row gap-3 "> */}
+            <div className="flex flex-col-reverse lg:flex-row gap-3 sticky top-[170px] z-[99] stickyZoom">
+
+                <div className="slider h-auto w-full lg:w-[10%] lg:min-w-[40px] lg:max-w-[80px] max-h-[560px] productDetailImageOptions  flex flex-row lg:flex-col items-center justify-center relative">
                     <Swiper
                         ref={zoomSlideSml}
                         centeredSlides={true}
                         centeredSlidesBounds={true}
                         slidesPerView={"auto"}
                         spaceBetween={6}
-                        direction={"vertical"}
+                        direction={typeof window !== "undefined" && window.innerWidth < 1024 ? "horizontal" : "vertical"}
                         navigation={{ nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" }}
                         modules={[Navigation]}
+                        onSwiper={setSwiperInstance}
+                        onSlideChange={handleSlideChange}
                         className="zoomProductSliderThumbs absolute h-full overflow-hidden"
                     >
                         {props?.images?.map((image, index) => (
-                            <SwiperSlide
-                                key={index}
-                                className="!w-[40px] !h-[40px] flex items-center justify-center border"
-                            >
+                            <SwiperSlide key={index} className="!w-[40px] !h-[40px] flex items-center justify-center">
                                 <div
-                                    className={`item w-[40px] h-[40px] overflow-hidden cursor-pointer group  flex items-center justify-center
-                                ${slideIndex === index ? "opacity-1 border-4 !border-blue-700" : "opacity-50"}`}
+                                    className={`item w-[40px] h-[40px] p-0.5 border border-black rounded-md overflow-hidden cursor-pointer group ${slideIndex === index ? "opacity-1 border-4 !border-blue-700" : "opacity-50"}`}
                                     onClick={() => goto(index)}
                                     onMouseEnter={() => goto(index)}
                                 >
                                     <img
                                         src={image}
                                         alt="img"
-                                        className="w-full h-full object-cover transition-all "
+                                        className="w-full h-full object-cover transition-all rounded-md"
                                     />
                                 </div>
                             </SwiperSlide>
-
                         ))}
                     </Swiper>
 
-                    <div className="swiper-button-prev"></div>
-                    <div className="swiper-button-next"></div>
+                    {/* Conditionally show buttons */}
+                    {props?.images?.length > 1 && (
+                        <>
+                            <div
+                                className={`swiper-button-prev ${isBeginning ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                            ></div>
+                            <div
+                                className={`swiper-button-next ${isEnd ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                            ></div>
+
+                        </>
+                    )}
                 </div>
 
-                {/* Main Image Viewer */}
-                <div className="zoomContainer w-full h-auto max-w-[90%] mx-auto relative shadow rounded-md aspect-square">
+                <div className="zoomContainer w-full h-auto max-w-full lg:max-w-[90%] max-h-[560px] mx-auto relative shadow rounded-md aspect-square">
                     <div className="w-full h-full border-red-400">
                         <Swiper
                             ref={zoomSlideBig}

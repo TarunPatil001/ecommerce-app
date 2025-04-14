@@ -16,6 +16,9 @@ import ProductLoadingGrid from './productLoadingGrid';
 import { postData } from '../../utils/api';
 import { MyContext } from '../../App';
 import { IoIosArrowDown } from 'react-icons/io';
+import { FiFilter } from 'react-icons/fi';
+import { useRef } from 'react';
+import { LuFilter } from 'react-icons/lu';
 
 function handleClick(event) {
   event.preventDefault();
@@ -36,7 +39,7 @@ const SearchPage = () => {
   const [index, setIndex] = useState({ startIndex: 0, endIndex: 0 });
   const open = Boolean(anchorEl);
   const sortedData = context?.searchData?.data || context?.filteredProductData?.data;
-
+  const sidebarWrapper = useRef(null);
 
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -81,117 +84,170 @@ const SearchPage = () => {
   };
 
 
+  useEffect(() => {
+    if (context?.isSidebarOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }, [context?.isSidebarOpen]);
+
+
+  useEffect(() => {
+    if (sidebarWrapper.current) {
+      sidebarWrapper.current.scrollTo(0, 0);
+    }
+  }, []); 
+  
+
+
 
   return (
+
     <section className="py-0 pb-0">
-      <div className="bg-white px-5 pb-2 py-5 border-b">
-        <div className="container flex items-center bg-white">
-          <Breadcrumbs separator={"/"} aria-label="breadcrumb" className="!text-[var(--text-dark)]">
-            <Link
-              underline="hover"
-              key="1"
-              color="inherit"
-              href="/"
-              onClick={handleClick}
-              className="link transition capitalize text-[14px] hover:underline underline-offset-4"
-            >
-              Home
-            </Link>
-            <Link
-              underline="hover"
-              key="2"
-              color="inherit"
-              href="/material-ui/getting-started/installation/"
-              onClick={handleClick}
-              className="link transition capitalize text-[14px] hover:underline underline-offset-4"
-            >
-              Fashion
-            </Link>
-            <Link
-              underline="hover"
-              key="3"
-              color="inherit"
-              href="/material-ui/getting-started/installation/"
-              onClick={handleClick}
-              className="link transition capitalize text-[14px] hover:underline underline-offset-4"
-            >
-              Men
-            </Link>
-            <Link
-              underline="hover"
-              key="4"
-              color="inherit"
-              href="/material-ui/getting-started/installation/"
-              onClick={handleClick}
-              className="link transition capitalize text-[14px] font-bold text-[var(--text-dark)] hover:underline underline-offset-4"
-            >
-              T-Shirt
-            </Link>
+      {/* Breadcrumbs */}
+      <div className="bg-white px-4 sm:px-5 py-3 sm:py-4 border-b">
+        <div className="container">
+          <Breadcrumbs
+            separator={<span className="mx-1">/</span>}
+            aria-label="breadcrumb"
+            className="!text-[var(--text-dark)] overflow-x-auto whitespace-nowrap py-1"
+          >
+            {[
+              { label: "Home", href: "/" },
+              { label: "Fashion", href: "/fashion" },
+              { label: "Men", href: "/fashion/men" },
+              { label: "T-Shirt", href: "/fashion/men/t-shirts" }
+            ].map((item, index) => (
+              <Link
+                key={index}
+                underline="hover"
+                color="inherit"
+                href={item.href}
+                onClick={handleClick}
+                className={`link transition capitalize text-xs sm:text-sm hover:underline underline-offset-2 ${index === 3 ? "font-bold text-[var(--text-dark)]" : ""}`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </Breadcrumbs>
         </div>
       </div>
 
-      <div className="bg-white p-3">
-        <div className="container flex gap-3">
-          <div className="sidebarWrapper w-[20%] h-full bg-white p-3">
-            <Sidebar
-              productsData={productsData}
-              setProductsData={setProductsData}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              page={page}               // Current page number
-              setPage={setPage}         // Function to update page
-              setTotalPages={setTotalPages}
-              setTotal={setTotal}
-              setSelectedName={setSelectedName}
-              setIndex={setIndex}
-              selectedSortValue={selectedSortValue}
-              setSelectedSortValue={setSelectedSortValue}
-            />
+      {/* Main Section */}
+      <div className="bg-white p-2 sm:p-3">
+        <div className="container flex flex-col lg:flex-row gap-3">
+
+          {/* <div
+            className={`
+    sidebarWrapper fixed bottom-0 left-0 w-full !h-[70vh] lg:h-full lg:static lg:w-[22%]
+    bg-white p-3 z-[102] lg:z-auto overflow-auto lg:overflow-visible customScroll
+    transition-transform duration-300 ease-in-out
+    ${context?.isSidebarOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}
+  `}
+          > */}
+
+          <div
+            ref={sidebarWrapper}
+            className={`
+    sidebarWrapper fixed bottom-0 left-0 w-full !h-[70vh] lg:h-full lg:static lg:w-[22%]
+    bg-white p-3 z-[102] lg:z-auto overflow-auto lg:overflow-visible customScroll
+    transition-transform duration-300 ease-in-out
+    ${context?.isSidebarOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}
+  `}
+          >
+
+            <div>
+              <Sidebar
+                productsData={productsData}
+                setProductsData={setProductsData}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+                page={page}
+                setPage={setPage}
+                setTotalPages={setTotalPages}
+                setTotal={setTotal}
+                setSelectedName={setSelectedName}
+                setIndex={setIndex}
+                selectedSortValue={selectedSortValue}
+                setSelectedSortValue={setSelectedSortValue}
+
+              />
+              {/* Close Button (mobile only) */}
+              <div className="lg:hidden mt-4 text-center">
+                <button
+                  onClick={() => context?.setIsSidebarOpen(false)}
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Close Filters
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="rightContent w-[80%] flex flex-col gap-2 py-3 mb-4">
-            <div className="bg-[#f1f1f1] p-2 w-full mb-3 rounded-md flex items-center justify-between pr-5">
+          {
+            context?.isSidebarOpen &&
+            <div className='filter_overlay w-full !h-screen bg-[rgba(0,0,0,0.5)] fixed top-0 left-0 z-[101]' onClick={() => context?.setIsSidebarOpen(false)}>
+            </div>
+          }
+
+
+          {/* Right Content */}
+          <div className="rightContent w-full flex flex-col gap-2 py-3 mb-4">
+            {/* View Toggle + Sorting */}
+            <div className="bg-[#f1f1f1] p-2 w-full mb-3 rounded-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2 lg:gap-0">
+
+              {/* View Toggle & Result Info */}
               <div className="col1 flex items-center gap-1">
-                <Button onClick={() => setItemView('grid')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'grid' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}>
+                <Button onClick={() => setItemView('grid')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full ${itemView === 'grid' ? '!bg-white' : '!bg-transparent'}`}>
                   <IoGridSharp className={`text-[20px] ${itemView === 'grid' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} />
                 </Button>
-                <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[rgba(0,0,0,0.8)] ${itemView === 'list' ? '!bg-[rgb(255,255,255)]' : '!bg-[rgba(0,0,0,0)]'}`}>
+                <Button onClick={() => setItemView('list')} className={`!w-[40px] !h-[40px] !min-w-[40px] !rounded-full ${itemView === 'list' ? '!bg-white' : '!bg-transparent'}`}>
                   <TfiLayoutListThumbAlt className={`text-[20px] ${itemView === 'list' ? '!text-[var(--bg-primary)]' : '!text-[rgba(0,0,0,0.5)]'}`} />
                 </Button>
-
-                <span className='font-semibold'>
+                <span className='font-semibold text-sm sm:text-base'>
                   {total === 0
-                    ? `No results found for ${context?.searchQuery?.trim()
-                      ? `"${context?.searchQuery}"`
+                    ? `No results found for ${
+                    // Show search query if it exists, otherwise show selectedName, otherwise "All Products"
+                    context?.searchQuery?.trim()
+                      ? `"${context.searchQuery}"`
                       : selectedName?.trim()
                         ? `"${selectedName}"`
-                        : `"All Products"`}`
+                        : `"All Products"`
+                    }`
                     : index.startIndex === index.endIndex
                       ? `Showing ${index.startIndex} of ${total} results for ${context?.searchQuery?.trim()
-                        ? `"${context?.searchQuery}"`
+                        ? `"${context.searchQuery}"`
                         : selectedName?.trim()
                           ? `"${selectedName}"`
-                          : `"All Products"`}`
-                      : `Showing ${index.startIndex} – ${index.endIndex} of ${total} results for ${context?.searchQuery?.trim()
-                        ? `"${context?.searchQuery}"`
+                          : `"All Products"`
+                      }`
+                      : `Showing ${index.startIndex}–${index.endIndex} of ${total} results for ${context?.searchQuery?.trim()
+                        ? `"${context.searchQuery}"`
                         : selectedName?.trim()
                           ? `"${selectedName}"`
-                          : `"All Products"`}`
+                          : `"All Products"`
+                      }`
                   }
                 </span>
               </div>
 
-              <div className="flex items-center justify-end gap-3">
-                <span className="text-sm font-medium text-gray-600">Sort By:</span>
-                <div className="relative">
+              {/* Sort Dropdown */}
+              <div className={`flex items-center justify-center gap-3 ${context?.windowWidth < 992 ? "w-full" : "w-auto"}`}>
+                <span className="text-sm font-medium text-gray-600 hidden lg:block">Sort By:</span>
+                <div className={`w-full ${context?.windowWidth < 992 ? "block" : "hidden"}`}>
+                  <Button className="!w-full !bg-primary !text-white !capitalize !h-9 !text-sm lg:!min-w-[160px] !px-4 flex items-center justify-between gap-2 hover:!bg-primary-dark transition-colors" onClick={() => context?.setIsSidebarOpen(true)}>
+                  <LuFilter /> Filters
+                    </Button>
+                </div>
+                <div className="relative w-full">
                   <Button
                     id="basic-button"
                     aria-controls={open ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleDropdownClick}
-                    className="!bg-primary !text-white !capitalize !h-9 !text-sm !min-w-[200px] !px-4 flex items-center justify-between hover:!bg-primary-dark transition-colors"
+                    className="!w-full !bg-primary !text-white !capitalize !h-9 !text-sm lg:!min-w-[160px] !px-4 flex items-center justify-between hover:!bg-primary-dark transition-colors"
                     endIcon={<IoIosArrowDown className={`transition-transform ${open ? 'rotate-180' : ''}`} />}
                   >
                     {selectedSortValue || 'Default'}
@@ -201,79 +257,45 @@ const SearchPage = () => {
                     anchorEl={anchorEl}
                     open={open}
                     onClose={handleDropdownClose}
-                    MenuListProps={{
-                      'aria-labelledby': 'basic-button',
-                    }}
+                    MenuListProps={{ 'aria-labelledby': 'basic-button' }}
                     className="mt-1"
-                    slotProps={{
-                      paper: {
-                        className: "!min-w-[200px] rounded-lg !shadow-lg" // Optional Tailwind classes
-                      }
-                    }}
+                    slotProps={{ paper: { className: "!min-w-[160px] rounded-lg !shadow-lg" } }}
                   >
-
-                    <MenuItem
-                      onClick={() => handleSortBy("name", "asc", sortedData, "Name: A to Z")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BsSortAlphaDown className="text-gray-500" />
-                      Name: A to Z
+                    <MenuItem onClick={() => handleSortBy("name", "asc", sortedData, "Name: A to Z")}>
+                      <BsSortAlphaDown className="text-gray-500 mr-2" /> Name: A to Z
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => handleSortBy("name", "desc", sortedData, "Name: Z to A")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BsSortAlphaUp className="text-gray-500" />
-                      Name: Z to A
+                    <MenuItem onClick={() => handleSortBy("name", "desc", sortedData, "Name: Z to A")}>
+                      <BsSortAlphaUp className="text-gray-500 mr-2" /> Name: Z to A
                     </MenuItem>
                     <div className="border-t border-gray-100 my-1"></div>
-                    <MenuItem
-                      onClick={() => handleSortBy("price", "asc", sortedData, "Price: low to high")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BiTrendingDown className="text-gray-500" />
-                      Price: low to high
+                    <MenuItem onClick={() => handleSortBy("price", "asc", sortedData, "Price: low to high")}>
+                      <BiTrendingDown className="text-gray-500 mr-2" /> Price: low to high
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => handleSortBy("price", "desc", sortedData, "Price: high to low")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BiTrendingUp className="text-gray-500" />
-                      Price: high to low
+                    <MenuItem onClick={() => handleSortBy("price", "desc", sortedData, "Price: high to low")}>
+                      <BiTrendingUp className="text-gray-500 mr-2" /> Price: high to low
                     </MenuItem>
                     <div className="border-t border-gray-100 my-1"></div>
-                    <MenuItem
-                      onClick={() => handleSortBy("rating", "asc", sortedData, "Rating: low to high")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BiTrendingDown className="text-gray-500" />
-                      Rating: low to high
+                    <MenuItem onClick={() => handleSortBy("rating", "asc", sortedData, "Rating: low to high")}>
+                      <BiTrendingDown className="text-gray-500 mr-2" /> Rating: low to high
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => handleSortBy("rating", "desc", sortedData, "Rating: high to low")}
-                      className="!text-sm !text-gray-700 !px-4 !py-2 hover:!bg-gray-50 gap-2"
-                    >
-                      <BiTrendingUp className="text-gray-500" />
-                      Rating: high to low
+                    <MenuItem onClick={() => handleSortBy("rating", "desc", sortedData, "Rating: high to low")}>
+                      <BiTrendingUp className="text-gray-500 mr-2" /> Rating: high to low
                     </MenuItem>
                   </Menu>
                 </div>
               </div>
-
             </div>
 
-
-            <div className={`grid ${itemView === 'grid' ? "grid-cols-4 md:grid-cols-4" : "grid-cols-1 md:grid-cols-1"} gap-3`}>
+            {/* Products Grid */}
+            <div className={`grid ${itemView === 'grid' ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" : "grid-cols-1"} gap-3`}>
               {isLoading ? (
                 <ProductLoadingGrid view={itemView} size={8} />
               ) : (
                 productsData?.data?.length > 0 ? (
                   productsData.data.map((item, index) => (
-                    itemView === 'grid' ? (
-                      <ProductItem product={item} key={index} />
-                    ) : (
-                      <ProductItemListView product={item} key={index} />
-                    )
+                    itemView === 'grid'
+                      ? <ProductItem product={item} key={index} />
+                      : <ProductItemListView product={item} key={index} />
                   ))
                 ) : (
                   <p>No products found.</p>
@@ -281,15 +303,23 @@ const SearchPage = () => {
               )}
             </div>
 
+            {/* Pagination */}
             {totalPages > 0 && (
               <div className="bottomPagination py-10 flex items-center justify-center">
-                <Pagination count={totalPages} page={page} onChange={(e, value) => setPage(value)} showFirstButton showLastButton />
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={(e, value) => setPage(value)}
+                  showFirstButton
+                  showLastButton
+                />
               </div>
             )}
           </div>
         </div>
       </div>
     </section>
+
   );
 };
 

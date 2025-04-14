@@ -20,7 +20,6 @@ const Search = () => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
 
-  const [placeholder, setPlaceholder] = useState("products");
   const [animate, setAnimate] = useState(true);
 
   // const placeholders = [
@@ -31,7 +30,7 @@ const Search = () => {
   //   "something amazing",
   // ];
 
- 
+
 
 
   // Utility functions first
@@ -65,6 +64,40 @@ const Search = () => {
       _searchText: terms.join(' ')
     };
   }) || [];
+
+  const getSuggestions = () => {
+    const productData = context?.productData || [];
+    return productData.flatMap(product =>
+      [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
+    );
+  };
+
+  const getRandomPlaceholder = () => {
+    const suggestions = getSuggestions();
+    const random = suggestions[Math.floor(Math.random() * suggestions.length)];
+    return random || "products";
+  };
+
+  const [placeholder, setPlaceholder] = useState(getRandomPlaceholder());
+
+  useEffect(() => {
+    const suggestions = getSuggestions();
+
+    if (!suggestions.length) return;
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      setAnimate(false);
+      setTimeout(() => {
+        setPlaceholder(suggestions[index] || "products");
+        setAnimate(true);
+        index = (index + 1) % suggestions.length;
+      }, 50);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [context?.productData]);
 
   // Improved suggestion engine
   const getQuickSuggestions = () => {
@@ -196,6 +229,7 @@ const Search = () => {
 
 
 
+
   // Handle input change
   const onChangeInput = (e) => {
     const value = e.target.value;
@@ -239,6 +273,7 @@ const Search = () => {
         // Only update context on explicit search (Enter/button click)
         context?.setSearchData(res);
         context?.setSearchQuery(trimmedQuery);
+        context?.setOpenSearchPanel(!context?.openSearchPanel);
         navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
       } else {
         // Store typing results locally
@@ -306,39 +341,40 @@ const Search = () => {
     };
   }, []);
 
-  const getRandomPlaceholder = () => {
-    const productData = context?.productData || [];
-  
-    const suggestions = productData.flatMap(product =>
-      [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
-    );
-  
-    const random = suggestions[Math.floor(Math.random() * suggestions.length)];
-    return random || "products";
-  };
-  
-  useEffect(() => {
-    if (!context?.productData?.length) return;
-  
-    let index = 0;
-    const suggestions = context.productData.flatMap(product =>
-      [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
-    );
-  
-    if (!suggestions.length) return;
-  
-    const interval = setInterval(() => {
-      setAnimate(false); // reset animation
-      setTimeout(() => {
-        setPlaceholder(suggestions[index] || "products");
-        setAnimate(true); // trigger animation
-        index = (index + 1) % suggestions.length;
-      }, 50); // small delay for smoother animation restart
-    }, 3000);
-  
-    return () => clearInterval(interval);
-  }, [context?.productData]);
-  
+  // const getRandomPlaceholder = () => {
+  //   const productData = context?.productData || [];
+
+  //   const suggestions = productData.flatMap(product =>
+  //     [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
+  //   );
+
+  //   const random = suggestions[Math.floor(Math.random() * suggestions.length)];
+  //   return random || "products";
+  // };
+
+  // useEffect(() => {
+  //   if (!context?.productData?.length) return;
+
+  //   let index = 0;
+  //   const suggestions = context.productData.flatMap(product =>
+  //     [product.brand, product.categoryName, product.thirdSubCategoryName].filter(Boolean)
+  //   );
+
+  //   if (!suggestions.length) return;
+
+  //   const interval = setInterval(() => {
+  //     setAnimate(false); // reset animation
+  //     setTimeout(() => {
+  //       setPlaceholder(suggestions[index] || "products");
+  //       setAnimate(true); // trigger animation
+  //       index = (index + 1) % suggestions.length;
+  //     }, 50); // small delay for smoother animation restart
+  //   }, 3000);
+
+  //   return () => clearInterval(interval);
+  // }, [context?.productData]);
+
+
 
 
   return (

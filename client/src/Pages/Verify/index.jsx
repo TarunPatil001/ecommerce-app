@@ -9,9 +9,9 @@ const Verify = () => {
     // const context = useContext(MyContext);
     const navigate = useNavigate();
     const [otp, setOtp] = useState("");
-    const [isLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [timer, setTimer] = useState(0); // Initial timer state
-    const [setIsOtpResent] = useState(false); // Track if OTP has been resent
+    const [isOtpResent, setIsOtpResent] = useState(false); // Track if OTP has been resent
     
     const handleOtpChange = (value) => {
         setOtp(value);
@@ -191,53 +191,120 @@ const Verify = () => {
         }
     };
 
+    const maskEmail = (email) => {
+        if (!email || typeof email !== 'string') return "your-email@example.com";
+      
+        const [username, domain] = email.split("@");
+      
+        if (username.length <= 3) {
+          return `${username[0]}***@${domain}`;
+        }
+      
+        return `${username.slice(0, 3)}*****@${domain}`;
+      };
+      
+
 
     return (
+        // <div>
+        //     <section className="section py-10">
+        //         <div className="container">
+        //             <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
+        //                 <h3 className="text-[18px] text-center font-bold flex flex-col items-center justify-center gap-2">
+        //                     <img src="/securityLogo.png" className="w-[64px] h-full" />
+        //                     Verify OTP
+        //                 </h3>
+        //                 <p className="pt-5 text-[14px] text-[rgba(0,0,0,0.5)]">
+        //                     Please enter the six-digit verification code that we&apos;ve sent to your email&nbsp;
+        //                     <span className="text-[var(--bg-primary)] font-bold">
+        //                         {localStorage.getItem("User email") || "your-email@example.com"}
+        //                     </span>.
+        //                 </p>
+        //                 <form action="" onSubmit={verifyOTP}>
+        //                     <div className="py-4">
+        //                         <OtpBox length={6} onChange={handleOtpChange} />
+        //                     </div>
+        //                     <div className="flex justify-center w-full">
+        //                         <Button type="submit" className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full !capitalize flex gap-1`} disabled={isLoading}>
+        //                             {isLoading ? <CircularProgress color="inherit" /> : "Verify OTP"}
+        //                         </Button>
+        //                     </div>
+        //                 </form>
+        //                 <p className="text-center pt-2 text-[14px] inline-block">
+        //                     Didn&apos;t get the code?{" "}
+        //                     <span
+        //                         className={`font-semibold cursor-pointer ${timer > 0 ? 'text-gray-500' : ''}`}
+        //                         onClick={sendOtp}
+        //                         disabled={timer > 0} // Disable resend button if OTP is being resent
+        //                     >
+        //                         <span>
+        //                             {timer > 0
+        //                                 ? <>
+        //                                     <span className="link underline underline-offset-4 transition-all">Resend code</span> in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+        //                                 </>
+        //                                 : <span className="link underline underline-offset-4 transition-all">Resend code</span>
+        //                             }
+        //                         </span>
+        //                     </span>
+        //                 </p>
+        //             </div>
+        //         </div>
+        //     </section>
+        // </div>
+
         <div>
-            <section className="section py-10">
-                <div className="container">
-                    <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
-                        <h3 className="text-[18px] text-center font-bold flex flex-col items-center justify-center gap-2">
-                            <img src="/securityLogo.png" className="w-[64px] h-full" />
-                            Verify OTP
-                        </h3>
-                        <p className="pt-5 text-[14px] text-[rgba(0,0,0,0.5)]">
-                            Please enter the six-digit verification code that we&apos;ve sent to your email&nbsp;
-                            <span className="text-[var(--bg-primary)] font-bold">
-                                {localStorage.getItem("User email") || "your-email@example.com"}
-                            </span>.
-                        </p>
-                        <form action="" onSubmit={verifyOTP}>
-                            <div className="py-4">
-                                <OtpBox length={6} onChange={handleOtpChange} />
-                            </div>
-                            <div className="flex justify-center w-full">
-                                <Button type="submit" className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full !capitalize flex gap-1`} disabled={isLoading}>
-                                    {isLoading ? <CircularProgress color="inherit" /> : "Verify OTP"}
-                                </Button>
-                            </div>
-                        </form>
-                        <p className="text-center pt-2 text-[14px] inline-block">
-                            Didn&apos;t get the code?{" "}
-                            <span
-                                className={`font-semibold cursor-pointer ${timer > 0 ? 'text-gray-500' : ''}`}
-                                onClick={sendOtp}
-                                disabled={timer > 0} // Disable resend button if OTP is being resent
-                            >
-                                <span>
-                                    {timer > 0
-                                        ? <>
-                                            <span className="link underline underline-offset-4 transition-all">Resend code</span> in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
-                                        </>
-                                        : <span className="link underline underline-offset-4 transition-all">Resend code</span>
-                                    }
-                                </span>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </div>
+  <section className="section py-10 px-4 sm:px-6">
+    <div className="container">
+      <div className="card shadow-md w-full max-w-[400px] mx-auto rounded-md bg-white p-5 sm:p-6 md:px-10">
+        <h3 className="text-[18px] text-center font-bold flex flex-col items-center justify-center gap-2">
+          <img src="/securityLogo.png" className="w-[64px] h-auto" alt="Security Logo" />
+          Verify OTP
+        </h3>
+
+        <p className="pt-5 text-[14px] text-[rgba(0,0,0,0.5)] text-center">
+          Please enter the six-digit verification code that we&apos;ve sent to your email&nbsp;
+          <span className="text-[var(--bg-primary)] font-bold break-words">
+          {maskEmail(localStorage.getItem("User email"))}
+          </span>.
+        </p>
+
+        <form action="" onSubmit={verifyOTP}>
+          <div className="py-4">
+            <OtpBox length={6} onChange={handleOtpChange} />
+          </div>
+
+          <div className="flex justify-center w-full">
+            <Button
+              type="submit"
+              className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full !capitalize flex gap-1`}
+              disabled={isLoading}
+            >
+              {isLoading ? <CircularProgress color="inherit" /> : "Verify OTP"}
+            </Button>
+          </div>
+        </form>
+
+        <p className="text-center pt-2 text-[14px] inline-block">
+          Didn&apos;t get the code?{" "}
+          <span
+            className={`font-semibold cursor-pointer ${timer > 0 ? 'text-gray-500' : 'text-[var(--bg-primary)]'}`}
+            onClick={sendOtp}
+            disabled={timer > 0}
+          >
+            {timer > 0 ? (
+              <>
+                <span className="link underline underline-offset-4 transition-all">Resend code</span> in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+              </>
+            ) : (
+              <span className="link underline underline-offset-4 transition-all">Resend code</span>
+            )}
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
     );
 };
 

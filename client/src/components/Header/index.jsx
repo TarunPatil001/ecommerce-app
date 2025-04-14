@@ -634,9 +634,11 @@ const Header = () => {
           </div>
 
           {/* Search */}
-          <div className="col2 fixed top-0 left-0 w-full h-full z-[1000] lg:w-[45%] lg:static p-2 lg:p-0 bg-white hidden lg:block">
+          
+          <div className={`col2 fixed top-0 left-0 w-full h-full z-[1000] lg:w-[45%] lg:static p-2 lg:p-0 bg-white  ${context?.windowWidth < 992 && context?.openSearchPanel ? "block" : "hidden"} lg:block`}>
             <Search />
           </div>
+          
 
           {/* User Actions */}
           <div className="col3 w-auto lg:w-[25%] flex justify-end">

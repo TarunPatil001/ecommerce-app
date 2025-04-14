@@ -357,7 +357,7 @@ const CartPanelItems = (props) => {
       </div>
       <Divider />
 
-      <Dialog open={isOpenModel} onClose={handleClose}>
+      {/* <Dialog open={isOpenModel} onClose={handleClose}>
         <div className="flex flex-col w-[400px] px-5 py-8 relative">
           <Button
             className="!absolute !top-2 !right-2 !w-[45px] !min-w-[45px] !h-[45px] !rounded-full !bg-red-50 !text-red-500 !text-[20px]"
@@ -456,7 +456,108 @@ const CartPanelItems = (props) => {
             </Button>
           </form>
         </div>
-      </Dialog>
+      </Dialog> */}
+
+<Dialog open={isOpenModel} onClose={handleClose}>
+  <div className="w-full max-w-[95vw] sm:max-w-[400px] px-5 py-8 relative mx-auto">
+    <Button
+      className="!absolute top-2 right-2 !w-[40px] !min-w-[40px] !h-[40px] !rounded-full !bg-red-50 !text-red-500 !text-[20px]"
+      onClick={handleClose}
+    >
+      <RxCross2 />
+    </Button>
+
+    {/* Product Info */}
+    <div className="flex flex-col sm:flex-row w-full gap-4">
+      <div className="w-full sm:w-[100px] h-[100px] rounded-md overflow-hidden">
+        <img
+          src={props?.item?.image}
+          alt="ProductImg"
+          className="w-full h-full object-cover rounded-md"
+        />
+      </div>
+
+      <div className="flex flex-col w-full">
+        <h4 className="text-[14px] line-clamp-1 sm:line-clamp-2">
+          {props?.item?.productTitle?.length > 100
+            ? `${props?.item?.productTitle?.substr(0, 100)}...`
+            : props?.item?.productTitle}
+        </h4>
+        <h6 className="text-[12px] line-clamp-1 text-[rgba(0,0,0,0.4)]">
+          Seller:{" "}
+          <span className="capitalize">
+            {props?.item?.sellerDetails?.sellerName?.length > 30
+              ? props?.item.sellerDetails.sellerName.substring(0, 30) + "..."
+              : props?.item?.sellerDetails?.sellerName}
+          </span>
+        </h6>
+
+        <div className="flex items-center gap-2 mt-2">
+          <span className="price text-black text-[16px] font-bold flex items-center">
+            ₹{new Intl.NumberFormat("en-IN").format(`${props?.item?.subTotal}`)}
+          </span>
+          <span className="oldPrice line-through text-[rgba(0,0,0,0.4)] text-[14px] font-normal flex items-center">
+            ₹{new Intl.NumberFormat("en-IN").format(`${props?.item?.subTotalOldPrice}`)}
+          </span>
+          <span className="uppercase text-[14px] text-[var(--off-color)] font-normal">
+            {props?.item?.discount}% OFF
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <hr className="my-4" />
+
+    {/* Option Title */}
+    <h2 className="text-gray-800 font-semibold">
+      Select{" "}
+      {props?.item?.availableOptions.size?.length > 0
+        ? "Size"
+        : props?.item?.availableOptions.productWeight?.length > 0
+        ? "Weight"
+        : props?.item?.availableOptions.productRam?.length > 0
+        ? "RAM"
+        : ""}
+    </h2>
+
+    {/* Option Selector */}
+    <form onSubmit={handleSubmit}>
+      <div className="flex flex-col gap-4 mt-4">
+        {props?.item?.availableOptions && (
+          ["size", "productWeight", "productRam"].map((option, idx) => {
+            const options = props?.item?.availableOptions[option];
+            if (options?.length > 0) {
+              return (
+                <div key={idx} className="flex flex-wrap gap-2">
+                  {options.map((item, index) => (
+                    <span
+                      key={index}
+                      className={`min-w-[45px] h-[45px] rounded-full px-3 py-2 border 
+                      ${selectedOptions[option] === item
+                          ? 'border-[var(--bg-primary)] text-[var(--bg-primary)]'
+                          : 'border-gray-400 text-black'} 
+                      hover:border-[var(--bg-primary)] hover:text-[var(--bg-primary)] transition-all 
+                      flex items-center justify-center font-bold cursor-pointer`}
+                      onClick={() => handleSelectOption(option, item)}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              );
+            }
+            return null;
+          })
+        )}
+      </div>
+
+      <Button type="submit" className="buttonPrimaryBlack !mt-8 w-full">
+        Done
+      </Button>
+    </form>
+  </div>
+</Dialog>
+
     </>
   );
 };

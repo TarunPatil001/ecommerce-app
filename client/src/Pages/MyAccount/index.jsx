@@ -193,113 +193,238 @@ const MyAccount = () => {
         }
     };
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
+
+    useEffect(() => {
+        if (isChangePasswordFormShow) {
+            const el = document.getElementById('pass');
+            if (el) {
+              const yOffset = -150; // adjust this for how much space you want
+              const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+            
+        }
+    }, [isChangePasswordFormShow]);
+
 
     return (
+        // <section className="py-10 w-full">
+        //     <div className="container flex gap-5">
+        //         <AccountSidebar />
+        //         <div className="col-2 w-[100%]">
+        //             <div className="card bg-white p-5 shadow-md rounded-md mb-5">
+        //                 <div className="flex items-center mb-2">
+        //                     <h2 className="pb-0 font-bold text-[20px]">My Account</h2>
+        //                     <Button className='!ml-auto' onClick={() => setIsChangePasswordFormShow(!isChangePasswordFormShow)}>Change Password</Button>
+        //                 </div>
+        //                 <Divider />
+        //                 <form action="" className="mt-6" onSubmit={handleSubmit}>
+        //                     <div className="flex items-center gap-5">
+        //                         <div className="w-[50%]">
+        //                             <TextField type='text' label="Full Name" variant="outlined" size="small" className="custom-textfield w-full" name="name" value={formFields.name} disabled={isLoading} onChange={onChangeInput} />
+        //                         </div>
+        //                         <div className="w-[50%]">
+        //                             <TextField type='email' label="Email" variant="outlined" size="small" className="custom-textfield w-full" name="email" value={formFields.email} disabled onChange={onChangeInput} />
+        //                         </div>
+        //                     </div>
+        //                     <div className="flex items-center gap-5 mt-4">
+        //                         <div className="w-[50%]">
+        //                             <MuiPhone margin="dense" defaultCountry="in" name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields(prevState => ({ ...prevState, mobile: phone })); }} disabled={isLoading} type="text" className={`!w-full h-[40px] flex items-center custom-textfield ${isLoading === true ? "!cursor-not-allowed" : ""}`} fullWidth variant="outlined" size="small" />
+        //                         </div>
+        //                         <div className="w-[50%]"></div>
+        //                     </div>
+        //                     <div className="flex items-center gap-5 mt-5">
+        //                         <div className="flex gap-5 w-[50%]">
+        //                             <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full`} disabled={isLoading}>
+        //                                 {
+        //                                     isLoading ? <CircularProgress color="inherit" /> : "Save"
+        //                                 }
+        //                             </Button>
+        //                             <Button type='reset' className="buttonPrimaryWhite w-full" disabled={isLoading}>Cancel</Button>
+        //                         </div>
+        //                         <div className="flex gap-5 w-[50%]">
+        //                         </div>
+        //                     </div>
+        //                 </form>
+        //             </div>
+
+
+        //             <Collapse isOpened={isChangePasswordFormShow}>
+        //                 <div className="card bg-white p-5 shadow-md rounded-md" >
+        //                     <div className="flex items-center mb-2">
+        //                         <h2 className="pb-0 font-semibold">Change Password</h2>
+        //                     </div>
+        //                     <Divider />
+        //                     <form action="" className="mt-6" onSubmit={handleSubmitChangePassword}>
+        //                         <div className="grid grid-cols-2 gap-5">
+        //                             {
+        //                                 context?.userData?.signUpWithGoogle === false &&
+        //                                 <div className="col relative">
+        //                                     <TextField type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} label="Old Password" variant="outlined" size="small" className="custom-textfield w-full" name="oldPassword" value={changePassword.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
+        //                                     <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
+        //                                         {
+        //                                             isShowPassword1 === false ?
+        //                                                 <FaRegEyeSlash className="text-[20px]" />
+        //                                                 :
+        //                                                 <FaRegEye className="text-[20px]" />
+        //                                         }
+        //                                     </Button>
+        //                                 </div>
+        //                             }
+
+        //                             <div className="col relative">
+        //                                 <TextField type={isLoading2 ? 'password' : (isShowPassword2 ? 'text' : 'password')} label="New Password" variant="outlined" size="small" className="custom-textfield w-full" name="newPassword" value={changePassword.newPassword} disabled={isLoading2} onChange={onChangeInput} />
+        //                                 <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword2(!isShowPassword2)} disabled={isLoading} >
+        //                                     {
+        //                                         isShowPassword2 === false ?
+        //                                             <FaRegEyeSlash className="text-[20px]" />
+        //                                             :
+        //                                             <FaRegEye className="text-[20px]" />
+        //                                     }
+        //                                 </Button>
+        //                             </div>
+        //                             <div className="col relative">
+        //                                 <TextField type={isLoading2 ? 'password' : (isShowPassword3 ? 'text' : 'password')} label="Confirm Password" variant="outlined" size="small" className="custom-textfield w-full" name="confirmPassword" value={changePassword.confirmPassword} disabled={isLoading2} onChange={onChangeInput} />
+        //                                 <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword3(!isShowPassword3)} disabled={isLoading} >
+        //                                     {
+        //                                         isShowPassword3 === false ?
+        //                                             <FaRegEyeSlash className="text-[20px]" />
+        //                                             :
+        //                                             <FaRegEye className="text-[20px]" />
+        //                                     }
+        //                                 </Button>
+        //                             </div>
+        //                             <div className="col"></div>
+        //                         </div>
+        //                         <div className="grid grid-cols-2 gap-5 mt-5">
+        //                             <div className="flex gap-5 col">
+        //                                 <Button type='submit' className={`${isLoading2 === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full`} disabled={isLoading2}>
+        //                                     {
+        //                                         isLoading2 ? <CircularProgress color="inherit" /> : "Change Password"
+        //                                     }
+        //                                 </Button>
+        //                                 <Button type='reset' className="buttonPrimaryWhite w-full" disabled={isLoading2}>Cancel</Button>
+        //                             </div>
+        //                         </div>
+        //                     </form>
+        //                 </div>
+        //             </Collapse>
+
+        //         </div>
+        //     </div>
+        // </section>
         <section className="py-10 w-full">
-            <div className="container flex gap-5">
+            <div className="container flex flex-col sm:flex-row gap-5">
                 <AccountSidebar />
-                <div className="col-2 w-[100%]">
+                <div className="w-full">
                     <div className="card bg-white p-5 shadow-md rounded-md mb-5">
-                        <div className="flex items-center mb-2">
-                            <h2 className="pb-0 font-bold text-[20px]">My Account</h2>
-                            <Button className='!ml-auto' onClick={() => setIsChangePasswordFormShow(!isChangePasswordFormShow)}>Change Password</Button>
+                        <div className="flex flex-wrap flex-row items-start justify-between md:items-center gap-3 mb-2">
+                            <h2 className="font-bold text-[20px]">My Account</h2>
+                            <Button className="md:ml-auto w-auto !capitalize" onClick={() => setIsChangePasswordFormShow(!isChangePasswordFormShow)}>Change Password ?</Button>
                         </div>
+
                         <Divider />
-                        <form action="" className="mt-6" onSubmit={handleSubmit}>
-                            <div className="flex items-center gap-5">
-                                <div className="w-[50%]">
-                                    <TextField type='text' label="Full Name" variant="outlined" size="small" className="custom-textfield w-full" name="name" value={formFields.name} disabled={isLoading} onChange={onChangeInput} />
+
+                        <form className="mt-6" onSubmit={handleSubmit}>
+                            <div className="flex flex-col lg:flex-row items-center gap-5">
+                                <div className="w-full lg:w-1/2">
+                                    <TextField type="text" label="Full Name" variant="outlined" size="small" className="custom-textfield w-full" name="name" value={formFields.name} disabled={isLoading} onChange={onChangeInput} />
                                 </div>
-                                <div className="w-[50%]">
-                                    <TextField type='email' label="Email" variant="outlined" size="small" className="custom-textfield w-full" name="email" value={formFields.email} disabled onChange={onChangeInput} />
+                                <div className="w-full lg:w-1/2">
+                                    <TextField type="email" label="Email" variant="outlined" size="small" className="custom-textfield w-full" name="email" value={formFields.email} disabled onChange={onChangeInput} />
                                 </div>
                             </div>
-                            <div className="flex items-center gap-5 mt-4">
-                                <div className="w-[50%]">
-                                    <MuiPhone margin="dense" defaultCountry="in" name='mobile' value={phone} onChange={(phone) => { setPhone(phone); setFormFields(prevState => ({ ...prevState, mobile: phone })); }} disabled={isLoading} type="text" className={`!w-full h-[40px] flex items-center custom-textfield ${isLoading === true ? "!cursor-not-allowed" : ""}`} fullWidth variant="outlined" size="small" />
+
+                            <div className="flex flex-col lg:flex-row items-center lg:gap-5 mt-4">
+                                <div className="w-full lg:w-1/2">
+                                    <MuiPhone
+                                        margin="dense"
+                                        defaultCountry="in"
+                                        name="mobile"
+                                        value={phone}
+                                        onChange={(phone) => {
+                                            setPhone(phone);
+                                            setFormFields(prevState => ({ ...prevState, mobile: phone }));
+                                        }}
+                                        disabled={isLoading}
+                                        type="text"
+                                        className={`!w-full h-[40px] flex items-center custom-textfield ${isLoading ? "!cursor-not-allowed" : ""}`}
+                                        fullWidth
+                                        variant="outlined"
+                                        size="small"
+                                    />
                                 </div>
-                                <div className="w-[50%]"></div>
+                                <div className="w-full lg:w-1/2"></div>
                             </div>
-                            <div className="flex items-center gap-5 mt-5">
-                                <div className="flex gap-5 w-[50%]">
-                                    <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full`} disabled={isLoading}>
-                                        {
-                                            isLoading ? <CircularProgress color="inherit" /> : "Save"
-                                        }
-                                    </Button>
-                                    <Button type='reset' className="buttonPrimaryWhite w-full" disabled={isLoading}>Cancel</Button>
-                                </div>
-                                <div className="flex gap-5 w-[50%]">
-                                </div>
+
+                            {/* <div className="flex flex-col md:flex-row items-center gap-5 mt-5"> */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+                                {/* <div className="flex gap-5 w-full md:w-1/2"> */}
+                                <Button type="submit" className={`${isLoading ? "buttonDisabled" : "buttonPrimaryBlack"} w-full !capitalize`} disabled={isLoading}>
+                                    {isLoading ? <CircularProgress color="inherit" /> : "Save"}
+                                </Button>
+                                <Button type="reset" className="buttonPrimaryWhite w-full !capitalize" disabled={isLoading}>Cancel</Button>
+                                {/* </div>
+                                <div className="w-full md:w-1/2"></div> */}
                             </div>
                         </form>
                     </div>
 
-
-                    <Collapse isOpened={isChangePasswordFormShow}>
-                        <div className="card bg-white p-5 shadow-md rounded-md" >
+                    <Collapse isOpened={isChangePasswordFormShow} >
+                        <div className="card bg-white p-5 shadow-md rounded-md" id="pass">
                             <div className="flex items-center mb-2">
-                                <h2 className="pb-0 font-semibold">Change Password</h2>
+                                <h2 className="font-semibold">Change Password</h2>
                             </div>
                             <Divider />
-                            <form action="" className="mt-6" onSubmit={handleSubmitChangePassword}>
-                                <div className="grid grid-cols-2 gap-5">
-                                    {
-                                        context?.userData?.signUpWithGoogle === false &&
-                                        <div className="col relative">
+
+                            <form className="mt-6" onSubmit={handleSubmitChangePassword}>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                                    {context?.userData?.signUpWithGoogle === false && (
+                                        <div className="relative">
                                             <TextField type={isLoading2 ? 'password' : (isShowPassword1 ? 'text' : 'password')} label="Old Password" variant="outlined" size="small" className="custom-textfield w-full" name="oldPassword" value={changePassword.oldPassword} disabled={isLoading2} onChange={onChangeInput} />
-                                            <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading} >
-                                                {
-                                                    isShowPassword1 === false ?
-                                                        <FaRegEyeSlash className="text-[20px]" />
-                                                        :
-                                                        <FaRegEye className="text-[20px]" />
-                                                }
+                                            <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword1(!isShowPassword1)} disabled={isLoading}>
+                                                {isShowPassword1 ? <FaRegEye className="text-[20px]" /> : <FaRegEyeSlash className="text-[20px]" />}
                                             </Button>
                                         </div>
-                                    }
+                                    )}
 
-                                    <div className="col relative">
+                                    <div className="relative">
                                         <TextField type={isLoading2 ? 'password' : (isShowPassword2 ? 'text' : 'password')} label="New Password" variant="outlined" size="small" className="custom-textfield w-full" name="newPassword" value={changePassword.newPassword} disabled={isLoading2} onChange={onChangeInput} />
-                                        <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword2(!isShowPassword2)} disabled={isLoading} >
-                                            {
-                                                isShowPassword2 === false ?
-                                                    <FaRegEyeSlash className="text-[20px]" />
-                                                    :
-                                                    <FaRegEye className="text-[20px]" />
-                                            }
+                                        <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword2(!isShowPassword2)} disabled={isLoading}>
+                                            {isShowPassword2 ? <FaRegEye className="text-[20px]" /> : <FaRegEyeSlash className="text-[20px]" />}
                                         </Button>
                                     </div>
-                                    <div className="col relative">
+
+                                    <div className="relative">
                                         <TextField type={isLoading2 ? 'password' : (isShowPassword3 ? 'text' : 'password')} label="Confirm Password" variant="outlined" size="small" className="custom-textfield w-full" name="confirmPassword" value={changePassword.confirmPassword} disabled={isLoading2} onChange={onChangeInput} />
-                                        <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword3(!isShowPassword3)} disabled={isLoading} >
-                                            {
-                                                isShowPassword3 === false ?
-                                                    <FaRegEyeSlash className="text-[20px]" />
-                                                    :
-                                                    <FaRegEye className="text-[20px]" />
-                                            }
+                                        <Button className="!absolute top-[3px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]" onClick={() => setIsShowPassword3(!isShowPassword3)} disabled={isLoading}>
+                                            {isShowPassword3 ? <FaRegEye className="text-[20px]" /> : <FaRegEyeSlash className="text-[20px]" />}
                                         </Button>
                                     </div>
+
                                     <div className="col"></div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-5 mt-5">
-                                    <div className="flex gap-5 col">
-                                        <Button type='submit' className={`${isLoading2 === true ? "buttonDisabled" : "buttonPrimaryBlack"} w-full`} disabled={isLoading2}>
-                                            {
-                                                isLoading2 ? <CircularProgress color="inherit" /> : "Change Password"
-                                            }
-                                        </Button>
-                                        <Button type='reset' className="buttonPrimaryWhite w-full" disabled={isLoading2}>Cancel</Button>
-                                    </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+                                    {/* <div className="flex gap-5"> */}
+                                    <Button type="submit" className={`${isLoading2 ? "buttonDisabled" : "buttonPrimaryBlack"} w-full !capitalize`} disabled={isLoading2}>
+                                        {isLoading2 ? <CircularProgress color="inherit" /> : "Change Password"}
+                                    </Button>
+                                    <Button type="reset" className="buttonPrimaryWhite w-full !capitalize" disabled={isLoading2} onClick={() => { setIsChangePasswordFormShow(!isChangePasswordFormShow); window.scrollTo(0, 0); }}
+                                    >Cancel</Button>
+                                    {/* </div> */}
                                 </div>
                             </form>
                         </div>
                     </Collapse>
-
                 </div>
             </div>
         </section>
+
     )
 }
 

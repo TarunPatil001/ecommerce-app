@@ -193,7 +193,7 @@ const ProductItem = (props) => {
         </div>
 
 
-        <div className="info px-3 py-1 border-t h-[150px] lg:h-[100px]">
+        <div className="info px-3 py-1 border-t h-[150px] lg:h-[130px]">
           <h6 className="text-[16px] font-bold text-[var(--text-dark)]">
             <Link to="#" className="link transition-all line-clamp-1">
               {props?.product?.brand}

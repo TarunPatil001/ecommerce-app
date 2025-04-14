@@ -1,5 +1,5 @@
-import  { useState, createContext, useEffect, useReducer } from 'react';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useState, createContext, useEffect, useReducer, useContext } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import "./responsive.css"
 import Header from "./components/Header";
@@ -56,8 +56,11 @@ function App() {
   const [isReducer, forceUpdate] = useReducer(x => x + 1, 0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [openSearchPanel, setOpenSearchPanel] = useState(false);
+  // const location = useLocation();
+  
   const handleOpenProductDetailsModal = (status, product) => {
     setOpenProductDetailsModal({
       open: status,
@@ -75,6 +78,13 @@ function App() {
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
+
+  
+  useEffect(() => {
+    if (location.pathname !== '/search' && location.pathname !== '/products') {
+      setIsSearch('');
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -95,13 +105,13 @@ function App() {
 
       getCartItems();
       getWishlistData();
-      
+
     } else {
       setIsLogin(false);
     }
   }, [isLogin]);
-  
-  
+
+
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
       if (res?.error === false) {
@@ -110,8 +120,8 @@ function App() {
       // console.log(res);
     });
   }, [isReducer]);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     getProductData();
 
     const handleSize = () => {
@@ -120,10 +130,10 @@ function App() {
 
     window.addEventListener('resize', handleSize);
 
-    return()=>{
+    return () => {
       window.removeEventListener('resize', handleSize);
     }
-  },[]);
+  }, []);
 
   const getProductData = () => {
     fetchDataFromApi('/api/product/get-all-products').then((res) => {
@@ -321,19 +331,27 @@ function App() {
 
     searchData,
     setSearchData,
-    filteredProductData, 
+    filteredProductData,
     setFilteredProductData,
 
-    searchQuery, 
+    searchQuery,
     setSearchQuery,
-    isSearch, 
+    isSearch,
     setIsSearch,
 
     windowWidth,
 
-    isOpenCatPanel, 
+    isOpenCatPanel,
     setIsOpenCatPanel,
 
+    isSidebarOpen,
+    setIsSidebarOpen,
+
+    isFilterApplied,
+    setIsFilterApplied,
+
+    openSearchPanel, 
+    setOpenSearchPanel,
 
   };
 

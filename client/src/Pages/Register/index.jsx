@@ -183,107 +183,209 @@ const Register = () => {
 
 
     return (
+        // <div>
+        //     <section className="section py-10">
+        //         <div className="container">
+        //             <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
+        //                 <h3 className="text-[18px] text-center font-bold flex items-center justify-center gap-2">
+        //                     <img src="/favicon.png" className="w-[18px] h-[18px]" />
+        //                     Create an account
+        //                 </h3>
+
+        //                 <form action="" className="w-full mt-5" onSubmit={handleSubmit}>
+        //                     <div className="form-group w-full mb-5 relative">
+        //                         <TextField
+        //                             type="text"
+        //                             name="name"
+        //                             id="fullName"
+        //                             label="Full Name"
+        //                             placeholder="Enter your full name"
+        //                             variant="outlined"
+        //                             className="custom-textfield w-full mb-5"
+        //                             value={formFields.name}
+        //                             disabled={isLoading} // Disable input field when loading
+        //                             onChange={onChangeInput}
+        //                         />
+        //                     </div>
+        //                     <div className="form-group w-full mb-5 relative">
+        //                         <TextField
+        //                             type="email"
+        //                             name="email"
+        //                             id="email"
+        //                             label="Email Id"
+        //                             placeholder="Enter email"
+        //                             variant="outlined"
+        //                             className="custom-textfield w-full mb-5"
+        //                             value={formFields.email}
+        //                             disabled={isLoading} // Disable input field when loading
+        //                             onChange={onChangeInput}
+        //                         />
+        //                     </div>
+        //                     <div className="form-group w-full mb-2 relative">
+        //                         <TextField
+        //                             type={isLoading ? 'password' : (isShowPassword ? 'text' : 'password')}
+        //                             name="password"
+        //                             id="password"
+        //                             label="Password"
+        //                             placeholder="Enter password"
+        //                             variant="outlined"
+        //                             className="custom-textfield w-full mb-5"
+        //                             value={formFields.password}
+        //                             disabled={isLoading} // Disable input field when loading
+        //                             onChange={onChangeInput}
+        //                         />
+        //                         <Button
+        //                             className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+        //                             onClick={() => setIsShowPassword(!isShowPassword)}
+        //                             disabled={isLoading} // Disable button when loading
+        //                         >
+        //                             {isShowPassword === false ? (
+        //                                 <FaRegEyeSlash className="text-[20px]" />
+        //                             ) : (
+        //                                 <FaRegEye className="text-[20px]" />
+        //                             )}
+        //                         </Button>
+        //                     </div>
+
+        //                     <Button
+        //                         type="submit"
+        //                         className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} !w-full !text-[15px] !font-semibold !mt-4 flex gap-3`}
+        //                         disabled={isLoading} // Disable submit button when loading
+        //                     >
+        //                         {
+        //                             isLoading ? <CircularProgress color="inherit" /> : "Sign Up"
+        //                         }
+        //                     </Button>
+
+        //                     <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-4">
+        //                         Already have an account?
+        //                         <Link
+        //                             to="/login"
+        //                             className="text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8 cursor-pointer text-[14px] font-medium"
+        //                         >
+        //                             Sign In
+        //                         </Link>
+        //                     </p>
+
+        //                     <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-1">
+        //                         Or continue with social account
+        //                     </p>
+
+        //                     <Button
+        //                         className="w-full !bg-[#f1f1f1] hover:!bg-[#ffe6db] hover:!text-gray-700 flex items-center gap-2 !text-[15px] !font-semibold !mt-2"
+        //                         disabled={isLoading} onClick={authWithGoogle}
+        //                     >
+        //                         <FcGoogle className="text-[18px]" />
+        //                         Sign Up with Google
+        //                     </Button>
+        //                 </form>
+        //             </div>
+        //         </div>
+        //     </section>
+
+        // </div>
+
         <div>
-            <section className="section py-10">
-                <div className="container">
-                    <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
-                        <h3 className="text-[18px] text-center font-bold flex items-center justify-center gap-2">
-                            <img src="/favicon.png" className="w-[18px] h-[18px]" />
-                            Create an account
-                        </h3>
+  <section className="section py-10">
+    <div className="container px-4 sm:px-6 lg:px-8">
+      <div className="card shadow-md w-full max-w-md mx-auto rounded-md bg-white p-5 sm:p-6 md:p-8">
+        <h3 className="text-[18px] text-center font-bold flex items-center justify-center gap-2">
+          <img src="/favicon.png" className="w-[18px] h-[18px]" alt="icon" />
+          Create an account
+        </h3>
 
-                        <form action="" className="w-full mt-5" onSubmit={handleSubmit}>
-                            <div className="form-group w-full mb-5 relative">
-                                <TextField
-                                    type="text"
-                                    name="name"
-                                    id="fullName"
-                                    label="Full Name"
-                                    placeholder="Enter your full name"
-                                    variant="outlined"
-                                    className="custom-textfield w-full mb-5"
-                                    value={formFields.name}
-                                    disabled={isLoading} // Disable input field when loading
-                                    onChange={onChangeInput}
-                                />
-                            </div>
-                            <div className="form-group w-full mb-5 relative">
-                                <TextField
-                                    type="email"
-                                    name="email"
-                                    id="email"
-                                    label="Email Id"
-                                    placeholder="Enter email"
-                                    variant="outlined"
-                                    className="custom-textfield w-full mb-5"
-                                    value={formFields.email}
-                                    disabled={isLoading} // Disable input field when loading
-                                    onChange={onChangeInput}
-                                />
-                            </div>
-                            <div className="form-group w-full mb-2 relative">
-                                <TextField
-                                    type={isLoading ? 'password' : (isShowPassword ? 'text' : 'password')}
-                                    name="password"
-                                    id="password"
-                                    label="Password"
-                                    placeholder="Enter password"
-                                    variant="outlined"
-                                    className="custom-textfield w-full mb-5"
-                                    value={formFields.password}
-                                    disabled={isLoading} // Disable input field when loading
-                                    onChange={onChangeInput}
-                                />
-                                <Button
-                                    className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
-                                    onClick={() => setIsShowPassword(!isShowPassword)}
-                                    disabled={isLoading} // Disable button when loading
-                                >
-                                    {isShowPassword === false ? (
-                                        <FaRegEyeSlash className="text-[20px]" />
-                                    ) : (
-                                        <FaRegEye className="text-[20px]" />
-                                    )}
-                                </Button>
-                            </div>
+        <form action="" className="w-full mt-5" onSubmit={handleSubmit}>
+          <div className="form-group w-full mb-5 relative">
+            <TextField
+              type="text"
+              name="name"
+              id="fullName"
+              label="Full Name"
+              placeholder="Enter your full name"
+              variant="outlined"
+              className="custom-textfield w-full"
+              value={formFields.name}
+              disabled={isLoading}
+              onChange={onChangeInput}
+            />
+          </div>
+          <div className="form-group w-full mb-5 relative">
+            <TextField
+              type="email"
+              name="email"
+              id="email"
+              label="Email Id"
+              placeholder="Enter email"
+              variant="outlined"
+              className="custom-textfield w-full"
+              value={formFields.email}
+              disabled={isLoading}
+              onChange={onChangeInput}
+            />
+          </div>
+          <div className="form-group w-full mb-2 relative">
+            <TextField
+              type={isLoading ? 'password' : (isShowPassword ? 'text' : 'password')}
+              name="password"
+              id="password"
+              label="Password"
+              placeholder="Enter password"
+              variant="outlined"
+              className="custom-textfield w-full"
+              value={formFields.password}
+              disabled={isLoading}
+              onChange={onChangeInput}
+            />
+            <Button
+              type="button"
+              className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-[rgba(0,0,0,0.7)]"
+              onClick={() => setIsShowPassword(!isShowPassword)}
+              disabled={isLoading}
+            >
+              {isShowPassword ? (
+                <FaRegEye className="text-[20px]" />
+              ) : (
+                <FaRegEyeSlash className="text-[20px]" />
+              )}
+            </Button>
+          </div>
 
-                            <Button
-                                type="submit"
-                                className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"} !w-full !text-[15px] !font-semibold !mt-4 flex gap-3`}
-                                disabled={isLoading} // Disable submit button when loading
-                            >
-                                {
-                                    isLoading ? <CircularProgress color="inherit" /> : "Sign Up"
-                                }
-                            </Button>
+          <Button
+            type="submit"
+            className={`${isLoading ? 'buttonDisabled' : 'buttonPrimaryBlack'} !capitalize !w-full !text-[15px] !font-semibold !mt-4 flex gap-3`}
+            disabled={isLoading}
+          >
+            {isLoading ? <CircularProgress color="inherit" /> : 'Sign Up'}
+          </Button>
 
-                            <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-4">
-                                Already have an account?
-                                <Link
-                                    to="/login"
-                                    className="text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8 cursor-pointer text-[14px] font-medium"
-                                >
-                                    Sign In
-                                </Link>
-                            </p>
+          <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-4">
+            Already have an account?
+            <Link
+              to="/login"
+              className="text-[var(--bg-primary)] hover:text-blue-700 hover:underline underline-offset-8 cursor-pointer"
+            >
+              Sign In
+            </Link>
+          </p>
 
-                            <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-1">
-                                Or continue with social account
-                            </p>
+          <p className="text-[14px] font-medium flex items-center justify-center gap-1 mt-1">
+            Or continue with social account
+          </p>
 
-                            <Button
-                                className="w-full !bg-[#f1f1f1] hover:!bg-[#ffe6db] hover:!text-gray-700 flex items-center gap-2 !text-[15px] !font-semibold !mt-2"
-                                disabled={isLoading} onClick={authWithGoogle}
-                            >
-                                <FcGoogle className="text-[18px]" />
-                                Sign Up with Google
-                            </Button>
-                        </form>
-                    </div>
-                </div>
-            </section>
+          <Button
+            className="w-full !capitalize !bg-[#f1f1f1] hover:!bg-[#ffe6db] hover:!text-gray-700 flex items-center gap-2 !text-[15px] !font-semibold !mt-2"
+            disabled={isLoading}
+            onClick={authWithGoogle}
+          >
+            <FcGoogle className="text-[18px]" />
+            Sign Up with Google
+          </Button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
 
-        </div>
     )
 }
 

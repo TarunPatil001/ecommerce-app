@@ -338,6 +338,8 @@ import { Button, Rating } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { MyContext } from '../../App';
 import PropTypes from 'prop-types';
+import { toast } from 'react-hot-toast';
+import { deleteData, postData } from '../../utils/api';
 
 const ProductDetailsContent = (props) => {
     const [checked, setChecked] = useState(false);
@@ -347,6 +349,7 @@ const ProductDetailsContent = (props) => {
     const [selectedRam, setSelectedRam] = useState(null);
     const [isAdded, setIsAdded] = useState(false);
     const [cartItem, setCartItem] = useState(null);
+    const [isAddedWishlist, setIsAddedWishlist] = useState(false);
 
     const context = useContext(MyContext);
     const navigate = useNavigate(); // React Router's navigate hook for redirection
@@ -435,6 +438,92 @@ const ProductDetailsContent = (props) => {
         }
     };
 
+
+    useEffect(() => {
+        if (context?.userData !== null && Array.isArray(context?.wishlistData)) {
+            const isWishlistItem = context.wishlistData.filter((item) =>
+                item?.productId?.includes(props?.product?._id)
+            );
+
+            setIsAddedWishlist(isWishlistItem.length > 0); // Set to true if the item exists in the wishlist
+        } else {
+            setIsAddedWishlist(false);
+        }
+    }, [context?.wishlistData, props?.product?._id, context?.userData]);
+
+    const handleAddToMyList = async (item) => {
+        if (!context?.userData) {
+            context?.openAlertBox("error", "You are not logged in.");
+            return;
+        }
+
+        // Find the wishlist item ID if it exists
+        const wishlistItem = context?.wishlistData?.find((w) => w.productId === item._id);
+        const wishlistItemId = wishlistItem?._id; // Correct wishlist item ID
+
+        const obj = {
+            productId: item._id,
+            userId: context?.userData?._id,
+            productTitle: item.name,
+            image: item.images[0],
+            rating: item.rating,
+            price: item.price,
+            oldPrice: item.oldPrice,
+            brand: item.brand,
+            discount: item.discount,
+        };
+
+        console.log("Item ID:", item?._id);
+        console.log("Wishlist Item ID:", wishlistItemId);
+
+        try {
+            if (wishlistItemId) {
+                // Item exists in wishlist, so remove it
+                const endpoint = `/api/wishlist/remove-from-wishlist/${wishlistItemId}`;
+                await toast.promise(deleteData(endpoint), {
+                    loading: "Removing from wishlist...",
+                    success: (res) => {
+                        if (!res.error) {
+                            setIsAddedWishlist(false); // Set state to removed
+                            context?.getWishlistData(); // Refresh wishlist
+                            return res?.message || "Item removed from wishlist!";
+                        } else {
+                            throw new Error(res?.message || "Failed to remove from wishlist.");
+                        }
+                    },
+                    error: (err) => {
+                        console.error("Error Response:", err);
+                        return err?.response?.data?.message || err?.message || "Something went wrong!";
+                    },
+                });
+            } else {
+                // Item not in wishlist, so add it
+                const endpoint = "/api/wishlist/add-to-wishlist";
+                await toast.promise(postData(endpoint, obj), {
+                    loading: "Adding to wishlist...",
+                    success: (res) => {
+                        if (!res.error) {
+                            setIsAddedWishlist(true); // Set state to added
+                            context?.getWishlistData(); // Refresh wishlist
+                            return res?.message || "Item added to wishlist!";
+                        } else {
+                            throw new Error(res?.message || "Failed to add to wishlist.");
+                        }
+                    },
+                    error: (err) => {
+                        console.error("Error Response:", err);
+                        return err?.response?.data?.message || err?.message || "Something went wrong!";
+                    },
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            context?.openAlertBox("error", "Unexpected error occurred. Please try again.");
+        }
+    };
+
+
+
     return (
         <>
             <h1 className="text-[20px] text-[var(--text-dark)] font-bold mb-1 productBrand">
@@ -464,7 +553,7 @@ const ProductDetailsContent = (props) => {
 
             <hr className="my-2" />
 
-            <div className="flex flex-col gap-3 py-1">
+            {/* <div className="flex flex-col gap-3 py-1">
                 <div className="flex items-center gap-3">
                     <span className="price text-[var(--text-dark)] text-[28px] font-medium flex items-center gap-0.5">
                         ₹<span>{new Intl.NumberFormat('en-IN').format(`${props?.product?.price}`)}</span>
@@ -507,19 +596,62 @@ const ProductDetailsContent = (props) => {
                         }
                     </div>
                 </div>
+            </div> */}
+
+            <div className="flex flex-col gap-3 py-1">
+                {/* Price Section */}
+                <div className="flex flex-row sm:items-center gap-2 sm:gap-3">
+                    <span className="price text-[var(--text-dark)] text-2xl md:text-[28px] font-medium flex items-center gap-0.5">
+                        ₹<span>{new Intl.NumberFormat('en-IN').format(`${props?.product?.price}`)}</span>
+                    </span>
+
+                    <span className="oldPrice text-[var(--text-light)] text-sm md:text-[16px] font-medium flex items-center gap-0.5">
+                        <span className="line-through">₹<span>{new Intl.NumberFormat('en-IN').format(`${props?.product?.oldPrice}`)}</span></span>
+                    </span>
+
+                    <span className="uppercase text-sm md:text-[16px] text-[var(--off-color)] font-medium flex items-center">
+                        ({`${props?.product?.discount}`}% OFF)
+                    </span>
+                </div>
+
+                {/* Stock Section */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5">
+                    {/* Stock Count */}
+                    <div className="flex items-center">
+                        <span className="text-sm md:text-[16px] font-normal flex items-center gap-2">
+                            Available in stocks:
+                            {props?.product?.countInStock > 0 ? (
+                                <span className="font-bold text-[var(--rating-star-color)]">
+                                    {`${props?.product?.countInStock} Items`}
+                                </span>
+                            ) : (
+                                <span className="p-1 text-[12px] bg-red-50 font-bold text-red-500 border border-red-500 capitalize">
+                                    Out of Stock
+                                </span>
+                            )}
+                        </span>
+                    </div>
+
+                    {/* Stock Status */}
+                    <div className="flex flex-col gap-1">
+                        {props?.product?.countInStock === 0 ? (
+                            <span className="normal-case border bg-[#fff2e5] p-1 px-2 border-orange-500 text-orange-500 text-sm md:text-[16px] font-medium">
+                                There are not enough products in stock
+                            </span>
+                        ) : (
+                            <span className="capitalize border bg-[#e5ffe8] p-1 px-2 border-green-500 text-green-500 text-sm md:text-[16px] font-medium">
+                                In stock
+                            </span>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/* Product Details */}
-            <div className="shadow-sm w-full px-8 border rounded-md mb-5 description py-5 mt-3">
-                <h2 className="text-[18px] font-bold text-[var(--text-dark)] mb-3">Description:</h2>
-                <p className="text-[16px] text-justify">
-                    {props?.product?.description || "No description available."}
-                </p>
-            </div>
+
 
             {/* Product Options */}
             {props?.product?.size?.length > 0 && (
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 my-4">
                     <span className="text-[16px] font-bold">Size:</span>
                     <div className="flex items-center gap-1 actions">
                         {props?.product?.size?.map((size, index) => (
@@ -595,7 +727,7 @@ const ProductDetailsContent = (props) => {
                 </Button>
             </div>
 
-            <div className="flex items-center gap-4 my-4">
+            {/* <div className="flex items-center gap-4 my-4">
                 <input id="wishlist-checkbox" type="checkbox" checked={checked} onChange={() => setChecked(!checked)} className="hidden" />
                 <label htmlFor="wishlist-checkbox" className="flex items-center gap-1 cursor-pointer group link text-[16px]">
                     {checked ? (
@@ -609,7 +741,44 @@ const ProductDetailsContent = (props) => {
                 <span className="flex items-center gap-2 text-[16px] cursor-pointer link transition-all duration-300">
                     <IoGitCompareOutline className="text-[20px]" />Add to Compare
                 </span>
+            </div> */}
+            <div className="flex flex-col items-start sm:flex-row sm:items-center gap-4 my-4 relative z-50">
+                <input
+                    id="wishlist-checkbox"
+                    type="checkbox"
+                    checked={isAddedWishlist}
+                    onChange={() => handleAddToMyList(props?.product)}
+                    className="hidden"
+                />
+
+                <label
+                    htmlFor="wishlist-checkbox"
+                    className="flex items-center gap-1 cursor-pointer group link text-[16px]"
+                >
+                    <div className="relative">
+                        {isAddedWishlist ? (
+                            <>
+                                <IoMdHeart className="text-[22px] text-red-500 transition-all duration-300" />
+                                <IoMdHeartEmpty className="text-[22px] text-white absolute inset-0 transition-opacity duration-300" />
+                            </>
+                        ) : (
+                            <>
+                                <IoMdHeart className="text-[22px] text-[rgba(0,0,0,0.3)] transition-all duration-300" />
+                                <IoMdHeartEmpty className="text-[22px] text-white absolute inset-0 transition-opacity duration-300" />
+                            </>
+                        )}
+                    </div>
+                    <span className="transition-all duration-300">Add to Wishlist</span>
+                </label>
+
+                <span className="line !h-[15px] mx-0.5 hidden sm:block"></span>
+
+                <span className="flex items-center gap-2 text-[16px] cursor-pointer link transition-all duration-300">
+                    <IoGitCompareOutline className="text-[20px]" />
+                    Add to Compare
+                </span>
             </div>
+
         </>
     );
 };

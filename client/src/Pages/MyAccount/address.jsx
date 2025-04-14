@@ -27,8 +27,8 @@ const Address = () => {
     const formRef = useRef(); // Create ref to the form
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [setIsLoading2] = useState(false);
-    // const [isLoading3, setIsLoading3] = useState(false);
+    const [isLoading2, setIsLoading2] = useState(false);
+    const [isLoading3, setIsLoading3] = useState(false);
     const [address, setAddress] = useState([]);
     const [isAddressType, setIsAddressType] = useState("");
     const [selectedValue, setSelectedValue] = useState(false);
@@ -48,6 +48,8 @@ const Address = () => {
     const pincodeRef = useRef(null);
     const mobileRef = useRef(null);
     const addressTypeRef = useRef(null);
+
+    const dropdownRef = useRef(null);
 
     const [formFields, setFormFields] = useState({
         name: '',
@@ -541,10 +543,49 @@ const Address = () => {
         }
     };
 
+    const handleToggle = (e, index) => {
+        e.stopPropagation();
+        if (context?.windowWidth < 992) {
+            setIsOpen((prev) => (prev === index ? false : index));
+        }
+    };
+
+    const handleMouseEnter = (index) => {
+        if (context?.windowWidth >= 992) {
+            setIsOpen(index);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (context?.windowWidth >= 992) {
+            setIsOpen(false);
+        }
+    };
+
+    // 🧠 Close on outside click
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <>
-            <section className="py-10 w-full">
+            {/* <section className="py-10 w-full">
                 <div className="container flex gap-5">
                     <AccountSidebar />
                     <div className="col-2 w-[100%]">
@@ -591,19 +632,19 @@ const Address = () => {
                                                         className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
                                                         onClick={() => handleSelectAddress(address?._id)} // Clicking the box selects the radio
                                                     >
-                                                        <div className="flex items-start w-full">
-                                                            {/* Radio Button with Label */}
-                                                            <label htmlFor={`address-${index}`} className="cursor-pointer w-full flex items-start mr-[70px] p-2">
+                                                        <div className="flex items-start w-full"> */}
+            {/* Radio Button with Label */}
+            {/* <label htmlFor={`address-${index}`} className="cursor-pointer w-full flex items-start mr-[70px] p-2">
                                                                 <Radio
                                                                     id={`address-${index}`}
                                                                     name="address"
                                                                     checked={selectedValue === address?._id}
                                                                     value={address?._id}
                                                                     onChange={handleSelectAddress}
-                                                                />
+                                                                /> */}
 
-                                                                {/* Address Content */}
-                                                                <div className="w-full px-5 text-[14px] mt-2">
+            {/* Address Content */}
+            {/* <div className="w-full px-5 text-[14px] mt-2">
                                                                     <div className="flex flex-col items-start mb-2 gap-2">
                                                                         <span className="bg-gray-200 px-2 rounded-sm">{addressType}</span>
                                                                         <div className="flex gap-5 font-semibold">
@@ -613,10 +654,10 @@ const Address = () => {
                                                                     </div>
                                                                     <div className="w-auto">{fullAddress} - <span className="font-semibold">{pincode}</span></div>
                                                                 </div>
-                                                            </label>
+                                                            </label> */}
 
-                                                            {/* Edit/Delete Popover */}
-                                                            <div
+            {/* Edit/Delete Popover */}
+            {/* <div
                                                                 className="relative inline-block"
                                                                 onMouseEnter={() => setIsOpen(index)}
                                                                 onMouseLeave={() => setIsOpen(false)}
@@ -674,6 +715,338 @@ const Address = () => {
                             </form>
                         </div>
 
+                    </div>
+                </div>
+            </section> */}
+
+            <section className="py-10 w-full">
+                <div className="container gap-5 flex w-full flex-col sm:flex-row">
+                    {
+                        context?.windowWidth > 992 &&
+                        <AccountSidebar />
+                    }
+                    <div className="w-full"> {/* Adjust width based on sidebar */}
+                        <div className="card bg-white p-5 shadow-md rounded-md mb-5 h-full">
+                            <form onSubmit={handleSubmit}>
+                                <div className="flex flex-wrap flex-row items-start sm:items-center justify-between mb-2 gap-4">
+                                    <h2 className="font-bold text-[20px]">Address Details</h2>
+                                    {address?.length > 0 && (
+                                        <Button
+                                            className={`h-[40px] buttonPrimaryBlack !capitalize !text-white flex items-center justify-center gap-1 rounded-md px-4 text-[14px] ${isLoading ? "cursor-not-allowed" : ""
+                                                }`}
+                                            onClick={() => handleClickOpen()}
+                                            disabled={isLoading3}
+                                        >
+                                            <span className="text-center flex items-center justify-center">
+                                                {isLoading3 ? (
+                                                    <CircularProgress color="inherit" />
+                                                ) : (
+                                                    <>
+                                                        <FiPlus className="text-[16px] font-bold" /> Add {context?.windowWidth < 992 ? "" : "Address"}
+                                                    </>
+                                                )}
+                                            </span>
+                                        </Button>
+                                    )}
+                                </div>
+                            </form>
+
+                            <Divider />
+
+                            {/* <div className="flex flex-col gap-5 mt-6">
+                                    <div
+                                        className={`w-full grid grid-cols-1 gap-4 text-md ${isLoading ? "cursor-not-allowed" : ""
+                                            }`}
+                                    >
+                                        {Array.isArray(address) && address.length > 0 ? (
+                                            address.map((address, index) => {
+                                                const name = address?.name;
+                                                const mobile = address?.mobile;
+                                                const addressType = address?.addressType;
+                                                const pincode = address?.pincode;
+                                                const fullAddress = [
+                                                    address?.address_line1,
+                                                    address?.landmark,
+                                                    address?.city,
+                                                    address?.state,
+                                                    address?.country,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(", ");
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
+                                                        onClick={() => handleSelectAddress(address?._id)}
+                                                    >
+                                                        <div className="flex flex-col sm:flex-row items-start w-full">
+                                                            <label
+                                                                htmlFor={`address-${index}`}
+                                                                className="cursor-pointer w-full flex items-start mr-0 sm:mr-[70px] p-2"
+                                                            >
+                                                                <Radio
+                                                                    id={`address-${index}`}
+                                                                    name="address"
+                                                                    checked={selectedValue === address?._id}
+                                                                    value={address?._id}
+                                                                    onChange={handleSelectAddress}
+                                                                />
+
+                                                                <div className="w-full px-5 text-[14px] mt-2">
+                                                                    <div className="flex flex-col items-start mb-2 gap-2">
+                                                                        <span className="bg-gray-200 px-2 rounded-sm">
+                                                                            {addressType}
+                                                                        </span>
+                                                                        <div className="flex flex-wrap gap-3 font-semibold">
+                                                                            <span>{name}</span>
+                                                                            <span>{mobile}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="w-auto">
+                                                                        {fullAddress} -{" "}
+                                                                        <span className="font-semibold">
+                                                                            {pincode}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+
+                                                            <div
+                                                                className="absolute top-0 right-0 inline-block mt-2 sm:mt-0"
+                                                                onMouseEnter={() => setIsOpen(index)}
+                                                                onMouseLeave={() => setIsOpen(false)}
+                                                            >
+                                                                <button className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200">
+                                                                    <TbDotsVertical size={20} />
+                                                                </button>
+
+                                                                {isOpen === index && (
+                                                                    <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2 z-10">
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditClick(
+                                                                                    address?.userId,
+                                                                                    address?._id
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </div>
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteAddress(
+                                                                                    e,
+                                                                                    address?._id
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </div>
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="w-full h-full flex flex-col items-center text-center">
+                                                <img
+                                                    src="../empty-myaddresses.png"
+                                                    className="w-[200px]"
+                                                    alt="Empty Address"
+                                                />
+                                                <span className="font-bold mt-5">
+                                                    No Addresses found in your account!
+                                                </span>
+                                                <span className="text-[14px]">Add a delivery address.</span>
+                                                <Button
+                                                    className={`h-[40px] !px-10 !mt-4 buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md p-3 text-[14px] ${isLoading ? "cursor-not-allowed" : ""
+                                                        }`}
+                                                    onClick={() => handleClickOpen()}
+                                                    disabled={isLoading}
+                                                >
+                                                    <span className="flex items-center justify-center">
+                                                        {isLoading ? (
+                                                            <CircularProgress color="inherit" />
+                                                        ) : (
+                                                            <>
+                                                                <FiPlus className="text-[16px] font-bold" />
+                                                                Add Address
+                                                            </>
+                                                        )}
+                                                    </span>
+                                                </Button>
+                                            </div>
+                                            )}
+                                            </div>
+                                            </div> */}
+
+                            <div className="grid grid-cols-1 gap-5 mt-4">
+                                {
+                                    isLoading ? (
+                                        <div className="w-full h-[200px] flex items-center justify-center">
+                                            <CircularProgress sx={{ color: 'var(--bg-primary)' }} />
+                                        </div>
+                                    )
+                                        :
+                                        Array.isArray(address) && address.length !== 0 ? (
+                                            address.map((address, index) => {
+                                                const fullAddress = [
+                                                    address?.address_line1,
+                                                    address?.landmark,
+                                                    address?.city,
+                                                    address?.state,
+                                                    address?.country,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(", ");
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="relative border addressBox w-full flex flex-col items-center justify-between rounded-md p-2 hover:border-[var(--bg-primary)]"
+                                                        onClick={() => handleSelectAddress(address?._id)}
+                                                    >
+                                                        <div className="flex flex-col md:flex-row items-start w-full">
+                                                            <label
+                                                                htmlFor={`address-${index}`}
+                                                                className="cursor-pointer w-full flex items-start p-2"
+                                                            >
+                                                                <Radio
+                                                                    id={`address-${index}`}
+                                                                    name="address"
+                                                                    checked={selectedValue === address?._id}
+                                                                    value={address?._id}
+                                                                    onChange={handleSelectAddress}
+                                                                />
+                                                                <div className="w-full px-5 text-[14px] mt-2">
+                                                                    <div className="flex flex-col items-start mb-2 gap-2">
+                                                                        <span className="bg-gray-200 px-2 rounded-sm">
+                                                                            {address?.addressType}
+                                                                        </span>
+                                                                        <div className="flex gap-5 font-semibold flex-wrap">
+                                                                            <span>{address?.name}</span>
+                                                                            <span>{address?.mobile}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="w-auto">
+                                                                        {fullAddress} -{" "}
+                                                                        <span className="font-semibold">{address?.pincode}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+
+                                                            {/* <div
+                                                        className="absolute top-2 right-2 inline-block mt-2 md:mt-0"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onMouseEnter={() => setIsOpen(index)}
+                                                        onMouseLeave={() => setIsOpen(false)}
+
+                                                    >
+                                                        <button
+                                                            className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <TbDotsVertical size={20} />
+                                                        </button>
+
+                                                        {isOpen === index && (
+                                                            <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2">
+                                                                <div
+                                                                    className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleEditClick(address?.userId, address?._id);
+                                                                    }}
+                                                                >
+                                                                    Edit
+                                                                </div>
+                                                                <div
+                                                                    className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteAddress(e, address?._id);
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </div>
+                                                            </span>
+                                                        )}
+                                                    </div> */}
+                                                            <div
+                                                                className="absolute top-2 right-2 inline-block mt-2 md:mt-0"
+                                                                onClick={(e) => handleToggle(e, index)}
+                                                                onMouseEnter={() => handleMouseEnter(index)}
+                                                                onMouseLeave={handleMouseLeave}
+                                                                ref={dropdownRef}
+                                                            >
+                                                                <button
+                                                                    className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-200"
+                                                                    onClick={(e) => handleToggle(e, index)}
+                                                                >
+                                                                    <TbDotsVertical size={20} />
+                                                                </button>
+
+                                                                {isOpen === index && (
+                                                                    <span className="absolute right-0 top-0 w-24 bg-white shadow-md rounded p-2">
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditClick(address?.userId, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </div>
+                                                                        <div
+                                                                            className="cursor-pointer p-1 hover:bg-gray-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteAddress(e, address?._id);
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </div>
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="w-full h-full flex flex-col items-center text-center">
+                                                <img src="../empty-myaddresses.png" className="w-[200px]" />
+                                                <span className="font-bold mt-5">No Addresses found in your account!</span>
+                                                <span className="text-[14px]">Add a delivery address.</span>
+                                                <Button
+                                                    className={`h-[40px] w-[250px] !capitalize !mt-4 px-6 buttonPrimaryBlack !text-white flex items-center justify-center gap-1 rounded-md text-[14px] ${isLoading3 ? "cursor-not-allowed" : ""
+                                                        }`}
+                                                    onClick={() => handleClickOpen()}
+                                                    disabled={isLoading}
+                                                >
+                                                    <span className="flex items-center justify-center">
+                                                        {isLoading ? (
+                                                            <CircularProgress color="inherit" size={18} />
+                                                        ) : (
+                                                            <>
+                                                                <FiPlus className="text-[16px] font-bold" /> Add Address
+                                                            </>
+                                                        )}
+                                                    </span>
+                                                </Button>
+                                            </div>
+                                        )
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -824,7 +1197,7 @@ const Address = () => {
                             size="small"
                         />
 
-                        <fieldset ref={addressTypeRef} className="border rounded-md p-2 hover:border-black">
+                        {/* <fieldset ref={addressTypeRef} className="border rounded-md p-2 hover:border-black">
                             <legend className="text-[12px] font-normal text-gray-700 px-2">Address Type*</legend>
                             <RadioGroup
                                 aria-labelledby="demo-radio-buttons-group-label"
@@ -837,8 +1210,22 @@ const Address = () => {
                                     <FormControlLabel value="Office" control={<Radio />} label="Office" />
                                 </div>
                             </RadioGroup>
-                        </fieldset>
+                        </fieldset> */}
 
+                        <fieldset ref={addressTypeRef} className="border rounded-md p-2 hover:border-black w-full">
+                            <legend className="text-[12px] font-normal text-gray-700 px-2">Address Type*</legend>
+                            <RadioGroup
+                                aria-labelledby="demo-radio-buttons-group-label"
+                                value={isAddressType}
+                                onChange={(e) => handleAddressType(e)}
+                                name="radio-buttons-group"
+                            >
+                                <div className="flex flex-wrap flex-row sm:items-center gap-2 sm:gap-4 px-2 sm:px-4">
+                                    <FormControlLabel value="Home" control={<Radio />} label="Home" />
+                                    <FormControlLabel value="Office" control={<Radio />} label="Office" />
+                                </div>
+                            </RadioGroup>
+                        </fieldset>
 
                         <FormControlLabel
                             control={
@@ -860,27 +1247,31 @@ const Address = () => {
 
                     </div>
 
-                    <div className='flex items-center justify-end px-5 pb-5 gap-5'>
+                    <div className='flex flex-row items-center justify-end px-4 pt-4 sm:px-5 pb-4 gap-4 sm:gap-5 '>
                         <Button
                             type="reset"
                             onClick={handleClose}
-                            className='buttonPrimaryWhite !text-white w-[150px] h-[40px] flex items-center justify-center gap-2 '
+                            className='buttonPrimaryWhite !text-white w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2'
                         >
                             <RiResetLeftFill className='text-[20px]' />Discard
                         </Button>
 
                         {
                             addressIdForEdit === undefined ? (
-                                <Button type='submit' className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading}>
-                                    {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>
-                                    }
+                                <Button
+                                    type='submit'
+                                    className={`${isLoading3 ? "buttonDisabled" : "buttonPrimaryBlack"} w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`}
+                                    disabled={isLoading3}
+                                >
+                                    {isLoading3 ? <CircularProgress color="inherit" /> : <><IoIosSave className='text-[20px]' />Create</>}
                                 </Button>
                             ) : (
-                                <Button className={`${isLoading === true ? "buttonDisabled" : "buttonPrimaryBlack"}  w-[150px] h-[40px] flex items-center justify-center gap-2`} disabled={isLoading} onClick={handleUpdate}>
-                                    {
-                                        isLoading ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>
-                                    }
+                                <Button
+                                    className={`${isLoading3 ? "buttonDisabled" : "buttonPrimaryBlack"} w-full sm:w-[150px] h-[40px] flex items-center justify-center gap-2`}
+                                    disabled={isLoading3}
+                                    onClick={handleUpdate}
+                                >
+                                    {isLoading3 ? <CircularProgress color="inherit" /> : <><FiEdit className='text-[20px]' />Update</>}
                                 </Button>
                             )
                         }

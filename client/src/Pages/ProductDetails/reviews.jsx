@@ -138,28 +138,120 @@ const Reviews = (props) => {
     };
 
     return (
+        // <div className="w-full productReviewsContainer">
+        //     <h4 className="font-bold text-[16px] mb-2">Customer questions and answers</h4>
+        //     <div className="reviewScroll w-full max-h-[1000px] overflow-y-scroll overflow-x-hidden customScroll pr-5">
+        //         {reviewData.length !== 0 ? (
+        //             reviewData.map((review, index) => (
+        //                 <div className="review w-full flex items-start justify-between p-5 border-b gap-2" key={index}>
+        //                     <div className="info w-[80%] flex items-start gap-3">
+        //                         <div className="img w-[50px] h-[50px] overflow-hidden rounded-full relative">
+        //                             <img
+        //                                 src={review.image}
+        //                                 alt="user_img"
+        //                                 className="absolute w-full h-full object-cover"
+        //                                 onError={(e) => e.target.src = "https://cdn.vectorstock.com/i/500p/08/19/gray-photo-placeholder-icon-design-ui-vector-35850819.jpg"}
+        //                             />
+        //                         </div>
+        //                         <div className="w-[80%]">
+        //                             <h4 className="font-semibold text-[16px]">{review.userName}</h4>
+        //                             <h5 className="font-semibold text-[14px] mb-1">
+        //                                 {formatDate(review?.createdAt)} &#x2022; {timeAgo(review?.createdAt)}
+        //                             </h5>
+        //                             <p className="text-[14px] text-justify">
+        //                                 {isExpanded ? review?.review : review?.review.split(" ").slice(0, wordLimit).join(" ") + (review?.review.split(" ").length > wordLimit ? "..." : "")}
+        //                             </p>
+
+        //                             {review?.review.split(" ").length > wordLimit && (
+        //                                 <button
+        //                                     className="text-[var(--bg-primary)] hover:underline underline-offset-2 mt-1"
+        //                                     onClick={() => setIsExpanded(!isExpanded)}
+        //                                 >
+        //                                     {isExpanded ? "Read Less" : "Read More"}
+        //                                 </button>
+        //                             )}
+        //                         </div>
+        //                     </div>
+        //                     <div className="w-[20%]">
+        //                         <Rating name="size-medium" value={review?.rating || 0} readOnly />
+        //                     </div>
+        //                 </div>
+        //             ))
+        //         ) : (
+        //             <div className="w-full border rounded-md flex items-center justify-center p-5 gap-2">
+        //                 <span>Be the first to review this product!</span>
+        //             </div>
+        //         )}
+        //     </div>
+
+        //     <br />
+
+        //     {context?.isLogin ? (
+        //         <div className="reviewForm bg-[#fafafa] p-4 rounded-md w-full flex flex-col items-start gap-2">
+        //             <form className="w-full flex flex-col gap-5" onSubmit={addReview}>
+        //                 <TextField
+        //                     label="Add a review"
+        //                     placeholder="Your feedback helps us improve!"
+        //                     multiline
+        //                     className="w-full textfieldReview"
+        //                     onChange={onChangeInput}
+        //                     name="review"
+        //                     value={reviews.review}
+        //                 />
+        //                 <div className="flex items-center justify-between gap-1">
+        //                     <Rating
+        //                         name="ratingStar"
+        //                         size="large"
+        //                         value={reviews.rating}
+        //                         onChange={(e, value) =>
+        //                             setReviews((prev) => ({ ...prev, rating: value }))
+        //                         }
+        //                     />
+        //                     <Button type="submit" className="!text-white !bg-yellow-400 !h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1">
+        //                         {isLoading ? <CircularProgress sx={{ color: "gray" }} /> : <><BsPencilSquare className="text-[16px]" /> Submit Review</>}
+        //                     </Button>
+        //                 </div>
+        //             </form>
+        //         </div>
+        //     ) : (
+        //         <div className="w-full border rounded-md flex items-center justify-center p-5 gap-2">
+        //             Please <Link to="/login" className="hover:underline text-[var(--bg-primary)]">login</Link> to write a review.
+        //         </div>
+        //     )}
+        // </div>
+
         <div className="w-full productReviewsContainer">
-            <h4 className="font-bold text-[16px] mb-2">Customer questions and answers</h4>
-            <div className="reviewScroll w-full max-h-[1000px] overflow-y-scroll overflow-x-hidden customScroll pr-5">
+            <h4 className="font-bold text-[16px] mb-2 sm:text-[18px]">Customer questions and answers</h4>
+
+            <div className="reviewScroll w-full max-h-[1000px] overflow-y-scroll overflow-x-hidden customScroll pr-2 sm:pr-5">
                 {reviewData.length !== 0 ? (
                     reviewData.map((review, index) => (
-                        <div className="review w-full flex items-start justify-between p-5 border-b gap-2" key={index}>
-                            <div className="info w-[80%] flex items-start gap-3">
+                        <div
+                            className="review w-full flex flex-col sm:flex-row items-start justify-between p-4 sm:p-5 border-b gap-3"
+                            key={index}
+                        >
+                            <div className="info w-full sm:w-[80%] flex flex-col sm:flex-row items-start gap-3">
                                 <div className="img w-[50px] h-[50px] overflow-hidden rounded-full relative">
                                     <img
                                         src={review.image}
                                         alt="user_img"
                                         className="absolute w-full h-full object-cover"
-                                        onError={(e) => e.target.src = "https://cdn.vectorstock.com/i/500p/08/19/gray-photo-placeholder-icon-design-ui-vector-35850819.jpg"}
+                                        onError={(e) =>
+                                        (e.target.src =
+                                            "https://cdn.vectorstock.com/i/500p/08/19/gray-photo-placeholder-icon-design-ui-vector-35850819.jpg")
+                                        }
                                     />
                                 </div>
-                                <div className="w-[80%]">
+                                <div className="w-full sm:w-[80%]">
                                     <h4 className="font-semibold text-[16px]">{review.userName}</h4>
                                     <h5 className="font-semibold text-[14px] mb-1">
                                         {formatDate(review?.createdAt)} &#x2022; {timeAgo(review?.createdAt)}
                                     </h5>
                                     <p className="text-[14px] text-justify">
-                                        {isExpanded ? review?.review : review?.review.split(" ").slice(0, wordLimit).join(" ") + (review?.review.split(" ").length > wordLimit ? "..." : "")}
+                                        {isExpanded
+                                            ? review?.review
+                                            : review?.review.split(" ").slice(0, wordLimit).join(" ") +
+                                            (review?.review.split(" ").length > wordLimit ? "..." : "")}
                                     </p>
 
                                     {review?.review.split(" ").length > wordLimit && (
@@ -172,7 +264,7 @@ const Reviews = (props) => {
                                     )}
                                 </div>
                             </div>
-                            <div className="w-[20%]">
+                            <div className="w-full sm:w-[20%] mt-2 sm:mt-0">
                                 <Rating name="size-medium" value={review?.rating || 0} readOnly />
                             </div>
                         </div>
@@ -198,7 +290,7 @@ const Reviews = (props) => {
                             name="review"
                             value={reviews.review}
                         />
-                        <div className="flex items-center justify-between gap-1">
+                        <div className="flex flex-wrap flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
                             <Rating
                                 name="ratingStar"
                                 size="large"
@@ -207,18 +299,32 @@ const Reviews = (props) => {
                                     setReviews((prev) => ({ ...prev, rating: value }))
                                 }
                             />
-                            <Button type="submit" className="!text-white !bg-yellow-400 !h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1">
-                                {isLoading ? <CircularProgress sx={{ color: "gray" }} /> : <><BsPencilSquare className="text-[16px]" /> Submit Review</>}
+                            <Button
+                                type="submit"
+                                className="!text-white !bg-yellow-400 !h-[40px] w-52 !text-[16px] flex items-center justify-center gap-1"
+                            >
+                                {isLoading ? (
+                                    <CircularProgress sx={{ color: "gray" }} />
+                                ) : (
+                                    <>
+                                        <BsPencilSquare className="text-[16px]" /> Submit Review
+                                    </>
+                                )}
                             </Button>
                         </div>
                     </form>
                 </div>
             ) : (
                 <div className="w-full border rounded-md flex items-center justify-center p-5 gap-2">
-                    Please <Link to="/login" className="hover:underline text-[var(--bg-primary)]">login</Link> to write a review.
+                    Please{" "}
+                    <Link to="/login" className="hover:underline text-[var(--bg-primary)]">
+                        login
+                    </Link>{" "}
+                    to write a review.
                 </div>
             )}
         </div>
+
     );
 };
 

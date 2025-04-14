@@ -140,6 +140,13 @@ nav ul button:hover {
   color: #fff !important;
 }
 
+/* Hide disabled buttons */
+.productDetailImageOptions .swiper-button-prev.swiper-button-disabled,
+.productDetailImageOptions .swiper-button-next.swiper-button-disabled {
+    display: none !important;
+}
+
+
 .swiper-pagination-bullet {
   width: 12px !important;
   /* Increase width */
@@ -771,3 +778,5 @@ input[type=number]::-webkit-outer-spin-button {
     opacity: 1;
   }
 }
+
+.css-y7ab46-MuiPaper-root-MuiDrawer-paper{ width: 400px !important; }

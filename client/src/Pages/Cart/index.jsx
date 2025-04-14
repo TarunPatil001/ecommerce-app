@@ -28,7 +28,7 @@ const CartPage = () => {
             setDiscount(calculatedDiscount);
             setTotalAmount(calculatedTotalAmount);
 
-           } else {
+        } else {
             setTotalMRP(0);
             setDiscount(0);
             setTotalAmount(0);
@@ -37,10 +37,13 @@ const CartPage = () => {
 
 
     return (
-        <section className="section py-5 pb-10">
-            <div className={`container w-[80%] max-w-[80%] ${context?.cartData?.length === 0 ? "flex items-center justify-center" : ""} flex gap-4`}>
 
-                <div className={`rightPart w-[70%] flex flex-col gap-2 rounded-md shadow`}>
+
+        <section className="section py-5 pb-10">
+            <div className={`container w-full ${window.innerWidth < 992 ? "max-w-[100%]" : "max-w-[80%]"} ${context?.cartData?.length === 0 ? "flex items-center justify-center" : ""} flex gap-4 flex-col lg:flex-row`}>
+
+                {/* Cart Items */}
+                <div className={`rightPart w-full lg:w-[70%] flex flex-col gap-2 rounded-md shadow`}>
 
                     <div className="h-[100%] shadow-sm rounded-md bg-white flex flex-col gap-2">
                         <div className="py-2 px-3">
@@ -57,9 +60,18 @@ const CartPage = () => {
                                         </span>
                                         <span className="text-[18px] mt-4">Your cart is empty!</span>
                                         <span className="text-[12px]">Add items to it now.</span>
-                                        <Link to="/" className="w-[30%] min-w-[30%] !flex !items-center !justify-center mt-4">
-                                            <Button className="buttonPrimaryBlack !normal-case w-[100%] min-w-[30%]" onClick={context.toggleCartPanel(false)}>Shop now</Button>
+                                        <Link
+                                            to="/"
+                                            className="w-[80%] sm:w-[30%] max-w-sm flex items-center justify-center mt-4"
+                                        >
+                                            <Button
+                                                className="buttonPrimaryBlack !normal-case w-full"
+                                                onClick={() => context.toggleCartPanel(false)}
+                                            >
+                                                Shop now
+                                            </Button>
                                         </Link>
+
                                     </div>
                                     :
                                     context?.cartData?.map((item, index) => {
@@ -72,9 +84,10 @@ const CartPage = () => {
                     </div>
                 </div>
 
-                <div className={`rightPart ${context?.cartData?.length === 0 ? "hidden" : "w-[30%]"}`}>
+                {/* Price Details */}
+                <div className={`rightPart ${context?.cartData?.length === 0 ? "hidden" : "w-full lg:w-[30%]"}`}>
                     <div className="shadow-md rounded-md bg-white flex flex-col gap-2 sticky top-[150px] z-50">
-                        <div className="cartTotals ">
+                        <div className="cartTotals">
                             <div className="py-2">
                                 <h2 className="uppercase px-4 py-1 text-[16px] font-bold text-[var(--text-light)] pb-2">Price Details <span className="capitalize">({context?.cartData?.length} Item{context?.cartData?.length <= 1 ? ("") : ("s")})</span></h2>
                             </div>
@@ -87,39 +100,6 @@ const CartPage = () => {
                                 <span className="text-[14px]">Discount on MRP</span>
                                 <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(discount)}</span>
                             </div>
-                            {/* <div className="flex items-center justify-between px-4 py-1">
-                                <span className="text-[14px]">Coupon Discount</span>
-                                <span className="price text-green-600 text-[14px] flex items-center gap-1">- ₹{new Intl.NumberFormat('en-IN').format(102)}</span>
-                                </div>
-                                <div className="flex items-center justify-between px-4 py-1">
-                                <span className="text-[14px]">Platform Fee</span>
-                                {
-                                    context.platformFee === 0 ? (
-                                        <span className="price text-green-600 text-[14px] flex items-center">Free</span>
-                                        ) : (
-                                            <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(49)}</span>
-                                            )
-                                            }
-                                            </div>
-                                            <div className="flex items-center justify-between px-4">
-                                            <span className="text-[14px]">Shipping Fee</span>
-                                            {
-                                                context.shippingFee === 0 ? (
-                                                    <span className="price text-green-600 text-[14px] flex items-center gap-1"><span className="line-through !text-[var(--text-dark)]"> ₹{new Intl.NumberFormat('en-IN').format(79)}</span>Free</span>
-                                                    ) : (
-                                                        <span className="price text-black text-[14px] flex items-center">₹{new Intl.NumberFormat('en-IN').format(79)}</span>
-                                                        )
-                                                        }
-                                                        </div>
-                                                        <div className="flex items-center justify-between px-4 py-0 pb-5">
-                                                        {
-                                                            context.shippingFee === 0 ? (
-                                                                <span className="text-[12px]">Free Shipping for you</span>
-                                                                ) : (""
-                                                                )
-                                                                }
-                                                                
-                                                                </div> */}
                             <Divider />
                             <div className="flex items-center justify-between px-4 py-4 font-bold text-[18px]">
                                 <span>Total Amount:</span>
@@ -134,8 +114,9 @@ const CartPage = () => {
                 </div>
 
             </div>
-
         </section>
+
+
     )
 }
 

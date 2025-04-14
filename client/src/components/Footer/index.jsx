@@ -474,7 +474,7 @@ const Footer = () => {
                   </div>
                 </div>
               </form>
-              
+
             </div>
           </div>
         </div>
@@ -519,7 +519,7 @@ const Footer = () => {
 
 
       {/* Cart Panel */}
-      <Drawer open={context.openCartPanel} onClose={context.toggleCartPanel(false)} anchor="right">
+      {/* <Drawer open={context.openCartPanel} onClose={context.toggleCartPanel(false)} anchor="right">
         <div className="flex items-center justify-between px-4 py-1 !w-[400px] !max-w-[400px]">
           <h3 className="text-[18px] !font-semibold text-[var(--text-dark)]">Shopping Cart ({context.cartData.length})</h3>
           <Button
@@ -529,15 +529,15 @@ const Footer = () => {
             <IoCloseOutline className="text-[50px]" onClose={context.toggleCartPanel(false)} />
           </Button>
         </div>
-        <Divider />
+        <Divider /> */}
         {/* <CartPanel  /> */}
-        {
+        {/* {
           context?.cartData?.length !== 0 ?
             <CartPanel data={context?.cartData} />
             :
-            <div className='w-full h-full flex flex-col items-center justify-center gap-2'>
+            <div className='w-full h-full flex flex-col items-center justify-center gap-2'> */}
               {/* <MdOutlineRemoveShoppingCart className='text-[40px]' /> */}
-              <span className="flex items-center justify-center">
+              {/* <span className="flex items-center justify-center">
                 <img src="../empty-cart.png" alt="empty-cart-img" className="w-[200px]" />
               </span>
               <span className="text-[18px] mt-4">Your cart is empty!</span>
@@ -548,6 +548,40 @@ const Footer = () => {
             </div>
         }
 
+      </Drawer> */}
+
+      <Drawer open={context.openCartPanel} onClose={context.toggleCartPanel(false)} anchor="right">
+        <div className="flex items-center justify-between px-4 py-1 w-full">
+          <h3 className="text-[18px] font-semibold text-[var(--text-dark)]">
+            Shopping Cart ({context.cartData.length})
+          </h3>
+          <Button
+            className="!w-[40px] !h-[40px] !min-w-[40px] shadow-sm !text-red-500 rounded-full flex items-center justify-center"
+            onClick={context.toggleCartPanel(false)}
+          >
+            <IoCloseOutline className="text-[30px]" />
+          </Button>
+        </div>
+        <Divider />
+
+        {
+          context?.cartData?.length !== 0 ? (
+            <CartPanel data={context?.cartData} />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 px-4 py-6">
+              <span className="flex items-center justify-center">
+                <img src="../empty-cart.png" alt="empty-cart-img" className="w-[200px] max-w-full" />
+              </span>
+              <span className="text-[18px] mt-4 text-center">Your cart is empty!</span>
+              <span className="text-[12px] text-center">Add items to it now.</span>
+              <Link to="/" className="w-full sm:w-[50%] mt-2 flex items-center justify-center">
+                <Button className="buttonPrimaryBlack normal-case w-full" onClick={context.toggleCartPanel(false)}>
+                  Shop now
+                </Button>
+              </Link>
+            </div>
+          )
+        }
       </Drawer>
 
 
