@@ -5,9 +5,10 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Navigation } from "swiper/modules";
 import PropTypes from "prop-types";
-import BannerBoxV2 from "../bannerBoxV2";
+
 import { useContext } from "react";
 import { MyContext } from "../../App";
+import BannerBoxV2 from "../BannerBoxV2";
 
 // const AdsBannerSliderV2 = (props) => {
 //   return (
