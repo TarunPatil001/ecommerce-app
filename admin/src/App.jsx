@@ -1,7 +1,7 @@
-import React, { createContext, forwardRef, useState } from 'react';
+import { createContext, forwardRef, useState } from 'react';
 import './App.css'
 import './responsive.css'
-import { BrowserRouter, createBrowserRouter, Route, RouterProvider, Routes } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
 import Dashboard from './Pages/Dashboard/index';
@@ -42,8 +42,6 @@ import AddBannersV1 from './Pages/Banners/addBannersV1';
 import BannersV1List from './Pages/Banners';
 import BlogList from './Pages/Blog';
 import AddBlog from './Pages/Blog/addBlog';
-import { Button } from '@mui/material';
-import { RxCross2 } from 'react-icons/rx';
 
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -56,7 +54,7 @@ function App() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
-  const apiUrl = import.meta.env.VITE_API_URL;
+  // const apiUrl = import.meta.env.VITE_API_URL;
   const [userData, setUserData] = useState(null);
   const [address, setAddress] = useState([]);
   const [addressIdNo, setAddressIdNo] = useState(null);

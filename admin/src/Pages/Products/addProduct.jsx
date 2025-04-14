@@ -11,7 +11,6 @@ import { editData, fetchDataFromApi, postData } from '../../utils/api';
 import { RiResetLeftFill } from 'react-icons/ri';
 import { IoIosSave } from 'react-icons/io';
 import { FiEdit } from 'react-icons/fi';
-import { motion, AnimatePresence } from "framer-motion";
 
 
 const ITEM_HEIGHT = 48;

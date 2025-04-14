@@ -1,5 +1,5 @@
 import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import  { useContext, useEffect, useRef, useState } from 'react'
 import { FiEdit } from 'react-icons/fi';
 import { IoIosSave } from 'react-icons/io';
 import { RiResetLeftFill } from 'react-icons/ri';
@@ -7,15 +7,15 @@ import UploadBox from '../../Components/UploadBox';
 import { IoClose } from 'react-icons/io5';
 import { MyContext } from '../../App';
 import toast from 'react-hot-toast';
-import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/api';
+import { editData, fetchDataFromApi, postData } from '../../utils/api';
 
 const AddBannersV1 = () => {
 
     const context = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
+    // const [isLoading2, setIsLoading2] = useState(false);
     // const [isLoading3, setIsLoading3] = useState(false);
-    const [previews, setPreviews] = useState([]);
+    // const [previews, setPreviews] = useState([]);
 
     // Consolidated states for banner files
     const [bannerFiles, setBannerFiles] = useState({
@@ -36,8 +36,8 @@ const AddBannersV1 = () => {
     const [productCategory2, setProductCategory2] = useState('');
     const [productCategory3, setProductCategory3] = useState('');
     const [alignInfo, setAlignInfo] = useState('');
-    const [isLoadingReset1, setIsLoadingReset1] = useState(false);
-    const [isLoadingSave1, setIsLoadingSave1] = useState(false);
+    // const [isLoadingReset1, setIsLoadingReset1] = useState(false);
+    // const [isLoadingSave1, setIsLoadingSave1] = useState(false);
     const [filteredCategories, setFilteredCategories] = useState([]);
     const [filteredSubCategories, setFilteredSubCategories] = useState([]); // ✅ Ensures default is an empty array
     const [multiple, setMultiple] = useState(false);  // Default: Single upload
@@ -195,7 +195,7 @@ const AddBannersV1 = () => {
     };
 
 
-    const selectedCatFun2 = (categoryId2, categoryName2) => {
+    const selectedCatFun2 = (categoryId2) => {
         setFormFields((prev) => ({
             ...prev,
             subCategoryId: categoryId2,  // ✅ Make sure subCategoryId is set
@@ -208,7 +208,7 @@ const AddBannersV1 = () => {
     };
 
 
-    const selectedCatFun3 = (categoryId3, categoryName3) => {
+    const selectedCatFun3 = (categoryId3) => {
         setFormFields((prev) => ({
             ...prev,
             thirdSubCategoryId: categoryId3,  // ✅ Ensure thirdSubCategoryId is set

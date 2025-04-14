@@ -1,17 +1,15 @@
 import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tooltip } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 import { GoPlus } from 'react-icons/go'
-import { RiDeleteBin6Line, RiDownloadCloud2Line } from 'react-icons/ri'
-import { Link } from 'react-router-dom'
+import { RiDeleteBin6Line } from 'react-icons/ri'
 import { MdOutlineEdit } from 'react-icons/md'
-import { IoEyeOutline } from 'react-icons/io5'
 import { MyContext } from '../../App'
 import toast from 'react-hot-toast'
 import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+// const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const columns = [
     { id: 'image', label: 'IMAGE', minWidth: 250, align: 'left' },

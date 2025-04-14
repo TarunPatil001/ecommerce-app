@@ -1,100 +1,82 @@
-import { useState, useContext, useMemo, useRef } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { MyContext } from '../../App'
 import DashboardBoxes from '../../Components/DashboardBoxes'
-import { Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Pagination, Rating, Skeleton } from '@mui/material'
-import { Tooltip } from '@mui/material'
+import { Button } from '@mui/material'
 import { FiPlus } from "react-icons/fi";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import Badge from '../../Components/Badge';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import ProgressBar from '../../Components/ProgressBar';
-import { MdOutlineEdit, MdOutlineFilterListOff } from 'react-icons/md';
-import { IoEyeOutline } from 'react-icons/io5';
-import { RiDeleteBin6Line, RiDownloadCloud2Line } from "react-icons/ri";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Select from '@mui/material/Select';
-import { GoDotFill, GoPlus } from "react-icons/go";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis, Area, AreaChart } from 'recharts';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { GoDotFill } from "react-icons/go";
+import { CartesianGrid, Legend, ResponsiveContainer, Tooltip as RechartTooltip, XAxis, YAxis, Area, AreaChart } from 'recharts';
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
-import { deleteData, deleteMultipleData, fetchDataFromApi } from '../../utils/api'
-import SearchBox from '../../Components/SearchBox'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { fetchDataFromApi } from '../../utils/api'
 import Products from '../Products'
 import Orders from '../Orders'
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+// const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 
-const columns = [
-  {
-    id: 'product',
-    label: 'PRODUCT',
-    minWidth: 150,
-    align: 'left'
-  },
-  {
-    id: 'category',
-    label: 'BROAD CATEGORY',
-    minWidth: 170,
-    align: 'left'
-  },
-  {
-    id: 'subCategory',
-    label: 'SUB CATEGORY',
-    minWidth: 150,
-    align: 'left'
-  },
-  {
-    id: 'subCategory',
-    label: 'SPECIFIC CATEGORY',
-    minWidth: 180,
-    align: 'left'
-  },
-  {
-    id: 'price',
-    label: 'PRICE',
-    minWidth: 100,
-    align: 'left',
-    format: (value) => `$${value.toFixed(2)}`,
-  },
-  {
-    id: 'sales',
-    label: 'SALES',
-    minWidth: 130,
-    align: 'center'
-  },
-  {
-    id: 'rating',
-    label: 'RATING',
-    minWidth: 100,
-    align: 'center'
-  },
-  {
-    id: 'action',
-    label: 'ACTION',
-    minWidth: 130,
-    align: 'center'
-  },
-];
+// const columns = [
+//   {
+//     id: 'product',
+//     label: 'PRODUCT',
+//     minWidth: 150,
+//     align: 'left'
+//   },
+//   {
+//     id: 'category',
+//     label: 'BROAD CATEGORY',
+//     minWidth: 170,
+//     align: 'left'
+//   },
+//   {
+//     id: 'subCategory',
+//     label: 'SUB CATEGORY',
+//     minWidth: 150,
+//     align: 'left'
+//   },
+//   {
+//     id: 'subCategory',
+//     label: 'SPECIFIC CATEGORY',
+//     minWidth: 180,
+//     align: 'left'
+//   },
+//   {
+//     id: 'price',
+//     label: 'PRICE',
+//     minWidth: 100,
+//     align: 'left',
+//     format: (value) => `$${value.toFixed(2)}`,
+//   },
+//   {
+//     id: 'sales',
+//     label: 'SALES',
+//     minWidth: 130,
+//     align: 'center'
+//   },
+//   {
+//     id: 'rating',
+//     label: 'RATING',
+//     minWidth: 100,
+//     align: 'center'
+//   },
+//   {
+//     id: 'action',
+//     label: 'ACTION',
+//     minWidth: 130,
+//     align: 'center'
+//   },
+// ];
 
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: "auto",
-    },
-  },
-};
+// const MenuProps = {
+//   PaperProps: {
+//     style: {
+//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//       width: "auto",
+//     },
+//   },
+// };
 
 
 const Dashboard = () => {
@@ -103,7 +85,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isOpenOrder, setIsOpenOrder] = useState(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categoryFilterValue, setCategoryFilterValue] = useState("");
   const [page, setPage] = useState(0);
@@ -115,8 +97,8 @@ const Dashboard = () => {
   const [productCategory, setProductCategory] = useState([]);
   const [productCategory2, setProductCategory2] = useState([]);
   const [productCategory3, setProductCategory3] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
-  const [thirdLevelCategories, setThirdLevelCategories] = useState([]);
+  // const [subCategories, setSubCategories] = useState([]);
+  // const [thirdLevelCategories, setThirdLevelCategories] = useState([]);
 
   // States to manage selected rows and select all functionality
   const [selectedRows, setSelectedRows] = useState([]);
@@ -133,8 +115,8 @@ const Dashboard = () => {
   const [overallTotalSales, setOverallTotalSales] = useState(0);
 
   const [chartData, setChartData] = useState([]);
-  const [year, setYear] = useState(new Date().getFullYear());
-  const location = useLocation();
+  // const [year, setYear] = useState(new Date().getFullYear());
+  // const location = useLocation();
 
 
   useEffect(() => {
@@ -199,13 +181,13 @@ const Dashboard = () => {
 
 
 
-  const isShowOrderedProduct = (index) => {
-    if (isOpenOrder === index) {
-      setIsOpenOrder(null);
-    } else {
-      setIsOpenOrder(index);
-    }
-  }
+  // const isShowOrderedProduct = (index) => {
+  //   if (isOpenOrder === index) {
+  //     setIsOpenOrder(null);
+  //   } else {
+  //     setIsOpenOrder(index);
+  //   }
+  // }
 
 
   // // Handle Category Change
@@ -544,10 +526,10 @@ const Dashboard = () => {
   };
 
   // Update displayed orders based on current pagination
-  const paginatedOrders = useMemo(() => {
-    const startIndex = (pageOrder - 1) * rowsPerPage2;
-    return filteredOrders.slice(startIndex, startIndex + rowsPerPage2);
-  }, [filteredOrders, pageOrder, rowsPerPage2]);
+  // const paginatedOrders = useMemo(() => {
+  //   const startIndex = (pageOrder - 1) * rowsPerPage2;
+  //   return filteredOrders.slice(startIndex, startIndex + rowsPerPage2);
+  // }, [filteredOrders, pageOrder, rowsPerPage2]);
 
 
   // Fetch all orders on component mount

@@ -5,11 +5,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-import { fetchDataFromApi } from "../../utils/api";
+import { deleteData, fetchDataFromApi, postData } from "../../utils/api";
 import { Link, useParams } from "react-router-dom";
 import { RiStarSFill } from "react-icons/ri";
 import { Button, Rating } from "@mui/material";
 import { MyContext } from "../../App";
+import toast from "react-hot-toast";
 
 
 const timeAgo = (date) => {

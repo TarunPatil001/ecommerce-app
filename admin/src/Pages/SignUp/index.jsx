@@ -5,7 +5,7 @@ import { HiLogin } from "react-icons/hi";
 import { PiUserCirclePlusLight } from "react-icons/pi";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook, FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { FaRegEye } from "react-icons/fa";
 import { useContext } from 'react';
@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { postData } from '../../utils/api.js';
 import toast from 'react-hot-toast';
 
-import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { firebaseApp } from '../../firebase.jsx';
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
@@ -54,9 +54,9 @@ const SignUp = () => {
         setLoadingGoogle(true);
     }
 
-    function handleClickFb() {
-        setLoadingFb(true);
-    }
+    // function handleClickFb() {
+    //     setLoadingFb(true);
+    // }
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -186,15 +186,15 @@ const SignUp = () => {
 
                 console.log(user);
                 // ...
-            }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
+            }).catch(() => {
+                // // Handle Errors here.
+                // const errorCode = error.code;
+                // const errorMessage = error.message;
+                // // The email of the user's account used.
+                // const email = error.customData.email;
+                // // The AuthCredential type that was used.
+                // const credential = GoogleAuthProvider.credentialFromError(error);
+                // // ...
             });
     }
 

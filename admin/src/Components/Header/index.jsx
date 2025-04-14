@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
-import { Badge, Button, Divider, IconButton } from '@mui/material';
+import { Badge, Button, IconButton } from '@mui/material';
 import { FaRegBell, FaRegUser } from "react-icons/fa";
 import { styled } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { MdOutlineDoubleArrow, MdOutlineLogout } from "react-icons/md";
+import { MdOutlineLogout } from "react-icons/md";
 import { MyContext } from "../../App";
 import { useNavigate } from 'react-router-dom';
 import { fetchDataFromApi } from '../../utils/api';

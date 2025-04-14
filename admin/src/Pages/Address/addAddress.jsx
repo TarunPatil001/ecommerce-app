@@ -1,6 +1,5 @@
 import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { FaCloudUploadAlt } from 'react-icons/fa';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { MyContext } from '../../App';
 import { PhoneInput } from 'react-international-phone';
 import toast from 'react-hot-toast';
@@ -15,7 +14,7 @@ const AddAddress = () => {
     const formRef = useRef("");
     const [phone, setPhone] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [userId, setUserId] = useState("");
+    // const [userId, setUserId] = useState("");
     const [status, setStatus] = useState("");  // Default empty string
 
     const [formFields, setFormFields] = useState({

@@ -1,5 +1,5 @@
-import { Button, CircularProgress, MenuItem, Select } from '@mui/material';
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { Button, CircularProgress } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react'
 import { FiEdit } from 'react-icons/fi';
 import { IoIosSave } from 'react-icons/io';
 import { RiResetLeftFill } from 'react-icons/ri';
@@ -7,7 +7,7 @@ import UploadBox from '../../Components/UploadBox';
 import { IoClose } from 'react-icons/io5';
 import { MyContext } from '../../App';
 import toast from 'react-hot-toast';
-import { deleteImages, editData, fetchDataFromApi, postData } from '../../utils/api';
+import { editData, fetchDataFromApi, postData } from '../../utils/api';
 import Editor from 'react-simple-wysiwyg';
 
 const AddBlog = () => {

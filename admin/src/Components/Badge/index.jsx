@@ -1,3 +1,4 @@
+import { PropTypes } from 'prop-types';
 
 const Badge = (props) => {
     return (
@@ -14,5 +15,9 @@ const Badge = (props) => {
 
     )
 }
+
+Badge.propTypes = {
+    status: PropTypes.string.isRequired,
+};
 
 export default Badge

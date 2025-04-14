@@ -4,13 +4,11 @@ import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 import { ImGift } from "react-icons/im";
 import { IoStatsChart } from "react-icons/io5";
-import { MdOutlineKeyboardDoubleArrowDown, MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
-import { ImLibrary } from "react-icons/im";
-import { FaChartPie } from 'react-icons/fa';
 import { GiShoppingBag } from "react-icons/gi";
 import { BiSolidCategoryAlt } from 'react-icons/bi';
 import { AiOutlineStock } from "react-icons/ai";
 import { FaUserLarge } from 'react-icons/fa6';
+import { PropTypes } from 'prop-types';
 
 const DashboardBoxes = (props) => {
     return (
@@ -126,5 +124,13 @@ const DashboardBoxes = (props) => {
         </>
     )
 }
+
+DashboardBoxes.propTypes = {
+    category: PropTypes.number.isRequired,
+    products: PropTypes.number.isRequired,
+    orders: PropTypes.number.isRequired,
+    users: PropTypes.number.isRequired,
+    sales: PropTypes.number.isRequired,
+};
 
 export default DashboardBoxes

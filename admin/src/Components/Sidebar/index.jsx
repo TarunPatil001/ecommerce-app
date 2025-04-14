@@ -28,7 +28,7 @@ const Sidebar = () => {
   const [subMenuIndex4, setSubMenuIndex4] = useState(false);
   const [subMenuIndex5, setSubMenuIndex5] = useState(false);
 
-  const { id } = useParams();
+  // const { id } = useParams();
 
   // Define a mapping of paths to menu names
   const menuMapping = {
